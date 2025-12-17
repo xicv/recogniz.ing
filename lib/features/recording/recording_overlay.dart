@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -87,13 +88,16 @@ class RecordingOverlay extends ConsumerWidget {
                           color: Colors.white70,
                         ),
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Check terminal for debug logs',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.white54,
-                        ),
-                  ),
+                  // Only show debug text in debug mode
+                  if (kDebugMode) ...[
+                    const SizedBox(height: 16),
+                    Text(
+                      'Check terminal for debug logs',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Colors.white54,
+                          ),
+                    ),
+                  ],
                 ],
               ],
             ),

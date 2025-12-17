@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -6,7 +7,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/providers/app_providers.dart';
 import '../../core/services/gemini_service.dart';
 import '../../core/theme/app_theme.dart';
-import '../../main.dart';
 import 'widgets/prompt_editor.dart';
 import 'widgets/settings_section.dart';
 import 'widgets/vocabulary_editor.dart';
@@ -26,15 +26,17 @@ class SettingsPage extends ConsumerWidget {
         children: [
           Text(
             'Settings',
-            style: Theme.of(context).textTheme.headlineLarge,
-          ).animate().fadeIn(duration: 300.ms).slideX(begin: -0.1),
-          const SizedBox(height: 8),
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ).animate().fadeIn(duration: 300.ms),
+          const SizedBox(height: 4),
           Text(
             'Configure your voice typing experience',
             style: Theme.of(context).textTheme.bodyMedium,
-          ).animate().fadeIn(duration: 300.ms, delay: 100.ms),
+          ).animate().fadeIn(duration: 300.ms, delay: 50.ms),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
 
           // API Configuration
           SettingsSection(
@@ -43,12 +45,9 @@ class SettingsPage extends ConsumerWidget {
             children: [
               _buildApiKeyField(context, ref, settings.geminiApiKey),
             ],
-          )
-              .animate()
-              .fadeIn(duration: 300.ms, delay: 200.ms)
-              .slideY(begin: 0.1),
+          ).animate().fadeIn(duration: 300.ms, delay: 100.ms),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
           // Hotkey Settings
           SettingsSection(
@@ -58,16 +57,13 @@ class SettingsPage extends ConsumerWidget {
               ListTile(
                 title: const Text('Global Hotkey'),
                 subtitle: Text(settings.globalHotkey),
-                trailing: const Icon(LucideIcons.chevronRight),
+                trailing: const Icon(LucideIcons.chevronRight, size: 18),
                 onTap: () => _showHotkeyDialog(context, ref),
               ),
             ],
-          )
-              .animate()
-              .fadeIn(duration: 300.ms, delay: 300.ms)
-              .slideY(begin: 0.1),
+          ).animate().fadeIn(duration: 300.ms, delay: 150.ms),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
           // Custom Prompts
           SettingsSection(
@@ -75,7 +71,7 @@ class SettingsPage extends ConsumerWidget {
             icon: LucideIcons.messageSquare,
             action: IconButton(
               onPressed: () => _showPromptEditor(context, ref),
-              icon: const Icon(LucideIcons.plus),
+              icon: const Icon(LucideIcons.plus, size: 20),
               tooltip: 'Add Prompt',
             ),
             children: [
@@ -102,7 +98,7 @@ class SettingsPage extends ConsumerWidget {
                         : IconButton(
                             onPressed: () =>
                                 _showPromptEditor(context, ref, prompt: prompt),
-                            icon: const Icon(LucideIcons.edit, size: 18),
+                            icon: const Icon(LucideIcons.edit, size: 16),
                           ),
                     onTap: () {
                       ref
@@ -111,12 +107,9 @@ class SettingsPage extends ConsumerWidget {
                     },
                   )),
             ],
-          )
-              .animate()
-              .fadeIn(duration: 300.ms, delay: 400.ms)
-              .slideY(begin: 0.1),
+          ).animate().fadeIn(duration: 300.ms, delay: 200.ms),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
           // Custom Vocabulary
           SettingsSection(
@@ -124,7 +117,7 @@ class SettingsPage extends ConsumerWidget {
             icon: LucideIcons.bookOpen,
             action: IconButton(
               onPressed: () => _showVocabularyEditor(context, ref),
-              icon: const Icon(LucideIcons.plus),
+              icon: const Icon(LucideIcons.plus, size: 20),
               tooltip: 'Add Vocabulary',
             ),
             children: [
@@ -151,7 +144,7 @@ class SettingsPage extends ConsumerWidget {
                         : IconButton(
                             onPressed: () => _showVocabularyEditor(context, ref,
                                 vocabulary: vocab),
-                            icon: const Icon(LucideIcons.edit, size: 18),
+                            icon: const Icon(LucideIcons.edit, size: 16),
                           ),
                     onTap: () {
                       ref
@@ -160,12 +153,9 @@ class SettingsPage extends ConsumerWidget {
                     },
                   )),
             ],
-          )
-              .animate()
-              .fadeIn(duration: 300.ms, delay: 500.ms)
-              .slideY(begin: 0.1),
+          ).animate().fadeIn(duration: 300.ms, delay: 250.ms),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
           // Preferences
           SettingsSection(
@@ -174,37 +164,38 @@ class SettingsPage extends ConsumerWidget {
             children: [
               SwitchListTile(
                 title: const Text('Auto-copy to Clipboard'),
-                subtitle: const Text('Automatically copy transcription result'),
+                subtitle: const Text('Copy result automatically'),
                 value: settings.autoCopyToClipboard,
                 onChanged: (value) {
-                  ref.read(settingsProvider.notifier).toggleAutoCopy();
+                  SchedulerBinding.instance.addPostFrameCallback((_) {
+                    ref.read(settingsProvider.notifier).toggleAutoCopy();
+                  });
                 },
               ),
               SwitchListTile(
                 title: const Text('Show Notifications'),
-                subtitle: const Text(
-                    'Display notification when transcription completes'),
+                subtitle: const Text('Notify when complete'),
                 value: settings.showNotifications,
                 onChanged: (value) {
-                  ref.read(settingsProvider.notifier).toggleNotifications();
+                  SchedulerBinding.instance.addPostFrameCallback((_) {
+                    ref.read(settingsProvider.notifier).toggleNotifications();
+                  });
                 },
               ),
               SwitchListTile(
                 title: const Text('Dark Mode'),
                 subtitle: const Text('Use dark theme'),
-                value: ref.watch(themeModeProvider) == ThemeMode.dark,
+                value: settings.darkMode,
                 onChanged: (value) {
-                  ref.read(themeModeProvider.notifier).state =
-                      value ? ThemeMode.dark : ThemeMode.light;
+                  SchedulerBinding.instance.addPostFrameCallback((_) {
+                    ref.read(settingsProvider.notifier).toggleDarkMode();
+                  });
                 },
               ),
             ],
-          )
-              .animate()
-              .fadeIn(duration: 300.ms, delay: 600.ms)
-              .slideY(begin: 0.1),
+          ).animate().fadeIn(duration: 300.ms, delay: 300.ms),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
           // About
           SettingsSection(
@@ -215,18 +206,8 @@ class SettingsPage extends ConsumerWidget {
                 title: Text('Version'),
                 trailing: Text('1.0.0'),
               ),
-              ListTile(
-                title: const Text('Source Code'),
-                trailing: const Icon(LucideIcons.externalLink, size: 18),
-                onTap: () {
-                  // Open GitHub link
-                },
-              ),
             ],
-          )
-              .animate()
-              .fadeIn(duration: 300.ms, delay: 700.ms)
-              .slideY(begin: 0.1),
+          ).animate().fadeIn(duration: 300.ms, delay: 350.ms),
 
           const SizedBox(height: 100),
         ],
@@ -266,14 +247,15 @@ class SettingsPage extends ConsumerWidget {
                       IconButton(
                         onPressed: () => isObscured.value = !obscured,
                         icon: Icon(
-                            obscured ? LucideIcons.eye : LucideIcons.eyeOff),
+                            obscured ? LucideIcons.eye : LucideIcons.eyeOff,
+                            size: 18),
                       ),
                       if (validating)
                         const Padding(
                           padding: EdgeInsets.all(12),
                           child: SizedBox(
-                            width: 20,
-                            height: 20,
+                            width: 18,
+                            height: 18,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           ),
                         )
@@ -281,7 +263,7 @@ class SettingsPage extends ConsumerWidget {
                         IconButton(
                           onPressed: () => _saveApiKey(
                               context, ref, controller.text, isValidating),
-                          icon: const Icon(LucideIcons.check),
+                          icon: const Icon(LucideIcons.check, size: 18),
                         ),
                     ],
                   ),
@@ -289,9 +271,9 @@ class SettingsPage extends ConsumerWidget {
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
-            'Get your API key from Google AI Studio',
+            'Get your key from Google AI Studio',
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ],
@@ -328,11 +310,10 @@ class SettingsPage extends ConsumerWidget {
         }
       }
     } catch (e) {
-      // If validation throws but key format looks correct, save it anyway
       if (trimmedKey.startsWith('AIza') && trimmedKey.length > 30) {
         await ref.read(settingsProvider.notifier).updateApiKey(trimmedKey);
         if (context.mounted) {
-          _showMessage(context, 'API key saved (validation skipped)');
+          _showMessage(context, 'API key saved');
         }
       } else {
         if (context.mounted) {
@@ -358,42 +339,35 @@ class SettingsPage extends ConsumerWidget {
   void _showHotkeyDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Set Global Hotkey'),
+      builder: (ctx) => AlertDialog(
+        title: const Text('Global Hotkey'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Press the key combination you want to use:'),
-            const SizedBox(height: 16),
+            const Text('Current hotkey:'),
+            const SizedBox(height: 12),
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceVariant,
-                borderRadius: BorderRadius.circular(12),
+                color: Theme.of(ctx).colorScheme.surfaceVariant,
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                ref.watch(settingsProvider).globalHotkey,
-                style: Theme.of(context).textTheme.headlineMedium,
+                ref.read(settingsProvider).globalHotkey,
+                style: Theme.of(ctx).textTheme.titleLarge,
               ),
             ),
-            const SizedBox(height: 16),
-            const Text(
-              'Note: Global hotkeys work on desktop platforms only.',
-              style: TextStyle(fontSize: 12),
+            const SizedBox(height: 12),
+            Text(
+              'Global hotkeys work on desktop only',
+              style: Theme.of(ctx).textTheme.bodySmall,
             ),
           ],
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              // Save hotkey
-              Navigator.pop(context);
-            },
-            child: const Text('Save'),
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Close'),
           ),
         ],
       ),

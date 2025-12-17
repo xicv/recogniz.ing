@@ -1,21 +1,56 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../core/models/transcription.dart';
 import '../../../core/theme/app_theme.dart';
 
-class TranscriptionTile extends StatelessWidget {
+class TranscriptionTile extends StatefulWidget {
   final Transcription transcription;
   final VoidCallback onCopy;
   final VoidCallback onDelete;
+  final Function(String)? onUpdate;
 
   const TranscriptionTile({
     super.key,
     required this.transcription,
     required this.onCopy,
     required this.onDelete,
+    this.onUpdate,
   });
+
+  @override
+  State<TranscriptionTile> createState() => _TranscriptionTileState();
+}
+
+class _TranscriptionTileState extends State<TranscriptionTile> {
+  late TextEditingController _controller;
+  bool _isEditing = false;
+  bool _hasChanges = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        TextEditingController(text: widget.transcription.processedText);
+  }
+
+  @override
+  void didUpdateWidget(TranscriptionTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.transcription.processedText !=
+        widget.transcription.processedText) {
+      _controller.text = widget.transcription.processedText;
+      _hasChanges = false;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,77 +58,177 @@ class TranscriptionTile extends StatelessWidget {
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: () => _showDetails(context),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(6),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    dateFormat.format(widget.transcription.createdAt),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  '${widget.transcription.tokenUsage} tokens',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Editable text field
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _isEditing = true;
+                });
+              },
+              child: _isEditing
+                  ? TextField(
+                      controller: _controller,
+                      maxLines: null,
+                      minLines: 2,
+                      autofocus: true,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                      decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.all(12),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                              color: AppColors.primary.withOpacity(0.5)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(
+                              color: AppColors.primary, width: 2),
+                        ),
+                        hintText: 'Enter transcription text...',
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          _hasChanges =
+                              value != widget.transcription.processedText;
+                        });
+                      },
+                      onTapOutside: (_) {
+                        setState(() {
+                          _isEditing = false;
+                        });
+                      },
+                    )
+                  : Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceVariant
+                            .withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .outline
+                              .withOpacity(0.2),
+                        ),
+                      ),
+                      child: Text(
+                        _controller.text,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
                     ),
-                    child: Text(
-                      dateFormat.format(transcription.createdAt),
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w500,
-                          ),
+            ),
+
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Icon(
+                  LucideIcons.clock,
+                  size: 14,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '${widget.transcription.audioDurationSeconds.toStringAsFixed(1)}s',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const Spacer(),
+
+                // Save button (only show when there are changes)
+                if (_hasChanges) ...[
+                  TextButton.icon(
+                    onPressed: _saveChanges,
+                    icon: const Icon(LucideIcons.save, size: 16),
+                    label: const Text('Save'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.success,
                     ),
                   ),
-                  const Spacer(),
-                  Text(
-                    '${transcription.tokenUsage} tokens',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
+                  const SizedBox(width: 8),
                 ],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                transcription.processedText,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Icon(
-                    LucideIcons.clock,
-                    size: 14,
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    '${transcription.audioDurationSeconds.toStringAsFixed(1)}s',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    onPressed: onCopy,
-                    icon: const Icon(LucideIcons.copy, size: 18),
-                    tooltip: 'Copy',
-                    visualDensity: VisualDensity.compact,
-                  ),
-                  IconButton(
-                    onPressed: onDelete,
-                    icon: Icon(LucideIcons.trash2,
-                        size: 18, color: AppColors.error),
-                    tooltip: 'Delete',
-                    visualDensity: VisualDensity.compact,
-                  ),
-                ],
-              ),
-            ],
-          ),
+
+                IconButton(
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: _controller.text));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Copied to clipboard'),
+                        behavior: SnackBarBehavior.floating,
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                  icon: const Icon(LucideIcons.copy, size: 18),
+                  tooltip: 'Copy',
+                  visualDensity: VisualDensity.compact,
+                ),
+                IconButton(
+                  onPressed: () => _showDetails(context),
+                  icon: const Icon(LucideIcons.expand, size: 18),
+                  tooltip: 'View details',
+                  visualDensity: VisualDensity.compact,
+                ),
+                IconButton(
+                  onPressed: widget.onDelete,
+                  icon: Icon(LucideIcons.trash2,
+                      size: 18, color: AppColors.error),
+                  tooltip: 'Delete',
+                  visualDensity: VisualDensity.compact,
+                ),
+              ],
+            ),
+          ],
         ),
+      ),
+    );
+  }
+
+  void _saveChanges() {
+    if (widget.onUpdate != null) {
+      widget.onUpdate!(_controller.text);
+    }
+    setState(() {
+      _hasChanges = false;
+      _isEditing = false;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Transcription saved'),
+        behavior: SnackBarBehavior.floating,
+        duration: Duration(seconds: 2),
       ),
     );
   }
@@ -150,31 +285,45 @@ class TranscriptionTile extends StatelessWidget {
                     _buildSection(
                       context,
                       title: 'Processed Text',
-                      content: transcription.processedText,
+                      content: _controller.text,
                       onCopy: () {
-                        onCopy();
+                        Clipboard.setData(
+                            ClipboardData(text: _controller.text));
                         Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Copied to clipboard'),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
                       },
                     ),
                     const SizedBox(height: 20),
                     _buildSection(
                       context,
                       title: 'Raw Transcription',
-                      content: transcription.rawText,
+                      content: widget.transcription.rawText,
                       onCopy: () {
-                        // Copy raw text
+                        Clipboard.setData(
+                            ClipboardData(text: widget.transcription.rawText));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Raw text copied'),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
                       },
                     ),
                     const SizedBox(height: 20),
                     _buildInfoRow(context, 'Duration',
-                        '${transcription.audioDurationSeconds.toStringAsFixed(1)} seconds'),
-                    _buildInfoRow(
-                        context, 'Tokens Used', '${transcription.tokenUsage}'),
+                        '${widget.transcription.audioDurationSeconds.toStringAsFixed(1)} seconds'),
+                    _buildInfoRow(context, 'Tokens Used',
+                        '${widget.transcription.tokenUsage}'),
                     _buildInfoRow(
                         context,
                         'Created',
                         DateFormat('MMM d, yyyy h:mm a')
-                            .format(transcription.createdAt)),
+                            .format(widget.transcription.createdAt)),
                     const SizedBox(height: 40),
                   ],
                 ),

@@ -1,12 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import '../models/transcription.dart';
-import '../models/custom_prompt.dart';
-import '../models/vocabulary.dart';
+
 import '../models/app_settings.dart';
-import '../services/storage_service.dart';
+import '../models/custom_prompt.dart';
+import '../models/transcription.dart';
+import '../models/vocabulary.dart';
 import '../services/audio_service.dart';
 import '../services/gemini_service.dart';
+import '../services/storage_service.dart';
 
 // Services
 final audioServiceProvider = Provider<AudioService>((ref) {
@@ -35,38 +35,47 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
   SettingsNotifier() : super(StorageService.settings);
 
   Future<void> updateApiKey(String apiKey) async {
-    state = state.copyWith(geminiApiKey: apiKey);
-    await StorageService.saveSettings(state);
+    final newState = state.copyWith(geminiApiKey: apiKey);
+    await StorageService.saveSettings(newState);
+    state = newState;
   }
 
   Future<void> updateSelectedPrompt(String promptId) async {
-    state = state.copyWith(selectedPromptId: promptId);
-    await StorageService.saveSettings(state);
+    final newState = state.copyWith(selectedPromptId: promptId);
+    await StorageService.saveSettings(newState);
+    state = newState;
   }
 
   Future<void> updateSelectedVocabulary(String vocabularyId) async {
-    state = state.copyWith(selectedVocabularyId: vocabularyId);
-    await StorageService.saveSettings(state);
+    final newState = state.copyWith(selectedVocabularyId: vocabularyId);
+    await StorageService.saveSettings(newState);
+    state = newState;
   }
 
   Future<void> updateHotkey(String hotkey) async {
-    state = state.copyWith(globalHotkey: hotkey);
-    await StorageService.saveSettings(state);
+    final newState = state.copyWith(globalHotkey: hotkey);
+    await StorageService.saveSettings(newState);
+    state = newState;
   }
 
   Future<void> toggleAutoCopy() async {
-    state = state.copyWith(autoCopyToClipboard: !state.autoCopyToClipboard);
-    await StorageService.saveSettings(state);
+    final newState =
+        state.copyWith(autoCopyToClipboard: !state.autoCopyToClipboard);
+    await StorageService.saveSettings(newState);
+    state = newState;
   }
 
   Future<void> toggleNotifications() async {
-    state = state.copyWith(showNotifications: !state.showNotifications);
-    await StorageService.saveSettings(state);
+    final newState =
+        state.copyWith(showNotifications: !state.showNotifications);
+    await StorageService.saveSettings(newState);
+    state = newState;
   }
 
   Future<void> toggleDarkMode() async {
-    state = state.copyWith(darkMode: !state.darkMode);
-    await StorageService.saveSettings(state);
+    final newState = state.copyWith(darkMode: !state.darkMode);
+    await StorageService.saveSettings(newState);
+    state = newState;
   }
 }
 
@@ -87,6 +96,15 @@ class TranscriptionsNotifier extends StateNotifier<List<Transcription>> {
   Future<void> addTranscription(Transcription transcription) async {
     await StorageService.transcriptions.put(transcription.id, transcription);
     state = _loadTranscriptions();
+  }
+
+  Future<void> updateTranscription(String id, String newText) async {
+    final existing = StorageService.transcriptions.get(id);
+    if (existing != null) {
+      final updated = existing.copyWith(processedText: newText);
+      await StorageService.transcriptions.put(id, updated);
+      state = _loadTranscriptions();
+    }
   }
 
   Future<void> deleteTranscription(String id) async {

@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:intl/intl.dart';
 
 import '../../core/providers/app_providers.dart';
 import '../../core/theme/app_theme.dart';
-import 'widgets/stat_card.dart';
 import 'widgets/transcription_tile.dart';
 
 class DashboardPage extends ConsumerWidget {
@@ -23,42 +22,65 @@ class DashboardPage extends ConsumerWidget {
         slivers: [
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Dashboard',
-                    style: Theme.of(context).textTheme.headlineLarge,
-                  ).animate().fadeIn(duration: 300.ms).slideX(begin: -0.1),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Your voice transcription overview',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ).animate().fadeIn(duration: 300.ms, delay: 100.ms),
+                  // Header row
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Dashboard',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ).animate().fadeIn(duration: 300.ms),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Voice transcription overview',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ).animate().fadeIn(duration: 300.ms, delay: 50.ms),
+                          ],
+                        ),
+                      ),
+                      // Search button
+                      IconButton(
+                        onPressed: () => _showSearchDialog(context, ref),
+                        icon: const Icon(LucideIcons.search),
+                        tooltip: 'Search',
+                      ),
+                    ],
+                  ),
 
                   // API Key warning
                   if (!settings.hasApiKey) ...[
                     const SizedBox(height: 16),
                     Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: AppColors.warning.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                         border: Border.all(
                             color: AppColors.warning.withOpacity(0.3)),
                       ),
                       child: Row(
                         children: [
                           const Icon(LucideIcons.alertTriangle,
-                              color: AppColors.warning),
-                          const SizedBox(width: 12),
+                              color: AppColors.warning, size: 18),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              'Please add your Gemini API key in Settings to start transcribing.',
+                              'Add your Gemini API key in Settings to start',
                               style: Theme.of(context)
                                   .textTheme
-                                  .bodyMedium
+                                  .bodySmall
                                   ?.copyWith(
                                     color: AppColors.warning,
                                   ),
@@ -66,81 +88,72 @@ class DashboardPage extends ConsumerWidget {
                           ),
                         ],
                       ),
-                    ).animate().fadeIn(duration: 300.ms, delay: 200.ms),
+                    ).animate().fadeIn(duration: 300.ms, delay: 100.ms),
                   ],
+
+                  const SizedBox(height: 16),
+
+                  // Compact stats row
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildCompactStat(
+                          context,
+                          icon: LucideIcons.mic,
+                          value: statistics.totalUsage.toString(),
+                          label: 'Total',
+                          color: AppColors.primary,
+                        ),
+                        _buildDivider(context),
+                        _buildCompactStat(
+                          context,
+                          icon: LucideIcons.calendar,
+                          value: statistics.thisWeekUsage.toString(),
+                          label: 'Week',
+                          color: AppColors.accent,
+                        ),
+                        _buildDivider(context),
+                        _buildCompactStat(
+                          context,
+                          icon: LucideIcons.coins,
+                          value: _formatNumber(statistics.totalTokens),
+                          label: 'Tokens',
+                          color: AppColors.success,
+                        ),
+                        _buildDivider(context),
+                        _buildCompactStat(
+                          context,
+                          icon: LucideIcons.clock,
+                          value:
+                              '${statistics.totalDurationMinutes.toStringAsFixed(1)}m',
+                          label: 'Time',
+                          color: AppColors.warning,
+                        ),
+                      ],
+                    ),
+                  )
+                      .animate()
+                      .fadeIn(duration: 300.ms, delay: 150.ms)
+                      .slideY(begin: 0.1),
 
                   const SizedBox(height: 24),
 
-                  // Statistics cards
-                  GridView.count(
-                    crossAxisCount: 2,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 1.5,
-                    children: [
-                      StatCard(
-                        title: 'Total Usage',
-                        value: statistics.totalUsage.toString(),
-                        icon: LucideIcons.mic,
-                        color: AppColors.primary,
-                      )
-                          .animate()
-                          .fadeIn(duration: 300.ms, delay: 200.ms)
-                          .scale(begin: const Offset(0.9, 0.9)),
-                      StatCard(
-                        title: 'This Week',
-                        value: statistics.thisWeekUsage.toString(),
-                        icon: LucideIcons.calendar,
-                        color: AppColors.accent,
-                      )
-                          .animate()
-                          .fadeIn(duration: 300.ms, delay: 300.ms)
-                          .scale(begin: const Offset(0.9, 0.9)),
-                      StatCard(
-                        title: 'Tokens Used',
-                        value: _formatNumber(statistics.totalTokens),
-                        icon: LucideIcons.coins,
-                        color: AppColors.success,
-                      )
-                          .animate()
-                          .fadeIn(duration: 300.ms, delay: 400.ms)
-                          .scale(begin: const Offset(0.9, 0.9)),
-                      StatCard(
-                        title: 'Minutes',
-                        value:
-                            statistics.totalDurationMinutes.toStringAsFixed(1),
-                        icon: LucideIcons.clock,
-                        color: AppColors.warning,
-                      )
-                          .animate()
-                          .fadeIn(duration: 300.ms, delay: 500.ms)
-                          .scale(begin: const Offset(0.9, 0.9)),
-                    ],
-                  ),
-
-                  const SizedBox(height: 32),
-
                   // Recent transcriptions header
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Recent Transcriptions',
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineMedium
-                            ?.copyWith(
-                              fontSize: 20,
-                            ),
-                      ),
-                      IconButton(
-                        onPressed: () => _showSearchDialog(context, ref),
-                        icon: const Icon(LucideIcons.search),
-                      ),
-                    ],
-                  ).animate().fadeIn(duration: 300.ms, delay: 600.ms),
+                  Text(
+                    'Recent Transcriptions',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ).animate().fadeIn(duration: 300.ms, delay: 200.ms),
+
+                  const SizedBox(height: 12),
                 ],
               ),
             ),
@@ -155,24 +168,24 @@ class DashboardPage extends ConsumerWidget {
                   children: [
                     Icon(
                       LucideIcons.micOff,
-                      size: 64,
+                      size: 48,
                       color: Theme.of(context).colorScheme.outline,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     Text(
                       'No transcriptions yet',
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             color: Theme.of(context).colorScheme.outline,
                           ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
                     Text(
-                      'Tap the microphone button to start',
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      'Tap the mic button to start',
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
                 ),
-              ).animate().fadeIn(duration: 300.ms, delay: 700.ms),
+              ).animate().fadeIn(duration: 300.ms, delay: 250.ms),
             )
           else
             SliverPadding(
@@ -187,13 +200,18 @@ class DashboardPage extends ConsumerWidget {
                           context, transcription.processedText),
                       onDelete: () =>
                           _deleteTranscription(context, ref, transcription.id),
-                    )
-                        .animate()
-                        .fadeIn(
-                          duration: 300.ms,
-                          delay: Duration(milliseconds: 700 + (index * 50)),
-                        )
-                        .slideY(begin: 0.1);
+                      onUpdate: (newText) {
+                        ref
+                            .read(transcriptionsProvider.notifier)
+                            .updateTranscription(
+                              transcription.id,
+                              newText,
+                            );
+                      },
+                    ).animate().fadeIn(
+                          duration: 200.ms,
+                          delay: Duration(milliseconds: 250 + (index * 30)),
+                        );
                   },
                   childCount: transcriptions.length,
                 ),
@@ -206,6 +224,43 @@ class DashboardPage extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildCompactStat(
+    BuildContext context, {
+    required IconData icon,
+    required String value,
+    required String label,
+    required Color color,
+  }) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 16, color: color),
+        const SizedBox(height: 6),
+        Text(
+          value,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                fontSize: 11,
+              ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDivider(BuildContext context) {
+    return Container(
+      height: 40,
+      width: 1,
+      color: Theme.of(context).dividerColor.withOpacity(0.3),
     );
   }
 
@@ -222,11 +277,11 @@ class DashboardPage extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Search Transcriptions'),
+        title: const Text('Search'),
         content: TextField(
           autofocus: true,
           decoration: const InputDecoration(
-            hintText: 'Enter search term...',
+            hintText: 'Search transcriptions...',
             prefixIcon: Icon(LucideIcons.search),
           ),
           onChanged: (value) {
@@ -251,11 +306,12 @@ class DashboardPage extends ConsumerWidget {
   }
 
   void _copyToClipboard(BuildContext context, String text) {
-    // Platform-specific clipboard implementation
+    Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Copied to clipboard'),
         behavior: SnackBarBehavior.floating,
+        duration: Duration(seconds: 2),
       ),
     );
   }
@@ -264,9 +320,8 @@ class DashboardPage extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Transcription'),
-        content:
-            const Text('Are you sure you want to delete this transcription?'),
+        title: const Text('Delete?'),
+        content: const Text('This transcription will be permanently deleted.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
