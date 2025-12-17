@@ -246,3 +246,9 @@ class Statistics {
     required this.thisWeekUsage,
   });
 }
+
+// Tray recording trigger - increment to trigger recording toggle from tray
+final trayRecordingTriggerProvider = StateProvider<int>((ref) => 0);
+
+// Current page provider (moved here for global access)
+final currentPageProvider = StateProvider<int>((ref) => 0);

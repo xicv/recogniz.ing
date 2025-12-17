@@ -7,12 +7,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is an AI-powered voice typing application built with Flutter, supporting desktop (macOS, Windows, Linux), iOS, and Android platforms. The app provides real-time voice activity detection, transcription using AI service providers (like Gemini API), and customized output through user-defined vocabulary and prompts.
 
 Core features:
-- Voice activity detection and recording
+- Voice recording with activity detection
 - AI-powered transcription with customizable vocabulary
 - Custom prompt management for tailored output
 - Dashboard with usage statistics and transcription history
 - Global hotkey support for quick activation
-- Cross-platform support (desktop + mobile)
+- System tray integration for desktop platforms
+- Cross-platform support with Material Design 3
 
 ## Development Commands
 
@@ -54,57 +55,86 @@ flutter format .
 
 # Upgrade dependencies
 flutter pub upgrade
+
+# Generate Hive type adapters (when model files change)
+flutter packages pub run build_runner build --delete-conflicting-outputs
 ```
 
 ## Project Architecture
 
-### Current State
-The project is in its initial setup phase with a default Flutter counter app template. The actual implementation needs to be built according to the requirements in `specs/requirements.md`.
+### Core Architecture
+The app follows a layered architecture with clear separation of concerns:
 
-### Planned Architecture
-Based on the requirements document, the app will need:
+1. **Core Layer** (`lib/core/`)
+   - **Models**: Data structures with Hive serialization (`Transcription`, `AppSettings`, `CustomPrompt`, `VocabularySet`)
+   - **Services**: Business logic and external integrations (`AudioService`, `GeminiService`, `StorageService`, `TrayService`, `HotkeyService`)
+   - **Providers**: Riverpod state management for global application state
+   - **Theme**: Material Design 3 theming system
 
-1. **Main Application Flow**
-   - Dashboard page: Statistics, recent transcriptions, search functionality
-   - Settings page: API key management, custom vocabulary, custom prompts, global hotkey configuration
-   - Voice recording/transcription service triggered by global hotkey
+2. **Features Layer** (`lib/features/`)
+   - **Dashboard**: Statistics display, transcription history, and search functionality
+   - **Settings**: API key management, vocabulary/prompts configuration, hotkey setup
+   - **Recording**: Recording overlay and voice activity detection UI
 
-2. **Key Services to Implement**
-   - Voice activity detection and recording
-   - AI service provider integration (Gemini API and others)
-   - Custom vocabulary and prompt management
-   - Statistics tracking and persistence
-   - Global hotkey system integration
-   - Clipboard management
-   - Notification system
+3. **Data Flow**
+   - State management uses Riverpod with providers for services, settings, and UI state
+   - Hive for local persistence with type adapters for models
+   - Global providers handle cross-feature state like recording state and navigation
 
-3. **Data Models**
-   - Transcription record (timestamp, content, vocabulary used, prompt used)
-   - Custom vocabulary entries
-   - Custom prompts
-   - Usage statistics (token usage, frequency counts)
-   - User settings (API keys, hotkeys, preferences)
+### Key Services Integration
 
-4. **Platform-Specific Considerations**
-   - Global hotkeys will require platform-specific implementations
-   - Voice recording permissions on mobile platforms
-   - Background processing capabilities
-   - System notifications integration
+**AudioService** (`lib/core/services/audio_service.dart`):
+- Manages voice recording using the `record` package
+- Handles microphone permissions and recording lifecycle
+- Returns audio data as bytes for AI processing
 
-### Development Notes
-- The app uses Material Design 3 (`useMaterial3: true`)
-- Dart SDK version: '>=3.3.3 <4.0.0'
-- Currently includes only basic Flutter dependencies
-- Will need additional packages for voice recording, HTTP requests, local storage, global hotkeys, and platform integration
+**GeminiService** (`lib/core/services/gemini_service.dart`):
+- Integrates with Google Gemini API for transcription
+- Applies custom vocabulary and prompt templates
+- Manages API initialization and token usage tracking
 
-### File Structure (to be implemented)
-```
-lib/
-├── main.dart
-├── models/          # Data models
-├── services/        # Voice recording, AI integration, storage
-├── screens/         # Dashboard, settings, transcription screens
-├── widgets/         # Reusable UI components
-├── utils/           # Helpers and utilities
-└── platform/        # Platform-specific implementations
-```
+**StorageService** (`lib/core/services/storage_service.dart`):
+- Centralized Hive database operations
+- Manages settings, transcriptions, prompts, and vocabulary
+- Provides default data initialization
+
+**TrayService** (`lib/core/services/tray_service.dart`):
+- Desktop system tray integration with customizable actions
+- Updates tray icon based on recording state
+- Handles global hotkey-triggered recording
+
+### State Management Pattern
+- Uses Riverpod with `StateNotifierProvider` for complex state
+- `Provider` for services and derived state
+- `StateProvider` for simple UI state
+- Providers are organized by feature and imported centrally in `app_providers.dart`
+
+### Platform-Specific Features
+- Global hotkeys only work on desktop platforms
+- System tray integration for macOS/Windows/Linux
+- Platform-specific permission handling for microphone access
+- Method channels for window management (macOS show/hide)
+
+## Important Development Notes
+
+### Hive Integration
+- All models use `@HiveType` annotations with unique type IDs
+- Run `build_runner` after modifying model classes
+- Hive boxes are initialized in `StorageService.initialize()`
+
+### Recording Flow
+1. User triggers recording via FAB or global hotkey
+2. `AudioService` handles microphone permissions and recording
+3. On stop, audio is sent to `GeminiService` with user's vocabulary/prompts
+4. Result is saved via `StorageService` and optionally copied to clipboard
+5. UI updates through state providers with success/error notifications
+
+### Error Handling
+- Errors are displayed through `lastErrorProvider` with SnackBar notifications
+- Service-level errors are logged to console for debugging
+- Recording gracefully handles permission denial and API failures
+
+### Testing Considerations
+- Mock services for unit tests (AudioService, GeminiService)
+- Test Hive operations with in-memory databases
+- Platform-specific features need conditional testing or mocks

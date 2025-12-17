@@ -9,19 +9,33 @@ import 'dashboard/dashboard_page.dart';
 import 'recording/recording_overlay.dart';
 import 'settings/settings_page.dart';
 
-final currentPageProvider = StateProvider<int>((ref) => 0);
-
-// Provider to track the last error for debugging
 final lastErrorProvider = StateProvider<String?>((ref) => null);
 
-class AppShell extends ConsumerWidget {
+class AppShell extends ConsumerStatefulWidget {
   const AppShell({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AppShell> createState() => _AppShellState();
+}
+
+class _AppShellState extends ConsumerState<AppShell> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final currentPage = ref.watch(currentPageProvider);
     final recordingState = ref.watch(recordingStateProvider);
     final lastError = ref.watch(lastErrorProvider);
+
+    // Listen to tray recording trigger
+    ref.listen(trayRecordingTriggerProvider, (prev, next) {
+      if (prev != next) {
+        _toggleRecording(context, ref, recordingState);
+      }
+    });
 
     // Show error snackbar if there's an error
     if (lastError != null) {

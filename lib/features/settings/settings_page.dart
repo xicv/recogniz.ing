@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -7,12 +9,24 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/providers/app_providers.dart';
 import '../../core/services/gemini_service.dart';
 import '../../core/theme/app_theme.dart';
+import 'widgets/hotkey_editor.dart';
 import 'widgets/prompt_editor.dart';
 import 'widgets/settings_section.dart';
 import 'widgets/vocabulary_editor.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
+
+  String _formatHotkeyForDisplay(String hotkey) {
+    if (!Platform.isMacOS) return hotkey;
+
+    return hotkey
+        .replaceAll('Ctrl+', '⌃')
+        .replaceAll('Cmd+', '⌘')
+        .replaceAll('Shift+', '⇧')
+        .replaceAll('Alt+', '⌥')
+        .replaceAll('+', '');
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -49,16 +63,42 @@ class SettingsPage extends ConsumerWidget {
 
           const SizedBox(height: 20),
 
-          // Hotkey Settings
+          // Hotkey Settings - Updated
           SettingsSection(
             title: 'Hotkey',
             icon: LucideIcons.keyboard,
             children: [
               ListTile(
                 title: const Text('Global Hotkey'),
-                subtitle: Text(settings.globalHotkey),
-                trailing: const Icon(LucideIcons.chevronRight, size: 18),
-                onTap: () => _showHotkeyDialog(context, ref),
+                subtitle: Text(
+                  'Press to start/stop recording',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        _formatHotkeyForDisplay(settings.globalHotkey),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primary,
+                                  letterSpacing: Platform.isMacOS ? 2 : 0,
+                                ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Icon(LucideIcons.chevronRight, size: 18),
+                  ],
+                ),
+                onTap: () => _showHotkeyEditor(context),
               ),
             ],
           ).animate().fadeIn(duration: 300.ms, delay: 150.ms),
@@ -198,11 +238,11 @@ class SettingsPage extends ConsumerWidget {
           const SizedBox(height: 20),
 
           // About
-          SettingsSection(
+          const SettingsSection(
             title: 'About',
             icon: LucideIcons.info,
             children: [
-              const ListTile(
+              ListTile(
                 title: Text('Version'),
                 trailing: Text('1.0.0'),
               ),
@@ -336,41 +376,10 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 
-  void _showHotkeyDialog(BuildContext context, WidgetRef ref) {
+  void _showHotkeyEditor(BuildContext context) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Global Hotkey'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Current hotkey:'),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Theme.of(ctx).colorScheme.surfaceVariant,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                ref.read(settingsProvider).globalHotkey,
-                style: Theme.of(ctx).textTheme.titleLarge,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Global hotkeys work on desktop only',
-              style: Theme.of(ctx).textTheme.bodySmall,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
+      builder: (context) => const HotkeyEditorDialog(),
     );
   }
 
