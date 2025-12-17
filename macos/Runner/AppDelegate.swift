@@ -12,6 +12,8 @@ class AppDelegate: FlutterAppDelegate {
     // Set up window delegate to intercept close button
     if let window = NSApplication.shared.windows.first {
       window.delegate = self
+      // Initially hide the window since this is a menubar app
+      window.orderOut(nil)
     }
   }
 

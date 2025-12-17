@@ -31,7 +31,7 @@ dependencies:
   hotkey_manager: ^0.2.0
 
   # System Tray / Menu Bar (Desktop)
-  tray_manager: ^0.2.0
+  tray_manager: ^0.5.2
 
   # UI Components
   flutter_animate: ^4.3.0

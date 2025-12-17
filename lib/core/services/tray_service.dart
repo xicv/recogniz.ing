@@ -34,12 +34,14 @@ class TrayService with TrayListener {
   Future<void> initialize() async {
     if (!isSupported) return;
 
+    debugPrint('[TrayService] Initializing tray service...');
     trayManager.addListener(this);
 
     await _createIcons();
     await _setIcon(false);
     await _updateMenu();
     await trayManager.setToolTip('Recogniz.ing');
+    debugPrint('[TrayService] Tray service initialized successfully');
   }
 
   Future<void> _createIcons() async {
