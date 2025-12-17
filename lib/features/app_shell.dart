@@ -220,13 +220,8 @@ class _AppShellState extends ConsumerState<AppShell> {
         print('Processed text: ${transcriptionResult.processedText}');
         print('Tokens: ${transcriptionResult.tokenUsage}');
 
-        // Check if the transcription is meaningful
-        if (!_isMeaningfulTranscription(transcriptionResult.rawText)) {
-          ref.read(lastErrorProvider.notifier).state =
-              'No speech detected. Please try again with clearer speech.';
-          ref.read(recordingStateProvider.notifier).state = RecordingState.idle;
-          return;
-        }
+        // The Gemini API now handles speech detection at the source
+        // If we get here, we have meaningful transcription
 
         // Save transcription
         final transcription = Transcription(
@@ -270,9 +265,16 @@ class _AppShellState extends ConsumerState<AppShell> {
         print('Error: $e');
         print('Stack trace: $stackTrace');
 
-        // Provide user-friendly error messages
-        final errorMessage = _getErrorMessage(e.toString());
-        ref.read(lastErrorProvider.notifier).state = errorMessage;
+        // Check for no speech error
+        if (e.toString().contains('No speech detected') ||
+            e.toString().contains('Empty transcription received')) {
+          ref.read(lastErrorProvider.notifier).state =
+              'No speech detected. Please speak clearly and try again.';
+        } else {
+          // Provide user-friendly error messages
+          final errorMessage = _getErrorMessage(e.toString());
+          ref.read(lastErrorProvider.notifier).state = errorMessage;
+        }
       }
 
       ref.read(recordingStateProvider.notifier).state = RecordingState.idle;
@@ -322,65 +324,5 @@ class _AppShellState extends ConsumerState<AppShell> {
            '• Ensure you have a valid API key\n'
            '• Try recording shorter audio clips\n'
            '• Speak clearly during recording';
-  }
-
-  bool _isMeaningfulTranscription(String text) {
-    if (text.isEmpty) return false;
-
-    // Convert to lowercase and trim
-    final cleanText = text.toLowerCase().trim();
-
-    // List of common non-meaningful responses from silence
-    const nonMeaningfulResponses = [
-      'ok',
-      'okay',
-      'hello',
-      'hi',
-      'um',
-      'uh',
-      'ah',
-      'mm',
-      'hm',
-      'yes',
-      'no',
-      'thanks',
-      'thank you',
-      'please',
-      'sure',
-      'alright',
-      'cool',
-      'good',
-      'bad',
-      'nice',
-      'great',
-    ];
-
-    // Check if it's just one word
-    final words = cleanText.split(' ').where((w) => w.isNotEmpty).toList();
-    if (words.length == 1 && nonMeaningfulResponses.contains(words.first)) {
-      return false;
-    }
-
-    // Check if it's too short (less than 3 words)
-    if (words.length < 3) {
-      return false;
-    }
-
-    // Check for email template patterns (common when no speech)
-    if (cleanText.contains('[recipient name]') ||
-        cleanText.contains('[your name]') ||
-        cleanText.contains('dear [recipient]') ||
-        cleanText.contains('subject:')) {
-      return false;
-    }
-
-    // Check for repetitive or generic responses
-    if (cleanText.contains('confirmation') &&
-        cleanText.contains('thank you for your message')) {
-      return false;
-    }
-
-    // If it passed all checks, consider it meaningful
-    return true;
   }
 }

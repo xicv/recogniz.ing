@@ -36,11 +36,28 @@ class GeminiService {
     }
 
     // First, transcribe the audio
-    final transcriptionPrompt = '''
+    String transcriptionPrompt = '''
 Transcribe the following audio accurately.
-Use this vocabulary for proper nouns and technical terms: $vocabulary
-Output only the transcription, nothing else.
+
+CRITICAL INSTRUCTIONS:
+- Only transcribe actual speech that you hear in the audio
+- If the audio contains only silence, background noise, or no discernible speech, respond with exactly: [NO_SPEECH]
+- Do NOT transcribe the vocabulary list or any text that is not spoken in the audio
+- The vocabulary below is for reference ONLY - do not use it to generate fake transcriptions
 ''';
+
+    // Only include vocabulary if it's not empty
+    if (vocabulary.isNotEmpty) {
+      transcriptionPrompt += '''
+Reference vocabulary for technical terms (use ONLY if you actually hear these words spoken):
+$vocabulary
+
+Remember: Only transcribe what is actually spoken in the audio. If there is no speech, respond with [NO_SPEECH].
+Output only the transcription, nothing else.''';
+    } else {
+      transcriptionPrompt += '''
+Output only the transcription, nothing else.''';
+    }
 
     print('[GeminiService] Sending audio to Gemini for transcription...');
 
@@ -63,6 +80,12 @@ Output only the transcription, nothing else.
       if (rawText.isEmpty) {
         print('[GeminiService] Warning: Empty transcription received');
         throw Exception('Empty transcription received from API');
+      }
+
+      // Check if no speech was detected
+      if (rawText.trim() == '[NO_SPEECH]') {
+        print('[GeminiService] No speech detected in audio');
+        throw Exception('No speech detected in audio');
       }
 
       // Then, process with the custom prompt
