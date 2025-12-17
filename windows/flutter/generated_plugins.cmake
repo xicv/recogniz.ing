@@ -8,6 +8,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   record_windows
   share_plus
   super_native_extensions
+  tray_manager
   url_launcher_windows
 )
 
