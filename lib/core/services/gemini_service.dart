@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:google_generative_ai/google_generative_ai.dart';
@@ -51,8 +52,10 @@ Output only the transcription, nothing else.
       ]);
 
       print('[GeminiService] Calling generateContent for transcription...');
-      final transcriptionResponse =
-          await _model!.generateContent([audioContent]);
+      final transcriptionResponse = await _executeWithRetry(
+        () => _model!.generateContent([audioContent]),
+        operationName: 'transcription',
+      );
 
       final rawText = transcriptionResponse.text ?? '';
       print('[GeminiService] Raw transcription: $rawText');
@@ -66,9 +69,10 @@ Output only the transcription, nothing else.
       final processedPrompt = promptTemplate.replaceAll('{{text}}', rawText);
       print('[GeminiService] Processing with custom prompt...');
 
-      final processedResponse = await _model!.generateContent([
-        Content.text(processedPrompt),
-      ]);
+      final processedResponse = await _executeWithRetry(
+        () => _model!.generateContent([Content.text(processedPrompt)]),
+        operationName: 'processing',
+      );
 
       final processedText = processedResponse.text ?? rawText;
       print('[GeminiService] Processed text: $processedText');
@@ -130,6 +134,66 @@ Output only the transcription, nothing else.
         errorStr.length > 100 ? errorStr.substring(0, 100) : errorStr
       );
     }
+  }
+
+  // Execute operation with exponential backoff retry
+  Future<T> _executeWithRetry<T>(
+    Future<T> Function() operation, {
+    String operationName = 'API call',
+    int maxRetries = 3,
+  }) async {
+    int attempt = 0;
+    Duration delay = const Duration(seconds: 1);
+
+    while (attempt < maxRetries) {
+      try {
+        return await operation();
+      } catch (e) {
+        attempt++;
+        print('[GeminiService] $operationName failed (attempt $attempt/$maxRetries): $e');
+
+        final errorStr = e.toString().toLowerCase();
+
+        // Don't retry on certain errors
+        if (errorStr.contains('invalid_argument') ||
+            errorStr.contains('permission_denied') ||
+            errorStr.contains('not_found') ||
+            errorStr.contains('api_key_invalid')) {
+          print('[GeminiService] Non-retryable error, failing immediately');
+          rethrow;
+        }
+
+        // Retry on 503, 429, and other transient errors
+        if (errorStr.contains('503') ||
+            errorStr.contains('unavailable') ||
+            errorStr.contains('429') ||
+            errorStr.contains('resource_exhausted') ||
+            errorStr.contains('deadline_exceeded') ||
+            errorStr.contains('internal')) {
+
+          if (attempt >= maxRetries) {
+            print('[GeminiService] Max retries exceeded for $operationName');
+            rethrow;
+          }
+
+          // Exponential backoff with jitter
+          final jitter = Random().nextDouble() * 0.5;
+          final waitTime = Duration(
+            milliseconds: (delay.inMilliseconds * (1 + jitter)).round(),
+          );
+
+          print('[GeminiService] Retrying $operationName in ${waitTime.inSeconds}s...');
+          await Future.delayed(waitTime);
+
+          delay *= 2;
+        } else {
+          // Unknown error, don't retry
+          rethrow;
+        }
+      }
+    }
+
+    throw Exception('$operationName failed after $maxRetries attempts');
   }
 
   void dispose() {

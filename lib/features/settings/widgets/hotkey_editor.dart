@@ -53,8 +53,8 @@ class _HotkeyEditorDialogState extends ConsumerState<HotkeyEditorDialog> {
         setState(() {
           _pressedModifiers.add(key);
         });
-      } else if (_pressedModifiers.isNotEmpty) {
-        // Got a main key with modifiers
+      } else {
+        // Got a main key (with or without modifiers)
         setState(() {
           _mainKey = key;
           _recordedHotkey = _buildHotkeyString();
@@ -111,10 +111,17 @@ class _HotkeyEditorDialogState extends ConsumerState<HotkeyEditorDialog> {
         .replaceAll('+', '');
   }
 
-  void _saveHotkey() {
+  void _saveHotkey() async {
     if (_recordedHotkey != null && _recordedHotkey!.isNotEmpty) {
-      ref.read(settingsProvider.notifier).updateHotkey(_recordedHotkey!);
-      Navigator.pop(context);
+      // Save to settings
+      await ref.read(settingsProvider.notifier).updateHotkey(_recordedHotkey!);
+
+      // Note: The hotkey will be automatically re-registered
+      // when the settings change are observed in main.dart
+
+      if (mounted) {
+        Navigator.pop(context);
+      }
     }
   }
 

@@ -95,6 +95,23 @@ class AudioService {
     _currentRecordingPath = null;
     _recordingStartTime = null;
 
+    // Validate recording has minimum duration and content
+    if (duration < 0.5) {
+      print('[AudioService] Recording too short: ${duration}s');
+      await file.delete();
+      return null;
+    }
+
+    // Check if audio is likely silent (very small file size)
+    const minFileSize = 1000; // 1KB minimum for valid audio
+    if (fileSize < minFileSize) {
+      print('[AudioService] Audio file too small: $fileSize bytes (likely silent)');
+      await file.delete();
+      return null;
+    }
+
+    print('[AudioService] Recording validation passed');
+
     return RecordingResult(
       path: path,
       bytes: bytes,

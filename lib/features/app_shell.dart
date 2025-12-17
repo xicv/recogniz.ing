@@ -170,7 +170,9 @@ class _AppShellState extends ConsumerState<AppShell> {
 
         if (result == null) {
           print('No recording result');
-          ref.read(lastErrorProvider.notifier).state = 'No audio recorded';
+          ref.read(lastErrorProvider.notifier).state =
+              'No audio recorded. Please speak clearly and try again.\n'
+              'Tip: Recordings must be at least 0.5 seconds long.';
           ref.read(recordingStateProvider.notifier).state = RecordingState.idle;
           return;
         }
@@ -218,6 +220,14 @@ class _AppShellState extends ConsumerState<AppShell> {
         print('Processed text: ${transcriptionResult.processedText}');
         print('Tokens: ${transcriptionResult.tokenUsage}');
 
+        // Check if the transcription is meaningful
+        if (!_isMeaningfulTranscription(transcriptionResult.rawText)) {
+          ref.read(lastErrorProvider.notifier).state =
+              'No speech detected. Please try again with clearer speech.';
+          ref.read(recordingStateProvider.notifier).state = RecordingState.idle;
+          return;
+        }
+
         // Save transcription
         final transcription = Transcription(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -259,11 +269,118 @@ class _AppShellState extends ConsumerState<AppShell> {
         print('=== Error during transcription ===');
         print('Error: $e');
         print('Stack trace: $stackTrace');
-        ref.read(lastErrorProvider.notifier).state = 'Transcription failed: $e';
+
+        // Provide user-friendly error messages
+        final errorMessage = _getErrorMessage(e.toString());
+        ref.read(lastErrorProvider.notifier).state = errorMessage;
       }
 
       ref.read(recordingStateProvider.notifier).state = RecordingState.idle;
       print('=== Recording flow complete ===');
     }
+  }
+
+  String _getErrorMessage(String error) {
+    final errorLower = error.toLowerCase();
+
+    if (errorLower.contains('503') || errorLower.contains('unavailable')) {
+      return 'Service temporarily unavailable (503)\n'
+             'The AI service is experiencing high demand. Please try again in a few moments.\n'
+             'The app will automatically retry up to 3 times.';
+    }
+
+    if (errorLower.contains('429') || errorLower.contains('resource_exhausted')) {
+      return 'Rate limit exceeded (429)\n'
+             'Too many requests. Please wait a moment before trying again.';
+    }
+
+    if (errorLower.contains('permission_denied') || errorLower.contains('api_key')) {
+      return 'API Key Error\n'
+             'Please check your API key in Settings.';
+    }
+
+    if (errorLower.contains('invalid_argument')) {
+      return 'Invalid audio format\n'
+             'Please try recording again with clear speech.';
+    }
+
+    if (errorLower.contains('empty transcription')) {
+      return 'No speech detected\n'
+             'Please speak clearly and ensure your microphone is working.';
+    }
+
+    if (errorLower.contains('deadline_exceeded')) {
+      return 'Request timeout\n'
+             'The request took too long. Please try with a shorter recording.';
+    }
+
+    // Generic error with suggestions
+    return 'Transcription failed\n'
+           'Error: ${error.length > 100 ? error.substring(0, 100) : error}\n\n'
+           'Suggestions:\n'
+           '• Check your internet connection\n'
+           '• Ensure you have a valid API key\n'
+           '• Try recording shorter audio clips\n'
+           '• Speak clearly during recording';
+  }
+
+  bool _isMeaningfulTranscription(String text) {
+    if (text.isEmpty) return false;
+
+    // Convert to lowercase and trim
+    final cleanText = text.toLowerCase().trim();
+
+    // List of common non-meaningful responses from silence
+    const nonMeaningfulResponses = [
+      'ok',
+      'okay',
+      'hello',
+      'hi',
+      'um',
+      'uh',
+      'ah',
+      'mm',
+      'hm',
+      'yes',
+      'no',
+      'thanks',
+      'thank you',
+      'please',
+      'sure',
+      'alright',
+      'cool',
+      'good',
+      'bad',
+      'nice',
+      'great',
+    ];
+
+    // Check if it's just one word
+    final words = cleanText.split(' ').where((w) => w.isNotEmpty).toList();
+    if (words.length == 1 && nonMeaningfulResponses.contains(words.first)) {
+      return false;
+    }
+
+    // Check if it's too short (less than 3 words)
+    if (words.length < 3) {
+      return false;
+    }
+
+    // Check for email template patterns (common when no speech)
+    if (cleanText.contains('[recipient name]') ||
+        cleanText.contains('[your name]') ||
+        cleanText.contains('dear [recipient]') ||
+        cleanText.contains('subject:')) {
+      return false;
+    }
+
+    // Check for repetitive or generic responses
+    if (cleanText.contains('confirmation') &&
+        cleanText.contains('thank you for your message')) {
+      return false;
+    }
+
+    // If it passed all checks, consider it meaningful
+    return true;
   }
 }
