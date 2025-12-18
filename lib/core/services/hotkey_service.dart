@@ -115,18 +115,12 @@ class HotkeyService {
             final char = part.toUpperCase().codeUnitAt(0);
             if (char >= 65 && char <= 90) {
               // A-Z - use the key code directly without adding 32
-              key = LogicalKeyboardKey.findKeyByKeyId(char | 0x1000000); // Use proper key ID
-              // Fallback if key not found
-              if (key == null) {
-                key = _getKeyFromLabel(part.toUpperCase());
-              }
+              key = LogicalKeyboardKey.findKeyByKeyId(char | 0x1000000) ?? // Use proper key ID
+                  _getKeyFromLabel(part.toUpperCase()); // Fallback if key not found
             } else if (char >= 48 && char <= 57) {
               // 0-9
-              key = LogicalKeyboardKey.findKeyByKeyId(char | 0x1000000);
-              // Fallback if key not found
-              if (key == null) {
-                key = _getKeyFromLabel(part);
-              }
+              key = LogicalKeyboardKey.findKeyByKeyId(char | 0x1000000) ??
+                  _getKeyFromLabel(part); // Fallback if key not found
             }
           }
       }

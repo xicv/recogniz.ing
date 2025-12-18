@@ -101,8 +101,8 @@ class _AppShellState extends ConsumerState<AppShell> {
     if (!settings.hasApiKey) return null;
 
     return SizedBox(
-      width: 100,
-      height: 100,
+      width: 56,
+      height: 56,
       child: FloatingActionButton(
         onPressed: state == RecordingState.processing
             ? null
@@ -114,18 +114,18 @@ class _AppShellState extends ConsumerState<AppShell> {
         elevation: 8,
         child: state == RecordingState.processing
             ? const SizedBox(
-                width: 40,
-                height: 40,
+                width: 24,
+                height: 24,
                 child: CircularProgressIndicator(
                   color: Colors.white,
-                  strokeWidth: 4,
+                  strokeWidth: 3,
                 ),
               )
             : Icon(
                 state == RecordingState.recording
                     ? LucideIcons.micOff
                     : LucideIcons.mic,
-                size: 40,
+                size: 24,
                 color: Colors.white,
               ),
       ),
@@ -137,16 +137,16 @@ class _AppShellState extends ConsumerState<AppShell> {
     final audioService = ref.read(audioServiceProvider);
     final settings = ref.read(settingsProvider);
 
-    print('=== Toggle Recording ===');
-    print('Current state: $state');
-    print('Has API key: ${settings.hasApiKey}');
+    debugPrint('=== Toggle Recording ===');
+    debugPrint('Current state: $state');
+    debugPrint('Has API key: ${settings.hasApiKey}');
 
     if (state == RecordingState.idle) {
       // Start recording
       try {
-        print('Checking microphone permission...');
+        debugPrint('Checking microphone permission...');
         final hasPermission = await audioService.hasPermission();
-        print('Has permission: $hasPermission');
+        debugPrint('Has permission: $hasPermission');
 
         if (!hasPermission) {
           ref.read(lastErrorProvider.notifier).state =
@@ -154,29 +154,29 @@ class _AppShellState extends ConsumerState<AppShell> {
           return;
         }
 
-        print('Starting recording...');
+        debugPrint('Starting recording...');
         await audioService.startRecording();
         ref.read(recordingStateProvider.notifier).state =
             RecordingState.recording;
-        print('Recording started successfully');
+        debugPrint('Recording started successfully');
       } catch (e) {
-        print('Error starting recording: $e');
+        debugPrint('Error starting recording: $e');
         ref.read(lastErrorProvider.notifier).state =
             'Failed to start recording: $e';
       }
     } else if (state == RecordingState.recording) {
       // Stop recording and process
-      print('Stopping recording...');
+      debugPrint('Stopping recording...');
       ref.read(recordingStateProvider.notifier).state =
           RecordingState.processing;
 
       try {
         final result = await audioService.stopRecording();
-        print(
+        debugPrint(
             'Recording stopped. Result: ${result != null ? "Got audio data" : "No data"}');
 
         if (result == null) {
-          print('No recording result');
+          debugPrint('No recording result');
           ref.read(lastErrorProvider.notifier).state =
               'No audio recorded. Please speak clearly and try again.\n'
               'Tip: Recordings must be at least 0.5 seconds long.';
@@ -184,18 +184,30 @@ class _AppShellState extends ConsumerState<AppShell> {
           return;
         }
 
-        print('Audio bytes: ${result.bytes.length}');
-        print('Duration: ${result.durationSeconds}s');
+        // Check if audio contains speech (pre-validated by AudioService)
+        if (!result.containsSpeech) {
+          final analysis = result.analysis;
+          debugPrint('Audio does not contain speech: ${analysis?.reason ?? "Unknown reason"}');
+          ref.read(lastErrorProvider.notifier).state =
+              'No speech detected in recording.\n'
+              '${analysis?.reason ?? "Please speak more clearly and try again."}\n'
+              'Tip: Make sure you\'re speaking at a normal volume.';
+          ref.read(recordingStateProvider.notifier).state = RecordingState.idle;
+          return;
+        }
+
+        debugPrint('Audio bytes: ${result.bytes.length}');
+        debugPrint('Duration: ${result.durationSeconds}s');
 
         // Get services and data
         final geminiService = ref.read(geminiServiceProvider);
         final prompts = ref.read(promptsProvider);
         final vocabulary = ref.read(vocabularyProvider);
 
-        print('Gemini initialized: ${geminiService.isInitialized}');
+        debugPrint('Gemini initialized: ${geminiService.isInitialized}');
 
         if (!geminiService.isInitialized) {
-          print('Initializing Gemini with API key...');
+          debugPrint('Initializing Gemini with API key...');
           geminiService.initialize(settings.geminiApiKey!);
         }
 
@@ -210,22 +222,24 @@ class _AppShellState extends ConsumerState<AppShell> {
           orElse: () => vocabulary.first,
         );
 
-        print('Selected prompt: ${selectedPrompt.name}');
-        print(
+        debugPrint('Selected prompt: ${selectedPrompt.name}');
+        debugPrint(
             'Selected vocabulary: ${selectedVocab.name} (${selectedVocab.words.length} words)');
 
         // Transcribe
-        print('Calling Gemini API for transcription...');
+        debugPrint('Calling Gemini API for transcription...');
+        debugPrint('Using critical instructions: ${settings.effectiveCriticalInstructions}');
         final transcriptionResult = await geminiService.transcribeAudio(
           audioBytes: Uint8List.fromList(result.bytes),
           vocabulary: selectedVocab.wordsAsString,
           promptTemplate: selectedPrompt.promptTemplate,
+          criticalInstructions: settings.effectiveCriticalInstructions,
         );
 
-        print('=== Transcription Result ===');
-        print('Raw text: ${transcriptionResult.rawText}');
-        print('Processed text: ${transcriptionResult.processedText}');
-        print('Tokens: ${transcriptionResult.tokenUsage}');
+        debugPrint('=== Transcription Result ===');
+        debugPrint('Raw text: ${transcriptionResult.rawText}');
+        debugPrint('Processed text: ${transcriptionResult.processedText}');
+        debugPrint('Tokens: ${transcriptionResult.tokenUsage}');
 
         // The Gemini API now handles speech detection at the source
         // If we get here, we have meaningful transcription
@@ -244,13 +258,13 @@ class _AppShellState extends ConsumerState<AppShell> {
         await ref
             .read(transcriptionsProvider.notifier)
             .addTranscription(transcription);
-        print('Transcription saved');
+        debugPrint('Transcription saved');
 
         // Auto-copy if enabled
         if (settings.autoCopyToClipboard) {
           await Clipboard.setData(
               ClipboardData(text: transcriptionResult.processedText));
-          print('Copied to clipboard');
+          debugPrint('Copied to clipboard');
         }
 
         // Show success notification
@@ -268,9 +282,9 @@ class _AppShellState extends ConsumerState<AppShell> {
           );
         }
       } catch (e, stackTrace) {
-        print('=== Error during transcription ===');
-        print('Error: $e');
-        print('Stack trace: $stackTrace');
+        debugPrint('=== Error during transcription ===');
+        debugPrint('Error: $e');
+        debugPrint('Stack trace: $stackTrace');
 
         // Check for no speech error
         if (e.toString().contains('No speech detected') ||
@@ -285,7 +299,7 @@ class _AppShellState extends ConsumerState<AppShell> {
       }
 
       ref.read(recordingStateProvider.notifier).state = RecordingState.idle;
-      print('=== Recording flow complete ===');
+      debugPrint('=== Recording flow complete ===');
     }
   }
 

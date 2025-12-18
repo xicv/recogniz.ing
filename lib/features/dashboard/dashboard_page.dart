@@ -72,7 +72,7 @@ class DashboardPage extends ConsumerWidget {
                       ),
                       child: Row(
                         children: [
-                          const Icon(LucideIcons.alertTriangle,
+                          Icon(LucideIcons.alertTriangle,
                               color: AppColors.warning, size: 18),
                           const SizedBox(width: 10),
                           Expanded(

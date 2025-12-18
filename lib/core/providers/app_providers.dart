@@ -77,6 +77,12 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await StorageService.saveSettings(newState);
     state = newState;
   }
+
+  Future<void> updateCriticalInstructions(String instructions) async {
+    final newState = state.copyWith(criticalInstructions: instructions);
+    await StorageService.saveSettings(newState);
+    state = newState;
+  }
 }
 
 // Transcriptions

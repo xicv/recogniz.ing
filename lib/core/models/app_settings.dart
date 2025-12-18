@@ -25,6 +25,9 @@ class AppSettings extends HiveObject {
   @HiveField(6)
   final bool showNotifications;
 
+  @HiveField(7)
+  final String? criticalInstructions;
+
   AppSettings({
     this.geminiApiKey,
     this.selectedPromptId = 'default-clean',
@@ -33,6 +36,11 @@ class AppSettings extends HiveObject {
     this.darkMode = false,
     this.autoCopyToClipboard = true,
     this.showNotifications = true,
+    this.criticalInstructions = '''CRITICAL INSTRUCTIONS:
+- Only transcribe actual speech that you hear in the audio
+- If the audio contains only silence, background noise, or no discernible speech, respond with exactly: [NO_SPEECH]
+- Do NOT transcribe the vocabulary list or any text that is not spoken in the audio
+- The vocabulary below is for reference ONLY - do not use it to generate fake transcriptions''',
   });
 
   AppSettings copyWith({
@@ -43,6 +51,7 @@ class AppSettings extends HiveObject {
     bool? darkMode,
     bool? autoCopyToClipboard,
     bool? showNotifications,
+    String? criticalInstructions,
   }) {
     return AppSettings(
       geminiApiKey: geminiApiKey ?? this.geminiApiKey,
@@ -52,8 +61,15 @@ class AppSettings extends HiveObject {
       darkMode: darkMode ?? this.darkMode,
       autoCopyToClipboard: autoCopyToClipboard ?? this.autoCopyToClipboard,
       showNotifications: showNotifications ?? this.showNotifications,
+      criticalInstructions: criticalInstructions ?? this.criticalInstructions,
     );
   }
 
   bool get hasApiKey => geminiApiKey != null && geminiApiKey!.isNotEmpty;
+
+  String get effectiveCriticalInstructions => criticalInstructions ?? '''CRITICAL INSTRUCTIONS:
+- Only transcribe actual speech that you hear in the audio
+- If the audio contains only silence, background noise, or no discernible speech, respond with exactly: [NO_SPEECH]
+- Do NOT transcribe the vocabulary list or any text that is not spoken in the audio
+- The vocabulary below is for reference ONLY - do not use it to generate fake transcriptions''';
 }

@@ -163,7 +163,7 @@ class _HotkeyEditorDialogState extends ConsumerState<HotkeyEditorDialog> {
                 child: Column(
                   children: [
                     if (_isRecording) ...[
-                      const Icon(LucideIcons.keyboard,
+                      Icon(LucideIcons.keyboard,
                           size: 32, color: AppColors.primary),
                       const SizedBox(height: 12),
                       Text(

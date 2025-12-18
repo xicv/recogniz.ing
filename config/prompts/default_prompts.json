@@ -1,0 +1,53 @@
+{
+  "version": "1.0.0",
+  "prompts": [
+    {
+      "id": "default-clean",
+      "name": "Clean Transcription",
+      "description": "Clean up speech, fix grammar, remove filler words",
+      "category": "general",
+      "template": "You are a transcription assistant. Clean up the following speech transcription:\n- Fix grammar and punctuation\n- Remove filler words (um, uh, like, you know)\n- Keep the original meaning intact\n- Output only the cleaned text, nothing else\n\nTranscription: {{text}}",
+      "isDefault": true
+    },
+    {
+      "id": "default-formal",
+      "name": "Formal Writing",
+      "description": "Convert speech to formal written text",
+      "category": "professional",
+      "template": "Convert the following speech transcription into formal written text:\n- Use professional language\n- Structure into proper paragraphs if needed\n- Fix all grammar and punctuation\n- Output only the formal text, nothing else\n\nTranscription: {{text}}",
+      "isDefault": true
+    },
+    {
+      "id": "default-bullet",
+      "name": "Bullet Points",
+      "description": "Convert speech to organized bullet points",
+      "category": "organization",
+      "template": "Convert the following speech transcription into organized bullet points:\n- Extract key points\n- Use clear, concise language\n- Group related points together\n- Output only the bullet points, nothing else\n\nTranscription: {{text}}",
+      "isDefault": true
+    },
+    {
+      "id": "default-email",
+      "name": "Email Draft",
+      "description": "Convert speech to email format",
+      "category": "communication",
+      "template": "Convert the following speech transcription into a professional email:\n- Add appropriate greeting and closing\n- Structure the content clearly\n- Use professional tone\n- Output only the email, nothing else\n\nTranscription: {{text}}",
+      "isDefault": true
+    },
+    {
+      "id": "default-meeting",
+      "name": "Meeting Notes",
+      "description": "Convert speech to structured meeting notes",
+      "category": "business",
+      "template": "Convert the following speech transcription into structured meeting notes:\n- Identify action items and assign owners\n- Summarize key decisions made\n- Highlight important discussion points\n- Use clear headings and bullet points\n- Output only the meeting notes, nothing else\n\nTranscription: {{text}}",
+      "isDefault": true
+    },
+    {
+      "id": "default-social",
+      "name": "Social Media Post",
+      "description": "Convert speech to social media friendly text",
+      "category": "social",
+      "template": "Convert the following speech transcription into a social media post:\n- Keep it concise and engaging\n- Add relevant hashtags if appropriate\n- Maintain a casual but professional tone\n- Format for readability on mobile\n- Output only the social media post, nothing else\n\nTranscription: {{text}}",
+      "isDefault": true
+    }
+  ]
+}

@@ -9,13 +9,137 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/providers/app_providers.dart';
 import '../../core/services/gemini_service.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/models/vocabulary.dart';
+import '../../core/models/app_settings.dart';
+import 'widgets/critical_instructions_editor.dart';
 import 'widgets/hotkey_editor.dart';
 import 'widgets/prompt_editor.dart';
 import 'widgets/settings_section.dart';
 import 'widgets/vocabulary_editor.dart';
 
-class SettingsPage extends ConsumerWidget {
+class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
+
+  @override
+  ConsumerState<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends ConsumerState<SettingsPage> {
+  final Set<String> _expandedVocabIds = <String>{};
+
+  Widget _buildVocabularyTile(
+    BuildContext context,
+    WidgetRef ref,
+    VocabularySet vocab,
+    AppSettings settings,
+  ) {
+    final isExpanded = _expandedVocabIds.contains(vocab.id);
+
+    return Column(
+      children: [
+        ListTile(
+          title: Text(vocab.name),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${vocab.words.length} words',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              if (!isExpanded && vocab.words.isNotEmpty)
+                Text(
+                  vocab.words.take(3).join(', '),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+            ],
+          ),
+          leading: Radio<String>(
+            value: vocab.id,
+            groupValue: settings.selectedVocabularyId,
+            onChanged: (value) {
+              if (value != null) {
+                ref
+                    .read(settingsProvider.notifier)
+                    .updateSelectedVocabulary(value);
+              }
+            },
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    if (isExpanded) {
+                      _expandedVocabIds.remove(vocab.id);
+                    } else {
+                      _expandedVocabIds.add(vocab.id);
+                    }
+                  });
+                },
+                icon: Icon(
+                  isExpanded ? LucideIcons.chevronUp : LucideIcons.chevronDown,
+                  size: 16,
+                ),
+                tooltip: isExpanded ? 'Show less' : 'Show words',
+              ),
+              if (!vocab.isDefault)
+                IconButton(
+                  onPressed: () => _showVocabularyEditor(context, ref,
+                      vocabulary: vocab),
+                  icon: const Icon(LucideIcons.edit, size: 16),
+                ),
+            ],
+          ),
+          onTap: () {
+            ref
+                .read(settingsProvider.notifier)
+                .updateSelectedVocabulary(vocab.id);
+          },
+        ),
+        if (isExpanded)
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (vocab.description.isNotEmpty) ...[
+                  Text(
+                    vocab.description,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          fontStyle: FontStyle.italic,
+                        ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  children: vocab.words.map((word) => Chip(
+                    label: Text(
+                      word,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                    visualDensity: VisualDensity.compact,
+                  )).toList(),
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
 
   String _formatHotkeyForDisplay(String hotkey) {
     if (!Platform.isMacOS) return hotkey;
@@ -29,7 +153,7 @@ class SettingsPage extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final settings = ref.watch(settingsProvider);
     final prompts = ref.watch(promptsProvider);
     final vocabulary = ref.watch(vocabularyProvider);
@@ -105,6 +229,12 @@ class SettingsPage extends ConsumerWidget {
 
           const SizedBox(height: 20),
 
+          // Critical Instructions
+          const CriticalInstructionsEditor()
+              .animate().fadeIn(duration: 300.ms, delay: 200.ms),
+
+          const SizedBox(height: 20),
+
           // Custom Prompts
           SettingsSection(
             title: 'Custom Prompts',
@@ -161,37 +291,7 @@ class SettingsPage extends ConsumerWidget {
               tooltip: 'Add Vocabulary',
             ),
             children: [
-              ...vocabulary.map((vocab) => ListTile(
-                    title: Text(vocab.name),
-                    subtitle: Text(
-                      '${vocab.words.length} words',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    leading: Radio<String>(
-                      value: vocab.id,
-                      groupValue: settings.selectedVocabularyId,
-                      onChanged: (value) {
-                        if (value != null) {
-                          ref
-                              .read(settingsProvider.notifier)
-                              .updateSelectedVocabulary(value);
-                        }
-                      },
-                    ),
-                    trailing: vocab.isDefault
-                        ? null
-                        : IconButton(
-                            onPressed: () => _showVocabularyEditor(context, ref,
-                                vocabulary: vocab),
-                            icon: const Icon(LucideIcons.edit, size: 16),
-                          ),
-                    onTap: () {
-                      ref
-                          .read(settingsProvider.notifier)
-                          .updateSelectedVocabulary(vocab.id);
-                    },
-                  )),
+              ...vocabulary.map((vocab) => _buildVocabularyTile(context, ref, vocab, settings)),
             ],
           ).animate().fadeIn(duration: 300.ms, delay: 250.ms),
 

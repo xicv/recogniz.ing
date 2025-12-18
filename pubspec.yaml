@@ -61,3 +61,7 @@ flutter:
   assets:
     - assets/
     - assets/icons/
+    - config/
+    - config/themes/
+    - config/prompts/
+    - config/vocabulary/

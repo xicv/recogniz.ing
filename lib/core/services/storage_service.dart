@@ -1,8 +1,12 @@
+import 'dart:io';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 import '../models/transcription.dart';
 import '../models/custom_prompt.dart';
 import '../models/vocabulary.dart';
 import '../models/app_settings.dart';
+import '../config/prompt_config.dart';
+import '../config/vocabulary_config.dart';
 
 class StorageService {
   static const String transcriptionsBox = 'transcriptions';
@@ -10,6 +14,7 @@ class StorageService {
   static const String vocabularyBox = 'vocabulary';
   static const String settingsBox = 'settings';
 
+  
   static Future<void> initialize() async {
     // Register adapters
     Hive.registerAdapter(TranscriptionAdapter());
@@ -32,17 +37,49 @@ class StorageService {
     final vocabBox = Hive.box<VocabularySet>(StorageService.vocabularyBox);
     final settingsBox = Hive.box<AppSettings>(StorageService.settingsBox);
 
-    // Add default prompts if empty
+    // Add default prompts from config if empty
     if (promptsBox.isEmpty) {
-      for (final prompt in CustomPrompt.defaults) {
-        await promptsBox.put(prompt.id, prompt);
+      try {
+        final promptConfig = await PromptConfig.fromAsset();
+        for (final prompt in promptConfig.prompts) {
+          final customPrompt = CustomPrompt(
+            id: prompt.id,
+            name: prompt.name,
+            description: prompt.description,
+            promptTemplate: prompt.template,
+            isDefault: prompt.isDefault,
+            createdAt: DateTime.now(),
+          );
+          await promptsBox.put(prompt.id, customPrompt);
+        }
+      } catch (e) {
+        // Fallback to hardcoded defaults if config loading fails
+        for (final prompt in CustomPrompt.defaults) {
+          await promptsBox.put(prompt.id, prompt);
+        }
       }
     }
 
-    // Add default vocabulary if empty
+    // Add default vocabulary from config if empty
     if (vocabBox.isEmpty) {
-      for (final vocab in VocabularySet.defaults) {
-        await vocabBox.put(vocab.id, vocab);
+      try {
+        final vocabConfig = await VocabularyConfig.fromAsset();
+        for (final vocab in vocabConfig.vocabularies) {
+          final vocabularySet = VocabularySet(
+            id: vocab.id,
+            name: vocab.name,
+            description: vocab.description,
+            words: vocab.words,
+            isDefault: vocab.isDefault,
+            createdAt: DateTime.now(),
+          );
+          await vocabBox.put(vocab.id, vocabularySet);
+        }
+      } catch (e) {
+        // Fallback to hardcoded defaults if config loading fails
+        for (final vocab in VocabularySet.defaults) {
+          await vocabBox.put(vocab.id, vocab);
+        }
       }
     }
 

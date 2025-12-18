@@ -1,0 +1,41 @@
+{
+  "name": "dark",
+  "displayName": "Dark Theme",
+  "colors": {
+    "primary": "#6366F1",
+    "primaryLight": "#818CF8",
+    "primaryDark": "#4F46E5",
+    "accent": "#22D3EE",
+    "success": "#10B981",
+    "warning": "#F59E0B",
+    "error": "#EF4444",
+    "background": "#0F172A",
+    "surface": "#1E293B",
+    "textPrimary": "#F1F5F9",
+    "textSecondary": "#94A3B8"
+  },
+  "borderRadius": {
+    "small": 8,
+    "medium": 12,
+    "large": 16,
+    "xlarge": 24
+  },
+  "spacing": {
+    "xs": 4,
+    "sm": 8,
+    "md": 16,
+    "lg": 24,
+    "xl": 32,
+    "xxl": 48
+  },
+  "elevation": {
+    "card": 0,
+    "button": 0,
+    "fab": 6
+  },
+  "padding": {
+    "small": 8,
+    "medium": 16,
+    "large": 24
+  }
+}

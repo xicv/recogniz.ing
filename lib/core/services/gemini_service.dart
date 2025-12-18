@@ -1,34 +1,33 @@
 import 'dart:math';
-import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 class GeminiService {
   GenerativeModel? _model;
-  String? _apiKey;
 
   static const String _modelName = 'gemini-3-flash-preview';
 
   bool get isInitialized => _model != null;
 
   void initialize(String apiKey) {
-    print('[GeminiService] Initializing with model: $_modelName');
-    _apiKey = apiKey;
+    debugPrint('[GeminiService] Initializing with model: $_modelName');
     _model = GenerativeModel(
       model: _modelName,
       apiKey: apiKey,
     );
-    print('[GeminiService] Initialized successfully');
+    debugPrint('[GeminiService] Initialized successfully');
   }
 
   Future<TranscriptionResult> transcribeAudio({
     required Uint8List audioBytes,
     required String vocabulary,
     required String promptTemplate,
+    String? criticalInstructions,
   }) async {
-    print('[GeminiService] transcribeAudio called');
-    print('[GeminiService] Audio bytes: ${audioBytes.length}');
-    print('[GeminiService] Vocabulary: $vocabulary');
+    debugPrint('[GeminiService] transcribeAudio called');
+    debugPrint('[GeminiService] Audio bytes: ${audioBytes.length}');
+    debugPrint('[GeminiService] Vocabulary: $vocabulary');
 
     if (_model == null) {
       throw Exception('Gemini service not initialized. Please set API key.');
@@ -38,11 +37,11 @@ class GeminiService {
     String transcriptionPrompt = '''
 Transcribe the following audio accurately.
 
-CRITICAL INSTRUCTIONS:
+${criticalInstructions ?? '''CRITICAL INSTRUCTIONS:
 - Only transcribe actual speech that you hear in the audio
 - If the audio contains only silence, background noise, or no discernible speech, respond with exactly: [NO_SPEECH]
 - Do NOT transcribe the vocabulary list or any text that is not spoken in the audio
-- The vocabulary below is for reference ONLY - do not use it to generate fake transcriptions
+- The vocabulary below is for reference ONLY - do not use it to generate fake transcriptions'''}
 ''';
 
     // Only include vocabulary if it's not empty
@@ -58,7 +57,7 @@ Output only the transcription, nothing else.''';
 Output only the transcription, nothing else.''';
     }
 
-    print('[GeminiService] Sending audio to Gemini for transcription...');
+    debugPrint('[GeminiService] Sending audio to Gemini for transcription...');
 
     try {
       // Create content with audio - try different MIME types
@@ -67,29 +66,29 @@ Output only the transcription, nothing else.''';
         DataPart('audio/mp4', audioBytes), // m4a is mp4 audio
       ]);
 
-      print('[GeminiService] Calling generateContent for transcription...');
+      debugPrint('[GeminiService] Calling generateContent for transcription...');
       final transcriptionResponse = await _executeWithRetry(
         () => _model!.generateContent([audioContent]),
         operationName: 'transcription',
       );
 
       final rawText = transcriptionResponse.text ?? '';
-      print('[GeminiService] Raw transcription: $rawText');
+      debugPrint('[GeminiService] Raw transcription: $rawText');
 
       if (rawText.isEmpty) {
-        print('[GeminiService] Warning: Empty transcription received');
+        debugPrint('[GeminiService] Warning: Empty transcription received');
         throw Exception('Empty transcription received from API');
       }
 
       // Check if no speech was detected
       if (rawText.trim() == '[NO_SPEECH]') {
-        print('[GeminiService] No speech detected in audio');
+        debugPrint('[GeminiService] No speech detected in audio');
         throw Exception('No speech detected in audio');
       }
 
       // Then, process with the custom prompt
       final processedPrompt = promptTemplate.replaceAll('{{text}}', rawText);
-      print('[GeminiService] Processing with custom prompt...');
+      debugPrint('[GeminiService] Processing with custom prompt...');
 
       final processedResponse = await _executeWithRetry(
         () => _model!.generateContent([Content.text(processedPrompt)]),
@@ -97,7 +96,7 @@ Output only the transcription, nothing else.''';
       );
 
       final processedText = processedResponse.text ?? rawText;
-      print('[GeminiService] Processed text: $processedText');
+      debugPrint('[GeminiService] Processed text: $processedText');
 
       // Estimate token usage
       final estimatedTokens =
@@ -110,14 +109,14 @@ Output only the transcription, nothing else.''';
         tokenUsage: estimatedTokens,
       );
     } catch (e, stackTrace) {
-      print('[GeminiService] Error during transcription: $e');
-      print('[GeminiService] Stack trace: $stackTrace');
+      debugPrint('[GeminiService] Error during transcription: $e');
+      debugPrint('[GeminiService] Stack trace: $stackTrace');
       rethrow;
     }
   }
 
   Future<(bool isValid, String? error)> validateApiKey(String apiKey) async {
-    print('[GeminiService] Validating API key...');
+    debugPrint('[GeminiService] Validating API key...');
     try {
       final testModel = GenerativeModel(
         model: _modelName,
@@ -128,15 +127,15 @@ Output only the transcription, nothing else.''';
         Content.text('Say "OK"'),
       ]);
 
-      print('[GeminiService] Validation response: ${response.text}');
+      debugPrint('[GeminiService] Validation response: ${response.text}');
 
       if (response.text != null && response.text!.isNotEmpty) {
-        print('[GeminiService] API key is valid');
+        debugPrint('[GeminiService] API key is valid');
         return (true, null);
       }
       return (false, 'No response from API');
     } catch (e) {
-      print('[GeminiService] Validation error: $e');
+      debugPrint('[GeminiService] Validation error: $e');
       final errorStr = e.toString();
 
       if (errorStr.contains('403') ||
@@ -172,7 +171,7 @@ Output only the transcription, nothing else.''';
         return await operation();
       } catch (e) {
         attempt++;
-        print(
+        debugPrint(
             '[GeminiService] $operationName failed (attempt $attempt/$maxRetries): $e');
 
         final errorStr = e.toString().toLowerCase();
@@ -182,7 +181,7 @@ Output only the transcription, nothing else.''';
             errorStr.contains('permission_denied') ||
             errorStr.contains('not_found') ||
             errorStr.contains('api_key_invalid')) {
-          print('[GeminiService] Non-retryable error, failing immediately');
+          debugPrint('[GeminiService] Non-retryable error, failing immediately');
           rethrow;
         }
 
@@ -194,7 +193,7 @@ Output only the transcription, nothing else.''';
             errorStr.contains('deadline_exceeded') ||
             errorStr.contains('internal')) {
           if (attempt >= maxRetries) {
-            print('[GeminiService] Max retries exceeded for $operationName');
+            debugPrint('[GeminiService] Max retries exceeded for $operationName');
             rethrow;
           }
 
@@ -204,7 +203,7 @@ Output only the transcription, nothing else.''';
             milliseconds: (delay.inMilliseconds * (1 + jitter)).round(),
           );
 
-          print(
+          debugPrint(
               '[GeminiService] Retrying $operationName in ${waitTime.inSeconds}s...');
           await Future.delayed(waitTime);
 
@@ -221,7 +220,6 @@ Output only the transcription, nothing else.''';
 
   void dispose() {
     _model = null;
-    _apiKey = null;
   }
 }
 

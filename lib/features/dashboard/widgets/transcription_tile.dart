@@ -112,7 +112,7 @@ class _TranscriptionTileState extends State<TranscriptionTile> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(
+                          borderSide: BorderSide(
                               color: AppColors.primary, width: 2),
                         ),
                         hintText: 'Enter transcription text...',
