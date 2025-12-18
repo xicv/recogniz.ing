@@ -100,28 +100,35 @@ class _AppShellState extends ConsumerState<AppShell> {
 
     if (!settings.hasApiKey) return null;
 
-    return FloatingActionButton.large(
-      onPressed: state == RecordingState.processing
-          ? null
-          : () => _toggleRecording(context, ref, state),
-      backgroundColor: state == RecordingState.recording
-          ? Colors.red
-          : Theme.of(context).colorScheme.primary,
-      child: state == RecordingState.processing
-          ? const SizedBox(
-              width: 32,
-              height: 32,
-              child: CircularProgressIndicator(
+    return SizedBox(
+      width: 100,
+      height: 100,
+      child: FloatingActionButton(
+        onPressed: state == RecordingState.processing
+            ? null
+            : () => _toggleRecording(context, ref, state),
+        backgroundColor: state == RecordingState.recording
+            ? Colors.red
+            : Theme.of(context).colorScheme.primary,
+        shape: const CircleBorder(),
+        elevation: 8,
+        child: state == RecordingState.processing
+            ? const SizedBox(
+                width: 40,
+                height: 40,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 4,
+                ),
+              )
+            : Icon(
+                state == RecordingState.recording
+                    ? LucideIcons.micOff
+                    : LucideIcons.mic,
+                size: 40,
                 color: Colors.white,
-                strokeWidth: 3,
               ),
-            )
-          : Icon(
-              state == RecordingState.recording
-                  ? LucideIcons.micOff
-                  : LucideIcons.mic,
-              size: 32,
-            ),
+      ),
     );
   }
 
