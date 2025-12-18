@@ -7,8 +7,7 @@ class GeminiService {
   GenerativeModel? _model;
   String? _apiKey;
 
-  // Gemini 2.5 Flash
-  static const String _modelName = 'gemini-2.5-flash';
+  static const String _modelName = 'gemini-3-flash-preview';
 
   bool get isInitialized => _model != null;
 
@@ -173,7 +172,8 @@ Output only the transcription, nothing else.''';
         return await operation();
       } catch (e) {
         attempt++;
-        print('[GeminiService] $operationName failed (attempt $attempt/$maxRetries): $e');
+        print(
+            '[GeminiService] $operationName failed (attempt $attempt/$maxRetries): $e');
 
         final errorStr = e.toString().toLowerCase();
 
@@ -193,7 +193,6 @@ Output only the transcription, nothing else.''';
             errorStr.contains('resource_exhausted') ||
             errorStr.contains('deadline_exceeded') ||
             errorStr.contains('internal')) {
-
           if (attempt >= maxRetries) {
             print('[GeminiService] Max retries exceeded for $operationName');
             rethrow;
@@ -205,7 +204,8 @@ Output only the transcription, nothing else.''';
             milliseconds: (delay.inMilliseconds * (1 + jitter)).round(),
           );
 
-          print('[GeminiService] Retrying $operationName in ${waitTime.inSeconds}s...');
+          print(
+              '[GeminiService] Retrying $operationName in ${waitTime.inSeconds}s...');
           await Future.delayed(waitTime);
 
           delay *= 2;
