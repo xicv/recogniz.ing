@@ -20,21 +20,35 @@ const _windowChannel = MethodChannel('com.recognizing.app/window');
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  debugPrint('[Main] WidgetsFlutterBinding initialized');
 
   await Hive.initFlutter();
-  await StorageService.initialize();
+  debugPrint('[Main] Hive initialized');
+
+  try {
+    await StorageService.initialize();
+    debugPrint('[Main] StorageService initialized');
+  } catch (e) {
+    debugPrint('[Main] StorageService initialization failed: $e');
+    // Try to continue with default settings
+    debugPrint('[Main] Continuing with default settings...');
+  }
 
   providerContainer = ProviderContainer();
+  debugPrint('[Main] ProviderContainer created');
 
   final trayService = TrayService();
   await trayService.initialize();
+  debugPrint('[Main] TrayService initialized');
 
+  debugPrint('[Main] Starting runApp');
   runApp(
     UncontrolledProviderScope(
       container: providerContainer,
       child: RecognizingApp(trayService: trayService),
     ),
   );
+  debugPrint('[Main] runApp completed');
 }
 
 class RecognizingApp extends ConsumerStatefulWidget {

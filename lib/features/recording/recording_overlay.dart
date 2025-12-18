@@ -8,6 +8,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/providers/app_providers.dart';
 import '../../core/theme/app_theme.dart';
+import '../../widgets/shared/widgets.dart';
 
 class RecordingOverlay extends ConsumerWidget {
   const RecordingOverlay({super.key});
@@ -69,11 +70,7 @@ class RecordingOverlay extends ConsumerWidget {
                   const SizedBox(height: 24),
                   const _RecordingTimer(),
                 ] else if (state == RecordingState.processing) ...[
-                  const SizedBox(
-                    width: 60,
-                    height: 60,
-                    child: CircularProgressIndicator(strokeWidth: 3),
-                  ),
+                  LoadingIndicators.medium(color: Colors.white),
                   const SizedBox(height: 24),
                   Text(
                     'Processing...',

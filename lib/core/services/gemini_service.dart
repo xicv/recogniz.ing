@@ -89,6 +89,7 @@ Output only the transcription, nothing else.''';
       // Then, process with the custom prompt
       final processedPrompt = promptTemplate.replaceAll('{{text}}', rawText);
       debugPrint('[GeminiService] Processing with custom prompt...');
+      debugPrint('[GeminiService] Processed prompt preview: ${processedPrompt.length > 200 ? "${processedPrompt.substring(0, 200)}..." : processedPrompt}');
 
       final processedResponse = await _executeWithRetry(
         () => _model!.generateContent([Content.text(processedPrompt)]),

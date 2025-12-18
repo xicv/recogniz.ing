@@ -80,12 +80,16 @@ flutter run -d linux
 - Desktop-only global hotkey support for quick activation
 - System tray integration for desktop platforms
 - Auto-cancellation of silent recordings
+- **Enhanced Audio Analysis**: RMS-based amplitude detection with optimized thresholds
+- Pre-validation to filter non-speech audio before API calls (reduces costs)
 
 ### 🤖 **AI-Powered Transcription**
 - Powered by Google's Gemini 1.5 Flash model
 - Intelligent noise filtering and silence detection
 - Real-time transcription with customizable processing
 - Automatic retry mechanism with exponential backoff
+- **Editable Critical Instructions**: Fine-tune AI behavior with customizable prompts
+- Built-in instruction presets (Strict, Balanced, Lenient) for different use cases
 
 ### 📝 **Smart Prompts System**
 - **6 Pre-configured Prompts:**
@@ -108,6 +112,8 @@ flutter run -d linux
   - Finance - Financial terms (portfolio, dividend, equity, IPO)
 - Dynamic vocabulary loading from JSON configuration
 - Multi-word phrase recognition
+- **Visual Vocabulary Preview**: Expandable vocabulary tiles showing actual words in chips
+- Quick word preview (first 3 words) when collapsed
 
 ### 🎨 **Modern UI/UX**
 - Material Design 3 with expressive shapes and colors
@@ -209,6 +215,14 @@ The app follows Flutter clean architecture principles:
 MIT License
 
 ## Changelog
+
+### v1.1.0 (Latest)
+- **NEW**: Editable critical instructions in settings with safety warnings
+- **NEW**: Expandable vocabulary tiles showing actual words in chip format
+- **FIXED**: Audio analyzer RMS calculation bug causing false negatives
+- **IMPROVED**: Lower audio detection thresholds for better speech sensitivity
+- **ENHANCED**: Comprehensive debug logging for audio analysis
+- **MIGRATION**: Seamless database migration for new features
 
 ### v1.0.0
 - Initial release with core voice typing functionality

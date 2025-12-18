@@ -1,6 +1,4 @@
-import 'dart:io';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:path_provider/path_provider.dart';
 import '../models/transcription.dart';
 import '../models/custom_prompt.dart';
 import '../models/vocabulary.dart';

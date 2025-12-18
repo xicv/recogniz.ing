@@ -6,6 +6,7 @@ import 'package:record/record.dart';
 import 'package:uuid/uuid.dart';
 import 'audio_analyzer.dart';
 import '../config/app_config.dart';
+import '../constants/constants.dart';
 
 class AudioService {
   final AudioRecorder _recorder = AudioRecorder();
@@ -75,7 +76,7 @@ class AudioService {
 
     final duration = _recordingStartTime != null
         ? DateTime.now().difference(_recordingStartTime!).inMilliseconds /
-            1000.0
+            AppConstants.millisecondsPerSecond
         : 0.0;
 
     debugPrint('[AudioService] Recording duration: ${duration}s');

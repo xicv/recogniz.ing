@@ -6,7 +6,7 @@
       "name": "Clean Transcription",
       "description": "Clean up speech, fix grammar, remove filler words",
       "category": "general",
-      "template": "You are a transcription assistant. Clean up the following speech transcription:\n- Fix grammar and punctuation\n- Remove filler words (um, uh, like, you know)\n- Keep the original meaning intact\n- Output only the cleaned text, nothing else\n\nTranscription: {{text}}",
+      "template": "Clean up the following speech transcription by:\n- Fixing grammar and punctuation\n- Removing filler words (um, uh, like, you know)\n- Keeping the original meaning intact\n- Outputting ONLY the cleaned transcription text\n\nTEXT TO CLEAN:\n{{text}}\n\nCLEANED VERSION:",
       "isDefault": true
     },
     {
@@ -14,7 +14,7 @@
       "name": "Formal Writing",
       "description": "Convert speech to formal written text",
       "category": "professional",
-      "template": "Convert the following speech transcription into formal written text:\n- Use professional language\n- Structure into proper paragraphs if needed\n- Fix all grammar and punctuation\n- Output only the formal text, nothing else\n\nTranscription: {{text}}",
+      "template": "Convert the following speech transcription into formal written text:\n- Use professional language\n- Structure into proper paragraphs if needed\n- Fix all grammar and punctuation\n- Output ONLY the formal text version\n\nORIGINAL SPEECH:\n{{text}}\n\nFORMAL VERSION:",
       "isDefault": true
     },
     {
@@ -22,7 +22,7 @@
       "name": "Bullet Points",
       "description": "Convert speech to organized bullet points",
       "category": "organization",
-      "template": "Convert the following speech transcription into organized bullet points:\n- Extract key points\n- Use clear, concise language\n- Group related points together\n- Output only the bullet points, nothing else\n\nTranscription: {{text}}",
+      "template": "Convert the following speech transcription into organized bullet points:\n- Extract key points\n- Use clear, concise language\n- Group related points together\n- Output ONLY the bullet points\n\nSPEECH TO CONVERT:\n{{text}}\n\nBULLET POINTS:",
       "isDefault": true
     },
     {
@@ -30,7 +30,7 @@
       "name": "Email Draft",
       "description": "Convert speech to email format",
       "category": "communication",
-      "template": "Convert the following speech transcription into a professional email:\n- Add appropriate greeting and closing\n- Structure the content clearly\n- Use professional tone\n- Output only the email, nothing else\n\nTranscription: {{text}}",
+      "template": "Convert the following speech transcription into a professional email:\n- Add appropriate greeting and closing\n- Structure the content clearly\n- Use professional tone\n- Output ONLY the email content\n\nSPEECH CONTENT:\n{{text}}\n\nEMAIL:",
       "isDefault": true
     },
     {

@@ -34,8 +34,10 @@ flutter run -d web       # Web
 
 ## 🎯 Key Features
 
-- **Voice Recording** with smart activity detection
+- **Voice Recording** with smart activity detection and RMS-based audio analysis
 - **AI-Powered Transcription** using Gemini 1.5 Flash
+- **Editable Critical Instructions** to fine-tune AI behavior with presets
+- **Visual Vocabulary Display** with expandable tiles showing actual words
 - **Custom Prompts** for different output formats
 - **Industry Vocabulary** sets (Medical, Legal, Finance, Tech)
 - **Global Hotkeys** on desktop platforms
@@ -141,3 +143,16 @@ flutter pub get
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆕 Latest Updates (v1.1.0)
+
+### New Features
+- **Editable Critical Instructions**: Customize AI behavior directly in settings with built-in safety warnings
+- **Vocabulary Word Preview**: Expand vocabulary sets to see all words in an elegant chip layout
+- **Audio Analysis Improvements**: Fixed RMS calculation bug for accurate speech detection
+
+### Fixes & Improvements
+- Resolved issue where valid speech was incorrectly rejected
+- Lowered audio detection thresholds for better sensitivity
+- Enhanced debug logging for troubleshooting
+- Seamless database migration for new features

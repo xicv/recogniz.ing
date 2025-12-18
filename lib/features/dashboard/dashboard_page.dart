@@ -6,6 +6,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/providers/app_providers.dart';
 import '../../core/theme/app_theme.dart';
+import 'widgets/simplified_stats_card.dart';
 import 'widgets/transcription_tile.dart';
 
 class DashboardPage extends ConsumerWidget {
@@ -93,55 +94,13 @@ class DashboardPage extends ConsumerWidget {
 
                   const SizedBox(height: 16),
 
-                  // Compact stats row
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildCompactStat(
-                          context,
-                          icon: LucideIcons.mic,
-                          value: statistics.totalUsage.toString(),
-                          label: 'Total',
-                          color: AppColors.primary,
-                        ),
-                        _buildDivider(context),
-                        _buildCompactStat(
-                          context,
-                          icon: LucideIcons.calendar,
-                          value: statistics.thisWeekUsage.toString(),
-                          label: 'Week',
-                          color: AppColors.accent,
-                        ),
-                        _buildDivider(context),
-                        _buildCompactStat(
-                          context,
-                          icon: LucideIcons.coins,
-                          value: _formatNumber(statistics.totalTokens),
-                          label: 'Tokens',
-                          color: AppColors.success,
-                        ),
-                        _buildDivider(context),
-                        _buildCompactStat(
-                          context,
-                          icon: LucideIcons.clock,
-                          value:
-                              '${statistics.totalDurationMinutes.toStringAsFixed(1)}m',
-                          label: 'Time',
-                          color: AppColors.warning,
-                        ),
-                      ],
-                    ),
-                  )
-                      .animate()
-                      .fadeIn(duration: 300.ms, delay: 150.ms)
-                      .slideY(begin: 0.1),
+                  // Simplified stats card
+                  SimplifiedStatsCard(
+                    totalUsage: statistics.totalUsage,
+                    thisWeekUsage: statistics.thisWeekUsage,
+                    totalTokens: statistics.totalTokens,
+                    totalDurationMinutes: statistics.totalDurationMinutes,
+                  ),
 
                   const SizedBox(height: 24),
 
@@ -225,52 +184,6 @@ class DashboardPage extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  Widget _buildCompactStat(
-    BuildContext context, {
-    required IconData icon,
-    required String value,
-    required String label,
-    required Color color,
-  }) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 16, color: color),
-        const SizedBox(height: 6),
-        Text(
-          value,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontSize: 11,
-              ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDivider(BuildContext context) {
-    return Container(
-      height: 40,
-      width: 1,
-      color: Theme.of(context).dividerColor.withOpacity(0.3),
-    );
-  }
-
-  String _formatNumber(int number) {
-    if (number >= 1000000) {
-      return '${(number / 1000000).toStringAsFixed(1)}M';
-    } else if (number >= 1000) {
-      return '${(number / 1000).toStringAsFixed(1)}K';
-    }
-    return number.toString();
   }
 
   void _showSearchDialog(BuildContext context, WidgetRef ref) {

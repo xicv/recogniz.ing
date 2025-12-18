@@ -17,46 +17,83 @@ Core features:
 
 ## Development Commands
 
-### Flutter Basics
+The project includes a comprehensive Makefile with 35+ commands for streamlined development.
+
+### Quick Start
 ```bash
 # Install dependencies
-flutter pub get
-
-# Run the app (development)
-flutter run
+make get              # or flutter pub get
 
 # Run on specific platforms
-flutter run -d macos
-flutter run -d ios
-flutter run -d android
-flutter run -d windows
-flutter run -d linux
-flutter run -d web
+make run-macos        # macOS (recommended)
+make run-ios          # iOS Simulator
+make run-android      # Android
+make run-web          # Web (limited functionality)
+make run-windows      # Windows
+make run-linux        # Linux
 
-# Build for release
-flutter build macos
-flutter build ios
-flutter build apk
-flutter build windows
-flutter build linux
-flutter build web
+# Full development workflow
+make dev              # get + analyze + format + test
+
+# Quick macOS development
+make quick-run        # get + run-macos
+```
+
+### Build Commands
+```bash
+# Build for release (defaults to macOS)
+make build            # Build for macOS
+make build-macos      # macOS release
+make build-ios        # iOS release
+make build-apk        # Android APK
+make build-aab        # Android App Bundle
+make build-web        # Web release
+make build-windows    # Windows release
+make build-linux      # Linux release
+
+# Install macOS release locally
+make install-release
 ```
 
 ### Code Quality
 ```bash
-# Analyze code for issues
+make analyze          # flutter analyze
+make format           # flutter format .
+make test             # Run all tests
+make test-coverage    # Run tests with coverage report
+make test-single TEST=test/widget_test.dart  # Run specific test
+make test-watch       # Run tests in watch mode
+```
+
+### Code Generation
+```bash
+# Generate Hive adapters and Riverpod generators
+make generate         # build_runner with delete-conflicting-outputs
+make generate-watch   # Watch mode for development
+
+# IMPORTANT: Run make generate after modifying any model files
+```
+
+### Utilities
+```bash
+make clean            # Clean build artifacts
+make clean-all        # Deep clean including generated files
+make upgrade          # Upgrade dependencies
+make deps-tree        # Show dependency tree
+make debug            # Show Flutter doctor and devices
+make logs             # Follow Flutter logs
+make check-version    # Check Flutter and app versions
+make help             # Show all available commands
+```
+
+### Manual Flutter Commands (if Makefile unavailable)
+```bash
+flutter pub get
+flutter run -d macos
+flutter build macos --release
 flutter analyze
-
-# Run tests
 flutter test
-
-# Format code
 flutter format .
-
-# Upgrade dependencies
-flutter pub upgrade
-
-# Generate Hive type adapters (when model files change)
 flutter packages pub run build_runner build --delete-conflicting-outputs
 ```
 
@@ -81,6 +118,11 @@ The app follows a layered architecture with clear separation of concerns:
    - Hive for local persistence with type adapters for models
    - Global providers handle cross-feature state like recording state and navigation
 
+4. **Configuration System** (`config/`)
+   - External JSON configuration for themes, prompts, vocabulary, and app settings
+   - Runtime loading of configurations without code changes
+   - Type-safe config classes in `lib/core/config/`
+
 ### Key Services Integration
 
 **AudioService** (`lib/core/services/audio_service.dart`):
@@ -103,11 +145,19 @@ The app follows a layered architecture with clear separation of concerns:
 - Updates tray icon based on recording state
 - Handles global hotkey-triggered recording
 
+**AudioAnalyzer** (`lib/core/services/audio_analyzer.dart`):
+- RMS-based amplitude detection for speech validation
+- Pre-validation of audio to filter non-speech content
+- Configurable sensitivity thresholds for voice activity detection
+
 ### State Management Pattern
 - Uses Riverpod with `StateNotifierProvider` for complex state
 - `Provider` for services and derived state
 - `StateProvider` for simple UI state
-- Providers are organized by feature and imported centrally in `app_providers.dart`
+- Providers are organized by feature and imported centrally:
+  - `lib/core/providers/core_providers.dart` - Global app providers
+  - `lib/features/providers/` - Feature-specific providers
+  - `lib/features/app_shell.dart` - Main provider aggregation
 
 ### Platform-Specific Features
 - Global hotkeys only work on desktop platforms
@@ -138,3 +188,46 @@ The app follows a layered architecture with clear separation of concerns:
 - Mock services for unit tests (AudioService, GeminiService)
 - Test Hive operations with in-memory databases
 - Platform-specific features need conditional testing or mocks
+
+### Key Dependencies
+- **flutter_riverpod**: State management with code-generation support
+- **hive_flutter**: Local persistence with type adapters
+- **record**: Audio recording with permission handling
+- **google_generative_ai**: Gemini API integration
+- **hotkey_manager**: Global hotkey support (desktop only)
+- **tray_manager**: System tray integration (desktop only)
+- **super_clipboard**: Enhanced clipboard operations
+- **flutter_animate**: UI animations and transitions
+
+## Platform-Specific Notes
+
+### Web Platform Limitations
+- Browser audio recording restrictions limit functionality
+- No system tray or global hotkey support
+- Reduced performance compared to native builds
+
+### Desktop Features
+- Global hotkeys:
+  - macOS: Cmd+Shift+Space
+  - Windows/Linux: Ctrl+Shift+Space
+- System tray integration with recording state indicators
+- Method channels for window management (macOS show/hide)
+
+### Mobile Considerations
+- Permission handling for microphone access
+- No global hotkey support on mobile platforms
+- Background recording limitations on iOS
+
+## Configuration System
+
+The app uses external JSON configurations for easy customization:
+
+```bash
+config/
+├── themes/           # Dark/light theme configurations
+├── prompts/          # Pre-configured AI prompt templates
+├── vocabulary/       # Industry-specific vocabulary sets
+└── app_config.json   # Global app settings
+```
+
+Edit JSON files directly to customize without code changes. Configurations are loaded at runtime.

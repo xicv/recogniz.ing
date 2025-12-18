@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
-import '../core/models/transcription.dart';
+import '../core/constants/constants.dart';
 import '../core/providers/app_providers.dart';
 import 'dashboard/dashboard_page.dart';
 import 'recording/recording_overlay.dart';
 import 'settings/settings_page.dart';
-
-final lastErrorProvider = StateProvider<String?>((ref) => null);
 
 class AppShell extends ConsumerStatefulWidget {
   const AppShell({super.key});
@@ -29,6 +26,7 @@ class _AppShellState extends ConsumerState<AppShell> {
     final currentPage = ref.watch(currentPageProvider);
     final recordingState = ref.watch(recordingStateProvider);
     final lastError = ref.watch(lastErrorProvider);
+    final errorState = ref.watch(errorStateProvider);
 
     // Listen to tray recording trigger
     ref.listen(trayRecordingTriggerProvider, (prev, next) {
@@ -38,12 +36,19 @@ class _AppShellState extends ConsumerState<AppShell> {
     });
 
     // Show error snackbar if there's an error
-    if (lastError != null) {
+    if (lastError != null && errorState != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showEnhancedErrorSnackBar(context, ref, errorState);
+        ref.read(lastErrorProvider.notifier).state = null;
+        ref.read(errorStateProvider.notifier).state = null;
+      });
+    } else if (lastError != null) {
+      // Fallback for simple errors
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(lastError),
-            backgroundColor: Colors.red,
+            backgroundColor: Theme.of(context).colorScheme.error,
             duration: const Duration(seconds: 5),
             action: SnackBarAction(
               label: 'Dismiss',
@@ -101,8 +106,8 @@ class _AppShellState extends ConsumerState<AppShell> {
     if (!settings.hasApiKey) return null;
 
     return SizedBox(
-      width: 56,
-      height: 56,
+      width: UIConstants.fabSize,
+      height: UIConstants.fabSize,
       child: FloatingActionButton(
         onPressed: state == RecordingState.processing
             ? null
@@ -111,11 +116,11 @@ class _AppShellState extends ConsumerState<AppShell> {
             ? Colors.red
             : Theme.of(context).colorScheme.primary,
         shape: const CircleBorder(),
-        elevation: 8,
+        elevation: UIConstants.fabElevation,
         child: state == RecordingState.processing
             ? const SizedBox(
-                width: 24,
-                height: 24,
+                width: UIConstants.iconMedium,
+                height: UIConstants.iconMedium,
                 child: CircularProgressIndicator(
                   color: Colors.white,
                   strokeWidth: 3,
@@ -134,216 +139,124 @@ class _AppShellState extends ConsumerState<AppShell> {
 
   Future<void> _toggleRecording(
       BuildContext context, WidgetRef ref, RecordingState state) async {
-    final audioService = ref.read(audioServiceProvider);
-    final settings = ref.read(settingsProvider);
-
-    debugPrint('=== Toggle Recording ===');
-    debugPrint('Current state: $state');
-    debugPrint('Has API key: ${settings.hasApiKey}');
-
-    if (state == RecordingState.idle) {
-      // Start recording
-      try {
-        debugPrint('Checking microphone permission...');
-        final hasPermission = await audioService.hasPermission();
-        debugPrint('Has permission: $hasPermission');
-
-        if (!hasPermission) {
-          ref.read(lastErrorProvider.notifier).state =
-              'Microphone permission denied. Please grant access in System Settings.';
-          return;
-        }
-
-        debugPrint('Starting recording...');
-        await audioService.startRecording();
-        ref.read(recordingStateProvider.notifier).state =
-            RecordingState.recording;
-        debugPrint('Recording started successfully');
-      } catch (e) {
-        debugPrint('Error starting recording: $e');
-        ref.read(lastErrorProvider.notifier).state =
-            'Failed to start recording: $e';
-      }
-    } else if (state == RecordingState.recording) {
-      // Stop recording and process
-      debugPrint('Stopping recording...');
-      ref.read(recordingStateProvider.notifier).state =
-          RecordingState.processing;
-
-      try {
-        final result = await audioService.stopRecording();
-        debugPrint(
-            'Recording stopped. Result: ${result != null ? "Got audio data" : "No data"}');
-
-        if (result == null) {
-          debugPrint('No recording result');
-          ref.read(lastErrorProvider.notifier).state =
-              'No audio recorded. Please speak clearly and try again.\n'
-              'Tip: Recordings must be at least 0.5 seconds long.';
-          ref.read(recordingStateProvider.notifier).state = RecordingState.idle;
-          return;
-        }
-
-        // Check if audio contains speech (pre-validated by AudioService)
-        if (!result.containsSpeech) {
-          final analysis = result.analysis;
-          debugPrint('Audio does not contain speech: ${analysis?.reason ?? "Unknown reason"}');
-          ref.read(lastErrorProvider.notifier).state =
-              'No speech detected in recording.\n'
-              '${analysis?.reason ?? "Please speak more clearly and try again."}\n'
-              'Tip: Make sure you\'re speaking at a normal volume.';
-          ref.read(recordingStateProvider.notifier).state = RecordingState.idle;
-          return;
-        }
-
-        debugPrint('Audio bytes: ${result.bytes.length}');
-        debugPrint('Duration: ${result.durationSeconds}s');
-
-        // Get services and data
-        final geminiService = ref.read(geminiServiceProvider);
-        final prompts = ref.read(promptsProvider);
-        final vocabulary = ref.read(vocabularyProvider);
-
-        debugPrint('Gemini initialized: ${geminiService.isInitialized}');
-
-        if (!geminiService.isInitialized) {
-          debugPrint('Initializing Gemini with API key...');
-          geminiService.initialize(settings.geminiApiKey!);
-        }
-
-        // Get selected prompt and vocabulary
-        final selectedPrompt = prompts.firstWhere(
-          (p) => p.id == settings.selectedPromptId,
-          orElse: () => prompts.first,
-        );
-
-        final selectedVocab = vocabulary.firstWhere(
-          (v) => v.id == settings.selectedVocabularyId,
-          orElse: () => vocabulary.first,
-        );
-
-        debugPrint('Selected prompt: ${selectedPrompt.name}');
-        debugPrint(
-            'Selected vocabulary: ${selectedVocab.name} (${selectedVocab.words.length} words)');
-
-        // Transcribe
-        debugPrint('Calling Gemini API for transcription...');
-        debugPrint('Using critical instructions: ${settings.effectiveCriticalInstructions}');
-        final transcriptionResult = await geminiService.transcribeAudio(
-          audioBytes: Uint8List.fromList(result.bytes),
-          vocabulary: selectedVocab.wordsAsString,
-          promptTemplate: selectedPrompt.promptTemplate,
-          criticalInstructions: settings.effectiveCriticalInstructions,
-        );
-
-        debugPrint('=== Transcription Result ===');
-        debugPrint('Raw text: ${transcriptionResult.rawText}');
-        debugPrint('Processed text: ${transcriptionResult.processedText}');
-        debugPrint('Tokens: ${transcriptionResult.tokenUsage}');
-
-        // The Gemini API now handles speech detection at the source
-        // If we get here, we have meaningful transcription
-
-        // Save transcription
-        final transcription = Transcription(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          rawText: transcriptionResult.rawText,
-          processedText: transcriptionResult.processedText,
-          createdAt: DateTime.now(),
-          tokenUsage: transcriptionResult.tokenUsage,
-          promptId: selectedPrompt.id,
-          audioDurationSeconds: result.durationSeconds,
-        );
-
-        await ref
-            .read(transcriptionsProvider.notifier)
-            .addTranscription(transcription);
-        debugPrint('Transcription saved');
-
-        // Auto-copy if enabled
-        if (settings.autoCopyToClipboard) {
-          await Clipboard.setData(
-              ClipboardData(text: transcriptionResult.processedText));
-          debugPrint('Copied to clipboard');
-        }
-
-        // Show success notification
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                settings.autoCopyToClipboard
-                    ? 'Transcription complete! Copied to clipboard.'
-                    : 'Transcription complete!',
-              ),
-              backgroundColor: Colors.green,
-              duration: const Duration(seconds: 3),
-            ),
-          );
-        }
-      } catch (e, stackTrace) {
-        debugPrint('=== Error during transcription ===');
-        debugPrint('Error: $e');
-        debugPrint('Stack trace: $stackTrace');
-
-        // Check for no speech error
-        if (e.toString().contains('No speech detected') ||
-            e.toString().contains('Empty transcription received')) {
-          ref.read(lastErrorProvider.notifier).state =
-              'No speech detected. Please speak clearly and try again.';
-        } else {
-          // Provide user-friendly error messages
-          final errorMessage = _getErrorMessage(e.toString());
-          ref.read(lastErrorProvider.notifier).state = errorMessage;
-        }
-      }
-
-      ref.read(recordingStateProvider.notifier).state = RecordingState.idle;
-      debugPrint('=== Recording flow complete ===');
-    }
+    final recordingUseCase = ref.read(recordingUseCaseProvider);
+    await recordingUseCase.toggleRecording(state);
   }
 
-  String _getErrorMessage(String error) {
-    final errorLower = error.toLowerCase();
+  void _showEnhancedErrorSnackBar(BuildContext context, WidgetRef ref, ErrorResult errorResult) {
+    final colorScheme = Theme.of(context).colorScheme;
 
-    if (errorLower.contains('503') || errorLower.contains('unavailable')) {
-      return 'Service temporarily unavailable (503)\n'
-             'The AI service is experiencing high demand. Please try again in a few moments.\n'
-             'The app will automatically retry up to 3 times.';
+    // Determine color based on error type
+    Color backgroundColor = colorScheme.error;
+    switch (errorResult.iconName) {
+      case 'zap-off':
+        backgroundColor = Colors.orange[700] ?? colorScheme.error;
+        break;
+      case 'timer':
+        backgroundColor = Colors.amber[700] ?? colorScheme.error;
+        break;
+      case 'wifi-off':
+        backgroundColor = Colors.blue[700] ?? colorScheme.error;
+        break;
+      case 'shield-off':
+        backgroundColor = Colors.red[700] ?? colorScheme.error;
+        break;
+      default:
+        backgroundColor = colorScheme.error;
     }
 
-    if (errorLower.contains('429') || errorLower.contains('resource_exhausted')) {
-      return 'Rate limit exceeded (429)\n'
-             'Too many requests. Please wait a moment before trying again.';
+    // Get the icon data
+    IconData iconData;
+    switch (errorResult.iconName) {
+      case 'cloud-off':
+        iconData = LucideIcons.cloudOff;
+        break;
+      case 'zap-off':
+        iconData = LucideIcons.zapOff;
+        break;
+      case 'timer':
+        iconData = LucideIcons.timer;
+        break;
+      case 'wifi-off':
+        iconData = LucideIcons.wifiOff;
+        break;
+      case 'shield-off':
+        iconData = LucideIcons.shieldOff;
+        break;
+      case 'key':
+        iconData = LucideIcons.key;
+        break;
+      case 'alert-triangle':
+        iconData = LucideIcons.alertTriangle;
+        break;
+      case 'mic-off':
+        iconData = LucideIcons.micOff;
+        break;
+      case 'volume-x':
+        iconData = LucideIcons.volumeX;
+        break;
+      case 'alert-circle':
+        iconData = LucideIcons.alertCircle;
+        break;
+      default:
+        iconData = LucideIcons.alertCircle;
     }
 
-    if (errorLower.contains('permission_denied') || errorLower.contains('api_key')) {
-      return 'API Key Error\n'
-             'Please check your API key in Settings.';
+    // Build the content
+    String content = errorResult.message;
+    if (errorResult.actionHint != null) {
+      content += '\n\n${errorResult.actionHint}';
     }
 
-    if (errorLower.contains('invalid_argument')) {
-      return 'Invalid audio format\n'
-             'Please try recording again with clear speech.';
+    // Calculate duration based on retry time
+    Duration duration = const Duration(seconds: 8);
+    if (errorResult.retryAfter != null) {
+      duration = errorResult.retryAfter! > const Duration(seconds: 10)
+          ? const Duration(seconds: 10)
+          : errorResult.retryAfter! + const Duration(seconds: 2);
     }
 
-    if (errorLower.contains('empty transcription')) {
-      return 'No speech detected\n'
-             'Please speak clearly and ensure your microphone is working.';
-    }
-
-    if (errorLower.contains('deadline_exceeded')) {
-      return 'Request timeout\n'
-             'The request took too long. Please try with a shorter recording.';
-    }
-
-    // Generic error with suggestions
-    return 'Transcription failed\n'
-           'Error: ${error.length > 100 ? error.substring(0, 100) : error}\n\n'
-           'Suggestions:\n'
-           '• Check your internet connection\n'
-           '• Ensure you have a valid API key\n'
-           '• Try recording shorter audio clips\n'
-           '• Speak clearly during recording';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              iconData,
+              color: Colors.white,
+              size: 24,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                content,
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: backgroundColor,
+        duration: duration,
+        action: errorResult.canRetry
+            ? SnackBarAction(
+                label: errorResult.actionHint?.contains('Settings') == true
+                    ? 'Settings'
+                    : 'Retry',
+                textColor: Colors.white,
+                onPressed: () {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  if (errorResult.actionHint?.contains('Settings') == true) {
+                    ref.read(currentPageProvider.notifier).state = 1;
+                  }
+                },
+              )
+            : SnackBarAction(
+                label: 'Dismiss',
+                textColor: Colors.white,
+                onPressed: () {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                },
+              ),
+      ),
+    );
   }
 }

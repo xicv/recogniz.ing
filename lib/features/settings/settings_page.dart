@@ -11,6 +11,7 @@ import '../../core/services/gemini_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/models/vocabulary.dart';
 import '../../core/models/app_settings.dart';
+import '../../core/constants/app_constants.dart';
 import 'widgets/critical_instructions_editor.dart';
 import 'widgets/hotkey_editor.dart';
 import 'widgets/prompt_editor.dart';
@@ -338,13 +339,19 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           const SizedBox(height: 20),
 
           // About
-          const SettingsSection(
+          SettingsSection(
             title: 'About',
             icon: LucideIcons.info,
             children: [
-              ListTile(
-                title: Text('Version'),
-                trailing: Text('1.0.0'),
+              FutureBuilder<String>(
+                future: AppConstants.getAppVersionWithBuild(),
+                builder: (context, snapshot) {
+                  final version = snapshot.data ?? AppConstants.appVersionWithBuild;
+                  return ListTile(
+                    title: Text('Version'),
+                    trailing: Text(version),
+                  );
+                },
               ),
             ],
           ).animate().fadeIn(duration: 300.ms, delay: 350.ms),
