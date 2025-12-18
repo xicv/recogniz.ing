@@ -186,7 +186,38 @@ flutter pub get
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆕 Latest Updates (v1.2.0)
+## 🆕 Latest Updates (v2.0)
+
+### ⚡ Performance Improvements
+- **Single API Call Mode**: 50% faster transcription by combining analysis and processing
+- **Background Audio Processing**: Smooth UI with isolated audio analysis
+- **Optimized Retry Logic**: Intelligent retry policies with circuit breaker pattern
+
+### 🎨 Enhanced UI/UX
+- **Theme-Consistent Components**: All widgets now use Material Design 3 colors
+- **Improved Dark Mode**: Better contrast and visual hierarchy
+- **Standardized Component Library**: Reusable widgets with consistent styling
+- **Fixed Password Fields**: Proper state management and better UX
+
+### 🔧 Better Error Handling
+- **Categorized Error Messages**: Network, API, Permission, Audio errors with specific guidance
+- **Actionable Recovery Options**: One-click fixes for common issues
+- **Error Severity Levels**: Critical errors shown as dialogs, others as snackbars
+- **Technical Details View**: Expandable error details for debugging (debug mode)
+
+### 📦 Component Library Standardization
+- **Removed Global Context Issues**: Fixed memory leaks and context passing problems
+- **Improved Input Components**: Better validation, theming, and accessibility
+- **Enhanced Cards and Lists**: Consistent styling across the app
+- **Better Loading States**: More informative loading indicators
+
+### 🏗️ Architecture Improvements
+- **Cleaner Error System**: EnhancedErrorHandler with better categorization
+- **Improved State Management**: Fixed provider dependencies and data flow
+- **Better Service Layer**: Optimized Gemini and Audio services
+- **Enhanced Use Cases**: More robust business logic handling
+
+## 🆕 v1.2.0 (Previous)
 
 ### Major Fixes
 - **Transcription History**: Fixed issue where transcriptions weren't appearing in recent history

@@ -1,10 +1,19 @@
 # Recogniz.ing
 
-AI-powered voice typing application built with Flutter, featuring modern Material Design 3 and cross-platform support.
+AI-powered voice typing application built with Flutter, featuring modern Material Design 3, enhanced performance optimizations, and comprehensive error handling.
+
+## ✨ What's New
+
+### **Recent Improvements (v2.0)**
+- **⚡ Performance Optimizations**: Single API call mode reduces transcription time by up to 50%
+- **🎨 Enhanced UI/UX**: Theme-consistent components with improved dark mode support
+- **🔧 Better Error Handling**: Categorized error messages with actionable recovery options
+- **📦 Component Library**: Standardized, reusable UI components for consistency
+- **🔐 Improved Security**: Better password field handling and input validation
 
 ## Prerequisites
 
-1. **Flutter SDK** (3.2.0 or higher)
+1. **Flutter SDK** (3.24.0 or higher recommended)
    ```bash
    # Check Flutter installation
    flutter doctor
@@ -77,11 +86,12 @@ flutter run -d linux
 ### 🎤 **Voice Recording**
 - Smart voice activity detection (VAD) with configurable sensitivity
 - Visual recording feedback with timer and waveform indicators
-- Desktop-only global hotkey support for quick activation
+- Desktop-only global hotkey support (Cmd+Shift+Space on macOS, Ctrl+Shift+Space on Windows/Linux)
 - System tray integration for desktop platforms
 - Auto-cancellation of silent recordings
 - **Enhanced Audio Analysis**: RMS-based amplitude detection with optimized thresholds
 - Pre-validation to filter non-speech audio before API calls (reduces costs)
+- **Background Processing**: Audio analysis in isolates for smooth UI performance
 
 ### 🤖 **AI-Powered Transcription**
 - Powered by Google's Gemini 1.5 Flash model
@@ -90,6 +100,23 @@ flutter run -d linux
 - Automatic retry mechanism with exponential backoff
 - **Editable Critical Instructions**: Fine-tune AI behavior with customizable prompts
 - Built-in instruction presets (Strict, Balanced, Lenient) for different use cases
+- **Single API Call Mode**: Optimized transcription that combines analysis and processing in one call
+- **Smart Retry Logic**: Intelligent retry policies with circuit breaker pattern
+
+### 📊 **Dashboard & Analytics**
+- Real-time transcription history with search functionality
+- Usage statistics tracking (transcriptions, tokens, duration)
+- Editable transcriptions with auto-save
+- Copy to clipboard with one-click
+- Detailed transcription metadata (duration, tokens used, creation time)
+
+### ⚙️ **Customization**
+- 6 pre-configured prompts for different use cases
+- Custom vocabulary sets for technical terms
+- Configurable recording settings (sensitivity, minimum duration)
+- Theme switching (Light/Dark mode)
+- Global hotkey customization
+- Auto-copy to clipboard option
 
 ### 📝 **Smart Prompts System**
 - **6 Pre-configured Prompts:**
@@ -149,6 +176,39 @@ config/
 ```
 
 Customize themes, prompts, and vocabulary by editing the JSON files without touching code!
+
+## Architecture
+
+### Clean Architecture Overview
+```
+lib/
+├── core/                    # Business logic and infrastructure
+│   ├── constants/          # App-wide constants
+│   ├── error/              # Error handling system
+│   ├── models/             # Data models with Hive serialization
+│   ├── providers/          # Riverpod state providers
+│   ├── services/           # External service integrations
+│   ├── theme/              # Material Design 3 theming
+│   └── use_cases/          # Business use cases
+├── features/               # Feature-based organization
+│   ├── dashboard/          # Main dashboard feature
+│   ├── recording/          # Voice recording UI
+│   └── settings/           # Settings management
+└── widgets/                # Reusable UI components
+    └── shared/             # Cross-feature components
+```
+
+### Key Services
+- **AudioService**: Handles recording with VAD and background processing
+- **GeminiService**: Manages AI transcription with optimized API calls
+- **StorageService**: Centralized Hive database operations
+- **TrayService**: Desktop system tray integration
+- **HotkeyService**: Global hotkey management
+
+### State Management
+- Uses Riverpod for reactive state management
+- Providers organized by feature for better maintainability
+- Clean separation between UI and business logic
 
 ## Development
 

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/transcription.dart';
 import '../services/storage_service.dart';
+import '../services/analytics_service.dart';
 
 /// Transcription management providers
 final transcriptionsProvider = StateNotifierProvider<TranscriptionsNotifier, List<Transcription>>((ref) {
@@ -26,24 +27,33 @@ final filteredTranscriptionsProvider = Provider<List<Transcription>>((ref) {
       .toList();
 });
 
-/// Statistics provider for dashboard
-final statisticsProvider = Provider<Statistics>((ref) {
+/// Enhanced statistics provider for dashboard
+final enhancedStatisticsProvider = Provider<EnhancedStatistics>((ref) {
   final transcriptions = ref.watch(transcriptionsProvider);
 
-  final totalUsage = transcriptions.length;
-  final totalTokens = transcriptions.fold<int>(0, (sum, t) => sum + t.tokenUsage);
-  final totalDuration = transcriptions.fold<double>(0, (sum, t) => sum + t.audioDurationSeconds);
+  return AnalyticsService.calculateEnhancedStats(transcriptions);
+});
 
-  // Usage by day for last 7 days
+/// Legacy statistics provider for backward compatibility
+final statisticsProvider = Provider<Statistics>((ref) {
+  final enhancedStats = ref.watch(enhancedStatisticsProvider);
+
   final now = DateTime.now();
   final weekAgo = now.subtract(const Duration(days: 7));
-  final recentTranscriptions = transcriptions.where((t) => t.createdAt.isAfter(weekAgo)).toList();
+
+  // Calculate this week's usage from enhanced data
+  int thisWeekUsage = 0;
+  enhancedStats.usageByDay.forEach((date, count) {
+    if (date.isAfter(weekAgo)) {
+      thisWeekUsage += count;
+    }
+  });
 
   return Statistics(
-    totalUsage: totalUsage,
-    totalTokens: totalTokens,
-    totalDurationMinutes: totalDuration / 60,
-    thisWeekUsage: recentTranscriptions.length,
+    totalUsage: enhancedStats.totalTranscriptions,
+    totalTokens: enhancedStats.totalTokens,
+    totalDurationMinutes: enhancedStats.totalDurationMinutes,
+    thisWeekUsage: thisWeekUsage,
   );
 });
 

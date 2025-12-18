@@ -85,7 +85,7 @@ class AppCards {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
-        hoverColor: hoverColor ?? Theme.of(CardGet.context!!).hoverColor,
+        hoverColor: hoverColor,
         child: Card(
           margin: margin ?? const EdgeInsets.all(8),
           color: color,
@@ -101,6 +101,7 @@ class AppCards {
 
   /// Card for displaying status or information
   static Widget info({
+    required BuildContext context,
     required Widget child,
     required IconData icon,
     Color? iconColor,
@@ -110,14 +111,14 @@ class AppCards {
   }) {
     return Card(
       margin: margin ?? const EdgeInsets.all(8),
-      color: backgroundColor ?? Colors.blue.withOpacity(0.1),
+      color: backgroundColor ?? Theme.of(context).colorScheme.primary.withOpacity(0.1),
       child: Padding(
         padding: padding ?? const EdgeInsets.all(16),
         child: Row(
           children: [
             Icon(
               icon,
-              color: iconColor ?? Colors.blue,
+              color: iconColor ?? Theme.of(context).colorScheme.primary,
               size: 24,
             ),
             const SizedBox(width: 12),
@@ -130,15 +131,17 @@ class AppCards {
 
   /// Card for displaying warnings
   static Widget warning({
+    required BuildContext context,
     required Widget child,
     EdgeInsetsGeometry? margin,
     EdgeInsetsGeometry? padding,
   }) {
     return info(
+      context: context,
       child: child,
       icon: Icons.warning_outlined,
-      iconColor: Colors.orange,
-      backgroundColor: Colors.orange.withOpacity(0.1),
+      iconColor: Theme.of(context).colorScheme.secondary,
+      backgroundColor: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
       margin: margin,
       padding: padding,
     );
@@ -146,15 +149,17 @@ class AppCards {
 
   /// Card for displaying errors
   static Widget error({
+    required BuildContext context,
     required Widget child,
     EdgeInsetsGeometry? margin,
     EdgeInsetsGeometry? padding,
   }) {
     return info(
+      context: context,
       child: child,
       icon: Icons.error_outline,
-      iconColor: Colors.red,
-      backgroundColor: Colors.red.withOpacity(0.1),
+      iconColor: Theme.of(context).colorScheme.error,
+      backgroundColor: Theme.of(context).colorScheme.error.withOpacity(0.1),
       margin: margin,
       padding: padding,
     );
@@ -162,26 +167,19 @@ class AppCards {
 
   /// Card for displaying success messages
   static Widget success({
+    required BuildContext context,
     required Widget child,
     EdgeInsetsGeometry? margin,
     EdgeInsetsGeometry? padding,
   }) {
     return info(
+      context: context,
       child: child,
       icon: Icons.check_circle_outline,
-      iconColor: Colors.green,
-      backgroundColor: Colors.green.withOpacity(0.1),
+      iconColor: Theme.of(context).colorScheme.primary,
+      backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
       margin: margin,
       padding: padding,
     );
   }
-}
-
-/// Extension to get context easily
-extension CardGet on Widget {
-  static BuildContext? _context;
-
-  static BuildContext? get context => _context;
-
-  static void setContext(BuildContext context) => _context = context;
 }

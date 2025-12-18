@@ -10,7 +10,7 @@ class AudioProcessor {
   static ReceivePort? _receivePort;
   static SendPort? _sendPort;
 
-  /// Initialize the audio processor isolate
+  /// Initialize the audio analyzer isolate
   static Future<void> initialize() async {
     if (_analysisIsolate != null) return;
 
@@ -73,7 +73,7 @@ class AudioProcessor {
     return completer.future;
   }
 
-  /// Perform streaming audio analysis for real-time feedback
+  /// Perform streaming audio analysis for immediate feedback
   static Stream<double> analyzeStreaming({
     required Stream<List<int>> audioStream,
     required double amplitudeThreshold,
@@ -106,14 +106,14 @@ class AudioProcessor {
     return _calculateRMS(audioChunk);
   }
 
-  /// Ensure the processor is initialized
+  /// Ensure the analyzer is initialized
   static void ensureInitialized() {
     if (_analysisIsolate == null) {
       throw StateError('AudioProcessor not initialized. Call initialize() first.');
     }
   }
 
-  /// Dispose the audio processor
+  /// Dispose the audio analyzer
   static void dispose() {
     _analysisIsolate?.kill(priority: Isolate.immediate);
     _analysisIsolate = null;

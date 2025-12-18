@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
@@ -7,18 +8,38 @@ import '../models/transcription_result.dart';
 
 class GeminiService {
   GenerativeModel? _model;
+  GenerativeModel? _lightningModel;
 
   static const String _modelName = 'gemini-3-flash-preview';
 
   bool get isInitialized => _model != null;
 
   void initialize(String apiKey) {
-    debugPrint('[GeminiService] Initializing with model: $_modelName');
+    debugPrint('[GeminiService] Initializing with models...');
     _model = GenerativeModel(
       model: _modelName,
       apiKey: apiKey,
+      generationConfig: GenerationConfig(
+        temperature: 0.1,
+        maxOutputTokens: 8192,  // Increased for longer transcriptions
+        topP: 0.8,
+        topK: 40,
+      ),
     );
-    debugPrint('[GeminiService] Initialized successfully');
+
+    // Initialize a model configured for longer transcriptions
+    _lightningModel = GenerativeModel(
+      model: _modelName,
+      apiKey: apiKey,
+      generationConfig: GenerationConfig(
+        temperature: 0.1,
+        maxOutputTokens: 8192,  // Increased for longer transcriptions (~6000 words)
+        topP: 0.8,
+        topK: 40,
+      ),
+    );
+
+    debugPrint('[GeminiService] Models initialized successfully');
   }
 
   Future<TranscriptionResult> transcribeAudio({
@@ -26,14 +47,32 @@ class GeminiService {
     required String vocabulary,
     required String promptTemplate,
     String? criticalInstructions,
+    bool useSingleCall = true,
   }) async {
     debugPrint('[GeminiService] transcribeAudio called');
     debugPrint('[GeminiService] Audio bytes: ${audioBytes.length}');
     debugPrint('[GeminiService] Vocabulary: $vocabulary');
+    debugPrint('[GeminiService] Single call mode: $useSingleCall');
 
     if (_model == null) {
       throw Exception('Gemini service not initialized. Please set API key.');
     }
+
+    // Check if we can use single call mode
+    final promptId = _extractPromptId(promptTemplate);
+    final needsProcessing = _requiresPostProcessing(promptId);
+
+    if (!needsProcessing || useSingleCall) {
+      if (needsProcessing) {
+        // Use combined prompt for single call
+        return _combinedTranscription(audioBytes, vocabulary, promptTemplate, criticalInstructions);
+      } else {
+        // Use direct transcription
+        return _directTranscription(audioBytes, vocabulary, criticalInstructions);
+      }
+    }
+
+    // Fall back to two separate calls
 
     // First, transcribe the audio
     String transcriptionPrompt = '''
@@ -75,7 +114,7 @@ Output only the transcription, nothing else.''';
       );
 
       final rawText = transcriptionResponse.text ?? '';
-      debugPrint('[GeminiService] Raw transcription: $rawText');
+      debugPrint('[GeminiService] Raw transcription received (${rawText.length} chars): ${rawText.length > 200 ? "${rawText.substring(0, 200)}..." : rawText}');
 
       if (rawText.isEmpty) {
         debugPrint('[GeminiService] Warning: Empty transcription received');
@@ -99,7 +138,7 @@ Output only the transcription, nothing else.''';
       );
 
       final processedText = processedResponse.text ?? rawText;
-      debugPrint('[GeminiService] Processed text: $processedText');
+      debugPrint('[GeminiService] Processed text received (${processedText.length} chars): ${processedText.length > 200 ? "${processedText.substring(0, 200)}..." : processedText}');
 
       // Estimate token usage
       final estimatedTokens =
@@ -221,8 +260,185 @@ Output only the transcription, nothing else.''';
     throw Exception('$operationName failed after $maxRetries attempts');
   }
 
+  /// Direct transcription without post-processing
+  Future<TranscriptionResult> _directTranscription(
+    Uint8List audioBytes,
+    String vocabulary,
+    String? criticalInstructions,
+  ) async {
+    final transcriptionPrompt = _buildDirectPrompt(vocabulary, criticalInstructions);
+
+    debugPrint('[GeminiService] Using direct transcription mode...');
+
+    try {
+      final audioContent = Content.multi([
+        TextPart(transcriptionPrompt),
+        DataPart('audio/mp4', audioBytes),
+      ]);
+
+      // Use lightning model for quicker responses
+      final response = await _executeWithRetry(
+        () => _lightningModel!.generateContent([audioContent]),
+        operationName: 'direct-transcription',
+        maxRetries: 2, // Fewer retries for speed
+      );
+
+      final rawText = response.text ?? '';
+      debugPrint('[GeminiService] Direct transcription complete (${rawText.length} chars): ${rawText.length > 200 ? "${rawText.substring(0, 200)}..." : rawText}');
+
+      if (rawText.isEmpty) {
+        throw Exception('Empty transcription received from API');
+      }
+
+      if (rawText.trim() == '[NO_SPEECH]') {
+        throw Exception('No speech detected in audio');
+      }
+
+      final estimatedTokens = (rawText.length / 4).round();
+
+      return TranscriptionResult(
+        rawText: rawText,
+        processedText: rawText, // Same text for direct mode
+        tokenUsage: estimatedTokens,
+      );
+    } catch (e) {
+      debugPrint('[GeminiService] Direct transcription error: $e');
+      rethrow;
+    }
+  }
+
+  /// Combined transcription and processing in a single API call
+  Future<TranscriptionResult> _combinedTranscription(
+    Uint8List audioBytes,
+    String vocabulary,
+    String promptTemplate,
+    String? criticalInstructions,
+  ) async {
+    final combinedPrompt = _buildCombinedPrompt(promptTemplate, vocabulary, criticalInstructions);
+
+    debugPrint('[GeminiService] Using combined transcription mode...');
+
+    try {
+      final audioContent = Content.multi([
+        TextPart(combinedPrompt),
+        DataPart('audio/mp4', audioBytes),
+      ]);
+
+      final response = await _executeWithRetry(
+        () => _model!.generateContent([audioContent]),
+        operationName: 'combined-transcription',
+      );
+
+      final resultText = response.text ?? '';
+      debugPrint('[GeminiService] Combined transcription complete');
+
+      if (resultText.isEmpty) {
+        throw Exception('Empty transcription received from API');
+      }
+
+      // Extract raw and processed text from the response
+      final parts = resultText.split('\n---\n');
+      String rawText = resultText;
+      String processedText = resultText;
+
+      if (parts.length >= 2) {
+        rawText = parts[0].trim();
+        processedText = parts[1].trim();
+      }
+
+      if (rawText.trim() == '[NO_SPEECH]') {
+        throw Exception('No speech detected in audio');
+      }
+
+      final estimatedTokens = (resultText.length / 4).round();
+
+      return TranscriptionResult(
+        rawText: rawText,
+        processedText: processedText,
+        tokenUsage: estimatedTokens,
+      );
+    } catch (e) {
+      debugPrint('[GeminiService] Combined transcription error: $e');
+      rethrow;
+    }
+  }
+
+  /// Build direct transcription prompt
+  String _buildDirectPrompt(String vocabulary, String? criticalInstructions) {
+    final buffer = StringBuffer();
+
+    buffer.writeln('Transcribe the audio accurately.');
+
+    if (criticalInstructions != null) {
+      buffer.writeln(criticalInstructions);
+    } else {
+      buffer.writeln('''
+CRITICAL INSTRUCTIONS:
+- Only transcribe actual speech that you hear
+- If there is only silence or no discernible speech, respond with exactly: [NO_SPEECH]
+- Do NOT use the vocabulary below to generate fake transcriptions''');
+    }
+
+    if (vocabulary.isNotEmpty) {
+      buffer.writeln('''
+Reference vocabulary for technical terms (use ONLY if you actually hear these words spoken):
+$vocabulary''');
+    }
+
+    buffer.writeln('''
+Transcribe only what is spoken. Output only the transcription, nothing else.''');
+
+    return buffer.toString();
+  }
+
+  /// Build combined prompt for single-call processing
+  String _buildCombinedPrompt(String promptTemplate, String vocabulary, String? criticalInstructions) {
+    final buffer = StringBuffer();
+
+    buffer.writeln('Transcribe the following audio and then process it according to the instructions.');
+
+    if (criticalInstructions != null) {
+      buffer.writeln(criticalInstructions);
+    }
+
+    if (vocabulary.isNotEmpty) {
+      buffer.writeln('''
+Reference vocabulary for technical terms (use ONLY if you actually hear these words spoken):
+$vocabulary''');
+    }
+
+    buffer.writeln('''
+Step 1: Transcribe exactly what is spoken.
+Step 2: Apply the following processing template to the transcription:
+$promptTemplate
+
+Output the raw transcription first, then "---", and finally the processed text.''');
+
+    return buffer.toString();
+  }
+
+  /// Extract prompt ID from template
+  String _extractPromptId(String promptTemplate) {
+    if (promptTemplate.contains('Clean up the following speech transcription')) {
+      return 'default-clean';
+    } else if (promptTemplate.contains('Convert the following speech transcription into formal written text')) {
+      return 'default-formal';
+    } else if (promptTemplate.contains('Convert the following speech transcription into organized bullet points')) {
+      return 'default-bullet';
+    }
+    return 'unknown';
+  }
+
+  /// Determine if transcription needs post-processing
+  bool _requiresPostProcessing(String promptId) {
+    // No prompts should use direct mode since they all need processing
+    // Direct mode bypasses the prompt template entirely
+    return true;  // Always use full processing
+  }
+
   void dispose() {
     _model = null;
+    _lightningModel = null;
   }
 }
 

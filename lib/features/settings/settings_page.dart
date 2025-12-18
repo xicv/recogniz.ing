@@ -492,21 +492,49 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
   void _showPromptEditor(BuildContext context, WidgetRef ref,
       {dynamic prompt}) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => PromptEditor(prompt: prompt),
+    Navigator.of(context).push(
+      PageRouteBuilder<void>(
+        pageBuilder: (context, animation, secondaryAnimation) => PromptEditor(prompt: prompt),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return SlideTransition(
+            position: animation.drive(
+              Tween(
+                begin: const Offset(0.0, 1.0),
+                end: Offset.zero,
+              ).chain(CurveTween(curve: Curves.easeOutCubic)),
+            ),
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 300),
+        barrierDismissible: true,
+        barrierColor: Colors.black54,
+        fullscreenDialog: true,
+      ),
     );
   }
 
   void _showVocabularyEditor(BuildContext context, WidgetRef ref,
       {dynamic vocabulary}) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => VocabularyEditor(vocabulary: vocabulary),
+    Navigator.of(context).push(
+      PageRouteBuilder<void>(
+        pageBuilder: (context, animation, secondaryAnimation) => VocabularyEditor(vocabulary: vocabulary),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return SlideTransition(
+            position: animation.drive(
+              Tween(
+                begin: const Offset(0.0, 1.0),
+                end: Offset.zero,
+              ).chain(CurveTween(curve: Curves.easeOutCubic)),
+            ),
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 300),
+        barrierDismissible: true,
+        barrierColor: Colors.black54,
+        fullscreenDialog: true,
+      ),
     );
   }
 }

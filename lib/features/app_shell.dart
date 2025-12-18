@@ -1,12 +1,16 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../core/constants/constants.dart';
+import '../core/error/error_components.dart';
+import '../core/error/enhanced_error_handler.dart';
 import '../core/providers/app_providers.dart';
 import 'dashboard/dashboard_page.dart';
 import 'recording/recording_overlay.dart';
 import 'settings/settings_page.dart';
+import 'transcriptions/transcriptions_page.dart';
 
 class AppShell extends ConsumerStatefulWidget {
   const AppShell({super.key});
@@ -69,6 +73,7 @@ class _AppShellState extends ConsumerState<AppShell> {
           IndexedStack(
             index: currentPage,
             children: const [
+              TranscriptionsPage(),
               DashboardPage(),
               SettingsPage(),
             ],
@@ -83,6 +88,11 @@ class _AppShellState extends ConsumerState<AppShell> {
         },
         destinations: const [
           NavigationDestination(
+            icon: Icon(LucideIcons.fileText),
+            selectedIcon: Icon(LucideIcons.fileText),
+            label: 'Transcriptions',
+          ),
+          NavigationDestination(
             icon: Icon(LucideIcons.layoutDashboard),
             selectedIcon: Icon(LucideIcons.layoutDashboard),
             label: 'Dashboard',
@@ -95,7 +105,7 @@ class _AppShellState extends ConsumerState<AppShell> {
         ],
       ),
       floatingActionButton: _buildRecordFab(context, ref, recordingState),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
@@ -143,64 +153,106 @@ class _AppShellState extends ConsumerState<AppShell> {
     await recordingUseCase.toggleRecording(state);
   }
 
-  void _showEnhancedErrorSnackBar(BuildContext context, WidgetRef ref, ErrorResult errorResult) {
+  void _showErrorDialog(BuildContext context, WidgetRef ref, ErrorResult errorResult) {
+    showDialog(
+      context: context,
+      builder: (context) => ErrorDialog(
+        error: EnhancedErrorHandler.enhanceErrorResult(errorResult),
+        additionalActions: [
+          if (errorResult.actionHint?.contains('Settings') == true)
+            ErrorAction(
+              label: 'Open Settings',
+              icon: LucideIcons.settings,
+              onPressed: () {
+                Navigator.of(context).pop();
+                ref.read(currentPageProvider.notifier).state = 1;
+              },
+            ),
+        ],
+        canShowTechnicalDetails: kDebugMode,
+      ),
+    );
+  }
+
+  ErrorSeverity _getErrorSeverity(ErrorResult result) {
+    final message = result.message.toLowerCase();
+    final icon = result.iconName;
+
+    if (message.contains('permission_denied') || icon == 'shield-off') {
+      return ErrorSeverity.critical;
+    }
+
+    if (message.contains('unauthorized') || message.contains('invalid')) {
+      return ErrorSeverity.high;
+    }
+
+    if (icon == 'wifi-off' || icon == 'mic-off' || icon == 'cloud-off') {
+      return ErrorSeverity.medium;
+    }
+
+    return ErrorSeverity.low;
+  }
+
+  Color _getErrorColor(ErrorResult result) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    // Determine color based on error type
-    Color backgroundColor = colorScheme.error;
-    switch (errorResult.iconName) {
+    switch (result.iconName) {
       case 'zap-off':
-        backgroundColor = Colors.orange[700] ?? colorScheme.error;
-        break;
+        return Colors.orange[700] ?? colorScheme.error;
       case 'timer':
-        backgroundColor = Colors.amber[700] ?? colorScheme.error;
-        break;
+        return Colors.amber[700] ?? colorScheme.error;
       case 'wifi-off':
-        backgroundColor = Colors.blue[700] ?? colorScheme.error;
-        break;
+        return Colors.blue[700] ?? colorScheme.error;
       case 'shield-off':
-        backgroundColor = Colors.red[700] ?? colorScheme.error;
-        break;
+        return Colors.red[700] ?? colorScheme.error;
       default:
-        backgroundColor = colorScheme.error;
+        return colorScheme.error;
+    }
+  }
+
+  IconData _getErrorIcon(ErrorResult result) {
+    switch (result.iconName) {
+      case 'cloud-off':
+        return LucideIcons.cloudOff;
+      case 'zap-off':
+        return LucideIcons.zapOff;
+      case 'timer':
+        return LucideIcons.timer;
+      case 'wifi-off':
+        return LucideIcons.wifiOff;
+      case 'shield-off':
+        return LucideIcons.shieldOff;
+      case 'key':
+        return LucideIcons.key;
+      case 'alert-triangle':
+        return LucideIcons.alertTriangle;
+      case 'mic-off':
+        return LucideIcons.micOff;
+      case 'volume-x':
+        return LucideIcons.volumeX;
+      case 'alert-circle':
+        return LucideIcons.alertCircle;
+      default:
+        return LucideIcons.alertCircle;
+    }
+  }
+
+  void _showEnhancedErrorSnackBar(BuildContext context, WidgetRef ref, ErrorResult errorResult) {
+    // Check if this is a critical error that needs a dialog
+    final severity = _getErrorSeverity(errorResult);
+
+    if (severity.value >= ErrorSeverity.high.value) {
+      _showErrorDialog(context, ref, errorResult);
+      return;
     }
 
+    final colorScheme = Theme.of(context).colorScheme;
+
+    // Determine color based on error category
+    Color backgroundColor = _getErrorColor(errorResult);
+
     // Get the icon data
-    IconData iconData;
-    switch (errorResult.iconName) {
-      case 'cloud-off':
-        iconData = LucideIcons.cloudOff;
-        break;
-      case 'zap-off':
-        iconData = LucideIcons.zapOff;
-        break;
-      case 'timer':
-        iconData = LucideIcons.timer;
-        break;
-      case 'wifi-off':
-        iconData = LucideIcons.wifiOff;
-        break;
-      case 'shield-off':
-        iconData = LucideIcons.shieldOff;
-        break;
-      case 'key':
-        iconData = LucideIcons.key;
-        break;
-      case 'alert-triangle':
-        iconData = LucideIcons.alertTriangle;
-        break;
-      case 'mic-off':
-        iconData = LucideIcons.micOff;
-        break;
-      case 'volume-x':
-        iconData = LucideIcons.volumeX;
-        break;
-      case 'alert-circle':
-        iconData = LucideIcons.alertCircle;
-        break;
-      default:
-        iconData = LucideIcons.alertCircle;
-    }
+    IconData iconData = _getErrorIcon(errorResult);
 
     // Build the content
     String content = errorResult.message;

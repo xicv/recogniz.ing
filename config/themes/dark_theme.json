@@ -9,6 +9,7 @@
     "success": "#10B981",
     "warning": "#F59E0B",
     "error": "#EF4444",
+    "info": "#64748B",
     "background": "#0F172A",
     "surface": "#1E293B",
     "textPrimary": "#F1F5F9",

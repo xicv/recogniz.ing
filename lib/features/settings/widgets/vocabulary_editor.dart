@@ -45,113 +45,86 @@ class _VocabularyEditorState extends ConsumerState<VocabularyEditor> {
 
   @override
   Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      initialChildSize: 0.9,
-      minChildSize: 0.5,
-      maxChildSize: 0.95,
-      builder: (context, scrollController) => Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        ),
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        surfaceTintColor: Theme.of(context).colorScheme.surfaceTint,
+        title: Text(isEditing ? 'Edit Vocabulary' : 'New Vocabulary'),
+        actions: [
+          if (isEditing && !widget.vocabulary!.isDefault)
+            IconButton(
+              onPressed: _deleteVocabulary,
+              icon: Icon(LucideIcons.trash2, color: AppColors.error),
+              tooltip: 'Delete',
+            ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              margin: const EdgeInsets.only(top: 12),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(2),
+            TextField(
+              controller: _nameController,
+              decoration: const InputDecoration(
+                labelText: 'Name',
+                hintText: 'Enter vocabulary set name',
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(20),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _descriptionController,
+              decoration: const InputDecoration(
+                labelText: 'Description',
+                hintText: 'Brief description of this vocabulary',
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _wordsController,
+              decoration: const InputDecoration(
+                labelText: 'Words',
+                hintText: 'Enter one word or phrase per line...',
+                alignLabelWithHint: true,
+              ),
+              maxLines: 15,
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
               child: Row(
                 children: [
-                  Text(
-                    isEditing ? 'Edit Vocabulary' : 'New Vocabulary',
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontSize: 18,
-                        ),
-                  ),
-                  const Spacer(),
-                  if (isEditing && !widget.vocabulary!.isDefault)
-                    IconButton(
-                      onPressed: _deleteVocabulary,
-                      icon: Icon(LucideIcons.trash2, color: AppColors.error),
-                    ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(LucideIcons.x),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: ListView(
-                controller: scrollController,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                children: [
-                  TextField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Name',
-                      hintText: 'Enter vocabulary set name',
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _descriptionController,
-                    decoration: const InputDecoration(
-                      labelText: 'Description',
-                      hintText: 'Brief description of this vocabulary',
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _wordsController,
-                    decoration: const InputDecoration(
-                      labelText: 'Words',
-                      hintText: 'Enter one word or phrase per line...',
-                      alignLabelWithHint: true,
-                    ),
-                    maxLines: 15,
-                  ),
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(LucideIcons.info,
-                            size: 16, color: AppColors.primary),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Add proper nouns, technical terms, or domain-specific vocabulary (one per line)',
-                            style:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: AppColors.primary,
-                                    ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: _saveVocabulary,
+                  Icon(LucideIcons.info,
+                      size: 16, color: AppColors.primary),
+                  const SizedBox(width: 8),
+                  Expanded(
                     child: Text(
-                        isEditing ? 'Update Vocabulary' : 'Create Vocabulary'),
+                      'Add proper nouns, technical terms, or domain-specific vocabulary (one per line)',
+                      style:
+                          Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: AppColors.primary,
+                              ),
+                    ),
                   ),
-                  const SizedBox(height: 40),
                 ],
               ),
             ),
+            const SizedBox(height: 32),
+            FilledButton.icon(
+              onPressed: _saveVocabulary,
+              icon: const Icon(LucideIcons.check),
+              label: Text(
+                  isEditing ? 'Update Vocabulary' : 'Create Vocabulary'),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(48),
+              ),
+            ),
+            const SizedBox(height: 100),
           ],
         ),
       ),

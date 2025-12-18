@@ -13,6 +13,7 @@ class AppColors {
   static Color success = const Color(0xFF10B981);
   static Color warning = const Color(0xFFF59E0B);
   static Color error = const Color(0xFFEF4444);
+  static Color info = const Color(0xFF64748B);
 
   // Neutrals - Light
   static Color backgroundLight = const Color(0xFFF8FAFC);
@@ -37,6 +38,7 @@ class AppColors {
     success = Color(int.parse(colors.success.replaceFirst('#', '0xFF')));
     warning = Color(int.parse(colors.warning.replaceFirst('#', '0xFF')));
     error = Color(int.parse(colors.error.replaceFirst('#', '0xFF')));
+    info = Color(int.parse(colors.info.replaceFirst('#', '0xFF')));
     backgroundLight = Color(int.parse(colors.background.replaceFirst('#', '0xFF')));
     surfaceLight = Color(int.parse(colors.surface.replaceFirst('#', '0xFF')));
     textPrimaryLight = Color(int.parse(colors.textPrimary.replaceFirst('#', '0xFF')));

@@ -1,21 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// Extension to get context easily
-extension InputGet on Widget {
-  static BuildContext? _context;
-
-  static BuildContext? get context => _context;
-
-  static void setContext(BuildContext context) => _context = context;
-}
-
 /// Custom-styled input widgets for consistent app-wide styling
 class AppInputs {
   const AppInputs._();
 
   /// Standard text field with consistent styling
   static Widget text({
+    required BuildContext context,
     TextEditingController? controller,
     String? labelText,
     String? hintText,
@@ -59,8 +51,9 @@ class AppInputs {
       autovalidateMode: autovalidateMode,
       focusNode: focusNode,
       textCapitalization: textCapitalization,
-      style: _inputStyle,
+      style: _inputStyle(context),
       decoration: _inputDecoration(
+        context: context,
         labelText: labelText,
         hintText: hintText,
         errorText: errorText,
@@ -76,6 +69,7 @@ class AppInputs {
 
   /// Password field with toggle visibility
   static Widget password({
+    required BuildContext context,
     TextEditingController? controller,
     String? labelText,
     String? errorText,
@@ -83,32 +77,19 @@ class AppInputs {
     String? Function(String?)? validator,
     bool showVisibilityToggle = true,
   }) {
-    return StatefulBuilder(
-      builder: (context, setState) {
-        bool obscureText = true;
-
-        return AppInputs.text(
-          controller: controller,
-          labelText: labelText ?? 'Password',
-          errorText: errorText,
-          obscureText: obscureText,
-          onChanged: onChanged,
-          validator: validator,
-          suffixIcon: showVisibilityToggle
-              ? IconButton(
-                  onPressed: () => setState(() => obscureText = !obscureText),
-                  icon: Icon(
-                    obscureText ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                  ),
-                )
-              : null,
-        );
-      },
+    return PasswordField(
+      controller: controller,
+      labelText: labelText,
+      errorText: errorText,
+      onChanged: onChanged,
+      validator: validator,
+      showVisibilityToggle: showVisibilityToggle,
     );
   }
 
   /// Search field with search icon and clear button
   static Widget search({
+    required BuildContext context,
     TextEditingController? controller,
     String? hintText,
     ValueChanged<String>? onChanged,
@@ -116,6 +97,7 @@ class AppInputs {
     bool showClearButton = true,
   }) {
     return AppInputs.text(
+      context: context,
       controller: controller,
       hintText: hintText ?? 'Search...',
       onChanged: onChanged,
@@ -132,6 +114,7 @@ class AppInputs {
 
   /// Multiline text field for longer input
   static Widget multiline({
+    required BuildContext context,
     TextEditingController? controller,
     String? labelText,
     String? hintText,
@@ -143,6 +126,7 @@ class AppInputs {
     EdgeInsetsGeometry? contentPadding,
   }) {
     return AppInputs.text(
+      context: context,
       controller: controller,
       labelText: labelText,
       hintText: hintText,
@@ -157,6 +141,7 @@ class AppInputs {
 
   /// Dropdown field with consistent styling
   static Widget dropdown<T>({
+    required BuildContext context,
     required List<DropdownMenuItem<T>> items,
     required T? value,
     required ValueChanged<T?>? onChanged,
@@ -170,8 +155,9 @@ class AppInputs {
       value: value,
       onChanged: onChanged,
       items: items,
-      style: _inputStyle,
+      style: _inputStyle(context),
       decoration: _inputDecoration(
+        context: context,
         labelText: labelText,
         hintText: hintText,
         errorText: errorText,
@@ -226,6 +212,7 @@ class AppInputs {
 
   /// Switch with consistent styling
   static Widget switch_({
+    required BuildContext context,
     required bool value,
     required ValueChanged<bool>? onChanged,
     required Widget label,
@@ -238,12 +225,13 @@ class AppInputs {
       title: label,
       subtitle: subtitle != null ? Text(subtitle) : null,
       contentPadding: EdgeInsets.zero,
-      activeColor: Theme.of(InputGet.context!).colorScheme.primary,
+      activeColor: Theme.of(context).colorScheme.primary,
     );
   }
 
   /// Radio group with consistent styling
   static Widget radioGroup<T>({
+    required BuildContext context,
     required T value,
     required ValueChanged<T>? onChanged,
     required Map<T, Widget> options,
@@ -255,7 +243,7 @@ class AppInputs {
         if (labelText != null) ...[
           Text(
             labelText,
-            style: Theme.of(InputGet.context!).textTheme.titleSmall,
+            style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),
         ],
@@ -266,7 +254,7 @@ class AppInputs {
             onChanged: (val) => onChanged?.call(val!),
             title: entry.value,
             contentPadding: EdgeInsets.zero,
-            activeColor: Theme.of(InputGet.context!).colorScheme.primary,
+            activeColor: Theme.of(context).colorScheme.primary,
           ),
         ),
       ],
@@ -275,6 +263,7 @@ class AppInputs {
 
   /// Slider with consistent styling
   static Widget slider({
+    required BuildContext context,
     required double value,
     required ValueChanged<double>? onChanged,
     required String label,
@@ -291,12 +280,12 @@ class AppInputs {
           children: [
             Text(
               label,
-              style: Theme.of(InputGet.context!).textTheme.titleSmall,
+              style: Theme.of(context).textTheme.titleSmall,
             ),
             Text(
               labelFormatter?.call(value) ?? value.toStringAsFixed(1),
-              style: Theme.of(InputGet.context!).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(InputGet.context!).colorScheme.primary,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
                   ),
             ),
           ],
@@ -307,20 +296,22 @@ class AppInputs {
           min: min,
           max: max,
           divisions: divisions,
-          activeColor: Theme.of(InputGet.context!).colorScheme.primary,
+          activeColor: Theme.of(context).colorScheme.primary,
         ),
       ],
     );
   }
 
   /// Default input text style
-  static TextStyle get _inputStyle => const TextStyle(
+  static TextStyle _inputStyle(BuildContext context) => TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.normal,
+        color: Theme.of(context).colorScheme.onSurface,
       );
 
   /// Default input decoration
   static InputDecoration _inputDecoration({
+    required BuildContext context,
     String? labelText,
     String? hintText,
     String? errorText,
@@ -331,6 +322,8 @@ class AppInputs {
     Widget? suffix,
     EdgeInsetsGeometry? contentPadding,
   }) {
+    final theme = Theme.of(context);
+
     return InputDecoration(
       labelText: labelText,
       hintText: hintText,
@@ -341,27 +334,117 @@ class AppInputs {
       prefix: prefix,
       suffix: suffix,
       contentPadding: contentPadding ?? const EdgeInsets.all(12),
-      border: const OutlineInputBorder(
-        borderRadius: BorderRadius.all(Radius.circular(8)),
+      border: OutlineInputBorder(
+        borderRadius: const BorderRadius.all(Radius.circular(12)),
+        borderSide: BorderSide(color: theme.colorScheme.outline),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: const BorderRadius.all(Radius.circular(8)),
+        borderRadius: const BorderRadius.all(Radius.circular(12)),
         borderSide: BorderSide(
-          color: Colors.grey.shade300,
+          color: theme.colorScheme.outline.withOpacity(0.3),
         ),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: const BorderRadius.all(Radius.circular(8)),
+        borderRadius: const BorderRadius.all(Radius.circular(12)),
         borderSide: BorderSide(
-          color: Theme.of(InputGet.context!).colorScheme.primary,
+          color: theme.colorScheme.primary,
           width: 2,
         ),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: const BorderRadius.all(Radius.circular(8)),
+        borderRadius: const BorderRadius.all(Radius.circular(12)),
         borderSide: BorderSide(
-          color: Theme.of(InputGet.context!).colorScheme.error,
+          color: theme.colorScheme.error,
         ),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: const BorderRadius.all(Radius.circular(12)),
+        borderSide: BorderSide(
+          color: theme.colorScheme.error,
+          width: 2,
+        ),
+      ),
+    );
+  }
+}
+
+/// Password field widget with proper state management
+class PasswordField extends StatefulWidget {
+  final TextEditingController? controller;
+  final String? labelText;
+  final String? errorText;
+  final ValueChanged<String>? onChanged;
+  final String? Function(String?)? validator;
+  final bool showVisibilityToggle;
+
+  const PasswordField({
+    super.key,
+    this.controller,
+    this.labelText,
+    this.errorText,
+    this.onChanged,
+    this.validator,
+    this.showVisibilityToggle = true,
+  });
+
+  @override
+  State<PasswordField> createState() => _PasswordFieldState();
+}
+
+class _PasswordFieldState extends State<PasswordField> {
+  late bool _obscureText;
+
+  @override
+  void initState() {
+    super.initState();
+    _obscureText = true;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: widget.controller,
+      obscureText: _obscureText,
+      onChanged: widget.onChanged,
+      validator: widget.validator,
+      style: AppInputs._inputStyle(context),
+      decoration: InputDecoration(
+        labelText: widget.labelText ?? 'Password',
+        errorText: widget.errorText,
+        contentPadding: const EdgeInsets.all(12),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.primary,
+            width: 2,
+          ),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.error,
+          ),
+        ),
+        suffixIcon: widget.showVisibilityToggle
+            ? IconButton(
+                onPressed: () => setState(() => _obscureText = !_obscureText),
+                icon: Icon(
+                  _obscureText ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+                tooltip: _obscureText ? 'Show password' : 'Hide password',
+              )
+            : null,
       ),
     );
   }

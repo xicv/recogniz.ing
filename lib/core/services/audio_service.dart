@@ -17,15 +17,10 @@ class AudioService {
   bool _isRecording = false;
   bool get isRecording => _isRecording;
 
-  // Performance monitoring
-  StreamSubscription<Amplitude>? _amplitudeSubscription;
-  final List<double> _amplitudeHistory = [];
-  static const int _maxHistorySize = 100;
-
   // Initialize audio processor on first use
   static bool _processorInitialized = false;
 
-  /// Initialize the audio processor for background analysis
+  /// Initialize the audio analyzer for background analysis
   static Future<void> _ensureProcessorInitialized() async {
     if (!_processorInitialized) {
       await AudioProcessor.initialize();
@@ -55,9 +50,6 @@ class AudioService {
     // Initialize processor for background analysis
     await _ensureProcessorInitialized();
 
-    // Clear previous amplitude history
-    _amplitudeHistory.clear();
-
     final dir = await getTemporaryDirectory();
     final uuid = const Uuid().v4();
     _currentRecordingPath = '${dir.path}/recording_$uuid.m4a';
@@ -77,16 +69,7 @@ class AudioService {
     _isRecording = true;
     _recordingStartTime = DateTime.now();
 
-    // Monitor amplitude for real-time feedback
-    // TODO: Fix amplitude monitoring API
-    // _amplitudeSubscription = _recorder
-    //     .onAmplitudeChanged.listen((amplitude) {
-    //   _amplitudeHistory.add(amplitude.current);
-    //   if (_amplitudeHistory.length > _maxHistorySize) {
-    //     _amplitudeHistory.removeAt(0);
-    //   }
-    // });
-
+  
     debugPrint('[AudioService] Recording started at $_recordingStartTime');
   }
 
@@ -101,11 +84,7 @@ class AudioService {
     final path = await _recorder.stop();
     _isRecording = false;
 
-    // Clean up amplitude monitoring
-    await _amplitudeSubscription?.cancel();
-    _amplitudeSubscription = null;
-    _amplitudeHistory.clear();
-
+    
     debugPrint('[AudioService] Recorder stopped, path: $path');
     debugPrint('[AudioService] Expected path: $_currentRecordingPath');
 
@@ -157,7 +136,7 @@ class AudioService {
       return null;
     }
 
-    // Analyze audio to detect speech using background processor
+    // Analyze audio to detect speech using background analyzer
     final audioBytes = Uint8List.fromList(bytes);
     final analysis = await AudioProcessor.analyzeAudio(
       audioBytes: audioBytes,
@@ -190,11 +169,7 @@ class AudioService {
     await _recorder.stop();
     _isRecording = false;
 
-    // Clean up amplitude monitoring
-    await _amplitudeSubscription?.cancel();
-    _amplitudeSubscription = null;
-    _amplitudeHistory.clear();
-
+    
     if (_currentRecordingPath != null) {
       final file = File(_currentRecordingPath!);
       if (await file.exists()) {
@@ -208,7 +183,6 @@ class AudioService {
   }
 
   void dispose() {
-    _amplitudeSubscription?.cancel();
     _recorder.dispose();
   }
 }

@@ -32,13 +32,13 @@ class RecordingOverlay extends ConsumerWidget {
                     width: 80,
                     height: 80,
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
+                      color: Theme.of(context).colorScheme.error.withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       LucideIcons.mic,
                       size: 40,
-                      color: Colors.red,
+                      color: Theme.of(context).colorScheme.error,
                     ),
                   )
                       .animate(onPlay: (c) => c.repeat())
@@ -57,32 +57,32 @@ class RecordingOverlay extends ConsumerWidget {
                   Text(
                     'Recording...',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Tap the mic button to stop',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.white70,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                         ),
                   ),
                   const SizedBox(height: 24),
                   const _RecordingTimer(),
                 ] else if (state == RecordingState.processing) ...[
-                  LoadingIndicators.medium(color: Colors.white),
+                  LoadingIndicators.medium(color: Theme.of(context).colorScheme.primary),
                   const SizedBox(height: 24),
                   Text(
                     'Processing...',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Sending to Gemini AI for transcription',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.white70,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                         ),
                   ),
                   // Only show debug text in debug mode
@@ -91,7 +91,7 @@ class RecordingOverlay extends ConsumerWidget {
                     Text(
                       'Check terminal for debug logs',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.white54,
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                           ),
                     ),
                   ],

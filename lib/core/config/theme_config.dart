@@ -9,6 +9,7 @@ class ThemeColors {
   final String success;
   final String warning;
   final String error;
+  final String info;
   final String background;
   final String surface;
   final String textPrimary;
@@ -22,6 +23,7 @@ class ThemeColors {
     required this.success,
     required this.warning,
     required this.error,
+    required this.info,
     required this.background,
     required this.surface,
     required this.textPrimary,
@@ -119,6 +121,7 @@ class ThemeConfig {
         success: json['colors']['success'],
         warning: json['colors']['warning'],
         error: json['colors']['error'],
+        info: json['colors']['info'],
         background: json['colors']['background'],
         surface: json['colors']['surface'],
         textPrimary: json['colors']['textPrimary'],

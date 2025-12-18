@@ -9,19 +9,56 @@
 
   body {
     @apply bg-white text-slate-900 font-sans antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Improve typography for modern minimalist design */
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tight;
+  }
+
+  p {
+    @apply leading-relaxed;
   }
 }
 
 @layer components {
   .gradient-text {
-    @apply bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent;
   }
 
   .section-padding {
-    @apply px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24;
+    @apply px-6 sm:px-8 lg:px-12 py-24 sm:py-32;
   }
 
   .container-custom {
     @apply max-w-7xl mx-auto;
+  }
+
+  /* Custom animations for smoother experience */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease-out;
+  }
+
+  /* Remove default focus styles and add custom ones */
+  button:focus-visible,
+  a:focus-visible {
+    @apply outline-none ring-2 ring-slate-300 ring-offset-2 ring-offset-white;
+  }
+
+  /* Better hover transitions */
+  .transition-all {
+    @apply transition-colors duration-300 ease-out;
   }
 }

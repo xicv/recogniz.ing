@@ -35,6 +35,7 @@ class AppLists {
 
   /// List tile with icon
   static Widget iconTile({
+    required BuildContext context,
     required IconData icon,
     required String title,
     String? subtitle,
@@ -45,7 +46,7 @@ class AppLists {
     return tile(
       leading: Icon(
         icon,
-        color: iconColor ?? Theme.of(ListGet.context!).colorScheme.primary,
+        color: iconColor ?? Theme.of(context).colorScheme.primary,
       ),
       title: Text(title),
       subtitle: subtitle != null ? Text(subtitle) : null,
@@ -56,6 +57,7 @@ class AppLists {
 
   /// List tile with checkbox
   static Widget checkboxTile({
+    required BuildContext context,
     required bool value,
     required ValueChanged<bool?>? onChanged,
     required String title,
@@ -69,7 +71,7 @@ class AppLists {
       title: Text(title),
       subtitle: subtitle != null ? Text(subtitle) : null,
       contentPadding: contentPadding,
-      activeColor: Theme.of(ListGet.context!).colorScheme.primary,
+      activeColor: Theme.of(context).colorScheme.primary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),
@@ -78,6 +80,7 @@ class AppLists {
 
   /// List tile with switch
   static Widget switchTile({
+    required BuildContext context,
     required bool value,
     required ValueChanged<bool>? onChanged,
     required String title,
@@ -91,7 +94,7 @@ class AppLists {
       title: Text(title),
       subtitle: subtitle != null ? Text(subtitle) : null,
       contentPadding: contentPadding,
-      activeColor: Theme.of(ListGet.context!).colorScheme.primary,
+      activeColor: Theme.of(context).colorScheme.primary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),
@@ -100,6 +103,7 @@ class AppLists {
 
   /// List tile with radio button
   static Widget radioTile<T>({
+    required BuildContext context,
     required T value,
     required T groupValue,
     required ValueChanged<T?>? onChanged,
@@ -115,7 +119,7 @@ class AppLists {
       title: Text(title),
       subtitle: subtitle != null ? Text(subtitle) : null,
       contentPadding: contentPadding,
-      activeColor: Theme.of(ListGet.context!).colorScheme.primary,
+      activeColor: Theme.of(context).colorScheme.primary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),
@@ -135,9 +139,9 @@ class AppLists {
       leading: leading,
       title: title,
       trailing: trailing,
+      tilePadding: contentPadding,
       children: children,
       initiallyExpanded: initiallyExpanded,
-      tilePadding: contentPadding,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),
@@ -146,6 +150,7 @@ class AppLists {
 
   /// Divider list tile for visual separation
   static Widget divider({
+    required BuildContext context,
     double height = 1,
     double thickness = 1,
     Color? color,
@@ -154,13 +159,14 @@ class AppLists {
     return Divider(
       height: height,
       thickness: thickness,
-      color: color ?? Theme.of(ListGet.context!).dividerColor,
+      color: color ?? Theme.of(context).dividerColor,
       indent: indent,
     );
   }
 
   /// Section header tile
   static Widget sectionHeader({
+    required BuildContext context,
     required String title,
     String? subtitle,
     Widget? action,
@@ -176,8 +182,8 @@ class AppLists {
               children: [
                 Text(
                   title,
-                  style: Theme.of(ListGet.context!).textTheme.titleMedium?.copyWith(
-                        color: Theme.of(ListGet.context!).colorScheme.primary,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
                         fontWeight: FontWeight.w600,
                       ),
                 ),
@@ -185,8 +191,8 @@ class AppLists {
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: Theme.of(ListGet.context!).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(ListGet.context!).colorScheme.outline,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.outline,
                         ),
                   ),
                 ],
@@ -201,6 +207,7 @@ class AppLists {
 
   /// Grouped list with section headers
   static Widget groupedList({
+    required BuildContext context,
     required List<ListGroup> groups,
     EdgeInsetsGeometry? padding,
   }) {
@@ -216,7 +223,7 @@ class AppLists {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (group.title != null) ...[
-              sectionHeader(title: group.title!),
+              sectionHeader(context: context, title: group.title!),
               const SizedBox(height: 8),
             ],
             Card(
@@ -233,6 +240,7 @@ class AppLists {
 
   /// Empty state widget for lists
   static Widget emptyState({
+    required BuildContext context,
     required String title,
     String? subtitle,
     IconData icon = LucideIcons.inbox,
@@ -247,13 +255,13 @@ class AppLists {
             Icon(
               icon,
               size: 64,
-              color: Theme.of(ListGet.context!).colorScheme.outline,
+              color: Theme.of(context).colorScheme.outline,
             ),
             const SizedBox(height: 16),
             Text(
               title,
-              style: Theme.of(ListGet.context!).textTheme.titleLarge?.copyWith(
-                    color: Theme.of(ListGet.context!).colorScheme.outline,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.outline,
                   ),
               textAlign: TextAlign.center,
             ),
@@ -261,8 +269,8 @@ class AppLists {
               const SizedBox(height: 8),
               Text(
                 subtitle,
-                style: Theme.of(ListGet.context!).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(ListGet.context!).colorScheme.outline,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.outline,
                     ),
                 textAlign: TextAlign.center,
               ),
@@ -315,7 +323,7 @@ class AppLists {
                       builder: (context, snapshot) {
                         final filteredItems = snapshot.data ?? [];
                         return filteredItems.isEmpty
-                            ? emptyState ?? AppLists.emptyState(title: 'No results found')
+                            ? emptyState ?? AppLists.emptyState(context: context, title: 'No results found')
                             : ListView.builder(
                                 padding: padding,
                                 itemCount: filteredItems.length,
@@ -342,11 +350,3 @@ class ListGroup {
   });
 }
 
-/// Extension to get context easily
-extension ListGet on Widget {
-  static BuildContext? _context;
-
-  static BuildContext? get context => _context;
-
-  static void setContext(BuildContext context) => _context = context;
-}

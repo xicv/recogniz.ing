@@ -30,6 +30,7 @@ class AppChips {
 
   /// Choice chip for selection from a set
   static Widget choice({
+    required BuildContext context,
     required Widget label,
     required bool selected,
     required ValueChanged<bool>? onSelected,
@@ -42,15 +43,15 @@ class AppChips {
       selected: selected,
       onSelected: onSelected,
       avatar: avatar,
-      selectedColor: selectedColor ?? Theme.of(ChipGet.context!).colorScheme.primary.withOpacity(0.2),
+      selectedColor: selectedColor ?? Theme.of(context).colorScheme.primary.withOpacity(0.2),
       labelStyle: TextStyle(
-        color: selected ? Theme.of(ChipGet.context!).colorScheme.primary : null,
+        color: selected ? Theme.of(context).colorScheme.primary : null,
       ),
       padding: padding,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
         side: BorderSide(
-          color: selected ? Theme.of(ChipGet.context!).colorScheme.primary : Colors.grey.shade300,
+          color: selected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.outline.withOpacity(0.3),
         ),
       ),
     );
@@ -58,6 +59,7 @@ class AppChips {
 
   /// Filter chip for filtering content
   static Widget filter({
+    required BuildContext context,
     required Widget label,
     required bool selected,
     required ValueChanged<bool>? onSelected,
@@ -70,15 +72,15 @@ class AppChips {
       selected: selected,
       onSelected: onSelected,
       avatar: avatar,
-      selectedColor: selectedColor ?? Theme.of(ChipGet.context!).colorScheme.primary.withOpacity(0.2),
+      selectedColor: selectedColor ?? Theme.of(context).colorScheme.primary.withOpacity(0.2),
       labelStyle: TextStyle(
-        color: selected ? Theme.of(ChipGet.context!).colorScheme.primary : null,
+        color: selected ? Theme.of(context).colorScheme.primary : null,
       ),
       padding: padding,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
         side: BorderSide(
-          color: selected ? Theme.of(ChipGet.context!).colorScheme.primary : Colors.grey.shade300,
+          color: selected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.outline.withOpacity(0.3),
         ),
       ),
     );
@@ -115,12 +117,13 @@ class AppChips {
 
   /// Status chip for displaying status information
   static Widget status({
+    required BuildContext context,
     required String label,
     required ChipStatus status,
     EdgeInsetsGeometry? padding,
   }) {
-    final theme = Theme.of(ChipGet.context!);
-    final config = _StatusConfig.fromStatus(status);
+    final theme = Theme.of(context);
+    final config = _StatusConfig.fromStatus(status, theme);
 
     return Container(
       padding: padding ?? const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -154,6 +157,7 @@ class AppChips {
 
   /// Badge chip for showing counts
   static Widget badge({
+    required BuildContext context,
     required String count,
     Color? backgroundColor,
     Color? foregroundColor,
@@ -162,13 +166,13 @@ class AppChips {
     return Container(
       padding: padding ?? const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: backgroundColor ?? Theme.of(ChipGet.context!).colorScheme.primary,
+        color: backgroundColor ?? Theme.of(context).colorScheme.primary,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         count,
-        style: Theme.of(ChipGet.context!).textTheme.bodySmall?.copyWith(
-          color: foregroundColor ?? Colors.white,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: foregroundColor ?? Theme.of(context).colorScheme.onPrimary,
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -226,47 +230,41 @@ class _StatusConfig {
     required this.icon,
   });
 
-  static _StatusConfig fromStatus(ChipStatus status) {
+  static _StatusConfig fromStatus(ChipStatus status, ThemeData theme) {
+    final colorScheme = theme.colorScheme;
+
     switch (status) {
       case ChipStatus.active:
-        return const _StatusConfig(
-          color: Colors.green,
+        return _StatusConfig(
+          color: colorScheme.primary,
           icon: Icons.check_circle,
         );
       case ChipStatus.inactive:
-        return const _StatusConfig(
-          color: Colors.grey,
+        return _StatusConfig(
+          color: colorScheme.outline,
           icon: Icons.cancel,
         );
       case ChipStatus.pending:
-        return const _StatusConfig(
-          color: Colors.orange,
+        return _StatusConfig(
+          color: colorScheme.secondary,
           icon: Icons.access_time,
         );
       case ChipStatus.success:
-        return const _StatusConfig(
-          color: Colors.green,
+        return _StatusConfig(
+          color: colorScheme.tertiary,
           icon: Icons.check_circle,
         );
       case ChipStatus.error:
-        return const _StatusConfig(
-          color: Colors.red,
+        return _StatusConfig(
+          color: colorScheme.error,
           icon: Icons.error,
         );
       case ChipStatus.warning:
-        return const _StatusConfig(
-          color: Colors.orange,
+        return _StatusConfig(
+          color: colorScheme.error,
           icon: Icons.warning,
         );
     }
   }
 }
 
-/// Extension to get context easily
-extension ChipGet on Widget {
-  static BuildContext? _context;
-
-  static BuildContext? get context => _context;
-
-  static void setContext(BuildContext context) => _context = context;
-}
