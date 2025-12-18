@@ -1,10 +1,11 @@
 import 'dart:io';
+import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import 'package:uuid/uuid.dart';
-import 'audio_analyzer.dart';
+import 'audio_processor.dart';
 import '../config/app_config.dart';
 import '../constants/constants.dart';
 
@@ -15,6 +16,22 @@ class AudioService {
 
   bool _isRecording = false;
   bool get isRecording => _isRecording;
+
+  // Performance monitoring
+  StreamSubscription<Amplitude>? _amplitudeSubscription;
+  final List<double> _amplitudeHistory = [];
+  static const int _maxHistorySize = 100;
+
+  // Initialize audio processor on first use
+  static bool _processorInitialized = false;
+
+  /// Initialize the audio processor for background analysis
+  static Future<void> _ensureProcessorInitialized() async {
+    if (!_processorInitialized) {
+      await AudioProcessor.initialize();
+      _processorInitialized = true;
+    }
+  }
 
   Future<bool> hasPermission() async {
     final result = await _recorder.hasPermission();
@@ -35,12 +52,19 @@ class AudioService {
       throw Exception('Microphone permission not granted');
     }
 
+    // Initialize processor for background analysis
+    await _ensureProcessorInitialized();
+
+    // Clear previous amplitude history
+    _amplitudeHistory.clear();
+
     final dir = await getTemporaryDirectory();
     final uuid = const Uuid().v4();
     _currentRecordingPath = '${dir.path}/recording_$uuid.m4a';
 
     debugPrint('[AudioService] Recording to: $_currentRecordingPath');
 
+    // Start with optimized config for better performance
     await _recorder.start(
       const RecordConfig(
         encoder: AudioEncoder.aacLc,
@@ -52,6 +76,17 @@ class AudioService {
 
     _isRecording = true;
     _recordingStartTime = DateTime.now();
+
+    // Monitor amplitude for real-time feedback
+    // TODO: Fix amplitude monitoring API
+    // _amplitudeSubscription = _recorder
+    //     .onAmplitudeChanged.listen((amplitude) {
+    //   _amplitudeHistory.add(amplitude.current);
+    //   if (_amplitudeHistory.length > _maxHistorySize) {
+    //     _amplitudeHistory.removeAt(0);
+    //   }
+    // });
+
     debugPrint('[AudioService] Recording started at $_recordingStartTime');
   }
 
@@ -65,6 +100,11 @@ class AudioService {
 
     final path = await _recorder.stop();
     _isRecording = false;
+
+    // Clean up amplitude monitoring
+    await _amplitudeSubscription?.cancel();
+    _amplitudeSubscription = null;
+    _amplitudeHistory.clear();
 
     debugPrint('[AudioService] Recorder stopped, path: $path');
     debugPrint('[AudioService] Expected path: $_currentRecordingPath');
@@ -117,10 +157,10 @@ class AudioService {
       return null;
     }
 
-    // Analyze audio to detect speech
+    // Analyze audio to detect speech using background processor
     final audioBytes = Uint8List.fromList(bytes);
-    final analysis = AudioAnalyzer.analyzeAudioBytes(
-      audioBytes,
+    final analysis = await AudioProcessor.analyzeAudio(
+      audioBytes: audioBytes,
       amplitudeThreshold: audioConfig.amplitudeThreshold,
       speechRatioThreshold: audioConfig.speechRatioThreshold,
       sampleRate: audioConfig.sampleRate,
@@ -150,6 +190,11 @@ class AudioService {
     await _recorder.stop();
     _isRecording = false;
 
+    // Clean up amplitude monitoring
+    await _amplitudeSubscription?.cancel();
+    _amplitudeSubscription = null;
+    _amplitudeHistory.clear();
+
     if (_currentRecordingPath != null) {
       final file = File(_currentRecordingPath!);
       if (await file.exists()) {
@@ -163,6 +208,7 @@ class AudioService {
   }
 
   void dispose() {
+    _amplitudeSubscription?.cancel();
     _recorder.dispose();
   }
 }

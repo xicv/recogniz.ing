@@ -34,32 +34,74 @@ flutter run -d web       # Web
 
 ## 🎯 Key Features
 
+### Core Functionality
 - **Voice Recording** with smart activity detection and RMS-based audio analysis
-- **AI-Powered Transcription** using Gemini 1.5 Flash
+- **AI-Powered Transcription** using Gemini 3 Flash (latest model)
+- **Real-time Processing** with customizable prompts and vocabulary
+- **Audio Duration Tracking** for accurate usage statistics
+- **Smart Retry Mechanism** with automatic error recovery
+
+### User Experience
+- **Enhanced Error Handling** with Lucide icons and rich metadata
+- **Color-coded Error Messages** for quick identification
+- **Actionable Error Hints** with direct navigation to settings
+- **Retry Countdown Timers** for quota exceeded scenarios
+- **Visual Feedback** with recording overlay and audio indicators
+
+### Customization
 - **Editable Critical Instructions** to fine-tune AI behavior with presets
+- **6 Pre-configured Prompts**: Clean, Formal, Bullet Points, Email, Meeting Notes, Social
+- **6 Industry Vocabulary Sets**: General, Technology, Business, Medical, Legal, Finance
 - **Visual Vocabulary Display** with expandable tiles showing actual words
-- **Custom Prompts** for different output formats
-- **Industry Vocabulary** sets (Medical, Legal, Finance, Tech)
-- **Global Hotkeys** on desktop platforms
+- **Custom Prompt Creation** with template variables
+
+### Platform Features
+- **Global Hotkeys** on desktop (Ctrl+Shift+R)
 - **System Tray Integration** for quick access
 - **Dark/Light Themes** with Material Design 3
-- **Search & Edit** transcription history
-- **Cross-Platform** support
+- **Cross-Platform Support**: macOS, Windows, Linux, iOS, Android, Web
+- **Auto-copy to Clipboard** for transcriptions
+- **Search & Edit** transcription history with inline editing
 
 ## 🏗️ Project Structure
 
 ```
 lib/
 ├── core/                 # Business logic and shared utilities
-│   ├── config/          # Configuration loaders
+│   ├── constants/       # App-wide constants and configuration
+│   ├── error/           # Enhanced error handling with metadata
 │   ├── models/          # Data models with Hive adapters
-│   ├── services/        # Business services (Audio, Gemini, Storage)
+│   ├── services/        # Business services (Audio, Gemini, Storage, Tray, Hotkey)
 │   ├── theme/           # Material Design 3 theming
-│   └── providers/       # Riverpod global providers
+│   ├── use_cases/       # Business logic orchestration
+│   └── providers/       # Riverpod state management
+│       ├── app_providers.dart      # Main aggregation
+│       ├── service_providers.dart  # Service instances
+│       ├── settings_providers.dart # App settings
+│       ├── transcription_providers.dart
+│       ├── prompt_providers.dart
+│       ├── vocabulary_providers.dart
+│       ├── ui_providers.dart
+│       └── loading_providers.dart
 ├── features/            # Feature-based UI modules
-│   ├── dashboard/       # Main dashboard and stats
+│   ├── dashboard/       # Main dashboard and statistics
+│   │   └── widgets/
+│   │       └── simplified_stats_card.dart
 │   ├── recording/       # Recording overlay and VAD
 │   └── settings/        # App configuration
+├── widgets/             # Shared UI components
+│   ├── shared/          # Reusable widgets
+│   │   ├── app_bars.dart
+│   │   ├── app_buttons.dart
+│   │   ├── app_cards.dart
+│   │   ├── app_dialogs.dart
+│   │   ├── app_inputs.dart
+│   │   └── app_lists.dart
+│   └── global_loading_overlay.dart
+├── config/              # JSON configuration files
+│   ├── prompts/         # Default prompt templates
+│   ├── vocabulary/      # Industry vocabularies
+│   └── themes/          # Color schemes
 └── main.dart            # App entry point
 ```
 
@@ -144,15 +186,33 @@ flutter pub get
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆕 Latest Updates (v1.1.0)
+## 🆕 Latest Updates (v1.2.0)
 
-### New Features
+### Major Fixes
+- **Transcription History**: Fixed issue where transcriptions weren't appearing in recent history
+- **Prompt Processing**: Resolved AI confusion between prompt IDs and actual prompt templates
+- **Audio Duration**: Now correctly captures and displays recording duration
+- **State Management**: Improved provider usage for better UI updates
+
+### Enhanced Error Handling
+- **Lucide Icons**: Replaced all emojis with professional Lucide icons
+- **Rich Error Metadata**: Added retry timing, action hints, and error categorization
+- **Smart Retry**: Automatic retry mechanism with countdown timers
+- **Color Coding**: Visual differentiation of error types
+- **Better UX**: Direct navigation to Settings for API key issues
+
+### Architecture Improvements
+- **Use Cases Layer**: Added RecordingUseCase for better business logic separation
+- **Shared Widgets**: Created comprehensive widget library for code reuse
+- **Provider Organization**: Better structured Riverpod providers
+- **Error System**: Complete error handling overhaul with metadata
+
+### v1.1.0
 - **Editable Critical Instructions**: Customize AI behavior directly in settings with built-in safety warnings
 - **Vocabulary Word Preview**: Expand vocabulary sets to see all words in an elegant chip layout
 - **Audio Analysis Improvements**: Fixed RMS calculation bug for accurate speech detection
 
-### Fixes & Improvements
-- Resolved issue where valid speech was incorrectly rejected
-- Lowered audio detection thresholds for better sensitivity
-- Enhanced debug logging for troubleshooting
-- Seamless database migration for new features
+### v1.0.0
+- **Initial Release**: Core voice typing with Material Design 3
+- **Platform Support**: Cross-platform deployment with desktop features
+- **Configuration System**: JSON-based prompts and vocabulary management

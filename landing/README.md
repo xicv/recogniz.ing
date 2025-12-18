@@ -2,6 +2,15 @@
 
 A modern, minimalist landing page for the Recogniz.ing AI voice typing application.
 
+## About Recogniz.ing
+
+Recogniz.ing is an AI-powered voice typing application built with Flutter that:
+- Transcribes voice recordings in real-time using Google's Gemini AI
+- Supports cross-platform deployment (macOS, Windows, Linux, iOS, Android, Web)
+- Features smart voice activity detection and audio analysis
+- Offers customizable prompts and vocabulary for specialized domains
+- Provides Material Design 3 UI with dark/light theme support
+
 ## Tech Stack
 
 - **Vue 3.5+** with Composition API and `<script setup>`
@@ -19,6 +28,7 @@ A modern, minimalist landing page for the Recogniz.ing AI voice typing applicati
 - ♿ Accessibility-first approach
 - 🔍 SEO optimized meta tags
 - 📦 PWA ready with service worker
+- 🔗 Links to app downloads and documentation
 
 ## Getting Started
 

@@ -204,11 +204,44 @@ flutter packages pub run build_runner build --delete-conflicting-outputs
 
 ## Architecture
 
-The app follows Flutter clean architecture principles:
-- **Core Layer**: Services, models, and business logic
-- **Features Layer**: UI components organized by feature
-- **Configuration Layer**: Externalized settings and constants
-- **State Management**: Riverpod with providers and notifiers
+The app follows Flutter clean architecture principles with layered separation:
+
+### Core Layer (`lib/core/`)
+- **Constants**: App-wide constants and configuration values
+- **Models**: Data models with Hive serialization
+- **Services**: Business logic and external integrations
+  - AudioService: Microphone recording and validation
+  - GeminiService: AI transcription and processing
+  - StorageService: Hive database operations
+  - TrayService: System tray integration (desktop)
+  - HotkeyService: Global hotkey management
+- **Error Handling**: Comprehensive error management with rich metadata
+- **Providers**: Riverpod state management organized by domain
+  - Service providers, settings providers, UI providers
+  - Transcription, prompt, and vocabulary providers
+
+### Use Cases Layer (`lib/core/use_cases/`)
+- **RecordingUseCase**: Orchestrates the recording workflow
+- Encapsulates business logic and coordinates services
+
+### Features Layer (`lib/features/`)
+- **Dashboard**: Statistics display, transcription history, search
+- **Settings**: API key management, prompts, vocabulary configuration
+- **Recording**: Recording overlay with voice activity detection UI
+
+### Shared Widgets (`lib/widgets/`)
+- Reusable UI components for consistency across features
+- App bars, buttons, cards, dialogs, inputs, lists
+
+### Configuration Layer (`config/`)
+- JSON-based external configuration
+- Prompts, vocabulary, themes, app settings
+- Runtime loading without code changes
+
+### State Management
+- Riverpod with Provider pattern
+- StateNotifier for complex state
+- Proper separation of UI and business logic
 
 ## License
 
@@ -216,7 +249,19 @@ MIT License
 
 ## Changelog
 
-### v1.1.0 (Latest)
+### v1.2.0 (Latest)
+- **FIXED**: Transcriptions now properly appear in recent history
+- **FIXED**: Prompt processing no longer confuses AI with IDs vs templates
+- **FIXED**: Audio duration is now correctly captured and displayed
+- **NEW**: Enhanced error handling with Lucide icons instead of emojis
+- **NEW**: Rich error metadata with retry timing and action hints
+- **NEW**: Smart retry mechanism with countdown timers
+- **NEW**: Color-coded error messages for better UX
+- **REFACTOR**: Improved code architecture with use cases layer
+- **REFACTOR**: Added comprehensive shared widget components
+- **ENHANCED**: Better prompt templates for clearer AI instructions
+
+### v1.1.0
 - **NEW**: Editable critical instructions in settings with safety warnings
 - **NEW**: Expandable vocabulary tiles showing actual words in chip format
 - **FIXED**: Audio analyzer RMS calculation bug causing false negatives

@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
+import '../models/transcription_result.dart';
+
 class GeminiService {
   GenerativeModel? _model;
 
@@ -224,14 +226,3 @@ Output only the transcription, nothing else.''';
   }
 }
 
-class TranscriptionResult {
-  final String rawText;
-  final String processedText;
-  final int tokenUsage;
-
-  TranscriptionResult({
-    required this.rawText,
-    required this.processedText,
-    required this.tokenUsage,
-  });
-}

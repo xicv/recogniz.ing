@@ -3,10 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../constants/constants.dart';
-import '../error/error_handler.dart';
 import '../models/transcription.dart';
+import '../models/transcription_result.dart';
 import '../providers/app_providers.dart';
 import '../services/audio_service.dart';
+import '../services/gemini_service.dart';
+import '../services/optimized_gemini_service.dart';
 import '../services/storage_service.dart';
 
 class RecordingUseCase {
@@ -113,16 +115,40 @@ class RecordingUseCase {
     final vocabularyWords = _getVocabularyWords(settings.selectedVocabularyId);
 
     try {
-      debugPrint('Sending to transcription service...');
+      debugPrint('Sending to optimized transcription service...');
       debugPrint('Using prompt: ${settings.selectedPromptId}');
       debugPrint('Using vocabulary: ${settings.selectedVocabularyId}');
 
-      final result = await geminiService.transcribeAudio(
-        audioBytes: Uint8List.fromList(audioData),
-        vocabulary: vocabularyWords,
-        promptTemplate: promptTemplate,
-        criticalInstructions: settings.effectiveCriticalInstructions,
-      );
+      // Check if we can use the optimized service
+      OptimizedGeminiService? optimizedService;
+      try {
+        optimizedService = ref.read(optimizedGeminiServiceProvider);
+      } catch (e) {
+        debugPrint('Optimized service not available, using standard service: $e');
+      }
+
+      TranscriptionResult result;
+
+      if (optimizedService != null && optimizedService.isInitialized) {
+        // Use optimized service for faster transcription
+        result = await optimizedService.transcribeAudio(
+          audioBytes: Uint8List.fromList(audioData),
+          vocabulary: vocabularyWords,
+          promptTemplate: promptTemplate,
+          criticalInstructions: settings.effectiveCriticalInstructions,
+          enableDirectMode: true, // Enable direct mode for maximum speed
+        );
+        debugPrint('Used optimized transcription service');
+      } else {
+        // Fall back to standard service
+        result = await geminiService.transcribeAudio(
+          audioBytes: Uint8List.fromList(audioData),
+          vocabulary: vocabularyWords,
+          promptTemplate: promptTemplate,
+          criticalInstructions: settings.effectiveCriticalInstructions,
+        );
+        debugPrint('Used standard transcription service');
+      }
 
       debugPrint('Transcription result: ${result.processedText.isNotEmpty ? "Success" : "Empty"}');
 
