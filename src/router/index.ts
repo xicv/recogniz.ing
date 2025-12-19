@@ -47,6 +47,14 @@ const router = createRouter({
   }
 })
 
+// Handle GitHub Pages SPA fallback
+// Check if we're coming from the 404.html redirect
+if (window.location.search && window.location.search.includes('/')) {
+  const path = window.location.search.slice(1).split('&')[0].replace(/\//g, '/')
+  const newPath = path.replace(/~and~/g, '&')
+  window.history.replaceState({}, '', newPath + window.location.hash)
+}
+
 // Navigation guard for title updates
 router.beforeEach((to) => {
   if (to.meta?.title) {
