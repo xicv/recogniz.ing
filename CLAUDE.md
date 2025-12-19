@@ -11,13 +11,13 @@ Core features:
 - AI-powered transcription with customizable vocabulary
 - Custom prompt management for tailored output
 - Dashboard with usage statistics and transcription history
-- Global hotkey support for quick activation
+- Global hotkey support for quick activation (Cmd+Shift+Space / Ctrl+Shift+Space)
 - System tray integration for desktop platforms
 - Cross-platform support with Material Design 3
 
 ## Development Commands
 
-The project includes a comprehensive Makefile with 35+ commands for streamlined development.
+The project includes a comprehensive Makefile with 40+ commands for streamlined development.
 
 ### Quick Start
 ```bash
@@ -39,7 +39,22 @@ make dev              # get + analyze + format + test
 make quick-run        # get + run-macos
 ```
 
-### Build Commands
+### Version Management
+```bash
+# Show current version
+make version
+
+# Bump semantic versions (automatically updates pubspec.yaml)
+make bump-patch        # 1.0.0 → 1.0.1
+make bump-minor        # 1.0.0 → 1.1.0
+make bump-major        # 1.0.0 → 2.0.0
+make bump-prerelease PRE=alpha  # 1.0.0 → 1.0.0-alpha
+
+# Create complete release (bump patch + deploy)
+make release
+```
+
+### Build & Deployment
 ```bash
 # Build for release (defaults to macOS)
 make build            # Build for macOS
@@ -50,6 +65,14 @@ make build-aab        # Android App Bundle
 make build-web        # Web release
 make build-windows    # Windows release
 make build-linux      # Linux release
+
+# Deploy to landing page
+make deploy-all       # Build and deploy all platforms
+make deploy-macos     # Deploy macOS only
+make deploy-windows   # Deploy Windows only
+make deploy-linux     # Deploy Linux only
+make deploy-android   # Deploy Android only
+make deploy-web       # Deploy Web only
 
 # Install macOS release locally
 make install-release
@@ -74,6 +97,21 @@ make generate-watch   # Watch mode for development
 # IMPORTANT: Run make generate after modifying any model files
 ```
 
+### Code Signing (macOS)
+```bash
+# Set up code signing configuration
+make codesign-setup
+
+# Build and sign macOS app
+make sign-macos
+
+# Build, sign, and notarize for distribution
+make notarize-macos
+
+# Create signed DMG for distribution
+make distribute-macos
+```
+
 ### Utilities
 ```bash
 make clean            # Clean build artifacts
@@ -86,37 +124,32 @@ make check-version    # Check Flutter and app versions
 make help             # Show all available commands
 ```
 
-### Manual Flutter Commands (if Makefile unavailable)
-```bash
-flutter pub get
-flutter run -d macos
-flutter build macos --release
-flutter analyze
-flutter test
-flutter format .
-flutter packages pub run build_runner build --delete-conflicting-outputs
-```
-
 ## Project Architecture
 
 ### Core Architecture
-The app follows a layered architecture with clear separation of concerns:
+The app follows a Clean Architecture pattern with clear separation of concerns:
 
 1. **Core Layer** (`lib/core/`)
    - **Models**: Data structures with Hive serialization (`Transcription`, `AppSettings`, `CustomPrompt`, `VocabularySet`)
-   - **Services**: Business logic and external integrations (`AudioService`, `GeminiService`, `StorageService`, `TrayService`, `HotkeyService`)
-   - **Providers**: Riverpod state management for global application state
-   - **Theme**: Material Design 3 theming system
+   - **Services**: Business logic and external integrations (`AudioService`, `GeminiService`, `StorageService`, `TrayService`, `HotkeyService`, `VersionService`)
+   - **Providers**: Riverpod state management organized by domain
+   - **Interfaces**: Service interfaces for dependency injection and testing
+   - **Use Cases**: Complex business logic orchestration (e.g., `VoiceRecordingUseCase`)
+   - **Config**: Type-safe configuration classes loaded from external JSON
+   - **Error**: Enhanced error handling system with categorization and metadata
+   - **Constants**: App-wide constants and UI configuration
 
 2. **Features Layer** (`lib/features/`)
    - **Dashboard**: Statistics display, transcription history, and search functionality
    - **Settings**: API key management, vocabulary/prompts configuration, hotkey setup
    - **Recording**: Recording overlay and voice activity detection UI
+   - **Transcriptions**: Transcription management and editing
 
 3. **Data Flow**
    - State management uses Riverpod with providers for services, settings, and UI state
    - Hive for local persistence with type adapters for models
    - Global providers handle cross-feature state like recording state and navigation
+   - Use cases orchestrate complex workflows across multiple services
 
 4. **Configuration System** (`config/`)
    - External JSON configuration for themes, prompts, vocabulary, and app settings
@@ -129,26 +162,29 @@ The app follows a layered architecture with clear separation of concerns:
 - Manages voice recording using the `record` package
 - Handles microphone permissions and recording lifecycle
 - Returns audio data as bytes for AI processing
+- Pre-validates audio with RMS-based amplitude detection
 
 **GeminiService** (`lib/core/services/gemini_service.dart`):
 - Integrates with Google Gemini API for transcription
 - Applies custom vocabulary and prompt templates
 - Manages API initialization and token usage tracking
+- Implements retry logic with exponential backoff
 
 **StorageService** (`lib/core/services/storage_service.dart`):
 - Centralized Hive database operations
 - Manages settings, transcriptions, prompts, and vocabulary
-- Provides default data initialization
+- Provides default data initialization from JSON configs
 
-**TrayService** (`lib/core/services/tray_service.dart`):
-- Desktop system tray integration with customizable actions
-- Updates tray icon based on recording state
-- Handles global hotkey-triggered recording
+**VersionService** (`lib/core/services/version_service.dart`):
+- Handles semantic version parsing and management
+- Provides dynamic version reading from package_info_plus
+- Includes utilities for version comparison and manipulation
 
 **AudioAnalyzer** (`lib/core/services/audio_analyzer.dart`):
 - RMS-based amplitude detection for speech validation
 - Pre-validation of audio to filter non-speech content
 - Configurable sensitivity thresholds for voice activity detection
+- Processes audio in isolates for smooth UI performance
 
 ### State Management Pattern
 - Uses Riverpod with `StateNotifierProvider` for complex state
@@ -156,14 +192,27 @@ The app follows a layered architecture with clear separation of concerns:
 - `StateProvider` for simple UI state
 - Providers are organized by feature and imported centrally:
   - `lib/core/providers/core_providers.dart` - Global app providers
-  - `lib/features/providers/` - Feature-specific providers
+  - Feature-specific provider files for modular organization
   - `lib/features/app_shell.dart` - Main provider aggregation
+
+### Interface-Based Design
+Services implement interfaces for testability:
+- `AudioService` implements `IAudioService`
+- Enables easy mocking for unit tests
+- Follows dependency injection pattern
+
+### Use Case Pattern
+Complex workflows are encapsulated in use cases:
+- `VoiceRecordingUseCase` coordinates audio recording, validation, and transcription
+- Orchestrates multiple services while maintaining clean separation
+- Encapsulates business rules and validation logic
 
 ### Platform-Specific Features
 - Global hotkeys only work on desktop platforms
 - System tray integration for macOS/Windows/Linux
 - Platform-specific permission handling for microphone access
 - Method channels for window management (macOS show/hide)
+- Keyboard shortcuts: Cmd/Ctrl+S to save edited transcriptions
 
 ## Important Development Notes
 
@@ -175,19 +224,29 @@ The app follows a layered architecture with clear separation of concerns:
 ### Recording Flow
 1. User triggers recording via FAB or global hotkey
 2. `AudioService` handles microphone permissions and recording
-3. On stop, audio is sent to `GeminiService` with user's vocabulary/prompts
-4. Result is saved via `StorageService` and optionally copied to clipboard
-5. UI updates through state providers with success/error notifications
+3. `AudioAnalyzer` validates audio contains speech before processing
+4. On stop, audio is sent to `GeminiService` with user's vocabulary/prompts
+5. Result is saved via `StorageService` and optionally copied to clipboard
+6. UI updates through state providers with success/error notifications
 
 ### Error Handling
+- Enhanced error system with `EnhancedErrorHandler` for categorization
 - Errors are displayed through `lastErrorProvider` with SnackBar notifications
 - Service-level errors are logged to console for debugging
 - Recording gracefully handles permission denial and API failures
+- Error metadata includes retry timing, action hints, and severity levels
 
 ### Testing Considerations
-- Mock services for unit tests (AudioService, GeminiService)
+- Mock services using interfaces for unit tests
 - Test Hive operations with in-memory databases
 - Platform-specific features need conditional testing or mocks
+- Use `VoiceRecordingUseCase` for testing complex workflows
+
+### Version Management
+- Uses semantic versioning (MAJOR.MINOR.PATCH) without build numbers
+- Version management tools: Dart script, shell script, and Makefile targets
+- Dynamic version display in settings (no hardcoded versions)
+- Automated deployment system integrates with version management
 
 ### Key Dependencies
 - **flutter_riverpod**: State management with code-generation support
@@ -196,6 +255,7 @@ The app follows a layered architecture with clear separation of concerns:
 - **google_generative_ai**: Gemini API integration
 - **hotkey_manager**: Global hotkey support (desktop only)
 - **tray_manager**: System tray integration (desktop only)
+- **package_info_plus**: Dynamic version reading
 - **super_clipboard**: Enhanced clipboard operations
 - **flutter_animate**: UI animations and transitions
 
@@ -212,11 +272,17 @@ The app follows a layered architecture with clear separation of concerns:
   - Windows/Linux: Ctrl+Shift+Space
 - System tray integration with recording state indicators
 - Method channels for window management (macOS show/hide)
+- Keyboard shortcuts: Cmd/Ctrl+S to save edited transcriptions
 
 ### Mobile Considerations
 - Permission handling for microphone access
 - No global hotkey support on mobile platforms
 - Background recording limitations on iOS
+
+### Code Signing (macOS)
+- Uses Developer ID Application certificate for distribution
+- Supports notarization for Gatekeeper compliance
+- Configure in `scripts/codesign-config.sh` with your Apple Developer credentials
 
 ## Configuration System
 
@@ -229,5 +295,11 @@ config/
 ├── vocabulary/       # Industry-specific vocabulary sets
 └── app_config.json   # Global app settings
 ```
+
+Type-safe config classes in `lib/core/config/` load these at runtime:
+- `AppConfig` - Global settings and feature flags
+- `ApiConfig` - API endpoints and timeouts
+- `AudioConfig` - Recording parameters and thresholds
+- `ThemeConfig` - Color schemes and UI constants
 
 Edit JSON files directly to customize without code changes. Configurations are loaded at runtime.

@@ -4,7 +4,15 @@ AI-powered voice typing application built with Flutter, featuring modern Materia
 
 ## ✨ What's New
 
-### **Recent Improvements (v2.0)**
+### **Latest Version: 1.0.2**
+- **📦 Version Management System**: Implemented proper semantic versioning with automated tools
+- **⌨️ Keyboard Shortcuts**: Added Cmd/Ctrl+S to save edited transcriptions
+- **🔧 Settings Navigation**: Fixed menu bar Settings navigation to open correct tab
+- **🏗️ Deployment System**: Automated build and deployment pipeline for all platforms
+- **📱 Code Signing**: macOS code signing and notarization support for distribution
+- **📋 Landing Page**: New landing page with download management system
+
+### **Previous Improvements (v2.0)**
 - **⚡ Performance Optimizations**: Single API call mode reduces transcription time by up to 50%
 - **🎨 Enhanced UI/UX**: Theme-consistent components with improved dark mode support
 - **🔧 Better Error Handling**: Categorized error messages with actionable recovery options
@@ -240,6 +248,7 @@ flutter packages pub run build_runner build --delete-conflicting-outputs
 
 - **Cmd+Shift+Space** - Start/Stop recording (macOS)
 - **Ctrl+Shift+Space** - Start/Stop recording (Windows/Linux)
+- **Cmd/Ctrl+S** - Save edited transcription (when in edit mode)
 
 ## Troubleshooting
 
@@ -309,7 +318,18 @@ MIT License
 
 ## Changelog
 
-### v1.2.0 (Latest)
+### v1.0.2 (Latest)
+- **NEW**: Comprehensive version management system with semantic versioning
+- **NEW**: Version management tools (Dart script, shell script, Makefile targets)
+- **NEW**: Keyboard shortcut (Cmd/Ctrl+S) for saving edited transcriptions
+- **FIXED**: Settings menu navigation now opens correct Settings tab
+- **NEW**: Automated deployment system with landing page integration
+- **NEW**: macOS code signing and notarization support
+- **NEW**: Landing page with download management
+- **REFACTOR**: Simplified version format (removed unnecessary build numbers)
+- **REFACTOR**: All version display now uses clean semantic versions
+
+### v1.2.0
 - **FIXED**: Transcriptions now properly appear in recent history
 - **FIXED**: Prompt processing no longer confuses AI with IDs vs templates
 - **FIXED**: Audio duration is now correctly captured and displayed

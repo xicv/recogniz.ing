@@ -29,6 +29,9 @@ Recogniz.ing is an AI-powered voice typing application built with Flutter that:
 - 🔍 SEO optimized meta tags
 - 📦 PWA ready with service worker
 - 🔗 Links to app downloads and documentation
+- 📦 **Download Management**: Automated platform-specific downloads
+- 📋 **Version Manifest**: JSON-based download system with version tracking
+- 🔄 **CI/CD Integration**: Automated build and deployment pipeline
 
 ## Getting Started
 
@@ -64,16 +67,27 @@ npm run preview
 
 ```
 landing/
-├── public/          # Static assets
+├── public/              # Static assets
+│   └── downloads/       # Platform-specific app downloads
+│       └── manifest.json # Version manifest for downloads
 ├── src/
-│   ├── App.vue      # Main component
-│   ├── main.ts      # Entry point
-│   └── style.css    # Global styles
-├── index.html       # HTML template
+│   ├── App.vue          # Main component
+│   ├── main.ts          # Entry point
+│   └── style.css        # Global styles
+├── index.html           # HTML template
+├── downloads.html       # Standalone download page
 ├── tailwind.config.js
 ├── vite.config.ts
 └── package.json
 ```
+
+### Download System
+
+The landing page includes an automated download management system:
+- Apps are built and placed in versioned directories (`public/downloads/vX.X.X/`)
+- Each platform has its own folder (macos, windows, linux, android, web)
+- `manifest.json` tracks current version and download paths
+- Downloads page dynamically loads version information from manifest
 
 ## Design Principles
 

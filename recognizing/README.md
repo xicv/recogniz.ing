@@ -56,7 +56,8 @@ flutter run -d web       # Web
 - **Custom Prompt Creation** with template variables
 
 ### Platform Features
-- **Global Hotkeys** on desktop (Ctrl+Shift+R)
+- **Global Hotkeys** on desktop (Cmd+Shift+Space / Ctrl+Shift+Space)
+- **Keyboard Shortcuts**: Cmd/Ctrl+S to save edited transcriptions
 - **System Tray Integration** for quick access
 - **Dark/Light Themes** with Material Design 3
 - **Cross-Platform Support**: macOS, Windows, Linux, iOS, Android, Web
@@ -186,36 +187,25 @@ flutter pub get
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆕 Latest Updates (v2.0)
+## 🆕 Latest Updates (v1.0.2)
 
-### ⚡ Performance Improvements
-- **Single API Call Mode**: 50% faster transcription by combining analysis and processing
-- **Background Audio Processing**: Smooth UI with isolated audio analysis
-- **Optimized Retry Logic**: Intelligent retry policies with circuit breaker pattern
+### 📦 Version Management & Deployment
+- **Semantic Versioning**: Clean version format (MAJOR.MINOR.PATCH) without build numbers
+- **Version Management Tools**: Dart script, shell script, and Makefile targets for automation
+- **Automated Deployment**: Build and deploy all platforms to landing page
+- **Code Signing Support**: macOS code signing and notarization for distribution
+- **Dynamic Version Display**: Version shown in settings without hardcoding
 
-### 🎨 Enhanced UI/UX
-- **Theme-Consistent Components**: All widgets now use Material Design 3 colors
-- **Improved Dark Mode**: Better contrast and visual hierarchy
-- **Standardized Component Library**: Reusable widgets with consistent styling
-- **Fixed Password Fields**: Proper state management and better UX
-
-### 🔧 Better Error Handling
-- **Categorized Error Messages**: Network, API, Permission, Audio errors with specific guidance
-- **Actionable Recovery Options**: One-click fixes for common issues
-- **Error Severity Levels**: Critical errors shown as dialogs, others as snackbars
-- **Technical Details View**: Expandable error details for debugging (debug mode)
-
-### 📦 Component Library Standardization
-- **Removed Global Context Issues**: Fixed memory leaks and context passing problems
-- **Improved Input Components**: Better validation, theming, and accessibility
-- **Enhanced Cards and Lists**: Consistent styling across the app
-- **Better Loading States**: More informative loading indicators
+### ⌨️ Enhanced User Experience
+- **Keyboard Shortcuts**: Cmd/Ctrl+S to save edited transcriptions
+- **Fixed Settings Navigation**: Menu bar Settings now opens correct tab
+- **Landing Page**: New download page with platform-specific builds
+- **Version Bumping Scripts**: Easy tools for managing releases
 
 ### 🏗️ Architecture Improvements
-- **Cleaner Error System**: EnhancedErrorHandler with better categorization
-- **Improved State Management**: Fixed provider dependencies and data flow
-- **Better Service Layer**: Optimized Gemini and Audio services
-- **Enhanced Use Cases**: More robust business logic handling
+- **VersionService**: Comprehensive service for version management
+- **Simplified Build Numbers**: Removed unnecessary complexity from version display
+- **Better Tooling**: Improved development workflow with automation
 
 ## 🆕 v1.2.0 (Previous)
 
