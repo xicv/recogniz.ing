@@ -48,21 +48,32 @@ const faqs = [
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
             <svg class="w-8 h-8" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="1024" height="1024" rx="180" fill="white"/>
               <defs>
-                <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style="stop-color:#2196F3"/>
-                  <stop offset="100%" style="stop-color:#00BCD4"/>
+                <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#0EA5E9"/>
+                  <stop offset="50%" stop-color="#0284C7"/>
+                  <stop offset="100%" stop-color="#0369A1"/>
+                </linearGradient>
+                <linearGradient id="innerGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="rgba(255,255,255,0.15)"/>
+                  <stop offset="100%" stop-color="rgba(0,0,0,0.1)"/>
+                </linearGradient>
+                <linearGradient id="iconGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#FFFFFF"/>
+                  <stop offset="100%" stop-color="#E0F2FE"/>
                 </linearGradient>
               </defs>
-              <path d="M 150 400 Q 250 300 350 400 T 450 512" stroke="url(#waveGradient)" stroke-width="30" fill="none" stroke-linecap="round"/>
-              <path d="M 150 512 Q 250 600 350 512 T 450 624" stroke="url(#waveGradient)" stroke-width="30" fill="none" stroke-linecap="round"/>
-              <rect x="550" y="350" width="300" height="12" rx="6" fill="#424242"/>
-              <rect x="550" y="390" width="280" height="12" rx="6" fill="#616161"/>
-              <rect x="550" y="430" width="290" height="12" rx="6" fill="#757575"/>
-              <rect x="550" y="470" width="260" height="12" rx="6" fill="#9E9E9E"/>
-              <path d="M 460 512 L 520 512" stroke="#757575" stroke-width="6" stroke-linecap="round"/>
-              <path d="M 520 512 L 505 500 M 520 512 L 505 524" stroke="#757575" stroke-width="6" stroke-linecap="round"/>
+              <rect width="1024" height="1024" rx="224" fill="url(#bgGradient)"/>
+              <rect width="1024" height="1024" rx="224" fill="url(#innerGlow)"/>
+              <g transform="translate(512, 512)">
+                <path d="M -280 -120 A 180 180 0 0 0 -280 120" stroke="url(#iconGradient)" stroke-width="44" fill="none" stroke-linecap="round" opacity="0.5"/>
+                <path d="M -200 -80 A 120 120 0 0 0 -200 80" stroke="url(#iconGradient)" stroke-width="44" fill="none" stroke-linecap="round" opacity="0.75"/>
+                <path d="M -120 -40 A 60 60 0 0 0 -120 40" stroke="url(#iconGradient)" stroke-width="44" fill="none" stroke-linecap="round"/>
+                <circle cx="-40" cy="0" r="32" fill="url(#iconGradient)"/>
+                <rect x="40" y="-100" width="240" height="36" rx="18" fill="url(#iconGradient)"/>
+                <rect x="40" y="-18" width="200" height="36" rx="18" fill="url(#iconGradient)" opacity="0.85"/>
+                <rect x="40" y="64" width="160" height="36" rx="18" fill="url(#iconGradient)" opacity="0.7"/>
+              </g>
             </svg>
             <span class="text-2xl font-display font-light tracking-tight text-slate-900">Recogniz.ing</span>
           </div>
@@ -294,21 +305,32 @@ const faqs = [
         <div class="flex flex-col md:flex-row items-center justify-between">
           <div class="flex items-center space-x-3 mb-6 md:mb-0">
             <svg class="w-7 h-7" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="1024" height="1024" rx="180" fill="white"/>
               <defs>
-                <linearGradient id="waveGradientFooter" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style="stop-color:#2196F3"/>
-                  <stop offset="100%" style="stop-color:#00BCD4"/>
+                <linearGradient id="bgGradientFooter" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#0EA5E9"/>
+                  <stop offset="50%" stop-color="#0284C7"/>
+                  <stop offset="100%" stop-color="#0369A1"/>
+                </linearGradient>
+                <linearGradient id="innerGlowFooter" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="rgba(255,255,255,0.15)"/>
+                  <stop offset="100%" stop-color="rgba(0,0,0,0.1)"/>
+                </linearGradient>
+                <linearGradient id="iconGradientFooter" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#FFFFFF"/>
+                  <stop offset="100%" stop-color="#E0F2FE"/>
                 </linearGradient>
               </defs>
-              <path d="M 150 400 Q 250 300 350 400 T 450 512" stroke="url(#waveGradientFooter)" stroke-width="30" fill="none" stroke-linecap="round"/>
-              <path d="M 150 512 Q 250 600 350 512 T 450 624" stroke="url(#waveGradientFooter)" stroke-width="30" fill="none" stroke-linecap="round"/>
-              <rect x="550" y="350" width="300" height="12" rx="6" fill="#424242"/>
-              <rect x="550" y="390" width="280" height="12" rx="6" fill="#616161"/>
-              <rect x="550" y="430" width="290" height="12" rx="6" fill="#757575"/>
-              <rect x="550" y="470" width="260" height="12" rx="6" fill="#9E9E9E"/>
-              <path d="M 460 512 L 520 512" stroke="#757575" stroke-width="6" stroke-linecap="round"/>
-              <path d="M 520 512 L 505 500 M 520 512 L 505 524" stroke="#757575" stroke-width="6" stroke-linecap="round"/>
+              <rect width="1024" height="1024" rx="224" fill="url(#bgGradientFooter)"/>
+              <rect width="1024" height="1024" rx="224" fill="url(#innerGlowFooter)"/>
+              <g transform="translate(512, 512)">
+                <path d="M -280 -120 A 180 180 0 0 0 -280 120" stroke="url(#iconGradientFooter)" stroke-width="44" fill="none" stroke-linecap="round" opacity="0.5"/>
+                <path d="M -200 -80 A 120 120 0 0 0 -200 80" stroke="url(#iconGradientFooter)" stroke-width="44" fill="none" stroke-linecap="round" opacity="0.75"/>
+                <path d="M -120 -40 A 60 60 0 0 0 -120 40" stroke="url(#iconGradientFooter)" stroke-width="44" fill="none" stroke-linecap="round"/>
+                <circle cx="-40" cy="0" r="32" fill="url(#iconGradientFooter)"/>
+                <rect x="40" y="-100" width="240" height="36" rx="18" fill="url(#iconGradientFooter)"/>
+                <rect x="40" y="-18" width="200" height="36" rx="18" fill="url(#iconGradientFooter)" opacity="0.85"/>
+                <rect x="40" y="64" width="160" height="36" rx="18" fill="url(#iconGradientFooter)" opacity="0.7"/>
+              </g>
             </svg>
             <span class="text-xl font-display font-light tracking-tight text-slate-900">Recogniz.ing</span>
           </div>

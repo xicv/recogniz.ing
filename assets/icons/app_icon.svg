@@ -6,63 +6,63 @@
       <stop offset="50%" stop-color="#0284C7"/>
       <stop offset="100%" stop-color="#0369A1"/>
     </linearGradient>
-    
+
     <!-- Subtle inner shadow effect -->
     <linearGradient id="innerGlow" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" stop-color="rgba(255,255,255,0.15)"/>
       <stop offset="100%" stop-color="rgba(0,0,0,0.1)"/>
     </linearGradient>
-    
+
     <!-- Icon gradient for depth -->
     <linearGradient id="iconGradient" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" stop-color="#FFFFFF"/>
       <stop offset="100%" stop-color="#E0F2FE"/>
     </linearGradient>
   </defs>
-  
+
   <!-- Background with rounded corners -->
   <rect width="1024" height="1024" rx="224" fill="url(#bgGradient)"/>
-  
+
   <!-- Subtle overlay for depth -->
   <rect width="1024" height="1024" rx="224" fill="url(#innerGlow)"/>
-  
+
   <!-- Central unified icon: Speech bubble morphing into text waves -->
   <g transform="translate(512, 512)">
     <!-- Outer sound arc - left -->
-    <path 
-      d="M -280 -120 
-         A 180 180 0 0 0 -280 120" 
-      stroke="url(#iconGradient)" 
-      stroke-width="44" 
-      fill="none" 
+    <path
+      d="M -280 -120
+         A 180 180 0 0 0 -280 120"
+      stroke="url(#iconGradient)"
+      stroke-width="44"
+      fill="none"
       stroke-linecap="round"
       opacity="0.5"
     />
-    
+
     <!-- Middle sound arc - left -->
-    <path 
-      d="M -200 -80 
-         A 120 120 0 0 0 -200 80" 
-      stroke="url(#iconGradient)" 
-      stroke-width="44" 
-      fill="none" 
+    <path
+      d="M -200 -80
+         A 120 120 0 0 0 -200 80"
+      stroke="url(#iconGradient)"
+      stroke-width="44"
+      fill="none"
       stroke-linecap="round"
       opacity="0.75"
     />
-    
+
     <!-- Inner sound arc - left -->
-    <path 
-      d="M -120 -40 
-         A 60 60 0 0 0 -120 40" 
-      stroke="url(#iconGradient)" 
-      stroke-width="44" 
-      fill="none" 
+    <path
+      d="M -120 -40
+         A 60 60 0 0 0 -120 40"
+      stroke="url(#iconGradient)"
+      stroke-width="44"
+      fill="none"
       stroke-linecap="round"
     />
-    
+
     <!-- Central transformation dot -->
     <circle cx="-40" cy="0" r="32" fill="url(#iconGradient)"/>
-    
+
     <!-- Text lines - representing recognized text -->
     <rect x="40" y="-100" width="240" height="36" rx="18" fill="url(#iconGradient)"/>
     <rect x="40" y="-18" width="200" height="36" rx="18" fill="url(#iconGradient)" opacity="0.85"/>
