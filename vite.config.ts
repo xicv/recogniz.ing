@@ -5,6 +5,44 @@ import { resolve } from 'path'
 
 export default defineConfig({
   base: '/', // Using custom domain, so use root path
+  plugins: [
+    vue({
+      template: {
+        compilerOptions: {
+          // Treat any tag that starts with k- as a custom element
+          isCustomElement: (tag) => tag.includes('-')
+        }
+      }
+    }),
+    VitePWA({
+      registerType: 'autoUpdate',
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        // Don't cache the 404.html for SPA routing
+        navigateFallback: null,
+      },
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      manifest: {
+        name: 'Recogniz.ing - AI Voice Typing',
+        short_name: 'Recogniz.ing',
+        description: 'Free AI-powered voice typing application with customizable prompts and vocabulary',
+        theme_color: '#1e293b',
+        background_color: '#ffffff',
+        icons: [
+          {
+            src: 'pwa-192x192.svg',
+            sizes: '192x192',
+            type: 'image/svg+xml'
+          },
+          {
+            src: 'pwa-512x512.svg',
+            sizes: '512x512',
+            type: 'image/svg+xml'
+          }
+        ]
+      }
+    })
+  ],
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
