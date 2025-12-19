@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  base: '/recogniz.ing/', // GitHub Pages repository name as base path
+  base: '/', // Using custom domain, so use root path
   plugins: [
     vue({
       template: {
