@@ -29,9 +29,11 @@ Recogniz.ing is an AI-powered voice typing application built with Flutter that:
 - 🔍 SEO optimized meta tags
 - 📦 PWA ready with service worker
 - 🔗 Links to app downloads and documentation
-- 📦 **Download Management**: Automated platform-specific downloads
-- 📋 **Version Manifest**: JSON-based download system with version tracking
-- 🔄 **CI/CD Integration**: Automated build and deployment pipeline
+- 📦 **Download Management**: Automated platform-specific downloads with semantic versioning
+- 📋 **Version Manifest**: JSON-based download system with version tracking (manifest.json)
+- 🔄 **CI/CD Integration**: Automated build and deployment pipeline with Makefile support
+- 🔐 **Code Signing**: macOS builds support code signing and notarization
+- 📱 **Cross-Platform Downloads**: Support for macOS, Windows, Linux, Android, and Web platforms
 
 ## Getting Started
 
@@ -88,6 +90,16 @@ The landing page includes an automated download management system:
 - Each platform has its own folder (macos, windows, linux, android, web)
 - `manifest.json` tracks current version and download paths
 - Downloads page dynamically loads version information from manifest
+- Supports semantic versioning (MAJOR.MINOR.PATCH) without build numbers
+- Automated through Makefile targets (`make deploy-all`, `make release`)
+- Version bumping tools available (Dart script, shell script, Makefile)
+
+#### Build Artifacts
+- **macOS**: Signed .app bundle and .dmg installer (with code signing support)
+- **Windows**: Portable executable in .zip archive
+- **Linux**: Tar.gz archive for distribution
+- **Android**: Both APK and AAB formats for flexibility
+- **Web**: Complete web build in .zip archive
 
 ## Design Principles
 

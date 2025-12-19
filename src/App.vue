@@ -77,12 +77,12 @@ const faqs = [
             </svg>
             <span class="text-2xl font-display font-light tracking-tight text-slate-900">Recogniz.ing</span>
           </div>
-          <button
-            @click="scrollToSection('download')"
+          <a
+            href="/features.html"
             class="text-slate-700 hover:text-slate-900 font-medium transition-colors"
           >
-            Download
-          </button>
+            Features
+          </a>
         </div>
       </div>
     </nav>
