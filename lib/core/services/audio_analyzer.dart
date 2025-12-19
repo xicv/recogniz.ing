@@ -22,8 +22,8 @@ class AudioAnalysisResult {
 class AudioAnalyzer {
   static AudioAnalysisResult analyzeAudioBytes(
     Uint8List bytes, {
-    double amplitudeThreshold = 0.01,  // Lowered from 0.02 to be more sensitive
-    double speechRatioThreshold = 0.05,  // Lowered from 0.1 to be more lenient
+    double amplitudeThreshold = 0.01, // Lowered from 0.02 to be more sensitive
+    double speechRatioThreshold = 0.05, // Lowered from 0.1 to be more lenient
     int sampleRate = 44100,
     int bitDepth = 16,
   }) {
@@ -64,22 +64,27 @@ class AudioAnalyzer {
       String reason;
       if (!containsSpeech) {
         if (averageAmplitude < amplitudeThreshold * 0.5) {
-          reason = 'Audio too quiet (avg amplitude: ${averageAmplitude.toStringAsFixed(4)})';
+          reason =
+              'Audio too quiet (avg amplitude: ${averageAmplitude.toStringAsFixed(4)})';
         } else if (speechRatio < speechRatioThreshold) {
-          reason = 'Insufficient speech activity (speech ratio: ${(speechRatio * 100).toStringAsFixed(1)}%)';
+          reason =
+              'Insufficient speech activity (speech ratio: ${(speechRatio * 100).toStringAsFixed(1)}%)';
         } else {
           reason = 'Audio appears to be mostly noise or silence';
         }
       } else {
-        reason = 'Speech detected (avg: ${averageAmplitude.toStringAsFixed(4)}, '
-               'max: ${maxAmplitude.toStringAsFixed(4)}, '
-               'speech ratio: ${(speechRatio * 100).toStringAsFixed(1)}%)';
+        reason =
+            'Speech detected (avg: ${averageAmplitude.toStringAsFixed(4)}, '
+            'max: ${maxAmplitude.toStringAsFixed(4)}, '
+            'speech ratio: ${(speechRatio * 100).toStringAsFixed(1)}%)';
       }
 
       debugPrint('[AudioAnalyzer] Analysis complete:');
-      debugPrint('  - Average amplitude: ${averageAmplitude.toStringAsFixed(4)}');
+      debugPrint(
+          '  - Average amplitude: ${averageAmplitude.toStringAsFixed(4)}');
       debugPrint('  - Max amplitude: ${maxAmplitude.toStringAsFixed(4)}');
-      debugPrint('  - Speech ratio: ${(speechRatio * 100).toStringAsFixed(1)}%');
+      debugPrint(
+          '  - Speech ratio: ${(speechRatio * 100).toStringAsFixed(1)}%');
       debugPrint('  - Contains speech: $containsSpeech');
       debugPrint('  - Reason: $reason');
 
@@ -118,7 +123,8 @@ class AudioAnalyzer {
     } else {
       // For other bit depths, we'll use a simplified approach
       // In a real implementation, you'd handle different bit depths properly
-      debugPrint('[AudioAnalyzer] Warning: Using simplified conversion for bit depth $bitDepth');
+      debugPrint(
+          '[AudioAnalyzer] Warning: Using simplified conversion for bit depth $bitDepth');
       for (int i = 0; i < bytes.length; i++) {
         samples.add(bytes[i] - 128); // Convert to signed value
       }
@@ -181,9 +187,11 @@ class AudioAnalyzer {
   }) {
     // Debug output for understanding values
     debugPrint('[AudioAnalyzer] Detection logic:');
-    debugPrint('  - Avg amplitude vs threshold: ${averageAmplitude.toStringAsFixed(5)} vs ${(amplitudeThreshold).toStringAsFixed(5)}');
+    debugPrint(
+        '  - Avg amplitude vs threshold: ${averageAmplitude.toStringAsFixed(5)} vs ${(amplitudeThreshold).toStringAsFixed(5)}');
     debugPrint('  - Max amplitude: ${maxAmplitude.toStringAsFixed(5)}');
-    debugPrint('  - Speech ratio: ${(speechRatio * 100).toStringAsFixed(1)}% vs ${(speechRatioThreshold * 100).toStringAsFixed(1)}%');
+    debugPrint(
+        '  - Speech ratio: ${(speechRatio * 100).toStringAsFixed(1)}% vs ${(speechRatioThreshold * 100).toStringAsFixed(1)}%');
 
     // Rule 1: Check if average amplitude is too low (likely silent)
     if (averageAmplitude < amplitudeThreshold) {
@@ -212,7 +220,8 @@ class AudioAnalyzer {
 
     // Rule 5: Check minimum duration and content
     // For very short recordings, be more lenient
-    if (averageAmplitude > amplitudeThreshold * 2 && speechRatio > speechRatioThreshold * 0.5) {
+    if (averageAmplitude > amplitudeThreshold * 2 &&
+        speechRatio > speechRatioThreshold * 0.5) {
       debugPrint('  - Accepted: Strong signal despite ratio');
       return true;
     }

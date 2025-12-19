@@ -84,12 +84,13 @@ class AppDialogs {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        actions: actions ?? [
-          AppButtons.text(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
-          ),
-        ],
+        actions: actions ??
+            [
+              AppButtons.text(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Close'),
+              ),
+            ],
       ),
     );
   }

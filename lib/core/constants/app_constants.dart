@@ -68,6 +68,21 @@ class AppConstants {
   static const double voiceActivityThreshold = 0.01;
   static const double minAmplitudeForVoice = 0.02;
   static const int minVoiceSamples = 5;
+
+  // Default prompt templates
+  static const String defaultPromptTemplate =
+      '''Clean up the following speech transcription by:
+- Fixing grammar and punctuation
+- Removing filler words (um, uh, like, you know)
+- Keeping the original meaning intact
+- Outputting ONLY the cleaned transcription text
+
+TEXT TO CLEAN:
+{{text}}
+CLEANED VERSION:''';
+
+  static const String defaultPromptId = 'default-clean';
+  static const String defaultVocabularyId = 'default-general';
 }
 
 class ApiConstants {

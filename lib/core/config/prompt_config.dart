@@ -29,7 +29,8 @@ class PromptConfig {
   });
 
   static Future<PromptConfig> fromAsset() async {
-    final String jsonString = await rootBundle.loadString('config/prompts/default_prompts.json');
+    final String jsonString =
+        await rootBundle.loadString('config/prompts/default_prompts.json');
     final Map<String, dynamic> json = jsonDecode(jsonString);
 
     return PromptConfig(

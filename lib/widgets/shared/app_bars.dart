@@ -38,7 +38,8 @@ class AppBars {
     return AppBar(
       title: Text(title),
       leading: IconButton(
-        onPressed: onBackPressed ?? () => Navigator.of(AppBarGet.context!).pop(),
+        onPressed:
+            onBackPressed ?? () => Navigator.of(AppBarGet.context!).pop(),
         icon: const Icon(LucideIcons.arrowLeft),
       ),
       actions: actions,
@@ -81,7 +82,10 @@ class AppBars {
           hintText: hint,
           border: InputBorder.none,
           hintStyle: TextStyle(
-            color: Theme.of(AppBarGet.context!).colorScheme.onSurface.withOpacity(0.6),
+            color: Theme.of(AppBarGet.context!)
+                .colorScheme
+                .onSurface
+                .withOpacity(0.6),
           ),
         ),
         style: TextStyle(
@@ -89,7 +93,8 @@ class AppBars {
         ),
       ),
       leading: IconButton(
-        onPressed: onBackPressed ?? () => Navigator.of(AppBarGet.context!).pop(),
+        onPressed:
+            onBackPressed ?? () => Navigator.of(AppBarGet.context!).pop(),
         icon: const Icon(LucideIcons.arrowLeft),
       ),
       actions: [

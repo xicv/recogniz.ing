@@ -181,7 +181,8 @@ class AppConfig {
   });
 
   static Future<AppConfig> fromAsset() async {
-    final String jsonString = await rootBundle.loadString('config/app_config.json');
+    final String jsonString =
+        await rootBundle.loadString('config/app_config.json');
     final Map<String, dynamic> json = jsonDecode(jsonString);
 
     return AppConfig(

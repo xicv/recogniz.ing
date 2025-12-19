@@ -44,7 +44,8 @@ class _InsightsWidgetState extends State<InsightsWidget> {
                   padding: const EdgeInsets.all(UIConstants.spacingSmall),
                   decoration: BoxDecoration(
                     color: AppColors.warning.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(UIConstants.borderRadiusSmall),
+                    borderRadius:
+                        BorderRadius.circular(UIConstants.borderRadiusSmall),
                   ),
                   child: Icon(
                     LucideIcons.lightbulb,
@@ -56,8 +57,8 @@ class _InsightsWidgetState extends State<InsightsWidget> {
                 Text(
                   'Insights & Tips',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                        fontWeight: FontWeight.w600,
+                      ),
                 ),
               ],
             ),
@@ -75,8 +76,8 @@ class _InsightsWidgetState extends State<InsightsWidget> {
               Text(
                 'Personalized Recommendations',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                      fontWeight: FontWeight.w600,
+                    ),
               ),
               const SizedBox(height: UIConstants.spacingSmall),
               ...widget.stats.recommendations.map((recommendation) =>
@@ -138,9 +139,9 @@ class _InsightsWidgetState extends State<InsightsWidget> {
               Text(
                 'Usage Forecast',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                ),
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
               ),
               const Spacer(),
               Row(
@@ -154,9 +155,9 @@ class _InsightsWidgetState extends State<InsightsWidget> {
                   Text(
                     trendText,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: trendColor,
-                      fontWeight: FontWeight.w600,
-                    ),
+                          color: trendColor,
+                          fontWeight: FontWeight.w600,
+                        ),
                   ),
                 ],
               ),
@@ -166,16 +167,22 @@ class _InsightsWidgetState extends State<InsightsWidget> {
           Text(
             'Based on your usage pattern, you\'ll likely transcribe ${avgFutureUsage.round()} times per day next week.',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onPrimaryContainer.withOpacity(0.8),
-            ),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onPrimaryContainer
+                      .withOpacity(0.8),
+                ),
           ),
           if (trendPercentage.abs() > 5) ...[
             const SizedBox(height: UIConstants.spacingXSmall),
             Text(
               '${trendPercentage > 0 ? '📈' : '📉'} That\'s ${trendPercentage.abs().toStringAsFixed(0)}% ${trendPercentage > 0 ? 'more' : 'less'} than your current average.',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onPrimaryContainer.withOpacity(0.8),
-              ),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onPrimaryContainer
+                        .withOpacity(0.8),
+                  ),
             ),
           ],
         ],
@@ -192,11 +199,11 @@ class _InsightsWidgetState extends State<InsightsWidget> {
       icon = LucideIcons.mic;
       color = AppColors.warning;
     } else if (recommendation.toLowerCase().contains('budget') ||
-               recommendation.toLowerCase().contains('cost')) {
+        recommendation.toLowerCase().contains('cost')) {
       icon = LucideIcons.dollarSign;
       color = AppColors.accent;
     } else if (recommendation.toLowerCase().contains('speed') ||
-               recommendation.toLowerCase().contains('speaking')) {
+        recommendation.toLowerCase().contains('speaking')) {
       icon = LucideIcons.zap;
       color = AppColors.primary;
     } else {
@@ -227,8 +234,8 @@ class _InsightsWidgetState extends State<InsightsWidget> {
             child: Text(
               recommendation,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
             ),
           ),
         ],
@@ -255,16 +262,16 @@ class _InsightsWidgetState extends State<InsightsWidget> {
           Text(
             'Keep using the app to get personalized insights!',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.outline,
-            ),
+                  color: Theme.of(context).colorScheme.outline,
+                ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: UIConstants.spacingXSmall),
           Text(
             'The more you transcribe, the better we can help optimize your experience.',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.outline,
-            ),
+                  color: Theme.of(context).colorScheme.outline,
+                ),
             textAlign: TextAlign.center,
           ),
         ],

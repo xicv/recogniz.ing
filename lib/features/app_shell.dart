@@ -7,6 +7,7 @@ import '../core/constants/constants.dart';
 import '../core/error/error_components.dart';
 import '../core/error/enhanced_error_handler.dart';
 import '../core/providers/app_providers.dart';
+import '../core/providers/recording_providers.dart';
 import 'dashboard/dashboard_page.dart';
 import 'recording/recording_overlay.dart';
 import 'settings/settings_page.dart';
@@ -149,11 +150,17 @@ class _AppShellState extends ConsumerState<AppShell> {
 
   Future<void> _toggleRecording(
       BuildContext context, WidgetRef ref, RecordingState state) async {
-    final recordingUseCase = ref.read(recordingUseCaseProvider);
-    await recordingUseCase.toggleRecording(state);
+    final voiceRecordingUseCase = ref.read(voiceRecordingUseCaseProvider);
+
+    if (state == RecordingState.idle) {
+      await voiceRecordingUseCase.startRecording();
+    } else if (state == RecordingState.recording) {
+      await voiceRecordingUseCase.stopRecording();
+    }
   }
 
-  void _showErrorDialog(BuildContext context, WidgetRef ref, ErrorResult errorResult) {
+  void _showErrorDialog(
+      BuildContext context, WidgetRef ref, ErrorResult errorResult) {
     showDialog(
       context: context,
       builder: (context) => ErrorDialog(
@@ -237,8 +244,8 @@ class _AppShellState extends ConsumerState<AppShell> {
     }
   }
 
-  void _showEnhancedErrorSnackBar(BuildContext context, WidgetRef ref, ErrorResult errorResult) {
-    // Check if this is a critical error that needs a dialog
+  void _showEnhancedErrorSnackBar(
+      BuildContext context, WidgetRef ref, ErrorResult errorResult) {
     final severity = _getErrorSeverity(errorResult);
 
     if (severity.value >= ErrorSeverity.high.value) {
@@ -246,69 +253,78 @@ class _AppShellState extends ConsumerState<AppShell> {
       return;
     }
 
-    final colorScheme = Theme.of(context).colorScheme;
+    final snackBar = _buildErrorSnackBar(context, ref, errorResult);
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
 
-    // Determine color based on error category
-    Color backgroundColor = _getErrorColor(errorResult);
+  SnackBar _buildErrorSnackBar(
+      BuildContext context, WidgetRef ref, ErrorResult errorResult) {
+    return SnackBar(
+      content: _buildSnackBarContent(errorResult),
+      backgroundColor: _getErrorColor(errorResult),
+      duration: _calculateSnackBarDuration(errorResult),
+      action: _buildSnackBarAction(context, ref, errorResult),
+    );
+  }
 
-    // Get the icon data
-    IconData iconData = _getErrorIcon(errorResult);
+  Widget _buildSnackBarContent(ErrorResult errorResult) {
+    return Row(
+      children: [
+        Icon(
+          _getErrorIcon(errorResult),
+          color: Colors.white,
+          size: 24,
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            _formatErrorContent(errorResult),
+            style: const TextStyle(color: Colors.white),
+          ),
+        ),
+      ],
+    );
+  }
 
-    // Build the content
+  String _formatErrorContent(ErrorResult errorResult) {
     String content = errorResult.message;
     if (errorResult.actionHint != null) {
       content += '\n\n${errorResult.actionHint}';
     }
+    return content;
+  }
 
-    // Calculate duration based on retry time
-    Duration duration = const Duration(seconds: 8);
-    if (errorResult.retryAfter != null) {
-      duration = errorResult.retryAfter! > const Duration(seconds: 10)
-          ? const Duration(seconds: 10)
-          : errorResult.retryAfter! + const Duration(seconds: 2);
+  Duration _calculateSnackBarDuration(ErrorResult errorResult) {
+    const baseDuration = Duration(seconds: 8);
+    if (errorResult.retryAfter == null) return baseDuration;
+
+    final maxDuration = Duration(seconds: 10);
+    final adjustedDuration =
+        errorResult.retryAfter! + const Duration(seconds: 2);
+    return adjustedDuration > maxDuration ? maxDuration : adjustedDuration;
+  }
+
+  SnackBarAction? _buildSnackBarAction(
+      BuildContext context, WidgetRef ref, ErrorResult errorResult) {
+    if (!errorResult.canRetry) {
+      return SnackBarAction(
+        label: 'Dismiss',
+        textColor: Colors.white,
+        onPressed: () => ScaffoldMessenger.of(context).hideCurrentSnackBar(),
+      );
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(
-              iconData,
-              color: Colors.white,
-              size: 24,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                content,
-                style: const TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: backgroundColor,
-        duration: duration,
-        action: errorResult.canRetry
-            ? SnackBarAction(
-                label: errorResult.actionHint?.contains('Settings') == true
-                    ? 'Settings'
-                    : 'Retry',
-                textColor: Colors.white,
-                onPressed: () {
-                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                  if (errorResult.actionHint?.contains('Settings') == true) {
-                    ref.read(currentPageProvider.notifier).state = 1;
-                  }
-                },
-              )
-            : SnackBarAction(
-                label: 'Dismiss',
-                textColor: Colors.white,
-                onPressed: () {
-                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                },
-              ),
-      ),
+    final isSettingsAction =
+        errorResult.actionHint?.contains('Settings') == true;
+    return SnackBarAction(
+      label: isSettingsAction ? 'Settings' : 'Retry',
+      textColor: Colors.white,
+      onPressed: () {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        if (isSettingsAction) {
+          ref.read(currentPageProvider.notifier).state = 1;
+        }
+      },
     );
   }
 }

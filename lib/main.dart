@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,48 +14,49 @@ import 'core/theme/app_theme.dart';
 import 'features/app_shell.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-late ProviderContainer providerContainer;
 
 // Window control channel
 const _windowChannel = MethodChannel('com.recognizing.app/window');
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  debugPrint('[Main] WidgetsFlutterBinding initialized');
+  if (kDebugMode) {
+    debugPrint('[Main] WidgetsFlutterBinding initialized');
+  }
 
   await Hive.initFlutter();
-  debugPrint('[Main] Hive initialized');
+  if (kDebugMode) {
+    debugPrint('[Main] Hive initialized');
+  }
 
   try {
     await StorageService.initialize();
-    debugPrint('[Main] StorageService initialized');
+    if (kDebugMode) {
+      debugPrint('[Main] StorageService initialized');
+    }
   } catch (e) {
-    debugPrint('[Main] StorageService initialization failed: $e');
-    // Try to continue with default settings
-    debugPrint('[Main] Continuing with default settings...');
+    if (kDebugMode) {
+      debugPrint('[Main] StorageService initialization failed: $e');
+      // Try to continue with default settings
+      debugPrint('[Main] Continuing with default settings...');
+    }
   }
 
-  providerContainer = ProviderContainer();
-  debugPrint('[Main] ProviderContainer created');
-
-  final trayService = TrayService();
-  await trayService.initialize();
-  debugPrint('[Main] TrayService initialized');
-
-  debugPrint('[Main] Starting runApp');
+  if (kDebugMode) {
+    debugPrint('[Main] Starting runApp');
+  }
   runApp(
-    UncontrolledProviderScope(
-      container: providerContainer,
-      child: RecognizingApp(trayService: trayService),
+    const ProviderScope(
+      child: RecognizingApp(),
     ),
   );
-  debugPrint('[Main] runApp completed');
+  if (kDebugMode) {
+    debugPrint('[Main] runApp completed');
+  }
 }
 
 class RecognizingApp extends ConsumerStatefulWidget {
-  final TrayService trayService;
-
-  const RecognizingApp({super.key, required this.trayService});
+  const RecognizingApp({super.key});
 
   @override
   ConsumerState<RecognizingApp> createState() => _RecognizingAppState();
@@ -63,17 +65,30 @@ class RecognizingApp extends ConsumerStatefulWidget {
 class _RecognizingAppState extends ConsumerState<RecognizingApp>
     with WidgetsBindingObserver {
   late final HotkeyService _hotkeyService;
+  late final TrayService _trayService;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _initializeServices();
+  }
+
+  Future<void> _initializeServices() async {
+    // Initialize tray service
+    _trayService = TrayService();
+    await _trayService.initialize();
+    if (kDebugMode) {
+      debugPrint('[MainApp] TrayService initialized');
+    }
     _setupTrayActions();
+
+    // Setup hotkey service
     _setupHotkeyService();
   }
 
   void _setupTrayActions() {
-    widget.trayService.onAction = (action) {
+    _trayService.onAction = (action) {
       switch (action) {
         case TrayAction.toggleRecording:
           _toggleRecording();
@@ -99,7 +114,9 @@ class _RecognizingAppState extends ConsumerState<RecognizingApp>
 
     // Set up the callback BEFORE initializing/registering
     _hotkeyService.onHotkeyPressed = () {
-      debugPrint('[MainApp] Global hotkey triggered!');
+      if (kDebugMode) {
+        debugPrint('[MainApp] Global hotkey triggered!');
+      }
       _toggleRecording();
     };
 
@@ -108,7 +125,10 @@ class _RecognizingAppState extends ConsumerState<RecognizingApp>
       // Listen to settings for the first time
       final settings = ref.read(settingsProvider);
       if (settings.globalHotkey.isNotEmpty) {
-        debugPrint('[MainApp] Initial hotkey setup: ${settings.globalHotkey}');
+        if (kDebugMode) {
+          debugPrint(
+              '[MainApp] Initial hotkey setup: ${settings.globalHotkey}');
+        }
         _hotkeyService.initialize(settings.globalHotkey);
       }
     });
@@ -125,7 +145,9 @@ class _RecognizingAppState extends ConsumerState<RecognizingApp>
       try {
         await _windowChannel.invokeMethod('showWindow');
       } catch (e) {
-        debugPrint('Failed to show window: $e');
+        if (kDebugMode) {
+          debugPrint('Failed to show window: $e');
+        }
       }
     }
   }
@@ -144,18 +166,18 @@ class _RecognizingAppState extends ConsumerState<RecognizingApp>
   }
 
   void _quitApp() {
-    widget.trayService.dispose();
-    exit(0);
+    _trayService.dispose();
+    // Use proper app lifecycle instead of force exit
+    if (mounted) {
+      SystemNavigator.pop();
+    }
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    widget.trayService.dispose();
-
-    // Dispose hotkey service
+    _trayService.dispose();
     _hotkeyService.dispose();
-
     super.dispose();
   }
 
@@ -164,19 +186,21 @@ class _RecognizingAppState extends ConsumerState<RecognizingApp>
     final isDarkMode = ref.watch(settingsProvider.select((s) => s.darkMode));
 
     ref.listen(recordingStateProvider, (prev, next) {
-      widget.trayService.updateRecordingState(next == RecordingState.recording);
+      _trayService.updateRecordingState(next == RecordingState.recording);
     });
 
     ref.listen(transcriptionsProvider, (prev, next) {
       if (next.isNotEmpty) {
-        widget.trayService.updateLastTranscription(next.first.processedText);
+        _trayService.updateLastTranscription(next.first.processedText);
       }
     });
 
     // Listen for hotkey changes and re-register
     ref.listen(settingsProvider.select((s) => s.globalHotkey), (prev, next) {
       if (prev != next && next.isNotEmpty) {
-        debugPrint('[MainApp] Hotkey changed from $prev to $next');
+        if (kDebugMode) {
+          debugPrint('[MainApp] Hotkey changed from $prev to $next');
+        }
         _hotkeyService.initialize(next);
       }
     });

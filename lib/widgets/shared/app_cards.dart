@@ -111,7 +111,8 @@ class AppCards {
   }) {
     return Card(
       margin: margin ?? const EdgeInsets.all(8),
-      color: backgroundColor ?? Theme.of(context).colorScheme.primary.withOpacity(0.1),
+      color: backgroundColor ??
+          Theme.of(context).colorScheme.primary.withOpacity(0.1),
       child: Padding(
         padding: padding ?? const EdgeInsets.all(16),
         child: Row(

@@ -178,9 +178,8 @@ class AppInputs {
   }) {
     return FormField<bool>(
       initialValue: value,
-      validator: errorText != null
-          ? (val) => val == true ? null : errorText
-          : null,
+      validator:
+          errorText != null ? (val) => val == true ? null : errorText : null,
       builder: (state) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -439,7 +438,9 @@ class _PasswordFieldState extends State<PasswordField> {
             ? IconButton(
                 onPressed: () => setState(() => _obscureText = !_obscureText),
                 icon: Icon(
-                  _obscureText ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                  _obscureText
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
                   color: Theme.of(context).colorScheme.outline,
                 ),
                 tooltip: _obscureText ? 'Show password' : 'Hide password',

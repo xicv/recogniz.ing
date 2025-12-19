@@ -314,20 +314,28 @@ class AppLists {
                   ? ListView.builder(
                       padding: padding,
                       itemCount: items.length,
-                      itemBuilder: (context, index) => itemBuilder(context, items[index]),
+                      itemBuilder: (context, index) =>
+                          itemBuilder(context, items[index]),
                     )
                   : StreamBuilder<List<T>>(
                       stream: Stream.value(
-                        items.where((item) => searchFilter(item).toLowerCase().contains(query.toLowerCase())).toList(),
+                        items
+                            .where((item) => searchFilter(item)
+                                .toLowerCase()
+                                .contains(query.toLowerCase()))
+                            .toList(),
                       ),
                       builder: (context, snapshot) {
                         final filteredItems = snapshot.data ?? [];
                         return filteredItems.isEmpty
-                            ? emptyState ?? AppLists.emptyState(context: context, title: 'No results found')
+                            ? emptyState ??
+                                AppLists.emptyState(
+                                    context: context, title: 'No results found')
                             : ListView.builder(
                                 padding: padding,
                                 itemCount: filteredItems.length,
-                                itemBuilder: (context, index) => itemBuilder(context, filteredItems[index]),
+                                itemBuilder: (context, index) =>
+                                    itemBuilder(context, filteredItems[index]),
                               );
                       },
                     ),
@@ -349,4 +357,3 @@ class ListGroup {
     required this.items,
   });
 }
-

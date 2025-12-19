@@ -21,7 +21,8 @@ class ModernTranscriptionTile extends StatefulWidget {
   });
 
   @override
-  State<ModernTranscriptionTile> createState() => _ModernTranscriptionTileState();
+  State<ModernTranscriptionTile> createState() =>
+      _ModernTranscriptionTileState();
 }
 
 class _ModernTranscriptionTileState extends State<ModernTranscriptionTile>
@@ -35,7 +36,8 @@ class _ModernTranscriptionTileState extends State<ModernTranscriptionTile>
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.transcription.processedText);
+    _controller =
+        TextEditingController(text: widget.transcription.processedText);
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 200),
       vsync: this,
@@ -45,7 +47,8 @@ class _ModernTranscriptionTileState extends State<ModernTranscriptionTile>
   @override
   void didUpdateWidget(ModernTranscriptionTile oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.transcription.processedText != widget.transcription.processedText) {
+    if (oldWidget.transcription.processedText !=
+        widget.transcription.processedText) {
       _controller.text = widget.transcription.processedText;
       _hasChanges = false;
     }
@@ -100,7 +103,8 @@ class _ModernTranscriptionTileState extends State<ModernTranscriptionTile>
                     ),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(UIConstants.borderRadiusSmall),
+                      borderRadius:
+                          BorderRadius.circular(UIConstants.borderRadiusSmall),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -130,7 +134,8 @@ class _ModernTranscriptionTileState extends State<ModernTranscriptionTile>
                     ),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.secondaryContainer,
-                      borderRadius: BorderRadius.circular(UIConstants.borderRadiusSmall),
+                      borderRadius:
+                          BorderRadius.circular(UIConstants.borderRadiusSmall),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -142,7 +147,8 @@ class _ModernTranscriptionTileState extends State<ModernTranscriptionTile>
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          _formatDuration(widget.transcription.audioDurationSeconds),
+                          _formatDuration(
+                              widget.transcription.audioDurationSeconds),
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSecondaryContainer,
                           ),
@@ -244,23 +250,28 @@ class _ModernTranscriptionTileState extends State<ModernTranscriptionTile>
                             color: theme.colorScheme.outline.withOpacity(0.6),
                           ),
                           filled: true,
-                          fillColor: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                          fillColor:
+                              theme.colorScheme.surfaceVariant.withOpacity(0.3),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(UIConstants.borderRadiusMedium),
+                            borderRadius: BorderRadius.circular(
+                                UIConstants.borderRadiusMedium),
                             borderSide: BorderSide.none,
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(UIConstants.borderRadiusMedium),
+                            borderRadius: BorderRadius.circular(
+                                UIConstants.borderRadiusMedium),
                             borderSide: BorderSide(
                               color: theme.colorScheme.primary,
                               width: 2,
                             ),
                           ),
-                          contentPadding: const EdgeInsets.all(UIConstants.spacingMedium),
+                          contentPadding:
+                              const EdgeInsets.all(UIConstants.spacingMedium),
                         ),
                         onChanged: (value) {
                           setState(() {
-                            _hasChanges = value != widget.transcription.processedText;
+                            _hasChanges =
+                                value != widget.transcription.processedText;
                           });
                         },
                         onTapOutside: (_) {
@@ -433,11 +444,11 @@ class _ModernTranscriptionTileState extends State<ModernTranscriptionTile>
   void _showDetails(BuildContext context) {
     Navigator.of(context).push(
       PageRouteBuilder<void>(
-        pageBuilder: (context, animation, secondaryAnimation) => _TranscriptionDetailsPage(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            _TranscriptionDetailsPage(
           transcription: widget.transcription,
-          onEdit: widget.onUpdate != null
-            ? (text) => widget.onUpdate!(text)
-            : null,
+          onEdit:
+              widget.onUpdate != null ? (text) => widget.onUpdate!(text) : null,
         ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(
@@ -507,7 +518,8 @@ class _TranscriptionDetailsPage extends StatelessWidget {
                       context,
                       LucideIcons.calendar,
                       'Date',
-                      DateFormat('EEEE, MMMM d, yyyy').format(transcription.createdAt),
+                      DateFormat('EEEE, MMMM d, yyyy')
+                          .format(transcription.createdAt),
                     ),
                     const Divider(),
                     _buildInfoRow(
@@ -581,15 +593,15 @@ class _TranscriptionDetailsPage extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.outline,
-            ),
+                  color: Theme.of(context).colorScheme.outline,
+                ),
           ),
           const Spacer(),
           Text(
             value,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
+                  fontWeight: FontWeight.w500,
+                ),
           ),
         ],
       ),
@@ -614,8 +626,8 @@ class _TranscriptionDetailsPage extends StatelessWidget {
                 Text(
                   title,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                        fontWeight: FontWeight.w600,
+                      ),
                 ),
                 const Spacer(),
                 TextButton.icon(
@@ -637,8 +649,8 @@ class _TranscriptionDetailsPage extends StatelessWidget {
             SelectableText(
               content,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                height: 1.6,
-              ),
+                    height: 1.6,
+                  ),
             ),
           ],
         ),

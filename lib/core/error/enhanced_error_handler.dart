@@ -34,7 +34,8 @@ class EnhancedErrorHandler {
     // Add technical context if provided
     String? technicalDetails;
     if (context != null) {
-      technicalDetails = 'Error Context:\n${context.entries.map((e) => '${e.key}: ${e.value}').join('\n')}';
+      technicalDetails =
+          'Error Context:\n${context.entries.map((e) => '${e.key}: ${e.value}').join('\n')}';
     }
 
     return enhanceErrorResult(
@@ -74,18 +75,21 @@ class EnhancedErrorHandler {
     }
 
     // Fallback to message analysis
-    if (message.contains('network') || message.contains('connection') ||
+    if (message.contains('network') ||
+        message.contains('connection') ||
         message.contains('timeout')) {
       return ErrorCategory.network;
     }
-    if (message.contains('api') || message.contains('quota') ||
+    if (message.contains('api') ||
+        message.contains('quota') ||
         message.contains('rate')) {
       return ErrorCategory.api;
     }
     if (message.contains('permission') || message.contains('unauthorized')) {
       return ErrorCategory.permission;
     }
-    if (message.contains('audio') || message.contains('recording') ||
+    if (message.contains('audio') ||
+        message.contains('recording') ||
         message.contains('speech')) {
       return ErrorCategory.audio;
     }
@@ -100,7 +104,8 @@ class EnhancedErrorHandler {
   }
 
   /// Get appropriate actions for error
-  static List<ErrorAction> _getActionsForError(ErrorCategory category, ErrorResult result) {
+  static List<ErrorAction> _getActionsForError(
+      ErrorCategory category, ErrorResult result) {
     final actions = <ErrorAction>[];
 
     switch (category) {
@@ -245,13 +250,12 @@ class EnhancedErrorHandler {
     // High severity errors
     if (category == ErrorCategory.api &&
         (message.toLowerCase().contains('unauthorized') ||
-         message.toLowerCase().contains('invalid'))) {
+            message.toLowerCase().contains('invalid'))) {
       return ErrorSeverity.high;
     }
 
     // Medium severity errors
-    if (category == ErrorCategory.network ||
-        category == ErrorCategory.audio) {
+    if (category == ErrorCategory.network || category == ErrorCategory.audio) {
       return ErrorSeverity.medium;
     }
 
@@ -264,7 +268,7 @@ class EnhancedErrorHandler {
     // Only auto-retry network and temporary API errors
     final message = result.message.toLowerCase();
     return result.canRetry &&
-           (message.contains('503') ||
+        (message.contains('503') ||
             message.contains('timeout') ||
             message.contains('connection') ||
             message.contains('rate limit'));

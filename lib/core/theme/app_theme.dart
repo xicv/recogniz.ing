@@ -32,21 +32,29 @@ class AppColors {
     final colors = themeConfig.colors;
 
     primary = Color(int.parse(colors.primary.replaceFirst('#', '0xFF')));
-    primaryLight = Color(int.parse(colors.primaryLight.replaceFirst('#', '0xFF')));
-    primaryDark = Color(int.parse(colors.primaryDark.replaceFirst('#', '0xFF')));
+    primaryLight =
+        Color(int.parse(colors.primaryLight.replaceFirst('#', '0xFF')));
+    primaryDark =
+        Color(int.parse(colors.primaryDark.replaceFirst('#', '0xFF')));
     accent = Color(int.parse(colors.accent.replaceFirst('#', '0xFF')));
     success = Color(int.parse(colors.success.replaceFirst('#', '0xFF')));
     warning = Color(int.parse(colors.warning.replaceFirst('#', '0xFF')));
     error = Color(int.parse(colors.error.replaceFirst('#', '0xFF')));
     info = Color(int.parse(colors.info.replaceFirst('#', '0xFF')));
-    backgroundLight = Color(int.parse(colors.background.replaceFirst('#', '0xFF')));
+    backgroundLight =
+        Color(int.parse(colors.background.replaceFirst('#', '0xFF')));
     surfaceLight = Color(int.parse(colors.surface.replaceFirst('#', '0xFF')));
-    textPrimaryLight = Color(int.parse(colors.textPrimary.replaceFirst('#', '0xFF')));
-    textSecondaryLight = Color(int.parse(colors.textSecondary.replaceFirst('#', '0xFF')));
-    backgroundDark = Color(int.parse(colors.background.replaceFirst('#', '0xFF')));
+    textPrimaryLight =
+        Color(int.parse(colors.textPrimary.replaceFirst('#', '0xFF')));
+    textSecondaryLight =
+        Color(int.parse(colors.textSecondary.replaceFirst('#', '0xFF')));
+    backgroundDark =
+        Color(int.parse(colors.background.replaceFirst('#', '0xFF')));
     surfaceDark = Color(int.parse(colors.surface.replaceFirst('#', '0xFF')));
-    textPrimaryDark = Color(int.parse(colors.textPrimary.replaceFirst('#', '0xFF')));
-    textSecondaryDark = Color(int.parse(colors.textSecondary.replaceFirst('#', '0xFF')));
+    textPrimaryDark =
+        Color(int.parse(colors.textPrimary.replaceFirst('#', '0xFF')));
+    textSecondaryDark =
+        Color(int.parse(colors.textSecondary.replaceFirst('#', '0xFF')));
   }
 }
 

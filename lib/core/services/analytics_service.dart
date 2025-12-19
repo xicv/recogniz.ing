@@ -10,15 +10,18 @@ class AnalyticsService {
   static const double averageWordsPerTranscription = 150;
 
   /// Calculate comprehensive statistics from transcriptions
-  static EnhancedStatistics calculateEnhancedStats(List<Transcription> transcriptions) {
+  static EnhancedStatistics calculateEnhancedStats(
+      List<Transcription> transcriptions) {
     if (transcriptions.isEmpty) {
       return EnhancedStatistics.empty();
     }
 
     // Basic metrics
     final totalTranscriptions = transcriptions.length;
-    final totalTokens = transcriptions.fold<int>(0, (sum, t) => sum + t.tokenUsage);
-    final totalDuration = transcriptions.fold<double>(0, (sum, t) => sum + t.audioDurationSeconds);
+    final totalTokens =
+        transcriptions.fold<int>(0, (sum, t) => sum + t.tokenUsage);
+    final totalDuration = transcriptions.fold<double>(
+        0, (sum, t) => sum + t.audioDurationSeconds);
     final totalWords = _countTotalWords(transcriptions);
 
     // Time-based metrics
@@ -35,8 +38,10 @@ class AnalyticsService {
 
     // Cost analysis
     final totalCost = _calculateTotalCost(totalTokens);
-    final costPerTranscription = totalTranscriptions > 0 ? totalCost / totalTranscriptions : 0.0;
-    final valueVsTraditional = _calculateValueVsTraditional(totalCost, totalWords);
+    final costPerTranscription =
+        totalTranscriptions > 0 ? totalCost / totalTranscriptions : 0.0;
+    final valueVsTraditional =
+        _calculateValueVsTraditional(totalCost, totalWords);
 
     // Quality metrics
     final avgProcessingTime = totalDuration / totalTranscriptions;
@@ -97,7 +102,8 @@ class AnalyticsService {
     return text.trim().isEmpty ? 0 : text.trim().split(RegExp(r'\s+')).length;
   }
 
-  static Map<DateTime, int> _calculateUsageByDay(List<Transcription> transcriptions, DateTime now) {
+  static Map<DateTime, int> _calculateUsageByDay(
+      List<Transcription> transcriptions, DateTime now) {
     final Map<DateTime, int> usageByDay = {};
     final thirtyDaysAgo = now.subtract(const Duration(days: 30));
 
@@ -137,14 +143,15 @@ class AnalyticsService {
     return weeklyPattern;
   }
 
-  static List<double> _calculateMonthlyUsage(List<Transcription> transcriptions, DateTime now) {
+  static List<double> _calculateMonthlyUsage(
+      List<Transcription> transcriptions, DateTime now) {
     final List<double> monthlyUsage = List.filled(12, 0);
     final twelveMonthsAgo = DateTime(now.year - 1, now.month, now.day);
 
     for (final transcription in transcriptions) {
       if (transcription.createdAt.isAfter(twelveMonthsAgo)) {
         final monthDiff = (now.year - transcription.createdAt.year) * 12 +
-                         (now.month - transcription.createdAt.month);
+            (now.month - transcription.createdAt.month);
         if (monthDiff < 12) {
           monthlyUsage[11 - monthDiff]++;
         }
@@ -154,7 +161,8 @@ class AnalyticsService {
     return monthlyUsage;
   }
 
-  static int _calculateStreakDays(List<Transcription> transcriptions, DateTime now) {
+  static int _calculateStreakDays(
+      List<Transcription> transcriptions, DateTime now) {
     if (transcriptions.isEmpty) return 0;
 
     final sortedTranscriptions = List<Transcription>.from(transcriptions)
@@ -170,9 +178,11 @@ class AnalyticsService {
         transcription.createdAt.day,
       );
 
-      if (transcriptionDate.isAfter(currentDate.subtract(const Duration(days: 1)))) {
+      if (transcriptionDate
+          .isAfter(currentDate.subtract(const Duration(days: 1)))) {
         if (transcriptionDate.isAtSameMomentAs(currentDate) ||
-            transcriptionDate.isAtSameMomentAs(currentDate.subtract(const Duration(days: 1)))) {
+            transcriptionDate.isAtSameMomentAs(
+                currentDate.subtract(const Duration(days: 1)))) {
           streak++;
           currentDate = currentDate.subtract(const Duration(days: 1));
         } else {
@@ -205,7 +215,7 @@ class AnalyticsService {
     final outputTokens = (totalTokens * 0.5);
 
     return (inputTokens / 1000000) * geminiInputCostPerMillion +
-           (outputTokens / 1000000) * geminiOutputCostPerMillion;
+        (outputTokens / 1000000) * geminiOutputCostPerMillion;
   }
 
   static double _calculateValueVsTraditional(double totalCost, int totalWords) {
@@ -222,7 +232,8 @@ class AnalyticsService {
 
   static double _calculateAudioQuality(List<Transcription> transcriptions) {
     // Calculate based on duration vs output ratio
-    final totalDuration = transcriptions.fold<double>(0, (sum, t) => sum + t.audioDurationSeconds);
+    final totalDuration = transcriptions.fold<double>(
+        0, (sum, t) => sum + t.audioDurationSeconds);
     final totalWords = _countTotalWords(transcriptions);
 
     if (totalDuration == 0) return 0;
@@ -230,7 +241,8 @@ class AnalyticsService {
     final wordsPerSecond = totalWords / totalDuration;
     // Optimal is 2-3 words per second for speech
     final optimalWordsPerSecond = 2.5;
-    final score = 1 - (wordsPerSecond - optimalWordsPerSecond).abs() / optimalWordsPerSecond;
+    final score = 1 -
+        (wordsPerSecond - optimalWordsPerSecond).abs() / optimalWordsPerSecond;
     return max(0, min(1, score));
   }
 
@@ -274,7 +286,8 @@ class AnalyticsService {
     final List<String> recommendations = [];
 
     if (avgWPM < 100) {
-      recommendations.add('Try speaking more clearly to improve transcription speed');
+      recommendations
+          .add('Try speaking more clearly to improve transcription speed');
     }
 
     if (totalCost > 10) {
@@ -282,11 +295,13 @@ class AnalyticsService {
     }
 
     if (transcriptionCount < 5) {
-      recommendations.add('Use voice typing regularly to build a productivity habit');
+      recommendations
+          .add('Use voice typing regularly to build a productivity habit');
     }
 
     if (audioQuality < 0.7) {
-      recommendations.add('Check your microphone placement for better audio quality');
+      recommendations
+          .add('Check your microphone placement for better audio quality');
     }
 
     return recommendations;

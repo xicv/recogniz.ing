@@ -21,7 +21,8 @@ class ErrorResult {
 class AppErrorHandler {
   /// Extract retry time from error message
   static Duration? _extractRetryTime(String errorString) {
-    final retryMatch = RegExp(r'Please retry in (\d+\.?\d*)s').firstMatch(errorString);
+    final retryMatch =
+        RegExp(r'Please retry in (\d+\.?\d*)s').firstMatch(errorString);
     if (retryMatch != null) {
       final seconds = double.tryParse(retryMatch.group(1) ?? '');
       if (seconds != null) {
@@ -48,13 +49,14 @@ class AppErrorHandler {
     if (errorString.contains('503') || errorString.contains('unavailable')) {
       return const ErrorResult(
         message: 'Service temporarily unavailable\n'
-                'The AI service is experiencing high demand. Please try again in a few moments.',
+            'The AI service is experiencing high demand. Please try again in a few moments.',
         canRetry: true,
         iconName: 'cloud-off',
       );
     }
 
-    if (errorString.contains('quota exceeded') || errorString.contains('current quota')) {
+    if (errorString.contains('quota exceeded') ||
+        errorString.contains('current quota')) {
       final retryTime = _extractRetryTime(error.toString());
       if (retryTime != null) {
         final minutes = retryTime.inMinutes;
@@ -62,8 +64,8 @@ class AppErrorHandler {
         if (minutes > 0) {
           return ErrorResult(
             message: 'API quota exceeded\n'
-                   'You\'ve reached the free tier limit.\n'
-                   'Please retry in ${minutes}m ${seconds}s.',
+                'You\'ve reached the free tier limit.\n'
+                'Please retry in ${minutes}m ${seconds}s.',
             retryAfter: retryTime,
             actionHint: 'Add your own API key in Settings for unlimited usage.',
             iconName: 'zap-off',
@@ -71,8 +73,8 @@ class AppErrorHandler {
         } else {
           return ErrorResult(
             message: 'API quota exceeded\n'
-                   'You\'ve reached the free tier limit.\n'
-                   'Please retry in $seconds seconds.',
+                'You\'ve reached the free tier limit.\n'
+                'Please retry in $seconds seconds.',
             retryAfter: retryTime,
             actionHint: 'Add your own API key in Settings for unlimited usage.',
             iconName: 'zap-off',
@@ -81,28 +83,31 @@ class AppErrorHandler {
       }
       return const ErrorResult(
         message: 'API quota exceeded\n'
-                'You\'ve reached the free tier limit.\n'
-                'Please try again later.',
+            'You\'ve reached the free tier limit.\n'
+            'Please try again later.',
         actionHint: 'Add your own API key in Settings for unlimited usage.',
         iconName: 'zap-off',
       );
     }
 
-    if (errorString.contains('429') || errorString.contains('rate limit') ||
+    if (errorString.contains('429') ||
+        errorString.contains('rate limit') ||
         errorString.contains('resource_exhausted')) {
       return const ErrorResult(
         message: 'Rate limit exceeded\n'
-                'Too many requests. Please wait a moment before trying again.',
+            'Too many requests. Please wait a moment before trying again.',
         canRetry: true,
         iconName: 'timer',
       );
     }
 
-    if (errorString.contains('connection') || errorString.contains('network') ||
-        errorString.contains('socket') || errorString.contains('timeout')) {
+    if (errorString.contains('connection') ||
+        errorString.contains('network') ||
+        errorString.contains('socket') ||
+        errorString.contains('timeout')) {
       return const ErrorResult(
         message: 'Network error\n'
-                'Please check your internet connection and try again.',
+            'Please check your internet connection and try again.',
         canRetry: true,
         actionHint: 'Check your Wi-Fi or mobile data connection',
         iconName: 'wifi-off',
@@ -110,30 +115,33 @@ class AppErrorHandler {
     }
 
     // Permission related errors
-    if (errorString.contains('permission_denied') || errorString.contains('permission')) {
+    if (errorString.contains('permission_denied') ||
+        errorString.contains('permission')) {
       return const ErrorResult(
         message: 'Permission denied\n'
-                'Please grant the necessary permissions and try again.',
+            'Please grant the necessary permissions and try again.',
         actionHint: 'Go to System Settings to enable microphone access',
         iconName: 'shield-off',
       );
     }
 
     // API related errors
-    if (errorString.contains('api_key') || errorString.contains('unauthorized') ||
+    if (errorString.contains('api_key') ||
+        errorString.contains('unauthorized') ||
         errorString.contains('401')) {
       return const ErrorResult(
         message: 'Authentication error\n'
-                'Please check your API key in Settings.',
+            'Please check your API key in Settings.',
         actionHint: 'Add a valid API key in Settings',
         iconName: 'key',
       );
     }
 
-    if (errorString.contains('invalid_argument') || errorString.contains('400')) {
+    if (errorString.contains('invalid_argument') ||
+        errorString.contains('400')) {
       return const ErrorResult(
         message: 'Invalid request\n'
-                'The request was invalid. Please try again.',
+            'The request was invalid. Please try again.',
         canRetry: true,
         iconName: 'alert-triangle',
       );
@@ -143,16 +151,17 @@ class AppErrorHandler {
     if (errorString.contains('audio') || errorString.contains('recording')) {
       return const ErrorResult(
         message: 'Audio error\n'
-                'Failed to process audio. Please ensure your microphone is working.',
+            'Failed to process audio. Please ensure your microphone is working.',
         actionHint: 'Check your microphone connection and permissions',
         iconName: 'mic-off',
       );
     }
 
-    if (errorString.contains('no speech') || errorString.contains('empty transcription')) {
+    if (errorString.contains('no speech') ||
+        errorString.contains('empty transcription')) {
       return const ErrorResult(
         message: 'No speech detected\n'
-                'Please speak clearly and ensure your microphone is working.',
+            'Please speak clearly and ensure your microphone is working.',
         canRetry: true,
         actionHint: 'Speak louder or reduce background noise',
         iconName: 'volume-x',
@@ -162,7 +171,7 @@ class AppErrorHandler {
     // Default error message
     return const ErrorResult(
       message: 'An unexpected error occurred\n'
-              'Please try again. If the problem persists, contact support.',
+          'Please try again. If the problem persists, contact support.',
       canRetry: true,
       iconName: 'alert-circle',
     );

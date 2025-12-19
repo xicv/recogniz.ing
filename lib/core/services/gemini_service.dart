@@ -1,16 +1,35 @@
 import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 import '../models/transcription_result.dart';
+import '../interfaces/audio_service_interface.dart';
 
-class GeminiService {
+/// Performance optimizations for Gemini API
+class GeminiPerformanceConfig {
+  // Enable caching for repeated requests
+  static const bool enableCaching = true;
+
+  // Audio pre-processing to reduce API calls
+  static const bool enableVADPreprocessing = true;
+
+  // Minimum audio duration before sending to API (seconds)
+  static const double minAudioDuration = 0.5;
+
+  // Maximum audio duration for optimal performance (seconds)
+  static const double maxAudioDuration = 60.0;
+}
+
+class GeminiService implements TranscriptionServiceInterface {
   GenerativeModel? _model;
   GenerativeModel? _lightningModel;
 
   static const String _modelName = 'gemini-3-flash-preview';
+
+  // Simple LRU cache for transcription results
+  final Map<String, TranscriptionResult> _cache = {};
+  static const int _maxCacheSize = 50;
 
   bool get isInitialized => _model != null;
 
@@ -21,7 +40,7 @@ class GeminiService {
       apiKey: apiKey,
       generationConfig: GenerationConfig(
         temperature: 0.1,
-        maxOutputTokens: 8192,  // Increased for longer transcriptions
+        maxOutputTokens: 8192, // Increased for longer transcriptions
         topP: 0.8,
         topK: 40,
       ),
@@ -33,7 +52,8 @@ class GeminiService {
       apiKey: apiKey,
       generationConfig: GenerationConfig(
         temperature: 0.1,
-        maxOutputTokens: 8192,  // Increased for longer transcriptions (~6000 words)
+        maxOutputTokens:
+            8192, // Increased for longer transcriptions (~6000 words)
         topP: 0.8,
         topK: 40,
       ),
@@ -42,6 +62,51 @@ class GeminiService {
     debugPrint('[GeminiService] Models initialized successfully');
   }
 
+  /// Generate a cache key for the audio and parameters
+  String _generateCacheKey(
+      Uint8List audioBytes, String vocabulary, String promptTemplate) {
+    final audioHash = audioBytes.fold<int>(
+        0, (hash, byte) => hash = ((hash << 5) - hash) + byte);
+    final paramsHash = '${vocabulary.length}_${promptTemplate.length}'.hashCode;
+    return '${audioHash}_$paramsHash';
+  }
+
+  /// Get result from cache if available
+  TranscriptionResult? _getFromCache(String cacheKey) {
+    if (!GeminiPerformanceConfig.enableCaching) return null;
+    return _cache[cacheKey];
+  }
+
+  /// Store result in cache
+  void _storeInCache(String cacheKey, TranscriptionResult result) {
+    if (!GeminiPerformanceConfig.enableCaching) return;
+
+    // Simple LRU: if cache is full, remove oldest entry
+    if (_cache.length >= _maxCacheSize) {
+      final oldestKey = _cache.keys.first;
+      _cache.remove(oldestKey);
+    }
+    _cache[cacheKey] = result;
+    debugPrint('[GeminiService] Cached transcription result');
+  }
+
+  /// Create and cache a transcription result
+  TranscriptionResult _createResult({
+    required String cacheKey,
+    required String rawText,
+    required String processedText,
+    int? tokenUsage,
+  }) {
+    final result = TranscriptionResult(
+      rawText: rawText,
+      processedText: processedText,
+      tokenUsage: tokenUsage ?? 0,
+    );
+    _storeInCache(cacheKey, result);
+    return result;
+  }
+
+  @override
   Future<TranscriptionResult> transcribeAudio({
     required Uint8List audioBytes,
     required String vocabulary,
@@ -58,6 +123,14 @@ class GeminiService {
       throw Exception('Gemini service not initialized. Please set API key.');
     }
 
+    // Check cache first
+    final cacheKey = _generateCacheKey(audioBytes, vocabulary, promptTemplate);
+    final cachedResult = _getFromCache(cacheKey);
+    if (cachedResult != null) {
+      debugPrint('[GeminiService] Returning cached transcription result');
+      return cachedResult;
+    }
+
     // Check if we can use single call mode
     final promptId = _extractPromptId(promptTemplate);
     final needsProcessing = _requiresPostProcessing(promptId);
@@ -65,10 +138,12 @@ class GeminiService {
     if (!needsProcessing || useSingleCall) {
       if (needsProcessing) {
         // Use combined prompt for single call
-        return _combinedTranscription(audioBytes, vocabulary, promptTemplate, criticalInstructions);
+        return await _combinedTranscription(audioBytes, vocabulary,
+            promptTemplate, criticalInstructions, cacheKey);
       } else {
         // Use direct transcription
-        return _directTranscription(audioBytes, vocabulary, criticalInstructions);
+        return await _directTranscription(
+            audioBytes, vocabulary, criticalInstructions, cacheKey);
       }
     }
 
@@ -107,14 +182,16 @@ Output only the transcription, nothing else.''';
         DataPart('audio/mp4', audioBytes), // m4a is mp4 audio
       ]);
 
-      debugPrint('[GeminiService] Calling generateContent for transcription...');
+      debugPrint(
+          '[GeminiService] Calling generateContent for transcription...');
       final transcriptionResponse = await _executeWithRetry(
         () => _model!.generateContent([audioContent]),
         operationName: 'transcription',
       );
 
       final rawText = transcriptionResponse.text ?? '';
-      debugPrint('[GeminiService] Raw transcription received (${rawText.length} chars): ${rawText.length > 200 ? "${rawText.substring(0, 200)}..." : rawText}');
+      debugPrint(
+          '[GeminiService] Raw transcription received (${rawText.length} chars): ${rawText.length > 200 ? "${rawText.substring(0, 200)}..." : rawText}');
 
       if (rawText.isEmpty) {
         debugPrint('[GeminiService] Warning: Empty transcription received');
@@ -130,7 +207,8 @@ Output only the transcription, nothing else.''';
       // Then, process with the custom prompt
       final processedPrompt = promptTemplate.replaceAll('{{text}}', rawText);
       debugPrint('[GeminiService] Processing with custom prompt...');
-      debugPrint('[GeminiService] Processed prompt preview: ${processedPrompt.length > 200 ? "${processedPrompt.substring(0, 200)}..." : processedPrompt}');
+      debugPrint(
+          '[GeminiService] Processed prompt preview: ${processedPrompt.length > 200 ? "${processedPrompt.substring(0, 200)}..." : processedPrompt}');
 
       final processedResponse = await _executeWithRetry(
         () => _model!.generateContent([Content.text(processedPrompt)]),
@@ -138,14 +216,16 @@ Output only the transcription, nothing else.''';
       );
 
       final processedText = processedResponse.text ?? rawText;
-      debugPrint('[GeminiService] Processed text received (${processedText.length} chars): ${processedText.length > 200 ? "${processedText.substring(0, 200)}..." : processedText}');
+      debugPrint(
+          '[GeminiService] Processed text received (${processedText.length} chars): ${processedText.length > 200 ? "${processedText.substring(0, 200)}..." : processedText}');
 
       // Estimate token usage
       final estimatedTokens =
           ((rawText.length + processedPrompt.length + processedText.length) / 4)
               .round();
 
-      return TranscriptionResult(
+      return _createResult(
+        cacheKey: cacheKey,
         rawText: rawText,
         processedText: processedText,
         tokenUsage: estimatedTokens,
@@ -223,7 +303,8 @@ Output only the transcription, nothing else.''';
             errorStr.contains('permission_denied') ||
             errorStr.contains('not_found') ||
             errorStr.contains('api_key_invalid')) {
-          debugPrint('[GeminiService] Non-retryable error, failing immediately');
+          debugPrint(
+              '[GeminiService] Non-retryable error, failing immediately');
           rethrow;
         }
 
@@ -235,7 +316,8 @@ Output only the transcription, nothing else.''';
             errorStr.contains('deadline_exceeded') ||
             errorStr.contains('internal')) {
           if (attempt >= maxRetries) {
-            debugPrint('[GeminiService] Max retries exceeded for $operationName');
+            debugPrint(
+                '[GeminiService] Max retries exceeded for $operationName');
             rethrow;
           }
 
@@ -265,8 +347,10 @@ Output only the transcription, nothing else.''';
     Uint8List audioBytes,
     String vocabulary,
     String? criticalInstructions,
+    String cacheKey,
   ) async {
-    final transcriptionPrompt = _buildDirectPrompt(vocabulary, criticalInstructions);
+    final transcriptionPrompt =
+        _buildDirectPrompt(vocabulary, criticalInstructions);
 
     debugPrint('[GeminiService] Using direct transcription mode...');
 
@@ -284,7 +368,8 @@ Output only the transcription, nothing else.''';
       );
 
       final rawText = response.text ?? '';
-      debugPrint('[GeminiService] Direct transcription complete (${rawText.length} chars): ${rawText.length > 200 ? "${rawText.substring(0, 200)}..." : rawText}');
+      debugPrint(
+          '[GeminiService] Direct transcription complete (${rawText.length} chars): ${rawText.length > 200 ? "${rawText.substring(0, 200)}..." : rawText}');
 
       if (rawText.isEmpty) {
         throw Exception('Empty transcription received from API');
@@ -296,7 +381,8 @@ Output only the transcription, nothing else.''';
 
       final estimatedTokens = (rawText.length / 4).round();
 
-      return TranscriptionResult(
+      return _createResult(
+        cacheKey: cacheKey,
         rawText: rawText,
         processedText: rawText, // Same text for direct mode
         tokenUsage: estimatedTokens,
@@ -313,8 +399,10 @@ Output only the transcription, nothing else.''';
     String vocabulary,
     String promptTemplate,
     String? criticalInstructions,
+    String cacheKey,
   ) async {
-    final combinedPrompt = _buildCombinedPrompt(promptTemplate, vocabulary, criticalInstructions);
+    final combinedPrompt =
+        _buildCombinedPrompt(promptTemplate, vocabulary, criticalInstructions);
 
     debugPrint('[GeminiService] Using combined transcription mode...');
 
@@ -352,7 +440,8 @@ Output only the transcription, nothing else.''';
 
       final estimatedTokens = (resultText.length / 4).round();
 
-      return TranscriptionResult(
+      return _createResult(
+        cacheKey: cacheKey,
         rawText: rawText,
         processedText: processedText,
         tokenUsage: estimatedTokens,
@@ -392,10 +481,12 @@ Transcribe only what is spoken. Output only the transcription, nothing else.''')
   }
 
   /// Build combined prompt for single-call processing
-  String _buildCombinedPrompt(String promptTemplate, String vocabulary, String? criticalInstructions) {
+  String _buildCombinedPrompt(
+      String promptTemplate, String vocabulary, String? criticalInstructions) {
     final buffer = StringBuffer();
 
-    buffer.writeln('Transcribe the following audio and then process it according to the instructions.');
+    buffer.writeln(
+        'Transcribe the following audio and then process it according to the instructions.');
 
     if (criticalInstructions != null) {
       buffer.writeln(criticalInstructions);
@@ -419,11 +510,14 @@ Output the raw transcription first, then "---", and finally the processed text.'
 
   /// Extract prompt ID from template
   String _extractPromptId(String promptTemplate) {
-    if (promptTemplate.contains('Clean up the following speech transcription')) {
+    if (promptTemplate
+        .contains('Clean up the following speech transcription')) {
       return 'default-clean';
-    } else if (promptTemplate.contains('Convert the following speech transcription into formal written text')) {
+    } else if (promptTemplate.contains(
+        'Convert the following speech transcription into formal written text')) {
       return 'default-formal';
-    } else if (promptTemplate.contains('Convert the following speech transcription into organized bullet points')) {
+    } else if (promptTemplate.contains(
+        'Convert the following speech transcription into organized bullet points')) {
       return 'default-bullet';
     }
     return 'unknown';
@@ -433,7 +527,7 @@ Output the raw transcription first, then "---", and finally the processed text.'
   bool _requiresPostProcessing(String promptId) {
     // No prompts should use direct mode since they all need processing
     // Direct mode bypasses the prompt template entirely
-    return true;  // Always use full processing
+    return true; // Always use full processing
   }
 
   void dispose() {
@@ -441,4 +535,3 @@ Output the raw transcription first, then "---", and finally the processed text.'
     _lightningModel = null;
   }
 }
-

@@ -90,8 +90,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               ),
               if (!vocab.isDefault)
                 IconButton(
-                  onPressed: () => _showVocabularyEditor(context, ref,
-                      vocabulary: vocab),
+                  onPressed: () =>
+                      _showVocabularyEditor(context, ref, vocabulary: vocab),
                   icon: const Icon(LucideIcons.edit, size: 16),
                 ),
             ],
@@ -107,7 +107,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             margin: const EdgeInsets.symmetric(horizontal: 16),
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+              color:
+                  Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Column(
@@ -125,14 +126,17 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 Wrap(
                   spacing: 8,
                   runSpacing: 4,
-                  children: vocab.words.map((word) => Chip(
-                    label: Text(
-                      word,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                    visualDensity: VisualDensity.compact,
-                  )).toList(),
+                  children: vocab.words
+                      .map((word) => Chip(
+                            label: Text(
+                              word,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primaryContainer,
+                            visualDensity: VisualDensity.compact,
+                          ))
+                      .toList(),
                 ),
                 const SizedBox(height: 8),
               ],
@@ -232,7 +236,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
           // Critical Instructions
           const CriticalInstructionsEditor()
-              .animate().fadeIn(duration: 300.ms, delay: 200.ms),
+              .animate()
+              .fadeIn(duration: 300.ms, delay: 200.ms),
 
           const SizedBox(height: 20),
 
@@ -292,7 +297,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               tooltip: 'Add Vocabulary',
             ),
             children: [
-              ...vocabulary.map((vocab) => _buildVocabularyTile(context, ref, vocab, settings)),
+              ...vocabulary.map((vocab) =>
+                  _buildVocabularyTile(context, ref, vocab, settings)),
             ],
           ).animate().fadeIn(duration: 300.ms, delay: 250.ms),
 
@@ -346,7 +352,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               FutureBuilder<String>(
                 future: AppConstants.getAppVersionWithBuild(),
                 builder: (context, snapshot) {
-                  final version = snapshot.data ?? AppConstants.appVersionWithBuild;
+                  final version =
+                      snapshot.data ?? AppConstants.appVersionWithBuild;
                   return ListTile(
                     title: Text('Version'),
                     trailing: Text(version),
@@ -494,7 +501,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       {dynamic prompt}) {
     Navigator.of(context).push(
       PageRouteBuilder<void>(
-        pageBuilder: (context, animation, secondaryAnimation) => PromptEditor(prompt: prompt),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            PromptEditor(prompt: prompt),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(
             position: animation.drive(
@@ -518,7 +526,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       {dynamic vocabulary}) {
     Navigator.of(context).push(
       PageRouteBuilder<void>(
-        pageBuilder: (context, animation, secondaryAnimation) => VocabularyEditor(vocabulary: vocabulary),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            VocabularyEditor(vocabulary: vocabulary),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(
             position: animation.drive(

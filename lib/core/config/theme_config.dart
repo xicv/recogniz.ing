@@ -107,7 +107,8 @@ class ThemeConfig {
   });
 
   static Future<ThemeConfig> fromAsset(String themeName) async {
-    final String jsonString = await rootBundle.loadString('config/themes/${themeName}_theme.json');
+    final String jsonString =
+        await rootBundle.loadString('config/themes/${themeName}_theme.json');
     final Map<String, dynamic> json = jsonDecode(jsonString);
 
     return ThemeConfig(

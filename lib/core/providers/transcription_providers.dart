@@ -6,7 +6,8 @@ import '../services/storage_service.dart';
 import '../services/analytics_service.dart';
 
 /// Transcription management providers
-final transcriptionsProvider = StateNotifierProvider<TranscriptionsNotifier, List<Transcription>>((ref) {
+final transcriptionsProvider =
+    StateNotifierProvider<TranscriptionsNotifier, List<Transcription>>((ref) {
   return TranscriptionsNotifier();
 });
 

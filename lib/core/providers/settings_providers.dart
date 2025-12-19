@@ -5,7 +5,8 @@ import '../models/app_settings.dart';
 import '../services/storage_service.dart';
 
 /// Settings state management
-final settingsProvider = StateNotifierProvider<SettingsNotifier, AppSettings>((ref) {
+final settingsProvider =
+    StateNotifierProvider<SettingsNotifier, AppSettings>((ref) {
   return SettingsNotifier();
 });
 
@@ -14,7 +15,9 @@ AppSettings _getInitialSettings() {
   try {
     return StorageService.settings;
   } catch (e) {
-    debugPrint('[SettingsNotifier] Failed to load settings: $e');
+    if (kDebugMode) {
+      debugPrint('[SettingsNotifier] Failed to load settings: $e');
+    }
     return AppSettings();
   }
 }
@@ -48,13 +51,15 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
   }
 
   Future<void> toggleAutoCopy() async {
-    final newState = state.copyWith(autoCopyToClipboard: !state.autoCopyToClipboard);
+    final newState =
+        state.copyWith(autoCopyToClipboard: !state.autoCopyToClipboard);
     await StorageService.saveSettings(newState);
     state = newState;
   }
 
   Future<void> toggleNotifications() async {
-    final newState = state.copyWith(showNotifications: !state.showNotifications);
+    final newState =
+        state.copyWith(showNotifications: !state.showNotifications);
     await StorageService.saveSettings(newState);
     state = newState;
   }

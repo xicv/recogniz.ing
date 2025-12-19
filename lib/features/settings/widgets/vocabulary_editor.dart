@@ -99,16 +99,14 @@ class _VocabularyEditorState extends ConsumerState<VocabularyEditor> {
               ),
               child: Row(
                 children: [
-                  Icon(LucideIcons.info,
-                      size: 16, color: AppColors.primary),
+                  Icon(LucideIcons.info, size: 16, color: AppColors.primary),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'Add proper nouns, technical terms, or domain-specific vocabulary (one per line)',
-                      style:
-                          Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: AppColors.primary,
-                              ),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.primary,
+                          ),
                     ),
                   ),
                 ],
@@ -118,8 +116,8 @@ class _VocabularyEditorState extends ConsumerState<VocabularyEditor> {
             FilledButton.icon(
               onPressed: _saveVocabulary,
               icon: const Icon(LucideIcons.check),
-              label: Text(
-                  isEditing ? 'Update Vocabulary' : 'Create Vocabulary'),
+              label:
+                  Text(isEditing ? 'Update Vocabulary' : 'Create Vocabulary'),
               style: FilledButton.styleFrom(
                 minimumSize: const Size.fromHeight(48),
               ),

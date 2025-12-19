@@ -108,7 +108,8 @@ class _SimplifiedStatsCardState extends State<SimplifiedStatsCard>
               SizeTransition(
                 sizeFactor: _expandAnimation,
                 child: Padding(
-                  padding: const EdgeInsets.only(top: UIConstants.spacingMedium),
+                  padding:
+                      const EdgeInsets.only(top: UIConstants.spacingMedium),
                   child: Column(
                     children: [
                       Divider(height: 1, color: Theme.of(context).dividerColor),
@@ -184,16 +185,16 @@ class _SimplifiedStatsCardState extends State<SimplifiedStatsCard>
         Text(
           value,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
         ),
         const SizedBox(height: 2),
         Text(
           label,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
         ),
       ],
     );
@@ -216,15 +217,15 @@ class _SimplifiedStatsCardState extends State<SimplifiedStatsCard>
         Text(
           value,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            fontWeight: FontWeight.w500,
-          ),
+                fontWeight: FontWeight.w500,
+              ),
         ),
         const SizedBox(height: 2),
         Text(
           label,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: Theme.of(context).colorScheme.outline,
-          ),
+                color: Theme.of(context).colorScheme.outline,
+              ),
         ),
       ],
     );

@@ -97,16 +97,14 @@ class _PromptEditorState extends ConsumerState<PromptEditor> {
               ),
               child: Row(
                 children: [
-                  Icon(LucideIcons.info,
-                      size: 16, color: AppColors.primary),
+                  Icon(LucideIcons.info, size: 16, color: AppColors.primary),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'Use {{text}} as placeholder for the transcription',
-                      style:
-                          Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: AppColors.primary,
-                              ),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.primary,
+                          ),
                     ),
                   ),
                 ],

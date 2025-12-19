@@ -29,7 +29,8 @@ class VocabularyConfig {
   });
 
   static Future<VocabularyConfig> fromAsset() async {
-    final String jsonString = await rootBundle.loadString('config/vocabulary/default_vocabulary.json');
+    final String jsonString = await rootBundle
+        .loadString('config/vocabulary/default_vocabulary.json');
     final Map<String, dynamic> json = jsonDecode(jsonString);
 
     return VocabularyConfig(

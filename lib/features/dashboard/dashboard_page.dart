@@ -8,10 +8,7 @@ import '../../core/providers/app_providers.dart';
 import '../../core/providers/transcription_providers.dart';
 import '../../core/theme/app_theme.dart';
 import 'widgets/simplified_stats_card.dart';
-import 'widgets/productivity_insights_widget.dart';
-import 'widgets/usage_pattern_widget.dart';
-import 'widgets/cost_analysis_widget.dart';
-import 'widgets/insights_widget.dart';
+import 'widgets/dashboard_metrics.dart';
 
 class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});
@@ -103,23 +100,8 @@ class DashboardPage extends ConsumerWidget {
 
                   const SizedBox(height: 16),
 
-                  // Productivity Insights Widget
-                  ProductivityInsightsWidget(stats: enhancedStats),
-
-                  const SizedBox(height: 16),
-
-                  // Usage Pattern Widget
-                  UsagePatternWidget(stats: enhancedStats),
-
-                  const SizedBox(height: 16),
-
-                  // Cost Analysis Widget
-                  CostAnalysisWidget(stats: enhancedStats),
-
-                  const SizedBox(height: 16),
-
-                  // Insights Widget
-                  InsightsWidget(stats: enhancedStats),
+                  // Consolidated Dashboard Metrics
+                  DashboardMetrics(stats: enhancedStats),
 
                   const SizedBox(height: 24),
                 ],
@@ -127,7 +109,6 @@ class DashboardPage extends ConsumerWidget {
             ),
           ),
 
-  
           // Bottom padding for FAB
           const SliverToBoxAdapter(
             child: SizedBox(height: 100),
@@ -136,5 +117,4 @@ class DashboardPage extends ConsumerWidget {
       ),
     );
   }
-
-  }
+}

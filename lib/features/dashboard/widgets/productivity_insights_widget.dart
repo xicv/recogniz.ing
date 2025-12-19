@@ -16,7 +16,8 @@ class ProductivityInsightsWidget extends StatefulWidget {
   });
 
   @override
-  State<ProductivityInsightsWidget> createState() => _ProductivityInsightsWidgetState();
+  State<ProductivityInsightsWidget> createState() =>
+      _ProductivityInsightsWidgetState();
 }
 
 class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
@@ -71,7 +72,8 @@ class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
                   padding: const EdgeInsets.all(UIConstants.spacingSmall),
                   decoration: BoxDecoration(
                     color: AppColors.success.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(UIConstants.borderRadiusSmall),
+                    borderRadius:
+                        BorderRadius.circular(UIConstants.borderRadiusSmall),
                   ),
                   child: Icon(
                     LucideIcons.trendingUp,
@@ -83,8 +85,8 @@ class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
                 Text(
                   'Productivity Insights',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                        fontWeight: FontWeight.w600,
+                      ),
                 ),
                 const Spacer(),
                 if (widget.stats.streakDays > 0)
@@ -95,7 +97,8 @@ class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
                     ),
                     decoration: BoxDecoration(
                       color: Colors.orange.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(UIConstants.borderRadiusSmall),
+                      borderRadius:
+                          BorderRadius.circular(UIConstants.borderRadiusSmall),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -108,10 +111,11 @@ class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
                         const SizedBox(width: 4),
                         Text(
                           '${widget.stats.streakDays} day streak!',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.orange,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Colors.orange,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                         ),
                       ],
                     ),
@@ -129,7 +133,8 @@ class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
                   child: _buildMetricCard(
                     context,
                     icon: LucideIcons.target,
-                    value: '${widget.stats.efficiencyScore.toStringAsFixed(0)}%',
+                    value:
+                        '${widget.stats.efficiencyScore.toStringAsFixed(0)}%',
                     label: 'Efficiency Score',
                     color: AppColors.primary,
                     showPulse: widget.stats.efficiencyScore > 80,
@@ -153,7 +158,8 @@ class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
                   child: _buildMetricCard(
                     context,
                     icon: LucideIcons.messageSquare,
-                    value: '${widget.stats.avgWordsPerMinute.toStringAsFixed(0)}',
+                    value:
+                        '${widget.stats.avgWordsPerMinute.toStringAsFixed(0)}',
                     label: 'Words/min',
                     color: AppColors.warning,
                   ),
@@ -170,7 +176,8 @@ class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
               label: 'Voice Efficiency vs Typing',
               value: widget.stats.efficiencyScore / 100,
               color: AppColors.success,
-              subtitle: '${widget.stats.efficiencyScore.toStringAsFixed(0)}% more efficient',
+              subtitle:
+                  '${widget.stats.efficiencyScore.toStringAsFixed(0)}% more efficient',
             ),
 
             const SizedBox(height: UIConstants.spacingSmall),
@@ -180,8 +187,11 @@ class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
               icon: LucideIcons.mic,
               label: 'Audio Quality Score',
               value: widget.stats.audioQualityScore,
-              color: widget.stats.audioQualityScore > 0.7 ? AppColors.success : AppColors.warning,
-              subtitle: '${(widget.stats.audioQualityScore * 100).toStringAsFixed(0)}% quality',
+              color: widget.stats.audioQualityScore > 0.7
+                  ? AppColors.success
+                  : AppColors.warning,
+              subtitle:
+                  '${(widget.stats.audioQualityScore * 100).toStringAsFixed(0)}% quality',
             ),
           ],
         ),
@@ -218,16 +228,16 @@ class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
           Text(
             value,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
           ),
           const SizedBox(height: 2),
           Text(
             label,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.outline,
-            ),
+                  color: Theme.of(context).colorScheme.outline,
+                ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -270,16 +280,16 @@ class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
             Text(
               label,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
+                    fontWeight: FontWeight.w500,
+                  ),
             ),
             const Spacer(),
             if (subtitle != null)
               Text(
                 subtitle,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.outline,
-                ),
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
               ),
           ],
         ),

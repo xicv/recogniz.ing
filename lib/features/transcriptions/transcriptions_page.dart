@@ -7,7 +7,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/providers/app_providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/models/app_settings.dart';
-import 'widgets/modern_transcription_tile.dart';
+import 'widgets/compact_transcription_tile.dart';
 
 class TranscriptionsPage extends ConsumerStatefulWidget {
   const TranscriptionsPage({super.key});
@@ -79,8 +79,8 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
                 Text(
                   'Transcriptions',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 if (transcriptions.isNotEmpty) ...[
                   const SizedBox(width: 16),
@@ -135,19 +135,21 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
                 ),
                 child: Row(
                   children: [
-                    Icon(LucideIcons.alertTriangle, color: AppColors.warning, size: 20),
+                    Icon(LucideIcons.alertTriangle,
+                        color: AppColors.warning, size: 20),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         'Add your Gemini API key in Settings to start recording',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.warning,
-                        ),
+                              color: AppColors.warning,
+                            ),
                       ),
                     ),
                     TextButton(
                       onPressed: () {
-                        ref.read(currentPageProvider.notifier).state = 2; // Settings tab
+                        ref.read(currentPageProvider.notifier).state =
+                            2; // Settings tab
                       },
                       child: const Text('Settings'),
                     ),
@@ -161,14 +163,15 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
           if (transcriptions.isNotEmpty) ...[
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   children: [
                     Text(
                       '${transcriptions.length} transcription${transcriptions.length != 1 ? 's' : ''}',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.outline,
-                      ),
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
                     ),
                     const Spacer(),
                     PopupMenuButton<String>(
@@ -230,21 +233,28 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
                     final transcription = transcriptions[index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 8),
-                      child: ModernTranscriptionTile(
+                      child: CompactTranscriptionTile(
                         transcription: transcription,
-                        onCopy: () => _copyToClipboard(context, transcription.processedText),
-                        onDelete: () => _deleteTranscription(context, ref, transcription.id),
+                        onCopy: () => _copyToClipboard(
+                            context, transcription.processedText),
+                        onDelete: () => _deleteTranscription(
+                            context, ref, transcription.id),
                         onUpdate: (newText) {
-                          ref.read(transcriptionsProvider.notifier).updateTranscription(
-                            transcription.id,
-                            newText,
-                          );
+                          ref
+                              .read(transcriptionsProvider.notifier)
+                              .updateTranscription(
+                                transcription.id,
+                                newText,
+                              );
                         },
                       ),
-                    ).animate().fadeIn(
-                      duration: 200.ms,
-                      delay: Duration(milliseconds: index * 50),
-                    ).slideY(begin: 0.05);
+                    )
+                        .animate()
+                        .fadeIn(
+                          duration: 200.ms,
+                          delay: Duration(milliseconds: index * 50),
+                        )
+                        .slideY(begin: 0.05);
                   },
                   childCount: transcriptions.length,
                 ),
@@ -264,68 +274,65 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(40),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                LucideIcons.mic,
-                size: 48,
-                color: Theme.of(context).colorScheme.onPrimaryContainer,
-              ),
-            ).animate().scale(duration: 600.ms, curve: Curves.elasticOut),
-
-            const SizedBox(height: 24),
-
-            Text(
-              'No transcriptions yet',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ).animate().fadeIn(delay: 200.ms),
-
-            const SizedBox(height: 8),
-
-            Text(
-              'Tap the record button to start transcribing',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.outline,
-              ),
-              textAlign: TextAlign.center,
-            ).animate().fadeIn(delay: 300.ms),
-
-            const SizedBox(height: 32),
-
-            if (settings.hasApiKey) ...[
-              FilledButton.icon(
-                onPressed: () {
-                  // Trigger recording
-                  ref.read(currentPageProvider.notifier).state = 0; // Dashboard tab
-                },
-                icon: const Icon(LucideIcons.mic),
-                label: const Text('Start Recording'),
-              ).animate().fadeIn(delay: 400.ms),
-            ] else ...[
-              OutlinedButton.icon(
-                onPressed: () {
-                  ref.read(currentPageProvider.notifier).state = 2; // Settings tab
-                },
-                icon: const Icon(LucideIcons.settings),
-                label: const Text('Add API Key'),
-              ).animate().fadeIn(delay: 400.ms),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  LucideIcons.mic,
+                  size: 48,
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                ),
+              ).animate().scale(duration: 600.ms, curve: Curves.elasticOut),
+              const SizedBox(height: 24),
+              Text(
+                'No transcriptions yet',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ).animate().fadeIn(delay: 200.ms),
+              const SizedBox(height: 8),
+              Text(
+                'Tap the record button to start transcribing',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
+                textAlign: TextAlign.center,
+              ).animate().fadeIn(delay: 300.ms),
+              const SizedBox(height: 32),
+              if (settings.hasApiKey) ...[
+                FilledButton.icon(
+                  onPressed: () {
+                    // Trigger recording
+                    ref.read(currentPageProvider.notifier).state =
+                        0; // Dashboard tab
+                  },
+                  icon: const Icon(LucideIcons.mic),
+                  label: const Text('Start Recording'),
+                ).animate().fadeIn(delay: 400.ms),
+              ] else ...[
+                OutlinedButton.icon(
+                  onPressed: () {
+                    ref.read(currentPageProvider.notifier).state =
+                        2; // Settings tab
+                  },
+                  icon: const Icon(LucideIcons.settings),
+                  label: const Text('Add API Key'),
+                ).animate().fadeIn(delay: 400.ms),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
   }
 
-  
   void _showFilterDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -357,8 +364,8 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
                       child: Text(
                         'Filter Transcriptions',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                     ),
                     IconButton(
@@ -493,8 +500,8 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
               Text(
                 title,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                      fontWeight: FontWeight.w600,
+                    ),
               ),
             ],
           ),
@@ -511,7 +518,8 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
                 ),
                 onSelected: (value) {},
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6),
                 ),

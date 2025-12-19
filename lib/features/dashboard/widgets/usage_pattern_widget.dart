@@ -57,7 +57,8 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
                   padding: const EdgeInsets.all(UIConstants.spacingSmall),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(UIConstants.borderRadiusSmall),
+                    borderRadius:
+                        BorderRadius.circular(UIConstants.borderRadiusSmall),
                   ),
                   child: Icon(
                     LucideIcons.barChart3,
@@ -69,8 +70,8 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
                 Text(
                   'Usage Patterns',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                        fontWeight: FontWeight.w600,
+                      ),
                 ),
               ],
             ),
@@ -104,7 +105,9 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
 
   Widget _buildDailyPattern() {
     final dailyData = widget.stats.usageByDay;
-    final maxCount = dailyData.values.isNotEmpty ? dailyData.values.reduce((a, b) => a > b ? a : b) : 1;
+    final maxCount = dailyData.values.isNotEmpty
+        ? dailyData.values.reduce((a, b) => a > b ? a : b)
+        : 1;
 
     return Padding(
       padding: const EdgeInsets.all(UIConstants.spacingMedium),
@@ -113,8 +116,8 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
           Text(
             'Last 30 Days',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.outline,
-            ),
+                  color: Theme.of(context).colorScheme.outline,
+                ),
           ),
           const SizedBox(height: UIConstants.spacingSmall),
           Expanded(
@@ -126,20 +129,24 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
                         .take(30)
                         .map((entry) => Expanded(
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 1),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 1),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     Expanded(
                                       child: Container(
                                         decoration: BoxDecoration(
-                                          color: AppColors.primary.withOpacity(0.8),
-                                          borderRadius: const BorderRadius.vertical(
+                                          color: AppColors.primary
+                                              .withOpacity(0.8),
+                                          borderRadius:
+                                              const BorderRadius.vertical(
                                             top: Radius.circular(2),
                                           ),
                                         ),
                                         child: FractionallySizedBox(
-                                          heightFactor: (entry.value / maxCount).clamp(0.1, 1.0),
+                                          heightFactor: (entry.value / maxCount)
+                                              .clamp(0.1, 1.0),
                                           alignment: Alignment.bottomCenter,
                                         ),
                                       ),
@@ -147,9 +154,12 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
                                     const SizedBox(height: 4),
                                     Text(
                                       '${entry.key.day}',
-                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        fontSize: 10,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            fontSize: 10,
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -165,7 +175,8 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
 
   Widget _buildWeeklyPattern() {
     final weeklyData = widget.stats.weeklyPattern;
-    final maxCount = weeklyData.isNotEmpty ? weeklyData.reduce((a, b) => a > b ? a : b) : 1;
+    final maxCount =
+        weeklyData.isNotEmpty ? weeklyData.reduce((a, b) => a > b ? a : b) : 1;
     final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
     return Padding(
@@ -175,8 +186,8 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
           Text(
             'Weekly Distribution',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.outline,
-            ),
+                  color: Theme.of(context).colorScheme.outline,
+                ),
           ),
           const SizedBox(height: UIConstants.spacingMedium),
           Expanded(
@@ -185,7 +196,8 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
               crossAxisAlignment: CrossAxisAlignment.end,
               children: List.generate(7, (index) {
                 final value = weeklyData[index];
-                final heightFactor = maxCount > 0 ? (value / maxCount).clamp(0.1, 1.0) : 0.1;
+                final heightFactor =
+                    maxCount > 0 ? (value / maxCount).clamp(0.1, 1.0) : 0.1;
 
                 return Column(
                   mainAxisSize: MainAxisSize.min,
@@ -193,8 +205,8 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
                     Text(
                       value.toString(),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                            fontWeight: FontWeight.w600,
+                          ),
                     ),
                     const SizedBox(height: 8),
                     Container(
@@ -235,7 +247,8 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
 
   Widget _buildHourlyPattern() {
     final hourlyData = widget.stats.usageByHour;
-    final maxCount = hourlyData.isNotEmpty ? hourlyData.reduce((a, b) => a > b ? a : b) : 1;
+    final maxCount =
+        hourlyData.isNotEmpty ? hourlyData.reduce((a, b) => a > b ? a : b) : 1;
 
     return Padding(
       padding: const EdgeInsets.all(UIConstants.spacingMedium),
@@ -244,8 +257,8 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
           Text(
             'Activity by Hour of Day',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.outline,
-            ),
+                  color: Theme.of(context).colorScheme.outline,
+                ),
           ),
           const SizedBox(height: UIConstants.spacingSmall),
           Expanded(
@@ -267,10 +280,13 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
                                 child: Container(
                                   decoration: BoxDecoration(
                                     color: isActive
-                                        ? (index >= 9 && index <= 17) // Business hours
+                                        ? (index >= 9 &&
+                                                index <= 17) // Business hours
                                             ? AppColors.success.withOpacity(0.8)
                                             : AppColors.primary.withOpacity(0.8)
-                                        : Theme.of(context).colorScheme.surfaceVariant,
+                                        : Theme.of(context)
+                                            .colorScheme
+                                            .surfaceVariant,
                                     borderRadius: const BorderRadius.vertical(
                                       top: Radius.circular(2),
                                     ),
@@ -286,9 +302,12 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
                               const SizedBox(height: 2),
                               Text(
                                 index % 6 == 0 ? '$index' : '',
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  fontSize: 10,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      fontSize: 10,
+                                    ),
                               ),
                             ],
                           ),
@@ -349,8 +368,8 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
           Text(
             message,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.outline,
-            ),
+                  color: Theme.of(context).colorScheme.outline,
+                ),
           ),
         ],
       ),

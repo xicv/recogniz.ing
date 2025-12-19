@@ -43,7 +43,8 @@ class AppChips {
       selected: selected,
       onSelected: onSelected,
       avatar: avatar,
-      selectedColor: selectedColor ?? Theme.of(context).colorScheme.primary.withOpacity(0.2),
+      selectedColor: selectedColor ??
+          Theme.of(context).colorScheme.primary.withOpacity(0.2),
       labelStyle: TextStyle(
         color: selected ? Theme.of(context).colorScheme.primary : null,
       ),
@@ -51,7 +52,9 @@ class AppChips {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
         side: BorderSide(
-          color: selected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+          color: selected
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.outline.withOpacity(0.3),
         ),
       ),
     );
@@ -72,7 +75,8 @@ class AppChips {
       selected: selected,
       onSelected: onSelected,
       avatar: avatar,
-      selectedColor: selectedColor ?? Theme.of(context).colorScheme.primary.withOpacity(0.2),
+      selectedColor: selectedColor ??
+          Theme.of(context).colorScheme.primary.withOpacity(0.2),
       labelStyle: TextStyle(
         color: selected ? Theme.of(context).colorScheme.primary : null,
       ),
@@ -80,7 +84,9 @@ class AppChips {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
         side: BorderSide(
-          color: selected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+          color: selected
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.outline.withOpacity(0.3),
         ),
       ),
     );
@@ -105,9 +111,7 @@ class AppChips {
       labelStyle: TextStyle(
         color: foregroundColor,
       ),
-      deleteIcon: onDeleted != null
-          ? const Icon(Icons.close, size: 18)
-          : null,
+      deleteIcon: onDeleted != null ? const Icon(Icons.close, size: 18) : null,
       padding: padding,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
@@ -126,7 +130,8 @@ class AppChips {
     final config = _StatusConfig.fromStatus(status, theme);
 
     return Container(
-      padding: padding ?? const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding:
+          padding ?? const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: config.color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
@@ -164,7 +169,8 @@ class AppChips {
     EdgeInsetsGeometry? padding,
   }) {
     return Container(
-      padding: padding ?? const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding:
+          padding ?? const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: backgroundColor ?? Theme.of(context).colorScheme.primary,
         borderRadius: BorderRadius.circular(12),
@@ -172,9 +178,9 @@ class AppChips {
       child: Text(
         count,
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: foregroundColor ?? Theme.of(context).colorScheme.onPrimary,
-          fontWeight: FontWeight.bold,
-        ),
+              color: foregroundColor ?? Theme.of(context).colorScheme.onPrimary,
+              fontWeight: FontWeight.bold,
+            ),
       ),
     );
   }
@@ -267,4 +273,3 @@ class _StatusConfig {
     }
   }
 }
-

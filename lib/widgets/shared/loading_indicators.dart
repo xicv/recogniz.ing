@@ -75,9 +75,7 @@ class LoadingIndicators {
         color: Colors.grey[300],
         borderRadius: borderRadius ?? BorderRadius.circular(4),
       ),
-    )
-        .animate(onPlay: (controller) => controller.repeat())
-        .shimmer(
+    ).animate(onPlay: (controller) => controller.repeat()).shimmer(
           duration: const Duration(seconds: 2),
           color: Colors.white.withOpacity(0.3),
         );
@@ -222,9 +220,7 @@ class ShimmerLoading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return isLoading
-        ? child
-            .animate(onPlay: (controller) => controller.repeat())
-            .shimmer(
+        ? child.animate(onPlay: (controller) => controller.repeat()).shimmer(
               duration: const Duration(seconds: 2),
               color: (highlightColor ?? Colors.white).withOpacity(0.3),
             )

@@ -4,6 +4,9 @@
 // Core service providers
 export 'service_providers.dart';
 
+// Recording use case providers
+export 'recording_providers.dart';
+
 // Feature-specific providers
 export 'settings_providers.dart';
 export 'transcription_providers.dart';
@@ -15,7 +18,6 @@ export 'ui_providers.dart';
 
 // Loading providers
 export 'loading_providers.dart';
-
 
 // Error handling
 export '../error/error_provider.dart';

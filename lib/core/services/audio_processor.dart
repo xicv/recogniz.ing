@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
+import '../interfaces/audio_service_interface.dart';
 
 /// Audio processor that runs analysis in a separate isolate
 class AudioProcessor {
@@ -87,7 +88,8 @@ class AudioProcessor {
       buffer.addAll(chunk);
 
       // Analyze every window
-      if (buffer.length >= windowSize * 2) { // 16-bit audio
+      if (buffer.length >= windowSize * 2) {
+        // 16-bit audio
         final windowData = buffer.take(windowSize * 2).toList();
 
         // Calculate RMS for the window
@@ -109,7 +111,8 @@ class AudioProcessor {
   /// Ensure the analyzer is initialized
   static void ensureInitialized() {
     if (_analysisIsolate == null) {
-      throw StateError('AudioProcessor not initialized. Call initialize() first.');
+      throw StateError(
+          'AudioProcessor not initialized. Call initialize() first.');
     }
   }
 
@@ -150,7 +153,8 @@ class AudioProcessor {
         if (command == 'analyze') {
           final audioBytes = message['audioBytes'] as Uint8List;
           final amplitudeThreshold = message['amplitudeThreshold'] as double;
-          final speechRatioThreshold = message['speechRatioThreshold'] as double;
+          final speechRatioThreshold =
+              message['speechRatioThreshold'] as double;
           final sampleRate = message['sampleRate'] as int;
           final bitDepth = message['bitDepth'] as int;
           final responsePort = message['responsePort'] as SendPort;
@@ -195,7 +199,8 @@ class AudioProcessor {
     final maxAmplitude = _calculateMaxAmplitude(audioBytes);
 
     // Estimate speech ratio based on amplitude patterns
-    final speechRatio = _estimateSpeechRatio(audioBytes, averageAmplitude, sampleRate);
+    final speechRatio =
+        _estimateSpeechRatio(audioBytes, averageAmplitude, sampleRate);
 
     // Determine if speech is present
     final containsSpeech = _containsSpeech(
@@ -211,7 +216,8 @@ class AudioProcessor {
       'maxAmplitude': maxAmplitude,
       'speechRatio': speechRatio,
       'containsSpeech': containsSpeech,
-      'reason': _getReason(averageAmplitude, maxAmplitude, speechRatio, containsSpeech),
+      'reason': _getReason(
+          averageAmplitude, maxAmplitude, speechRatio, containsSpeech),
     };
   }
 
@@ -287,7 +293,8 @@ class AudioProcessor {
     }
 
     // Both amplitude and ratio must meet thresholds
-    return avgAmplitude >= amplitudeThreshold && speechRatio >= speechRatioThreshold;
+    return avgAmplitude >= amplitudeThreshold &&
+        speechRatio >= speechRatioThreshold;
   }
 
   /// Generate analysis reason
@@ -318,12 +325,14 @@ class AudioProcessor {
 }
 
 /// Audio analysis result
-class AudioAnalysisResult {
+class AudioAnalysisResult implements AudioAnalysis {
+  @override
+  final bool containsSpeech;
+  @override
+  final String reason;
   final double averageAmplitude;
   final double maxAmplitude;
   final double speechRatio;
-  final bool containsSpeech;
-  final String reason;
 
   const AudioAnalysisResult({
     required this.averageAmplitude,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class UIConstants {
   // FAB and Button dimensions
-  static const double fabSize = 70.0;
+  static const double fabSize = 56.0; // Standard Material Design FAB size
   static const double fabElevation = 8.0;
   static const double buttonHeight = 48.0;
 

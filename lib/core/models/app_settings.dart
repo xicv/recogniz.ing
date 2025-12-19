@@ -67,7 +67,9 @@ class AppSettings extends HiveObject {
 
   bool get hasApiKey => geminiApiKey != null && geminiApiKey!.isNotEmpty;
 
-  String get effectiveCriticalInstructions => criticalInstructions ?? '''CRITICAL INSTRUCTIONS:
+  String get effectiveCriticalInstructions =>
+      criticalInstructions ??
+      '''CRITICAL INSTRUCTIONS:
 - Only transcribe actual speech that you hear in the audio
 - If the audio contains only silence, background noise, or no discernible speech, respond with exactly: [NO_SPEECH]
 - Do NOT transcribe the vocabulary list or any text that is not spoken in the audio

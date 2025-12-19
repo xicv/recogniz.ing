@@ -5,7 +5,8 @@ import '../models/custom_prompt.dart';
 import '../services/storage_service.dart';
 
 /// Custom prompt management providers
-final promptsProvider = StateNotifierProvider<PromptsNotifier, List<CustomPrompt>>((ref) {
+final promptsProvider =
+    StateNotifierProvider<PromptsNotifier, List<CustomPrompt>>((ref) {
   return PromptsNotifier();
 });
 

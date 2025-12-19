@@ -106,7 +106,8 @@ class HotkeyService {
           // Check for function keys first (before single character check)
           if (part.startsWith('f') && part.length <= 3) {
             final num = int.tryParse(part.substring(1));
-            if (num != null && num >= 1 && num <= 24) {  // Support F1-F24
+            if (num != null && num >= 1 && num <= 24) {
+              // Support F1-F24
               key = _getFunctionKey(num);
             }
           }
@@ -115,8 +116,10 @@ class HotkeyService {
             final char = part.toUpperCase().codeUnitAt(0);
             if (char >= 65 && char <= 90) {
               // A-Z - use the key code directly without adding 32
-              key = LogicalKeyboardKey.findKeyByKeyId(char | 0x1000000) ?? // Use proper key ID
-                  _getKeyFromLabel(part.toUpperCase()); // Fallback if key not found
+              key = LogicalKeyboardKey.findKeyByKeyId(
+                      char | 0x1000000) ?? // Use proper key ID
+                  _getKeyFromLabel(
+                      part.toUpperCase()); // Fallback if key not found
             } else if (char >= 48 && char <= 57) {
               // 0-9
               key = LogicalKeyboardKey.findKeyByKeyId(char | 0x1000000) ??
@@ -194,47 +197,88 @@ class HotkeyService {
     // Helper method to find key by its label
     // Common key mappings for faster lookup
     switch (label) {
-      case 'A': return LogicalKeyboardKey.keyA;
-      case 'B': return LogicalKeyboardKey.keyB;
-      case 'C': return LogicalKeyboardKey.keyC;
-      case 'D': return LogicalKeyboardKey.keyD;
-      case 'E': return LogicalKeyboardKey.keyE;
-      case 'F': return LogicalKeyboardKey.keyF;
-      case 'G': return LogicalKeyboardKey.keyG;
-      case 'H': return LogicalKeyboardKey.keyH;
-      case 'I': return LogicalKeyboardKey.keyI;
-      case 'J': return LogicalKeyboardKey.keyJ;
-      case 'K': return LogicalKeyboardKey.keyK;
-      case 'L': return LogicalKeyboardKey.keyL;
-      case 'M': return LogicalKeyboardKey.keyM;
-      case 'N': return LogicalKeyboardKey.keyN;
-      case 'O': return LogicalKeyboardKey.keyO;
-      case 'P': return LogicalKeyboardKey.keyP;
-      case 'Q': return LogicalKeyboardKey.keyQ;
-      case 'R': return LogicalKeyboardKey.keyR;
-      case 'S': return LogicalKeyboardKey.keyS;
-      case 'T': return LogicalKeyboardKey.keyT;
-      case 'U': return LogicalKeyboardKey.keyU;
-      case 'V': return LogicalKeyboardKey.keyV;
-      case 'W': return LogicalKeyboardKey.keyW;
-      case 'X': return LogicalKeyboardKey.keyX;
-      case 'Y': return LogicalKeyboardKey.keyY;
-      case 'Z': return LogicalKeyboardKey.keyZ;
-      case '0': return LogicalKeyboardKey.digit0;
-      case '1': return LogicalKeyboardKey.digit1;
-      case '2': return LogicalKeyboardKey.digit2;
-      case '3': return LogicalKeyboardKey.digit3;
-      case '4': return LogicalKeyboardKey.digit4;
-      case '5': return LogicalKeyboardKey.digit5;
-      case '6': return LogicalKeyboardKey.digit6;
-      case '7': return LogicalKeyboardKey.digit7;
-      case '8': return LogicalKeyboardKey.digit8;
-      case '9': return LogicalKeyboardKey.digit9;
-      case ' ': return LogicalKeyboardKey.space;
-      case 'Enter': return LogicalKeyboardKey.enter;
-      case 'Escape': return LogicalKeyboardKey.escape;
-      case 'Tab': return LogicalKeyboardKey.tab;
-      default: return LogicalKeyboardKey.space;
+      case 'A':
+        return LogicalKeyboardKey.keyA;
+      case 'B':
+        return LogicalKeyboardKey.keyB;
+      case 'C':
+        return LogicalKeyboardKey.keyC;
+      case 'D':
+        return LogicalKeyboardKey.keyD;
+      case 'E':
+        return LogicalKeyboardKey.keyE;
+      case 'F':
+        return LogicalKeyboardKey.keyF;
+      case 'G':
+        return LogicalKeyboardKey.keyG;
+      case 'H':
+        return LogicalKeyboardKey.keyH;
+      case 'I':
+        return LogicalKeyboardKey.keyI;
+      case 'J':
+        return LogicalKeyboardKey.keyJ;
+      case 'K':
+        return LogicalKeyboardKey.keyK;
+      case 'L':
+        return LogicalKeyboardKey.keyL;
+      case 'M':
+        return LogicalKeyboardKey.keyM;
+      case 'N':
+        return LogicalKeyboardKey.keyN;
+      case 'O':
+        return LogicalKeyboardKey.keyO;
+      case 'P':
+        return LogicalKeyboardKey.keyP;
+      case 'Q':
+        return LogicalKeyboardKey.keyQ;
+      case 'R':
+        return LogicalKeyboardKey.keyR;
+      case 'S':
+        return LogicalKeyboardKey.keyS;
+      case 'T':
+        return LogicalKeyboardKey.keyT;
+      case 'U':
+        return LogicalKeyboardKey.keyU;
+      case 'V':
+        return LogicalKeyboardKey.keyV;
+      case 'W':
+        return LogicalKeyboardKey.keyW;
+      case 'X':
+        return LogicalKeyboardKey.keyX;
+      case 'Y':
+        return LogicalKeyboardKey.keyY;
+      case 'Z':
+        return LogicalKeyboardKey.keyZ;
+      case '0':
+        return LogicalKeyboardKey.digit0;
+      case '1':
+        return LogicalKeyboardKey.digit1;
+      case '2':
+        return LogicalKeyboardKey.digit2;
+      case '3':
+        return LogicalKeyboardKey.digit3;
+      case '4':
+        return LogicalKeyboardKey.digit4;
+      case '5':
+        return LogicalKeyboardKey.digit5;
+      case '6':
+        return LogicalKeyboardKey.digit6;
+      case '7':
+        return LogicalKeyboardKey.digit7;
+      case '8':
+        return LogicalKeyboardKey.digit8;
+      case '9':
+        return LogicalKeyboardKey.digit9;
+      case ' ':
+        return LogicalKeyboardKey.space;
+      case 'Enter':
+        return LogicalKeyboardKey.enter;
+      case 'Escape':
+        return LogicalKeyboardKey.escape;
+      case 'Tab':
+        return LogicalKeyboardKey.tab;
+      default:
+        return LogicalKeyboardKey.space;
     }
   }
 

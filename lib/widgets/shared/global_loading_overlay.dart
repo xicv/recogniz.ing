@@ -97,7 +97,9 @@ class LoadingButton extends ConsumerWidget {
     return SizedBox(
       width: fullWidth ? double.infinity : null,
       child: ElevatedButton(
-        onPressed: enabled && !isActuallyLoading ? () => _executeAction(context, ref) : null,
+        onPressed: enabled && !isActuallyLoading
+            ? () => _executeAction(context, ref)
+            : null,
         style: style,
         child: isActuallyLoading
             ? Row(

@@ -44,7 +44,8 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                   padding: const EdgeInsets.all(UIConstants.spacingSmall),
                   decoration: BoxDecoration(
                     color: AppColors.accent.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(UIConstants.borderRadiusSmall),
+                    borderRadius:
+                        BorderRadius.circular(UIConstants.borderRadiusSmall),
                   ),
                   child: Icon(
                     LucideIcons.dollarSign,
@@ -56,8 +57,8 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                 Text(
                   'Cost Analysis',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                        fontWeight: FontWeight.w600,
+                      ),
                 ),
               ],
             ),
@@ -75,7 +76,8 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                     value: '\$${widget.stats.totalCost.toStringAsFixed(3)}',
                     label: 'Total Spent',
                     color: AppColors.accent,
-                    subtitle: '${widget.stats.totalTranscriptions} transcriptions',
+                    subtitle:
+                        '${widget.stats.totalTranscriptions} transcriptions',
                   ),
                 ),
                 const SizedBox(width: UIConstants.spacingSmall),
@@ -84,7 +86,8 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                   child: _buildCostMetric(
                     context,
                     icon: LucideIcons.receipt,
-                    value: '\$${widget.stats.costPerTranscription.toStringAsFixed(4)}',
+                    value:
+                        '\$${widget.stats.costPerTranscription.toStringAsFixed(4)}',
                     label: 'Avg Cost',
                     color: AppColors.primary,
                     subtitle: 'per transcription',
@@ -96,7 +99,8 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                   child: _buildCostMetric(
                     context,
                     icon: LucideIcons.piggyBank,
-                    value: '\$${widget.stats.valueVsTraditionalSavings.toStringAsFixed(2)}',
+                    value:
+                        '\$${widget.stats.valueVsTraditionalSavings.toStringAsFixed(2)}',
                     label: 'Money Saved',
                     color: AppColors.success,
                     subtitle: 'vs traditional',
@@ -112,7 +116,8 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
               padding: const EdgeInsets.all(UIConstants.spacingMedium),
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surfaceVariant,
-                borderRadius: BorderRadius.circular(UIConstants.borderRadiusSmall),
+                borderRadius:
+                    BorderRadius.circular(UIConstants.borderRadiusSmall),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,15 +133,15 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                       Text(
                         'Token Usage',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+                              fontWeight: FontWeight.w600,
+                            ),
                       ),
                       const Spacer(),
                       Text(
                         '${widget.stats.totalTokens.toStringAsFixed(0)} total',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.outline,
-                        ),
+                              color: Theme.of(context).colorScheme.outline,
+                            ),
                       ),
                     ],
                   ),
@@ -150,17 +155,24 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                           children: [
                             Text(
                               'Input',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context).colorScheme.outline,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                  ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               '${(widget.stats.totalTokens * 0.5).toStringAsFixed(0)}',
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.accent,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.accent,
+                                  ),
                             ),
                           ],
                         ),
@@ -178,17 +190,24 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                           children: [
                             Text(
                               'Output',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context).colorScheme.outline,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                  ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               '${(widget.stats.totalTokens * 0.5).toStringAsFixed(0)}',
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primary,
+                                  ),
                             ),
                           ],
                         ),
@@ -238,25 +257,25 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
           Text(
             value,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
           ),
           const SizedBox(height: 2),
           Text(
             label,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
+                  fontWeight: FontWeight.w500,
+                ),
           ),
           if (subtitle != null) ...[
             const SizedBox(height: 2),
             Text(
               subtitle,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.outline,
-                fontSize: 10,
-              ),
+                    color: Theme.of(context).colorScheme.outline,
+                    fontSize: 10,
+                  ),
             ),
           ],
         ],
@@ -278,8 +297,8 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
         Text(
           'Value Comparison',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+                fontWeight: FontWeight.w600,
+              ),
         ),
         const SizedBox(height: UIConstants.spacingSmall),
         Row(
@@ -291,15 +310,15 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                   Text(
                     'Traditional Service',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
                   ),
                   Text(
                     '\$${traditionalCost.toStringAsFixed(2)}',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppColors.error,
-                      fontWeight: FontWeight.bold,
-                    ),
+                          color: AppColors.error,
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                 ],
               ),
@@ -324,15 +343,15 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                   Text(
                     'With Recogniz.ing',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
                   ),
                   Text(
                     '\$${widget.stats.totalCost.toStringAsFixed(3)}',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppColors.success,
-                      fontWeight: FontWeight.bold,
-                    ),
+                          color: AppColors.success,
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                 ],
               ),
@@ -346,7 +365,8 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
             padding: const EdgeInsets.all(UIConstants.spacingSmall),
             decoration: BoxDecoration(
               color: AppColors.success.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(UIConstants.borderRadiusSmall),
+              borderRadius:
+                  BorderRadius.circular(UIConstants.borderRadiusSmall),
             ),
             child: Row(
               children: [
@@ -359,9 +379,9 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                 Text(
                   'You saved ${savingsPercentage.toStringAsFixed(0)}% on transcription costs!',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.success,
-                    fontWeight: FontWeight.w600,
-                  ),
+                        color: AppColors.success,
+                        fontWeight: FontWeight.w600,
+                      ),
                 ),
               ],
             ),

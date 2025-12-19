@@ -8,8 +8,9 @@ import 'package:uuid/uuid.dart';
 import 'audio_processor.dart';
 import '../config/app_config.dart';
 import '../constants/constants.dart';
+import '../interfaces/audio_service_interface.dart';
 
-class AudioService {
+class AudioService implements AudioServiceInterface {
   final AudioRecorder _recorder = AudioRecorder();
   String? _currentRecordingPath;
   DateTime? _recordingStartTime;
@@ -28,20 +29,28 @@ class AudioService {
     }
   }
 
+  @override
   Future<bool> hasPermission() async {
     final result = await _recorder.hasPermission();
-    debugPrint('[AudioService] hasPermission: $result');
+    if (kDebugMode) {
+      debugPrint('[AudioService] hasPermission: $result');
+    }
     return result;
   }
 
+  @override
   Future<void> startRecording() async {
     if (_isRecording) {
-      debugPrint('[AudioService] Already recording, ignoring start');
+      if (kDebugMode) {
+        debugPrint('[AudioService] Already recording, ignoring start');
+      }
       return;
     }
 
     final hasPermission = await _recorder.hasPermission();
-    debugPrint('[AudioService] Permission check: $hasPermission');
+    if (kDebugMode) {
+      debugPrint('[AudioService] Permission check: $hasPermission');
+    }
 
     if (!hasPermission) {
       throw Exception('Microphone permission not granted');
@@ -54,7 +63,9 @@ class AudioService {
     final uuid = const Uuid().v4();
     _currentRecordingPath = '${dir.path}/recording_$uuid.m4a';
 
-    debugPrint('[AudioService] Recording to: $_currentRecordingPath');
+    if (kDebugMode) {
+      debugPrint('[AudioService] Recording to: $_currentRecordingPath');
+    }
 
     // Start with optimized config for better performance
     await _recorder.start(
@@ -69,27 +80,39 @@ class AudioService {
     _isRecording = true;
     _recordingStartTime = DateTime.now();
 
-  
-    debugPrint('[AudioService] Recording started at $_recordingStartTime');
+    if (kDebugMode) {
+      debugPrint('[AudioService] Recording started at $_recordingStartTime');
+    }
   }
 
+  @override
   Future<RecordingResult?> stopRecording() async {
-    debugPrint('[AudioService] stopRecording called, isRecording: $_isRecording');
+    if (kDebugMode) {
+      debugPrint(
+          '[AudioService] stopRecording called, isRecording: $_isRecording');
+    }
 
     if (!_isRecording) {
-      debugPrint('[AudioService] Not recording, returning null');
+      if (kDebugMode) {
+        debugPrint('[AudioService] Not recording, returning null');
+      }
       return null;
     }
 
     final path = await _recorder.stop();
     _isRecording = false;
 
-    
-    debugPrint('[AudioService] Recorder stopped, path: $path');
-    debugPrint('[AudioService] Expected path: $_currentRecordingPath');
+    if (kDebugMode) {
+      debugPrint('[AudioService] Recorder stopped, path: $path');
+    }
+    if (kDebugMode) {
+      debugPrint('[AudioService] Expected path: $_currentRecordingPath');
+    }
 
     if (path == null || _currentRecordingPath == null) {
-      debugPrint('[AudioService] No path returned');
+      if (kDebugMode) {
+        debugPrint('[AudioService] No path returned');
+      }
       return null;
     }
 
@@ -98,22 +121,32 @@ class AudioService {
             AppConstants.millisecondsPerSecond
         : 0.0;
 
-    debugPrint('[AudioService] Recording duration: ${duration}s');
+    if (kDebugMode) {
+      debugPrint('[AudioService] Recording duration: ${duration}s');
+    }
 
     final file = File(_currentRecordingPath!);
     final exists = await file.exists();
-    debugPrint('[AudioService] File exists: $exists');
+    if (kDebugMode) {
+      debugPrint('[AudioService] File exists: $exists');
+    }
 
     if (!exists) {
-      debugPrint('[AudioService] Recording file does not exist!');
+      if (kDebugMode) {
+        debugPrint('[AudioService] Recording file does not exist!');
+      }
       return null;
     }
 
     final fileSize = await file.length();
-    debugPrint('[AudioService] File size: $fileSize bytes');
+    if (kDebugMode) {
+      debugPrint('[AudioService] File size: $fileSize bytes');
+    }
 
     final bytes = await file.readAsBytes();
-    debugPrint('[AudioService] Read ${bytes.length} bytes');
+    if (kDebugMode) {
+      debugPrint('[AudioService] Read ${bytes.length} bytes');
+    }
 
     _currentRecordingPath = null;
     _recordingStartTime = null;
@@ -124,14 +157,20 @@ class AudioService {
 
     // Validate recording has minimum duration and content
     if (duration < audioConfig.minDuration) {
-      debugPrint('[AudioService] Recording too short: ${duration}s (min: ${audioConfig.minDuration}s)');
+      if (kDebugMode) {
+        debugPrint(
+            '[AudioService] Recording too short: ${duration}s (min: ${audioConfig.minDuration}s)');
+      }
       await file.delete();
       return null;
     }
 
     // Check if audio is likely silent (very small file size)
     if (fileSize < audioConfig.minFileSize) {
-      debugPrint('[AudioService] Audio file too small: $fileSize bytes (min: ${audioConfig.minFileSize})');
+      if (kDebugMode) {
+        debugPrint(
+            '[AudioService] Audio file too small: $fileSize bytes (min: ${audioConfig.minFileSize})');
+      }
       await file.delete();
       return null;
     }
@@ -148,12 +187,17 @@ class AudioService {
 
     // Additional check: if no speech detected, delete the recording
     if (!analysis.containsSpeech) {
-      debugPrint('[AudioService] No speech detected, deleting recording: ${analysis.reason}');
+      if (kDebugMode) {
+        debugPrint(
+            '[AudioService] No speech detected, deleting recording: ${analysis.reason}');
+      }
       await file.delete();
       return null;
     }
 
-    debugPrint('[AudioService] Recording validation passed');
+    if (kDebugMode) {
+      debugPrint('[AudioService] Recording validation passed');
+    }
 
     return RecordingResult(
       path: path,
@@ -169,7 +213,6 @@ class AudioService {
     await _recorder.stop();
     _isRecording = false;
 
-    
     if (_currentRecordingPath != null) {
       final file = File(_currentRecordingPath!);
       if (await file.exists()) {
@@ -179,7 +222,9 @@ class AudioService {
 
     _currentRecordingPath = null;
     _recordingStartTime = null;
-    debugPrint('[AudioService] Recording cancelled');
+    if (kDebugMode) {
+      debugPrint('[AudioService] Recording cancelled');
+    }
   }
 
   void dispose() {
@@ -187,18 +232,33 @@ class AudioService {
   }
 }
 
-class RecordingResult {
-  final String path;
-  final List<int> bytes;
-  final double durationSeconds;
-  final AudioAnalysisResult? analysis;
+class RecordingResult implements RecordingResultInterface {
+  final String _path;
+  final List<int> _bytes;
+  final double _durationSeconds;
+  final AudioAnalysisResult? _analysis;
 
   RecordingResult({
-    required this.path,
-    required this.bytes,
-    required this.durationSeconds,
-    this.analysis,
-  });
+    required String path,
+    required List<int> bytes,
+    required double durationSeconds,
+    AudioAnalysisResult? analysis,
+  })  : _path = path,
+        _bytes = bytes,
+        _durationSeconds = durationSeconds,
+        _analysis = analysis;
 
-  bool get containsSpeech => analysis?.containsSpeech ?? true;
+  bool get containsSpeech => _analysis?.containsSpeech ?? true;
+
+  @override
+  String get path => _path;
+
+  @override
+  List<int> get bytes => _bytes;
+
+  @override
+  double get durationSeconds => _durationSeconds;
+
+  @override
+  AudioAnalysisResult? get analysis => _analysis;
 }

@@ -5,7 +5,8 @@ import '../models/vocabulary.dart';
 import '../services/storage_service.dart';
 
 /// Vocabulary set management providers
-final vocabularyProvider = StateNotifierProvider<VocabularyNotifier, List<VocabularySet>>((ref) {
+final vocabularyProvider =
+    StateNotifierProvider<VocabularyNotifier, List<VocabularySet>>((ref) {
   return VocabularyNotifier();
 });
 

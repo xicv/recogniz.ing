@@ -38,7 +38,9 @@ class EnhancedErrorResult extends ErrorResult {
     required super.iconName,
   }) : timestamp = null;
 
-  factory EnhancedErrorResult.fromErrorResult(ErrorResult result, ErrorCategory category, {
+  factory EnhancedErrorResult.fromErrorResult(
+    ErrorResult result,
+    ErrorCategory category, {
     String? technicalDetails,
     List<ErrorAction> actions = const [],
   }) {
@@ -190,15 +192,16 @@ class ErrorBanner extends StatelessWidget {
                 children: error.actions.map((action) {
                   return OutlinedButton.icon(
                     onPressed: action.onPressed,
-                    icon: action.icon != null ? Icon(action.icon!, size: 16) : SizedBox.shrink(),
+                    icon: action.icon != null
+                        ? Icon(action.icon!, size: 16)
+                        : SizedBox.shrink(),
                     label: Text(action.label),
                     style: OutlinedButton.styleFrom(
                       backgroundColor: action.isPrimary
                           ? error.category.color.withOpacity(0.1)
                           : null,
-                      foregroundColor: action.isPrimary
-                          ? error.category.color
-                          : null,
+                      foregroundColor:
+                          action.isPrimary ? error.category.color : null,
                     ),
                   );
                 }).toList(),
@@ -335,12 +338,12 @@ class ErrorDialog extends StatelessWidget {
       actions: [
         if (additionalActions != null)
           ...additionalActions!.map((action) => TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              action.onPressed();
-            },
-            child: Text(action.label),
-          )),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  action.onPressed();
+                },
+                child: Text(action.label),
+              )),
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('Close'),
@@ -417,7 +420,7 @@ class ErrorRecovery {
     final jitter = (baseDelay.inMilliseconds * 0.1).toInt();
     return Duration(
       milliseconds: baseDelay.inMilliseconds +
-        (jitter * (DateTime.now().millisecond % 2 == 0 ? 1 : -1)),
+          (jitter * (DateTime.now().millisecond % 2 == 0 ? 1 : -1)),
     );
   }
 
@@ -428,7 +431,8 @@ class ErrorRecovery {
 
     // Don't retry certain error types
     final nonRetryableErrors = ['permission_denied', 'api_key', 'unauthorized'];
-    return !nonRetryableErrors.any((e) => error.message.toLowerCase().contains(e));
+    return !nonRetryableErrors
+        .any((e) => error.message.toLowerCase().contains(e));
   }
 }
 

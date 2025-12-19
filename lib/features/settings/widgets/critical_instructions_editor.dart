@@ -23,7 +23,9 @@ class _CriticalInstructionsEditorState
   void initState() {
     super.initState();
     final settings = ref.read(settingsProvider);
-    _controller = TextEditingController(text: settings.criticalInstructions ?? settings.effectiveCriticalInstructions);
+    _controller = TextEditingController(
+        text: settings.criticalInstructions ??
+            settings.effectiveCriticalInstructions);
     _controller.addListener(_onTextChanged);
   }
 
@@ -35,7 +37,9 @@ class _CriticalInstructionsEditorState
 
   void _onTextChanged() {
     final settings = ref.read(settingsProvider);
-    final hasChanges = _controller.text != (settings.criticalInstructions ?? settings.effectiveCriticalInstructions);
+    final hasChanges = _controller.text !=
+        (settings.criticalInstructions ??
+            settings.effectiveCriticalInstructions);
     if (hasChanges != _hasChanges) {
       setState(() {
         _hasChanges = hasChanges;
@@ -45,7 +49,6 @@ class _CriticalInstructionsEditorState
 
   @override
   Widget build(BuildContext context) {
-
     return SettingsSection(
       title: 'Critical Instructions',
       icon: LucideIcons.shield,
@@ -86,7 +89,10 @@ class _CriticalInstructionsEditorState
                 '• Lenient instructions capture more but may include false positives\n'
                 '• Changes apply to new recordings only',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.8),
                     ),
               ),
             ],
@@ -311,8 +317,8 @@ class _CriticalInstructionsEditorState
   void _doSave() async {
     try {
       await ref.read(settingsProvider.notifier).updateCriticalInstructions(
-        _controller.text,
-      );
+            _controller.text,
+          );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -334,4 +340,3 @@ class _CriticalInstructionsEditorState
     }
   }
 }
-
