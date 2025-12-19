@@ -1,289 +1,414 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Download Recogniz.ing</title>
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 40px 20px;
-        }
+      body {
+        font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background: white;
+        min-height: 100vh;
+      }
 
+      /* Navigation */
+      .navbar {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        background: white/80;
+        backdrop-blur: xl;
+        z-index: 50;
+        border-bottom: 1px solid #f1f5f9;
+      }
+
+      .navbar-content {
+        max-width: 80rem;
+        margin: 0 auto;
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .logo {
+        width: 32px;
+        height: 32px;
+      }
+
+      .brand {
+        font-size: 20px;
+        font-weight: 300;
+        letter-spacing: -0.025em;
+        color: #0f172a;
+      }
+
+      /* Main Content */
+      .container {
+        max-width: 80rem;
+        margin: 0 auto;
+        padding: 128px 24px 64px;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 64px;
+      }
+
+      .title {
+        font-size: 48px;
+        font-weight: 300;
+        letter-spacing: -0.025em;
+        color: #0f172a;
+        margin-bottom: 16px;
+      }
+
+      .subtitle {
+        font-size: 24px;
+        font-weight: 300;
+        color: #64748b;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      /* Download Grid */
+      .downloads {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 24px;
+        margin-bottom: 64px;
+      }
+
+      .download-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 32px;
+        transition: all 0.3s ease;
+      }
+
+      .download-card:hover {
+        border-color: #cbd5e1;
+      }
+
+      .platform-name {
+        font-size: 20px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: #0f172a;
+      }
+
+      .platform-desc {
+        color: #64748b;
+        margin-bottom: 24px;
+        line-height: 1.6;
+        font-size: 15px;
+      }
+
+      .download-btn {
+        display: inline-block;
+        width: 100%;
+        text-align: center;
+        background: #0f172a;
+        color: white;
+        padding: 16px 24px;
+        border-radius: 9999px;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        margin-bottom: 16px;
+      }
+
+      .download-btn:hover:not(:disabled) {
+        background: #1e293b;
+        transform: translateY(-2px);
+      }
+
+      .download-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: #94a3b8;
+      }
+
+      /* Requirements */
+      .requirements {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 16px;
+        margin-top: 16px;
+      }
+
+      .requirements h4 {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: #0f172a;
+      }
+
+      .requirements ul {
+        list-style: none;
+        font-size: 14px;
+        color: #475569;
+      }
+
+      .requirements li {
+        padding: 4px 0;
+        display: flex;
+        align-items: center;
+      }
+
+      .requirements li::before {
+        content: "•";
+        color: #2563eb;
+        font-weight: bold;
+        margin-right: 8px;
+      }
+
+      /* Android section with two buttons */
+      .android-buttons {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .android-buttons .download-btn {
+        margin-bottom: 0;
+        flex: 1;
+      }
+
+      .version-info {
+        text-align: center;
+        color: #64748b;
+        font-size: 14px;
+        margin-top: 64px;
+        padding: 24px;
+        background: #f8fafc;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
+          padding: 112px 16px 48px;
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 60px;
-        }
-
-        .logo {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            color: white;
-            font-size: 3em;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        .title {
+          font-size: 40px;
         }
 
         .subtitle {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 1.2em;
+          font-size: 20px;
         }
 
         .downloads {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-bottom: 60px;
+          grid-template-columns: 1fr;
         }
 
-        .download-card {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        .android-buttons {
+          flex-direction: column;
         }
-
-        .download-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
-        }
-
-        .platform-icon {
-            width: 48px;
-            height: 48px;
-            margin-bottom: 20px;
-        }
-
-        .platform-name {
-            font-size: 1.5em;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .platform-desc {
-            color: #666;
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
-
-        .download-btn {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 12px 30px;
-            border-radius: 30px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .download-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .coming-soon {
-            color: #999;
-            font-style: italic;
-            margin-top: 10px;
-        }
-
-        .version-info {
-            text-align: center;
-            color: white;
-            font-size: 0.9em;
-            opacity: 0.8;
-        }
-
-        .requirements {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 15px;
-            font-size: 0.9em;
-            color: #f0f0f0;
-        }
-
-        .requirements h4 {
-            margin-bottom: 8px;
-        }
-
-        .requirements ul {
-            list-style-position: inside;
-            line-height: 1.6;
-        }
-
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2em;
-            }
-
-            .downloads {
-                grid-template-columns: 1fr;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <div class="navbar-content">
+        <div class="logo-container">
+          <svg class="logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="10" fill="#2563EB"/>
+            <path d="M10 20V12C10 11.4477 10.4477 11 11 11H21C21.5523 11 22 11.4477 22 12V20C22 20.5523 21.5523 21 21 21H11C10.4477 21 10 20.5523 10 20Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13 14L19 14" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <path d="M13 17L17 17" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span class="brand">Recogniz.ing</span>
+        </div>
+        <a href="/" class="text-slate-700 hover:text-slate-900 font-medium transition-colors">
+          ← Back
+        </a>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
     <div class="container">
-        <div class="header">
-            <img src="/logo.svg" alt="Recogniz.ing Logo" class="logo">
-            <h1>Recogniz.ing</h1>
-            <p class="subtitle">AI-powered voice typing that understands you</p>
+      <div class="header">
+        <h1 class="title">Downloads</h1>
+        <p class="subtitle">Get Recogniz.ing for your platform</p>
+      </div>
+
+      <div class="downloads" id="downloads">
+        <!-- macOS -->
+        <div class="download-card">
+          <h3 class="platform-name">macOS</h3>
+          <p class="platform-desc">For macOS 10.15 or later. Universal binary for Apple Silicon and Intel Macs.</p>
+          <a href="#" class="download-btn" id="download-macos" onclick="trackDownload('macOS')">
+            Download for macOS
+          </a>
+          <div class="requirements">
+            <h4>Requirements:</h4>
+            <ul>
+              <li>macOS 10.15 or later</li>
+              <li>Microphone access for recording</li>
+            </ul>
+          </div>
         </div>
 
-        <div class="downloads" id="downloads">
-            <div class="download-card">
-                <h3 class="platform-name">macOS</h3>
-                <p class="platform-desc">For macOS 10.14 or later. Includes universal binary for Apple Silicon and Intel Macs.</p>
-                <a href="#" class="download-btn" id="download-macos" onclick="trackDownload('macOS')">
-                    Download for macOS
-                </a>
-                <div class="requirements">
-                    <h4>Requirements:</h4>
-                    <ul>
-                        <li>macOS 10.14 Mojave or later</li>
-                        <li>Microphone access for recording</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="download-card">
-                <h3 class="platform-name">Windows</h3>
-                <p class="platform-desc">For Windows 10 or later. Includes installer with all dependencies.</p>
-                <a href="#" class="download-btn" id="download-windows" onclick="trackDownload('Windows')">
-                    Download for Windows
-                </a>
-                <div class="requirements">
-                    <h4>Requirements:</h4>
-                    <ul>
-                        <li>Windows 10 (1903) or later</li>
-                        <li>Microphone access for recording</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="download-card">
-                <h3 class="platform-name">Linux</h3>
-                <p class="platform-desc">For most Linux distributions. Includes AppImage for easy installation.</p>
-                <a href="#" class="download-btn" id="download-linux" onclick="trackDownload('Linux')">
-                    Download for Linux
-                </a>
-                <div class="requirements">
-                    <h4>Requirements:</h4>
-                    <ul>
-                        <li>64-bit Linux distribution</li>
-                        <li>PulseAudio for audio recording</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="download-card">
-                <h3 class="platform-name">Android</h3>
-                <p class="platform-desc">For Android 6.0 or later. Choose APK for direct install or AAB for Play Store.</p>
-                <a href="#" class="download-btn" id="download-android-apk" onclick="trackDownload('Android APK')">
-                    Download APK
-                </a>
-                <a href="#" class="download-btn" id="download-android-aab" onclick="trackDownload('Android AAB')" style="margin-left: 10px; background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);">
-                    Download AAB
-                </a>
-                <div class="requirements">
-                    <h4>Requirements:</h4>
-                    <ul>
-                        <li>Android 6.0 (Marshmallow) or later</li>
-                        <li>At least 100MB free space</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="download-card">
-                <h3 class="platform-name">Web</h3>
-                <p class="platform-desc">Use directly in your browser. No installation required.</p>
-                <a href="#" class="download-btn" id="download-web" onclick="trackDownload('Web')">
-                    Download Web Version
-                </a>
-                <div class="requirements">
-                    <h4>Requirements:</h4>
-                    <ul>
-                        <li>Chrome, Firefox, Safari, or Edge</li>
-                        <li>Secure (HTTPS) connection required</li>
-                    </ul>
-                </div>
-            </div>
+        <!-- Windows -->
+        <div class="download-card">
+          <h3 class="platform-name">Windows</h3>
+          <p class="platform-desc">For Windows 10 or later. Includes installer with all dependencies.</p>
+          <a href="#" class="download-btn" id="download-windows" onclick="trackDownload('Windows')">
+            Download for Windows
+          </a>
+          <div class="requirements">
+            <h4>Requirements:</h4>
+            <ul>
+              <li>Windows 10 (1903) or later</li>
+              <li>Microphone access for recording</li>
+            </ul>
+          </div>
         </div>
 
-        <div class="version-info" id="version-info">
-            <p>Loading version information...</p>
+        <!-- Linux -->
+        <div class="download-card">
+          <h3 class="platform-name">Linux</h3>
+          <p class="platform-desc">For most Linux distributions. Includes AppImage for easy installation.</p>
+          <a href="#" class="download-btn" id="download-linux" onclick="trackDownload('Linux')">
+            Download for Linux
+          </a>
+          <div class="requirements">
+            <h4>Requirements:</h4>
+            <ul>
+              <li>64-bit Linux distribution</li>
+              <li>PulseAudio for audio recording</li>
+            </ul>
+          </div>
         </div>
+
+        <!-- Mobile -->
+        <div class="download-card">
+          <h3 class="platform-name">Mobile</h3>
+          <p class="platform-desc">For iOS 15+ and Android 8+. Available on App Store and Google Play.</p>
+          <a href="#" class="download-btn" id="download-ios" onclick="trackDownload('iOS')">
+            App Store
+          </a>
+          <a href="#" class="download-btn" id="download-android" onclick="trackDownload('Android')" style="background: #000;">
+            Coming Soon
+          </a>
+          <div class="requirements">
+            <h4>Requirements:</h4>
+            <ul>
+              <li>iOS 15+ or Android 8+</li>
+              <li>Microphone permission</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="version-info" id="version-info">
+        <p>Loading version information...</p>
+      </div>
     </div>
 
     <script>
-        let manifestData = {};
+      let manifestData = {};
 
-        // Load manifest and update download links
-        async function loadManifest() {
-            try {
-                const response = await fetch('/downloads/manifest.json');
-                manifestData = await response.json();
+      // Load manifest and update download links
+      async function loadManifest() {
+        try {
+          const response = await fetch('/downloads/manifest.json');
+          manifestData = await response.json();
 
-                // Update version info
-                document.getElementById('version-info').innerHTML =
-                    `<p>Version ${manifestData.version} • Built on ${new Date(manifestData.build_date).toLocaleDateString()}</p>`;
+          // Update version info
+          document.getElementById('version-info').innerHTML =
+            `<p>Version ${manifestData.version} • Built on ${new Date(manifestData.build_date).toLocaleDateString()}</p>`;
 
-                // Update download links
-                document.getElementById('download-macos').href = `/downloads/${manifestData.platforms.macos}`;
-                document.getElementById('download-windows').href = `/downloads/${manifestData.platforms.windows}`;
-                document.getElementById('download-linux').href = `/downloads/${manifestData.platforms.linux}`;
-                document.getElementById('download-android-apk').href = `/downloads/${manifestData.platforms.android_apk}`;
-                document.getElementById('download-android-aab').href = `/downloads/${manifestData.platforms.android_aab}`;
-                document.getElementById('download-web').href = `/downloads/${manifestData.platforms.web}`;
+          // Update download links based on availability
+          updateDownloadLink('macos');
+          updateDownloadLink('windows');
+          updateDownloadLink('linux');
+          updateDownloadLink('android');
+          updateDownloadLink('ios');
 
-            } catch (error) {
-                console.error('Failed to load manifest:', error);
-                document.getElementById('version-info').innerHTML =
-                    '<p>Version information not available. Please check back later.</p>';
-            }
+        } catch (error) {
+          console.error('Failed to load manifest:', error);
+          document.getElementById('version-info').innerHTML =
+            '<p>Version information not available. Please check back later.</p>';
+        }
+      }
+
+      function updateDownloadLink(platform) {
+        let buttonId;
+        let manifestKey;
+
+        switch(platform) {
+          case 'ios':
+            buttonId = 'download-ios';
+            // For now, direct to App Store - you can update this when iOS builds are available
+            document.getElementById(buttonId).href = 'https://apps.apple.com';
+            return;
+          case 'android':
+            buttonId = 'download-android';
+            manifestKey = 'android_aab';
+            break;
+          default:
+            buttonId = `download-${platform}`;
+            manifestKey = platform;
+            break;
         }
 
-        // Track download events (you can send this to your analytics)
-        function trackDownload(platform) {
-            console.log(`Download initiated for: ${platform}`);
+        const button = document.getElementById(buttonId);
+        if (manifestData.platforms[manifestKey] && manifestData.platforms[manifestKey] !== '#') {
+          button.href = `/downloads/${manifestData.platforms[manifestKey]}`;
+        } else {
+          button.href = '#';
+          button.disabled = true;
+          if (platform === 'android') {
+            button.textContent = 'Coming Soon';
+          } else {
+            button.textContent = 'Coming Soon';
+          }
+        }
+      }
 
-            // Example: Send to Google Analytics
-            if (typeof gtag !== 'undefined') {
-                gtag('event', 'download', {
-                    'platform': platform,
-                    'version': manifestData.version || 'unknown'
-                });
-            }
+      // Track download events (you can send this to your analytics)
+      function trackDownload(platform) {
+        console.log(`Download initiated for: ${platform}`);
 
-            // Example: Send to Plausible Analytics
-            if (typeof plausible !== 'undefined') {
-                plausible('Download', { props: { platform: platform } });
-            }
+        // Example: Send to Google Analytics
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'download', {
+            'platform': platform,
+            'version': manifestData.version || 'unknown'
+          });
         }
 
-        // Load manifest on page load
-        loadManifest();
+        // Example: Send to Plausible Analytics
+        if (typeof plausible !== 'undefined') {
+          plausible('Download', { props: { platform: platform } });
+        }
+      }
+
+      // Load manifest on page load
+      loadManifest();
     </script>
-</body>
+  </body>
 </html>
