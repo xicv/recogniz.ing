@@ -1,0 +1,182 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - prerelease
+      prerelease_id:
+        description: 'Pre-release identifier (if prerelease)'
+        required: false
+        default: 'beta'
+
+jobs:
+  release:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Get current version
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            # Manual trigger - bump version
+            BUMP_TYPE="${{ github.event.inputs.version_bump }}"
+            PRE_RELEASE_ID="${{ github.event.inputs.prerelease_id }}"
+
+            if [[ "$BUMP_TYPE" == "prerelease" ]]; then
+              dart scripts/version_manager.dart --bump prerelease "$PRE_RELEASE_ID"
+              VERSION_STRING=$(dart scripts/version_manager.dart --current | sed 's/.*: //')
+              VERSION_NAME=${VERSION_STRING%+*}
+            else
+              dart scripts/version_manager.dart --bump "$BUMP_TYPE"
+              VERSION_STRING=$(dart scripts/version_manager.dart --current | sed 's/.*: //')
+              VERSION_NAME=${VERSION_STRING%+*}
+            fi
+
+            # Commit and push new version
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git add pubspec.yaml
+            git commit -m "chore: bump version to $VERSION_STRING"
+            git push
+          else
+            # Tag push - extract version from tag
+            VERSION_NAME=${GITHUB_REF#refs/tags/v*}
+            VERSION_STRING=$(dart scripts/version_manager.dart --current | sed 's/.*: //')
+          fi
+
+          echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
+          echo "version_string=$VERSION_STRING" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION_STRING"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Build for all platforms
+        run: |
+          # Build for all platforms
+          make deploy-all
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get previous tag
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          # Generate changelog
+          if [[ -n "$PREVIOUS_TAG" ]]; then
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" $PREVIOUS_TAG..HEAD)
+          else
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)")
+          fi
+
+          # Save to file
+          echo "$CHANGELOG" > CHANGELOG.md
+
+          # Set output for GitHub release
+          {
+            echo 'changelog<<EOF'
+            echo "$CHANGELOG"
+            echo EOF
+          } >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        if: github.event_name == 'push'
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ steps.version.outputs.version_name }}
+          tag_name: v${{ steps.version.outputs.version_name }}
+          body: |
+            ## Changes in this release
+
+            ${{ steps.changelog.outputs.changelog }}
+
+            ### Downloads
+
+            - **macOS**: `recognizing-${{ steps.version.outputs.version_name }}-macos.zip`
+            - **Windows**: `recognizing-${{ steps.version.outputs.version_name }}-windows.zip`
+            - **Linux**: `recognizing-${{ steps.version.outputs.version_name }}-linux.tar.gz`
+            - **Android APK**: `recognizing-${{ steps.version.outputs.version_name }}.apk`
+            - **Android AAB**: `recognizing-${{ steps.version.outputs.version_name }}.aab`
+
+            ---
+
+            <details>
+            <summary>Installation Instructions</summary>
+
+            ### macOS
+            1. Download the ZIP file
+            2. Extract `recognizing.app`
+            3. Move to Applications folder
+            4. Right-click and Open (to bypass Gatekeeper)
+
+            ### Windows
+            1. Download the ZIP file
+            2. Extract all files
+            3. Run `recognizing.exe`
+
+            ### Linux
+            1. Download the TAR.GZ file
+            2. Extract: `tar -xzf recognizing-*.tar.gz`
+            3. Run `./recognizing`
+
+            ### Android
+            1. Download the APK file
+            2. Enable "Install from unknown sources"
+            3. Install the APK
+
+            </details>
+          files: |
+            landing/public/downloads/${{ steps.version.outputs.version_name }}/**/*.zip
+            landing/public/downloads/${{ steps.version.outputs.version_name }}/**/*.tar.gz
+            landing/public/downloads/${{ steps.version.outputs.version_name }}/**/*.apk
+            landing/public/downloads/${{ steps.version.outputs.version_name }}/**/*.aab
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.version_name, '-') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Notarize macOS (if signed)
+        if: github.event_name == 'push' && env.DEVELOPER_TEAM_ID != ''
+        env:
+          DEVELOPER_TEAM_ID: ${{ secrets.DEVELOPER_TEAM_ID }}
+          APPLE_DEVELOPER_ID: ${{ secrets.APPLE_DEVELOPER_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        run: |
+          # Setup code signing
+          if [[ -n "$DEVELOPER_TEAM_ID" ]]; then
+            echo "DEVELOPER_TEAM_ID=$DEVELOPER_TEAM_ID" >> scripts/codesign-config.sh
+            echo "APPLE_DEVELOPER_ID=$APPLE_DEVELOPER_ID" >> scripts/codesign-config.sh
+            echo "APPLE_APP_PASSWORD=$APPLE_APP_PASSWORD" >> scripts/codesign-config.sh
+
+            # Build and notarize
+            make notarize-macos
+          fi

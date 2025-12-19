@@ -154,7 +154,7 @@ class _RecognizingAppState extends ConsumerState<RecognizingApp>
 
   void _openSettings() {
     _showApp();
-    ref.read(currentPageProvider.notifier).state = 1;
+    ref.read(currentPageProvider.notifier).state = 2;
   }
 
   void _copyLastTranscription() {

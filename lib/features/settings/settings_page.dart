@@ -350,10 +350,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             icon: LucideIcons.info,
             children: [
               FutureBuilder<String>(
-                future: AppConstants.getAppVersionWithBuild(),
+                future: AppConstants.getVersionDisplayName(),
                 builder: (context, snapshot) {
-                  final version =
-                      snapshot.data ?? AppConstants.appVersionWithBuild;
+                  final version = snapshot.data ?? 'Loading...';
                   return ListTile(
                     title: Text('Version'),
                     trailing: Text(version),

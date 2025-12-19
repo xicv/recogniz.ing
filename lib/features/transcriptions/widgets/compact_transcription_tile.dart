@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
@@ -105,9 +106,18 @@ class _CompactTranscriptionTileState extends State<CompactTranscriptionTile>
     final theme = Theme.of(context);
     final dateFormat = DateFormat('MMM d');
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: UIConstants.spacingXSmall),
-      child: ListTile(
+    return CallbackShortcuts(
+      bindings: {
+        if (_isEditing && _hasChanges)
+          const SingleActivator(LogicalKeyboardKey.keyS, control: true): _saveChanges,
+        if (_isEditing && _hasChanges)
+          const SingleActivator(LogicalKeyboardKey.keyS, meta: true): _saveChanges,
+      },
+      child: Focus(
+        autofocus: _isEditing,
+        child: Card(
+          margin: const EdgeInsets.only(bottom: UIConstants.spacingXSmall),
+          child: ListTile(
         contentPadding: const EdgeInsets.symmetric(
           horizontal: UIConstants.spacingMedium,
           vertical: UIConstants.spacingSmall,
@@ -251,6 +261,8 @@ class _CompactTranscriptionTileState extends State<CompactTranscriptionTile>
             setState(() => _isEditing = true);
           }
         },
+          ),
+        ),
       ),
     );
   }

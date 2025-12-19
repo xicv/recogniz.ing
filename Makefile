@@ -4,7 +4,10 @@
 .PHONY: help get deps run run-macos run-ios run-android run-web run-windows run-linux
 .PHONY: build build-macos build-ios build-apk build-web build-windows build-linux
 .PHONY: test test-coverage test-single analyze format clean upgrade deps-tree
-.PHONY: generate debug-release install-release logs
+.PHONY: generate debug-release install-release logs deploy deploy-all
+.PHONY: package-macos package-windows package-linux package-android package-web
+.PHONY: sign-macos notarize-macos codesign-setup
+.PHONY: version bump-patch bump-minor bump-major bump-prerelease
 
 # Default target
 help: ## Show this help message
@@ -174,3 +177,172 @@ check-version: ## Check current Flutter and app version
 dev-hotkey: run-macos ## Run with hotkey development setup
 	@echo "🔥 Starting development with hotkey support..."
 	@echo "💡 Use Cmd+Shift+Space to test global hotkey"
+
+# Version Management
+VERSION := $(shell grep "version:" pubspec.yaml | cut -d: -f2 | xargs)
+PLATFORM := $(shell uname -s | tr '[:upper:]' '[:lower:]')
+
+# Packaging & Deployment
+package-macos: ## Build and package macOS release
+	@echo "📦 Building and packaging for macOS..."
+	$(MAKE) build-macos
+	@echo "📋 Creating macOS package..."
+	@mkdir -p landing/public/downloads/macos/$(VERSION)
+	@cp -R build/macos/Build/Products/Release/recognizing.app landing/public/downloads/macos/$(VERSION)/
+	@cd landing/public/downloads/macos/$(VERSION) && zip -r recognizing-$(VERSION)-macos.zip recognizing.app && rm -rf recognizing.app
+	@echo "✅ macOS package created: landing/public/downloads/macos/$(VERSION)/recognizing-$(VERSION)-macos.zip"
+
+package-windows: ## Build and package Windows release
+	@echo "📦 Building and packaging for Windows..."
+	$(MAKE) build-windows
+	@echo "📋 Creating Windows package..."
+	@mkdir -p landing/public/downloads/windows/$(VERSION)
+	@cp -R build/windows/runner/Release/* landing/public/downloads/windows/$(VERSION)/
+	@cd landing/public/downloads/windows/$(VERSION) && zip -r recognizing-$(VERSION)-windows.zip .
+	@echo "✅ Windows package created: landing/public/downloads/windows/$(VERSION)/recognizing-$(VERSION)-windows.zip"
+
+package-linux: ## Build and package Linux release
+	@echo "📦 Building and packaging for Linux..."
+	$(MAKE) build-linux
+	@echo "📋 Creating Linux package..."
+	@mkdir -p landing/public/downloads/linux/$(VERSION)
+	@cp -R build/linux/x64/release/bundle/* landing/public/downloads/linux/$(VERSION)/
+	@cd landing/public/downloads/linux/$(VERSION) && tar -czf recognizing-$(VERSION)-linux.tar.gz .
+	@echo "✅ Linux package created: landing/public/downloads/linux/$(VERSION)/recognizing-$(VERSION)-linux.tar.gz"
+
+package-android: ## Build and package Android releases
+	@echo "📦 Building and packaging for Android..."
+	$(MAKE) build-apk
+	$(MAKE) build-aab
+	@echo "📋 Creating Android packages..."
+	@mkdir -p landing/public/downloads/android/$(VERSION)
+	@cp build/app/outputs/flutter-apk/app-release.apk landing/public/downloads/android/$(VERSION)/recognizing-$(VERSION).apk
+	@cp build/app/outputs/bundle/release/app-release.aab landing/public/downloads/android/$(VERSION)/recognizing-$(VERSION).aab
+	@echo "✅ Android packages created:"
+	@echo "   - APK: landing/public/downloads/android/$(VERSION)/recognizing-$(VERSION).apk"
+	@echo "   - AAB: landing/public/downloads/android/$(VERSION)/recognizing-$(VERSION).aab"
+
+package-web: ## Build and package Web release
+	@echo "📦 Building and packaging for Web..."
+	$(MAKE) build-web
+	@echo "📋 Creating Web package..."
+	@mkdir -p landing/public/downloads/web/$(VERSION)
+	@cp -R build/web/* landing/public/downloads/web/$(VERSION)/
+	@cd landing/public/downloads/web/$(VERSION) && zip -r recognizing-$(VERSION)-web.zip .
+	@echo "✅ Web package created: landing/public/downloads/web/$(VERSION)/recognizing-$(VERSION)-web.zip"
+
+# Deploy single platform
+deploy-macos: package-macos ## Deploy macOS release to landing page
+
+deploy-windows: package-windows ## Deploy Windows release to landing page
+
+deploy-linux: package-linux ## Deploy Linux release to landing page
+
+deploy-android: package-android ## Deploy Android releases to landing page
+
+deploy-web: package-web ## Deploy Web release to landing page
+
+# Deploy all platforms
+deploy-all: ## Build and deploy all platform releases
+	@echo "🚀 Building and deploying all platforms..."
+	@$(MAKE) package-macos
+	@$(MAKE) package-windows
+	@$(MAKE) package-linux
+	@$(MAKE) package-android
+	@$(MAKE) package-web
+	@echo "📋 Generating download manifest..."
+	@echo '{"version": "$(VERSION)", "platforms": {"macos": "downloads/macos/$(VERSION)/recognizing-$(VERSION)-macos.zip", "windows": "downloads/windows/$(VERSION)/recognizing-$(VERSION)-windows.zip", "linux": "downloads/linux/$(VERSION)/recognizing-$(VERSION)-linux.tar.gz", "android_apk": "downloads/android/$(VERSION)/recognizing-$(VERSION).apk", "android_aab": "downloads/android/$(VERSION)/recognizing-$(VERSION).aab", "web": "downloads/web/$(VERSION)/recognizing-$(VERSION)-web.zip"}, "build_date": "'$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")'"}' > landing/public/downloads/manifest.json
+	@echo "✅ All platforms deployed successfully!"
+	@echo "📋 Download manifest created: landing/public/downloads/manifest.json"
+
+# Code Signing & Notarization
+codesign-setup: ## Set up code signing configuration
+	@echo "📋 Setting up code signing configuration..."
+	@if [ ! -f scripts/codesign-config.sh ]; then \
+		echo "❌ scripts/codesign-config.sh not found!"; \
+		exit 1; \
+	fi
+	@echo "Please edit scripts/codesign-config.sh with your Apple Developer credentials:"
+	@echo "  - DEVELOPER_TEAM_ID: Your 10-character Apple Developer Team ID"
+	@echo "  - APPLE_DEVELOPER_ID: Your Apple ID email"
+	@echo "  - APPLE_APP_PASSWORD: App-specific password from Apple ID"
+	@echo ""
+	@echo "After configuration, run: make verify-codesign"
+
+verify-codesign: ## Verify code signing setup and certificates
+	@echo "🔍 Verifying code signing configuration..."
+	@source scripts/codesign-config.sh && verify_codesign_config
+	@source scripts/codesign-config.sh && check_codesign_certificates
+
+sign-macos: ## Sign macOS build (requires codesign-setup)
+	@echo "🔐 Signing macOS build..."
+	@source scripts/codesign-config.sh && verify_codesign_config
+	@flutter clean
+	@flutter pub get
+	@flutter build macos --release
+	@echo "📋 Signing application..."
+	@find build/macos/Build/Products/Release/recognizing.app/Contents/Frameworks -name "*.framework" -exec codesign --force --options runtime --sign "$$DEVELOPER_ID_APPLICATION_NAME" {} \;
+	@find build/macos/Build/Products/Release/recognizing.app -name "*.dylib" -exec codesign --force --sign "$$DEVELOPER_ID_APPLICATION_NAME" {} \;
+	@codesign --force --options runtime --sign "$$DEVELOPER_ID_APPLICATION_NAME" --deep build/macos/Build/Products/Release/recognizing.app
+	@codesign --verify --deep --strict --verbose=2 build/macos/Build/Products/Release/recognizing.app
+	@echo "✅ macOS build signed successfully"
+
+notarize-macos: ## Notarize signed macOS build (requires Apple Developer account)
+	@echo "📬 Notarizing macOS build..."
+	@source scripts/codesign-config.sh && verify_codesign_config
+	@if [ ! -f scripts/sign-macos.sh ]; then \
+		echo "❌ scripts/sign-macos.sh not found!"; \
+		exit 1; \
+	fi
+	@./scripts/sign-macos.sh
+
+distribute-macos: ## Build, sign, and notarize macOS distribution
+	@echo "📦 Creating macOS distribution package..."
+	@$(MAKE) sign-macos
+	@mkdir -p landing/public/downloads/macos/$(VERSION)
+	@hdiutil create -srcfolder build/macos/Build/Products/Release/recognizing.app -volname "Recogniz.ing" -fs HFS+ -fsargs "-c c=64,a=16,e=16" landing/public/downloads/macos/$(VERSION)/recognizing-$(VERSION)-macos-unsigned.dmg
+	@if [ -n "$$DEVELOPER_TEAM_ID" ] && [ -n "$$APPLE_DEVELOPER_ID" ]; then \
+		echo "🔐 Code signing configured - creating signed distribution..."; \
+		$(MAKE) notarize-macos; \
+		cp recognizing-$(VERSION)-macos.dmg landing/public/downloads/macos/$(VERSION)/; \
+	fi
+	@echo "✅ macOS distribution package ready"
+
+# Version Management
+version: ## Show current version
+	@echo "📋 Current version:"
+	@dart scripts/version_manager.dart --current
+
+bump-patch: ## Bump patch version (e.g., 1.0.0 → 1.0.1)
+	@echo "🔖 Bumping patch version..."
+	@dart scripts/version_manager.dart --bump patch --pub-get
+	@echo "✅ Patch version bumped"
+
+bump-minor: ## Bump minor version (e.g., 1.0.0 → 1.1.0)
+	@echo "🔖 Bumping minor version..."
+	@dart scripts/version_manager.dart --bump minor --pub-get
+	@echo "✅ Minor version bumped"
+
+bump-major: ## Bump major version (e.g., 1.0.0 → 2.0.0)
+	@echo "🔖 Bumping major version..."
+	@dart scripts/version_manager.dart --bump major --pub-get
+	@echo "✅ Major version bumped"
+
+bump-prerelease: ## Create pre-release version (usage: make bump-prerelease PRE=alpha)
+	@echo "🔖 Creating pre-release version..."
+	@if [ -z "$(PRE)" ]; then \
+		echo "❌ Please specify pre-release identifier: make bump-prerelease PRE=alpha|beta|rc"; \
+		exit 1; \
+	fi
+	@dart scripts/version_manager.dart --bump prerelease $(PRE) --pub-get
+	@echo "✅ Pre-release version created: $(PRE)"
+
+release: ## Create a release (bump patch, build, and deploy)
+	@echo "🚀 Creating release..."
+	@$(MAKE) bump-patch
+	@$(MAKE) deploy-all
+	@echo "✅ Release complete!"
+	@echo "📋 Don't forget to:"
+	@echo "   1. Commit the version changes: git add pubspec.yaml && git commit -m 'chore: bump version'"
+	@echo "   2. Create a git tag: git tag v$$(dart scripts/version_manager.dart --current | sed 's/.*: //' | sed 's/+.*//')"
+	@echo "   3. Push to remote: git push && git push --tags"

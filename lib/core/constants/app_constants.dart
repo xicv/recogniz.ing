@@ -1,4 +1,5 @@
 import 'package:package_info_plus/package_info_plus.dart';
+import '../services/version_service.dart';
 
 class AppConstants {
   // Audio recording
@@ -40,27 +41,31 @@ class AppConstants {
   // Application info
   static const String appName = 'Recogniz.ing';
 
-  // Default version - fallback if package info fails
-  static const String appVersion = '1.0.0';
-  static const String appVersionWithBuild = '1.0.0+1';
-
-  // Get version from package info (call this after app initialization)
+  // Get version from VersionService (call this after app initialization)
   static Future<String> getAppVersion() async {
     try {
-      final packageInfo = await PackageInfo.fromPlatform();
-      return packageInfo.version;
+      final version = await VersionService.getVersion();
+      return version.toString();
     } catch (e) {
-      return appVersion;
+      return '1.0.0';
     }
   }
 
   // Get version with build number
   static Future<String> getAppVersionWithBuild() async {
     try {
-      final packageInfo = await PackageInfo.fromPlatform();
-      return '${packageInfo.version}+${packageInfo.buildNumber}';
+      return await VersionService.getVersionWithBuild();
     } catch (e) {
-      return appVersionWithBuild;
+      return '1.0.0+1';
+    }
+  }
+
+  // Get version display name (cleaner version for UI)
+  static Future<String> getVersionDisplayName() async {
+    try {
+      return await VersionService.getVersionDisplayName();
+    } catch (e) {
+      return '1.0.0';
     }
   }
 
