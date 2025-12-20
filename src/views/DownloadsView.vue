@@ -166,9 +166,10 @@ const downloadPlatform = (platform: Platform) => {
               <div class="bg-white rounded-lg border border-slate-200 p-6">
                 <h4 class="font-medium mb-2">macOS:</h4>
                 <ol class="list-decimal list-inside text-slate-600 space-y-1 mb-4">
-                  <li>Download the .dmg file</li>
-                  <li>Open the downloaded file</li>
-                  <li>Drag Recogniz.ing to Applications folder</li>
+                  <li>Download the .app file</li>
+                  <li>Drag the .app file to Applications folder</li>
+                  <li>If you see a warning "Apple could not verify 'recognizing.app' is free of malware", click "Done", then go to Settings → Privacy & Security, and click "Open Anyway"</li>
+                  <li>Alternatively, run <code class="bg-slate-100 px-2 py-1 rounded text-sm">sudo codesign -fs Recognizing /Applications/Recognizing.app</code> from Terminal.app</li>
                   <li>Launch from Applications or Spotlight</li>
                 </ol>
 
