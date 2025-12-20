@@ -91,6 +91,11 @@ class TranscriptionsNotifier extends StateNotifier<List<Transcription>> {
     state = _loadTranscriptions();
   }
 
+  Future<void> deleteMultipleTranscriptions(List<String> ids) async {
+    await StorageService.deleteMultipleTranscriptions(ids);
+    state = _loadTranscriptions();
+  }
+
   void refresh() {
     state = _loadTranscriptions();
   }

@@ -130,6 +130,12 @@ class StorageService implements StorageServiceInterface {
     await box.delete(id);
   }
 
+  /// Delete multiple transcriptions at once
+  static Future<void> deleteMultipleTranscriptions(List<String> ids) async {
+    final box = Hive.box<Transcription>(transcriptionsBox);
+    await box.deleteAll(ids);
+  }
+
   @override
   Future<void> updateTranscription(String id, String newText) async {
     final box = Hive.box<Transcription>(transcriptionsBox);

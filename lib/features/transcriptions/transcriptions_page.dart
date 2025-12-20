@@ -83,7 +83,14 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
                       ),
                 ),
                 if (transcriptions.isNotEmpty) ...[
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    onPressed: () => _showClearAllDialog(context, transcriptions.length),
+                    icon: const Icon(LucideIcons.trash2),
+                    tooltip: 'Clear All',
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  const SizedBox(width: 8),
                   IconButton(
                     onPressed: () => _showFilterDialog(context),
                     icon: const Icon(LucideIcons.filter),
@@ -333,6 +340,63 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
     );
   }
 
+  void _showClearAllDialog(BuildContext context, int count) {
+    final isFiltered = _searchQuery.isNotEmpty;
+    final message = isFiltered
+        ? 'Delete $count transcription${count != 1 ? 's' : ''} matching "${_searchQuery}"?'
+        : 'Delete all $count transcription${count != 1 ? 's' : ''}?';
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(isFiltered ? 'Clear Filtered Transcriptions?' : 'Clear All Transcriptions?'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(message),
+            const SizedBox(height: 12),
+            Text(
+              'This action cannot be undone.',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.outline,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await _clearAllTranscriptions(ref);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(isFiltered
+                    ? '$count transcription${count != 1 ? 's' : ''} deleted'
+                    : 'All transcriptions deleted'),
+                  behavior: SnackBarBehavior.floating,
+                  duration: const Duration(seconds: 3),
+                  action: SnackBarAction(
+                    label: 'Dismiss',
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    },
+                  ),
+                ),
+              );
+            },
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: const Text('Delete All'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showFilterDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -576,5 +640,20 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
         ],
       ),
     );
+  }
+
+  Future<void> _clearAllTranscriptions(WidgetRef ref) async {
+    final transcriptions = ref.watch(filteredTranscriptionsProvider);
+
+    // Extract IDs and delete all at once for better performance
+    final ids = transcriptions.map((t) => t.id).toList();
+    if (ids.isNotEmpty) {
+      await ref.read(transcriptionsProvider.notifier).deleteMultipleTranscriptions(ids);
+    }
+
+    // Clear search if it was active
+    if (_searchQuery.isNotEmpty) {
+      _clearSearch();
+    }
   }
 }
