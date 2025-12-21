@@ -67,14 +67,25 @@ if [ "$1" = "all" ] || [ "$1" = "" ]; then
     if [ "$PLATFORM" = "windows" ] || command -v cmd.exe &> /dev/null; then
         print_status "Building for Windows..."
         flutter build windows --release
-        mkdir -p landing/public/downloads/windows/$VERSION
-        cp -R build/windows/runner/Release/* landing/public/downloads/windows/$VERSION/
-        cd landing/public/downloads/windows/$VERSION
-        zip -r recognizing-$VERSION-windows.zip .
-        cd ../../../../../
-        print_success "Windows package created"
+        if [ $? -eq 0 ]; then
+            mkdir -p landing/public/downloads/windows/$VERSION
+            cp -R build/windows/runner/Release/* landing/public/downloads/windows/$VERSION/
+            cd landing/public/downloads/windows/$VERSION
+            zip -r recognizing-$VERSION-windows.zip .
+            cd ../../../../../
+            print_success "Windows package created"
+        else
+            print_error "Windows build failed"
+            print_warning "Make sure Windows toolchain is installed"
+        fi
     else
         print_warning "Skipping Windows build (not on Windows platform)"
+        print_warning "To build Windows, use one of these methods:"
+        print_warning "  1. GitHub Actions (recommended):"
+        print_warning "     https://github.com/xicao/recognizing/actions"
+        print_warning "  2. Cross-compilation setup:"
+        print_warning "     https://docs.flutter.dev/deployment/windows#cross-compilation"
+        print_warning "  3. Run on Windows machine with Flutter SDK"
     fi
 
     # Linux (only if on Linux)

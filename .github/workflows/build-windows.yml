@@ -1,0 +1,155 @@
+name: Build Windows Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g., 1.0.3)'
+        required: true
+        type: string
+      upload_artifact:
+        description: 'Upload Windows build as artifact'
+        required: false
+        default: true
+        type: boolean
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Get version from tag or input
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            # Extract version from tag (remove 'v' prefix)
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Building version: $VERSION"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Windows Release
+        run: |
+          flutter build windows --release
+
+      - name: Create distribution package
+        run: |
+          mkdir -p dist/windows
+          cp -R build/windows/runner/Release/* dist/windows/
+          cd dist/windows
+          7z a -tzip recognizing-${{ steps.version.outputs.version }}-windows.zip *
+
+      - name: Upload build artifact
+        if: github.event.inputs.upload_artifact == 'true' || github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: recognizing-windows-${{ steps.version.outputs.version }}
+          path: dist/windows/recognizing-${{ steps.version.outputs.version }}-windows.zip
+          retention-days: 30
+
+      - name: Download macOS build artifacts
+        if: github.event_name == 'push'
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          workflow: release.yml
+          workflow_conclusion: success
+          path: downloads
+
+      - name: Create complete release package
+        if: github.event_name == 'push'
+        run: |
+          # Create directories
+          mkdir -p landing/public/downloads/${{ steps.version.outputs.version }}/windows
+          mkdir -p landing/public/downloads/${{ steps.version.outputs.version }}/macos
+
+          # Copy Windows build
+          cp dist/windows/recognizing-${{ steps.version.outputs.version }}-windows.zip landing/public/downloads/${{ steps.version.outputs.version }}/windows/
+
+          # Copy macOS build if available
+          if (Test-Path "downloads/recognizing-macos-${{ steps.version.outputs.version }}.zip") {
+            cp downloads/recognizing-macos-${{ steps.version.outputs.version }}.zip landing/public/downloads/${{ steps.version.outputs.version }}/macos/recognizing-${{ steps.version.outputs.version }}-macos.zip
+          }
+
+          # Generate manifest
+          @"
+          {
+            "version": "${{ steps.version.outputs.version }}",
+            "platforms": {
+              "windows": "downloads/windows/${{ steps.version.outputs.version }}/recognizing-${{ steps.version.outputs.version }}-windows.zip",
+              "macos": "downloads/macos/${{ steps.version.outputs.version }}/recognizing-${{ steps.version.outputs.version }}-macos.zip",
+              "linux": "downloads/linux/${{ steps.version.outputs.version }}/recognizing-${{ steps.version.outputs.version }}-linux.tar.gz",
+              "android_apk": "downloads/android/${{ steps.version.outputs.version }}/recognizing-${{ steps.version.outputs.version }}.apk",
+              "android_aab": "downloads/android/${{ steps.version.outputs.version }}/recognizing-${{ steps.version.outputs.version }}.aab",
+              "web": "downloads/web/${{ steps.version.outputs.version }}/recognizing-${{ steps.version.outputs.version }}-web.zip"
+            },
+            "build_date": "$(Get-Date -UFormat '%Y-%m-%dT%H:%M:%SZ')"
+          }
+          "@ | Out-File -FilePath landing/public/downloads/manifest.json -Encoding utf8
+
+      - name: Update Downloads Page
+        if: github.event_name == 'push'
+        run: |
+          # Create a simple index for the downloads
+          @"
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Recogniz.ing Downloads</title>
+            <style>
+              body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+              .platform { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+              h1 { color: #333; }
+              a { display: inline-block; padding: 10px 20px; background: #007AFF; color: white; text-decoration: none; border-radius: 5px; margin: 5px; }
+              a:hover { background: #0056CC; }
+            </style>
+          </head>
+          <body>
+            <h1>Recogniz.ing v${{ steps.version.outputs.version }}</h1>
+            <p>AI-powered voice typing application</p>
+
+            <div class="platform">
+              <h2>Windows</h2>
+              <a href="downloads/windows/${{ steps.version.outputs.version }}/recognizing-${{ steps.version.outputs.version }}-windows.zip">Download Windows ZIP</a>
+            </div>
+
+            <div class="platform">
+              <h2>macOS</h2>
+              <a href="downloads/macos/${{ steps.version.outputs.version }}/recognizing-${{ steps.version.outputs.version }}-macos.zip">Download macOS ZIP</a>
+            </div>
+
+            <p><small>Built on $(Get-Date -UFormat '%Y-%m-%d %H:%M:%S UTC')</small></p>
+          </body>
+          </html>
+          "@ | Out-File -FilePath landing/public/downloads.html -Encoding utf8
+
+      - name: Commit downloads to main
+        if: github.event_name == 'push'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add landing/public/downloads/
+          git add landing/public/downloads.html
+          git add landing/public/downloads/manifest.json
+          git commit -m "build: Add v${{ steps.version.outputs.version }} downloads" || echo "No changes to commit"
+          git push
