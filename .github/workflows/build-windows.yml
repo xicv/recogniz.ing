@@ -35,14 +35,14 @@ jobs:
       - name: Get version from tag or input
         id: version
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            VERSION="${{ github.event.inputs.version }}"
-          else
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            $VERSION = "${{ github.event.inputs.version }}"
+          } else {
             # Extract version from tag (remove 'v' prefix)
-            VERSION="${GITHUB_REF#refs/tags/v}"
-          fi
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Building version: $VERSION"
+            $VERSION = "${{ github.ref_name }}" -replace "^v", ""
+          }
+          echo "version=$VERSION" >> $env:GITHUB_OUTPUT
+          Write-Host "Building version: $VERSION"
 
       - name: Install dependencies
         run: flutter pub get
