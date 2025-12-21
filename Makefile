@@ -150,7 +150,14 @@ logs: ## Show Flutter logs
 # Quick Development Workflow
 dev: get analyze format test ## Full development workflow (get, analyze, format, test)
 
-quick-run: get run-macos ## Quick start for macOS development
+quick-run: ## Quick start for macOS development
+	@echo "⚡ Quick start for macOS..."
+	@echo "📦 Installing dependencies..."
+	@flutter pub get
+	@echo "🧹 Cleaning build directory to prevent code signing issues..."
+	@rm -rf build/macos
+	@echo "🍎 Running on macOS..."
+	@flutter run -d macos
 
 # Release Management
 install-release: build-macos ## Build and install macOS release
