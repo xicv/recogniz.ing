@@ -53,10 +53,10 @@ jobs:
 
       - name: Create distribution package
         run: |
-          mkdir -p dist/windows
-          cp -R build/windows/runner/Release/* dist/windows/
-          cd dist/windows
-          7z a -tzip recognizing-${{ steps.version.outputs.version }}-windows.zip *
+          New-Item -ItemType Directory -Path "dist/windows" -Force
+          Copy-Item -Path "build\windows\runner\Release\*" -Destination "dist\windows" -Recurse
+          Set-Location "dist\windows"
+          7z a -tzip "recognizing-${{ steps.version.outputs.version }}-windows.zip" *
 
       - name: Upload build artifact
         if: github.event.inputs.upload_artifact == 'true' || github.event_name == 'push'
@@ -78,15 +78,15 @@ jobs:
         if: github.event_name == 'push'
         run: |
           # Create directories
-          mkdir -p landing/public/downloads/${{ steps.version.outputs.version }}/windows
-          mkdir -p landing/public/downloads/${{ steps.version.outputs.version }}/macos
+          New-Item -ItemType Directory -Path "landing/public/downloads/${{ steps.version.outputs.version }}/windows" -Force
+          New-Item -ItemType Directory -Path "landing/public/downloads/${{ steps.version.outputs.version }}/macos" -Force
 
           # Copy Windows build
-          cp dist/windows/recognizing-${{ steps.version.outputs.version }}-windows.zip landing/public/downloads/${{ steps.version.outputs.version }}/windows/
+          Copy-Item -Path "dist/windows/recognizing-${{ steps.version.outputs.version }}-windows.zip" -Destination "landing/public/downloads/${{ steps.version.outputs.version }}/windows/"
 
           # Copy macOS build if available
           if (Test-Path "downloads/recognizing-macos-${{ steps.version.outputs.version }}.zip") {
-            cp downloads/recognizing-macos-${{ steps.version.outputs.version }}.zip landing/public/downloads/${{ steps.version.outputs.version }}/macos/recognizing-${{ steps.version.outputs.version }}-macos.zip
+            Copy-Item -Path "downloads/recognizing-macos-${{ steps.version.outputs.version }}.zip" -Destination "landing/public/downloads/${{ steps.version.outputs.version }}/macos/recognizing-${{ steps.version.outputs.version }}-macos.zip"
           }
 
           # Generate manifest
