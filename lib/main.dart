@@ -11,7 +11,7 @@ import 'core/services/hotkey_service.dart';
 import 'core/services/storage_service.dart';
 import 'core/services/tray_service.dart';
 import 'core/theme/app_theme.dart';
-import 'features/app_shell.dart';
+import 'features/app_shell_drawer.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -154,7 +154,7 @@ class _RecognizingAppState extends ConsumerState<RecognizingApp>
 
   void _openSettings() {
     _showApp();
-    ref.read(currentPageProvider.notifier).state = 2;
+    ref.read(currentPageProvider.notifier).state = 4; // Settings (now page 4 with 5 pages)
   }
 
   void _copyLastTranscription() {
@@ -212,7 +212,7 @@ class _RecognizingAppState extends ConsumerState<RecognizingApp>
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
-      home: const AppShell(),
+      home: const AppShellWithDrawer(),
     );
   }
 }
