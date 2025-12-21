@@ -1,0 +1,76 @@
+name: Build Windows Release (Fixed)
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g., 1.0.3)'
+        required: true
+        type: string
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Set version
+        id: version
+        run: |
+          $VERSION = "${{ github.event.inputs.version }}"
+          echo "version=$VERSION" >> $env:GITHUB_OUTPUT
+          Write-Host "Building version: $VERSION"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Windows Release
+        run: |
+          flutter build windows --release
+
+      - name: Create distribution package
+        run: |
+          New-Item -ItemType Directory -Path "dist/windows" -Force
+          Copy-Item -Path "build\windows\runner\Release\*" -Destination "dist\windows" -Recurse
+          Set-Location "dist\windows"
+          7z a -tzip "recognizing-$(${{ steps.version.outputs.version }})-windows.zip" *
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: recognizing-windows-${{ steps.version.outputs.version }}
+          path: dist/windows/recognizing-${{ steps.version.outputs.version }}-windows.zip
+          retention-days: 30
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Windows Release ${{ steps.version.outputs.version }}
+          tag_name: v${{ steps.version.outputs.version }}-windows
+          body: |
+            Windows build for Recogniz.ing v${{ steps.version.outputs.version }}
+
+            ## Installation
+            1. Download the ZIP file
+            2. Extract all files
+            3. Run `recognizing.exe`
+
+            ## Requirements
+            - Windows 10 or later
+            - Microphone access for recording
+            - Internet connection for transcription
+          files: |
+            dist/windows/recognizing-${{ steps.version.outputs.version }}-windows.zip
+          draft: false
+          prerelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}

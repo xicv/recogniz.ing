@@ -53,13 +53,6 @@ dependencies:
 
 dependency_overrides:
   win32: ^5.15.0
-  # Fix for Windows build with record package
-  record_linux: any
-  record_web: any
-  record_windows: any
-  record_macos: any
-  record_android: any
-  record_ios: any
 
 dev_dependencies:
   flutter_test:
