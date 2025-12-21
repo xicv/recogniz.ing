@@ -68,8 +68,8 @@ class VoiceRecordingUseCase {
         return;
       }
 
-      // Cast to RecordingResult since we know AudioService returns that type
-      final recordingResult = result as RecordingResult;
+      // Use the RecordingResultInterface directly
+      final recordingResult = result;
 
       if (recordingResult.durationSeconds <
           AppConstants.minRecordingDurationSeconds) {
