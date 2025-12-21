@@ -8,6 +8,7 @@ import '../../core/providers/app_providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/models/app_settings.dart';
 import 'widgets/compact_transcription_tile.dart';
+import 'widgets/transcription_card.dart';
 
 class TranscriptionsPage extends ConsumerStatefulWidget {
   const TranscriptionsPage({super.key});
@@ -156,7 +157,7 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
                     TextButton(
                       onPressed: () {
                         ref.read(currentPageProvider.notifier).state =
-                            2; // Settings tab
+                            4; // Settings tab
                       },
                       child: const Text('Settings'),
                     ),
@@ -240,7 +241,7 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
                     final transcription = transcriptions[index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 8),
-                      child: CompactTranscriptionTile(
+                      child: TranscriptionCard(
                         transcription: transcription,
                         onCopy: () => _copyToClipboard(
                             context, transcription.processedText),

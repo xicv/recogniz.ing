@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
@@ -8,9 +10,12 @@ import '../core/error/error_components.dart';
 import '../core/error/enhanced_error_handler.dart';
 import '../core/providers/app_providers.dart';
 import '../core/providers/recording_providers.dart';
+import '../widgets/navigation/navigation_drawer.dart';
 import 'dashboard/dashboard_page.dart';
+import 'dictionaries/dictionaries_page.dart';
+import 'prompts/prompts_page.dart';
 import 'recording/recording_overlay.dart';
-import 'settings/settings_page.dart';
+import 'settings/settings_page_refactored.dart';
 import 'transcriptions/transcriptions_page.dart';
 
 class AppShell extends ConsumerStatefulWidget {
@@ -68,46 +73,90 @@ class _AppShellState extends ConsumerState<AppShell> {
       });
     }
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          IndexedStack(
-            index: currentPage,
-            children: const [
-              TranscriptionsPage(),
-              DashboardPage(),
-              SettingsPage(),
-            ],
-          ),
-          if (recordingState != RecordingState.idle) const RecordingOverlay(),
-        ],
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: currentPage,
-        onDestinationSelected: (index) {
-          ref.read(currentPageProvider.notifier).state = index;
-        },
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(LucideIcons.fileText),
-            selectedIcon: Icon(LucideIcons.fileText),
-            label: 'Transcriptions',
-          ),
-          NavigationDestination(
-            icon: Icon(LucideIcons.layoutDashboard),
-            selectedIcon: Icon(LucideIcons.layoutDashboard),
-            label: 'Dashboard',
-          ),
-          NavigationDestination(
-            icon: Icon(LucideIcons.settings),
-            selectedIcon: Icon(LucideIcons.settings),
-            label: 'Settings',
+    // Define keyboard shortcuts
+final Map<LogicalKeySet, VoidCallback> shortcuts = {
+  // Ctrl/Cmd + 1-5 for navigation
+  if (kIsWeb)
+    LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit1): () =>
+      ref.read(currentPageProvider.notifier).state = 0,
+  if (kIsWeb)
+    LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit2): () =>
+      ref.read(currentPageProvider.notifier).state = 1,
+  if (kIsWeb)
+    LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit3): () =>
+      ref.read(currentPageProvider.notifier).state = 2,
+  if (kIsWeb)
+    LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit4): () =>
+      ref.read(currentPageProvider.notifier).state = 3,
+  if (kIsWeb)
+    LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit5): () =>
+      ref.read(currentPageProvider.notifier).state = 4,
+  // Meta(Cmd) + 1-5 for macOS
+  if (!kIsWeb && Platform.isMacOS)
+    LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.digit1): () =>
+      ref.read(currentPageProvider.notifier).state = 0,
+  if (!kIsWeb && Platform.isMacOS)
+    LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.digit2): () =>
+      ref.read(currentPageProvider.notifier).state = 1,
+  if (!kIsWeb && Platform.isMacOS)
+    LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.digit3): () =>
+      ref.read(currentPageProvider.notifier).state = 2,
+  if (!kIsWeb && Platform.isMacOS)
+    LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.digit4): () =>
+      ref.read(currentPageProvider.notifier).state = 3,
+  if (!kIsWeb && Platform.isMacOS)
+    LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.digit5): () =>
+      ref.read(currentPageProvider.notifier).state = 4,
+  // Ctrl + 1-5 for Windows/Linux
+  if (!kIsWeb && (Platform.isWindows || Platform.isLinux))
+    LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit1): () =>
+      ref.read(currentPageProvider.notifier).state = 0,
+  if (!kIsWeb && (Platform.isWindows || Platform.isLinux))
+    LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit2): () =>
+      ref.read(currentPageProvider.notifier).state = 1,
+  if (!kIsWeb && (Platform.isWindows || Platform.isLinux))
+    LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit3): () =>
+      ref.read(currentPageProvider.notifier).state = 2,
+  if (!kIsWeb && (Platform.isWindows || Platform.isLinux))
+    LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit4): () =>
+      ref.read(currentPageProvider.notifier).state = 3,
+  if (!kIsWeb && (Platform.isWindows || Platform.isLinux))
+    LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit5): () =>
+      ref.read(currentPageProvider.notifier).state = 4,
+};
+
+return CallbackShortcuts(
+  bindings: shortcuts,
+  child: Scaffold(
+    body: Row(
+      children: [
+          // Navigation Drawer
+          const AppNavigationDrawer(),
+
+          // Main Content
+          Expanded(
+            child: Stack(
+              children: [
+                IndexedStack(
+                  index: currentPage,
+                  children: const [
+                    TranscriptionsPage(),
+                    DashboardPage(),
+                    DictionariesPage(),
+                    PromptsPage(),
+                    SettingsPageRefactored(),
+                  ],
+                ),
+                if (recordingState != RecordingState.idle) const RecordingOverlay(),
+              ],
+            ),
           ),
         ],
       ),
       floatingActionButton: _buildRecordFab(context, ref, recordingState),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-    );
+    ),
+  );
   }
 
   Widget? _buildRecordFab(
@@ -119,31 +168,43 @@ class _AppShellState extends ConsumerState<AppShell> {
     return SizedBox(
       width: UIConstants.fabSize,
       height: UIConstants.fabSize,
-      child: FloatingActionButton(
+      child: FloatingActionButton.extended(
         onPressed: state == RecordingState.processing
             ? null
             : () => _toggleRecording(context, ref, state),
         backgroundColor: state == RecordingState.recording
-            ? Colors.red
+            ? Colors.red[400]
             : Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
         shape: const CircleBorder(),
-        elevation: UIConstants.fabElevation,
-        child: state == RecordingState.processing
-            ? const SizedBox(
-                width: UIConstants.iconMedium,
-                height: UIConstants.iconMedium,
-                child: CircularProgressIndicator(
+        elevation: state == RecordingState.recording ? 8 : UIConstants.fabElevation,
+        hoverElevation: 12,
+        hoverColor: state == RecordingState.recording
+            ? Colors.red[300]
+            : Theme.of(context).colorScheme.primaryContainer,
+        isExtended: false,
+        icon: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          child: state == RecordingState.processing
+              ? const SizedBox(
+                  key: ValueKey('processing'),
+                  width: UIConstants.iconMedium,
+                  height: UIConstants.iconMedium,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 3,
+                  ),
+                )
+              : Icon(
+                  state == RecordingState.recording
+                      ? LucideIcons.micOff
+                      : LucideIcons.mic,
+                  key: ValueKey(state == RecordingState.recording ? 'off' : 'on'),
+                  size: 24,
                   color: Colors.white,
-                  strokeWidth: 3,
                 ),
-              )
-            : Icon(
-                state == RecordingState.recording
-                    ? LucideIcons.micOff
-                    : LucideIcons.mic,
-                size: 24,
-                color: Colors.white,
-              ),
+        ),
+        label: const SizedBox.shrink(),
       ),
     );
   }
@@ -172,7 +233,7 @@ class _AppShellState extends ConsumerState<AppShell> {
               icon: LucideIcons.settings,
               onPressed: () {
                 Navigator.of(context).pop();
-                ref.read(currentPageProvider.notifier).state = 1;
+                ref.read(currentPageProvider.notifier).state = 4; // Settings
               },
             ),
         ],
@@ -322,7 +383,7 @@ class _AppShellState extends ConsumerState<AppShell> {
       onPressed: () {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         if (isSettingsAction) {
-          ref.read(currentPageProvider.notifier).state = 1;
+          ref.read(currentPageProvider.notifier).state = 4; // Settings
         }
       },
     );

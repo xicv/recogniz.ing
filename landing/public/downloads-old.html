@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Download Recogniz.ing</title>
+    <link rel="icon" type="image/svg+xml" href="/assets/icons/app_icon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background: white;
+        min-height: 100vh;
+      }
+
+      /* Navigation */
+      .navbar {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        background: white/80;
+        backdrop-blur: xl;
+        z-index: 50;
+        border-bottom: 1px solid #f1f5f9;
+      }
+
+      .navbar-content {
+        max-width: 80rem;
+        margin: 0 auto;
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .logo {
+        width: 32px;
+        height: 32px;
+      }
+
+      .brand {
+        font-size: 20px;
+        font-weight: 300;
+        letter-spacing: -0.025em;
+        color: #0f172a;
+      }
+
+      /* Main Content */
+      .container {
+        max-width: 80rem;
+        margin: 0 auto;
+        padding: 128px 24px 64px;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 64px;
+      }
+
+      .title {
+        font-size: 48px;
+        font-weight: 300;
+        letter-spacing: -0.025em;
+        color: #0f172a;
+        margin-bottom: 16px;
+      }
+
+      .subtitle {
+        font-size: 24px;
+        font-weight: 300;
+        color: #64748b;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      /* Download Grid */
+      .downloads {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 24px;
+        margin-bottom: 64px;
+      }
+
+      .download-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 32px;
+        transition: all 0.3s ease;
+      }
+
+      .download-card:hover {
+        border-color: #cbd5e1;
+      }
+
+      .platform-name {
+        font-size: 20px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: #0f172a;
+      }
+
+      .platform-desc {
+        color: #64748b;
+        margin-bottom: 24px;
+        line-height: 1.6;
+        font-size: 15px;
+      }
+
+      .download-btn {
+        display: inline-block;
+        width: 100%;
+        text-align: center;
+        background: #0f172a;
+        color: white;
+        padding: 16px 24px;
+        border-radius: 9999px;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        margin-bottom: 16px;
+      }
+
+      .download-btn:hover:not(:disabled) {
+        background: #1e293b;
+        transform: translateY(-2px);
+      }
+
+      .download-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: #94a3b8;
+      }
+
+      /* Requirements */
+      .requirements {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 16px;
+        margin-top: 16px;
+      }
+
+      .requirements h4 {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: #0f172a;
+      }
+
+      .requirements ul {
+        list-style: none;
+        font-size: 14px;
+        color: #475569;
+      }
+
+      .requirements li {
+        padding: 4px 0;
+        display: flex;
+        align-items: center;
+      }
+
+      .requirements li::before {
+        content: "•";
+        color: #2563eb;
+        font-weight: bold;
+        margin-right: 8px;
+      }
+
+      /* Android section with two buttons */
+      .android-buttons {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .android-buttons .download-btn {
+        margin-bottom: 0;
+        flex: 1;
+      }
+
+      .version-info {
+        text-align: center;
+        color: #64748b;
+        font-size: 14px;
+        margin-top: 64px;
+        padding: 24px;
+        background: #f8fafc;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .container {
+          padding: 112px 16px 48px;
+        }
+
+        .title {
+          font-size: 40px;
+        }
+
+        .subtitle {
+          font-size: 20px;
+        }
+
+        .downloads {
+          grid-template-columns: 1fr;
+        }
+
+        .android-buttons {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <div class="navbar-content">
+        <div class="logo-container">
+          <svg class="logo" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="bgGradientNav" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0EA5E9"/>
+                <stop offset="50%" stop-color="#0284C7"/>
+                <stop offset="100%" stop-color="#0369A1"/>
+              </linearGradient>
+              <linearGradient id="innerGlowNav" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0.15)"/>
+                <stop offset="100%" stop-color="rgba(0,0,0,0.1)"/>
+              </linearGradient>
+              <linearGradient id="iconGradientNav" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#FFFFFF"/>
+                <stop offset="100%" stop-color="#E0F2FE"/>
+              </linearGradient>
+            </defs>
+            <rect width="1024" height="1024" rx="224" fill="url(#bgGradientNav)"/>
+            <rect width="1024" height="1024" rx="224" fill="url(#innerGlowNav)"/>
+            <g transform="translate(512, 512)">
+              <path d="M -280 -120 A 180 180 0 0 0 -280 120" stroke="url(#iconGradientNav)" stroke-width="44" fill="none" stroke-linecap="round" opacity="0.5"/>
+              <path d="M -200 -80 A 120 120 0 0 0 -200 80" stroke="url(#iconGradientNav)" stroke-width="44" fill="none" stroke-linecap="round" opacity="0.75"/>
+              <path d="M -120 -40 A 60 60 0 0 0 -120 40" stroke="url(#iconGradientNav)" stroke-width="44" fill="none" stroke-linecap="round"/>
+              <circle cx="-40" cy="0" r="32" fill="url(#iconGradientNav)"/>
+              <rect x="40" y="-100" width="240" height="36" rx="18" fill="url(#iconGradientNav)"/>
+              <rect x="40" y="-18" width="200" height="36" rx="18" fill="url(#iconGradientNav)" opacity="0.85"/>
+              <rect x="40" y="64" width="160" height="36" rx="18" fill="url(#iconGradientNav)" opacity="0.7"/>
+            </g>
+          </svg>
+          <span class="brand">Recogniz.ing</span>
+        </div>
+        <a href="/" class="text-slate-700 hover:text-slate-900 font-medium transition-colors">
+          ← Back
+        </a>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+      <div class="header">
+        <h1 class="title">Downloads</h1>
+        <p class="subtitle">Get Recogniz.ing for your platform</p>
+      </div>
+
+      <div class="downloads" id="downloads">
+        <!-- macOS -->
+        <div class="download-card">
+          <h3 class="platform-name">macOS</h3>
+          <p class="platform-desc">For macOS 10.15 or later. Universal binary for Apple Silicon and Intel Macs.</p>
+          <a href="#" class="download-btn" id="download-macos" onclick="trackDownload('macOS')">
+            Download for macOS
+          </a>
+          <div class="requirements">
+            <h4>Requirements:</h4>
+            <ul>
+              <li>macOS 10.15 or later</li>
+              <li>Microphone access for recording</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Windows -->
+        <div class="download-card">
+          <h3 class="platform-name">Windows</h3>
+          <p class="platform-desc">For Windows 10 or later. Includes installer with all dependencies.</p>
+          <a href="#" class="download-btn" id="download-windows" onclick="trackDownload('Windows')">
+            Download for Windows
+          </a>
+          <div class="requirements">
+            <h4>Requirements:</h4>
+            <ul>
+              <li>Windows 10 (1903) or later</li>
+              <li>Microphone access for recording</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Linux -->
+        <div class="download-card">
+          <h3 class="platform-name">Linux</h3>
+          <p class="platform-desc">For most Linux distributions. Includes AppImage for easy installation.</p>
+          <a href="#" class="download-btn" id="download-linux" onclick="trackDownload('Linux')">
+            Download for Linux
+          </a>
+          <div class="requirements">
+            <h4>Requirements:</h4>
+            <ul>
+              <li>64-bit Linux distribution</li>
+              <li>PulseAudio for audio recording</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Mobile -->
+        <div class="download-card">
+          <h3 class="platform-name">Mobile</h3>
+          <p class="platform-desc">For iOS 15+ and Android 8+. Available on App Store and Google Play.</p>
+          <a href="#" class="download-btn" id="download-ios" onclick="trackDownload('iOS')">
+            App Store
+          </a>
+          <a href="#" class="download-btn" id="download-android" onclick="trackDownload('Android')" style="background: #000;">
+            Coming Soon
+          </a>
+          <div class="requirements">
+            <h4>Requirements:</h4>
+            <ul>
+              <li>iOS 15+ or Android 8+</li>
+              <li>Microphone permission</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="version-info" id="version-info">
+        <p>Loading version information...</p>
+      </div>
+    </div>
+
+    <script>
+      let manifestData = {};
+
+      // Load manifest and update download links
+      async function loadManifest() {
+        try {
+          const response = await fetch('/downloads/manifest.json');
+          manifestData = await response.json();
+
+          // Update version info
+          document.getElementById('version-info').innerHTML =
+            `<p>Version ${manifestData.version} • Built on ${new Date(manifestData.build_date).toLocaleDateString()}</p>`;
+
+          // Update download links based on availability
+          updateDownloadLink('macos');
+          updateDownloadLink('windows');
+          updateDownloadLink('linux');
+          updateDownloadLink('android');
+          updateDownloadLink('ios');
+
+        } catch (error) {
+          console.error('Failed to load manifest:', error);
+          document.getElementById('version-info').innerHTML =
+            '<p>Version information not available. Please check back later.</p>';
+        }
+      }
+
+      function updateDownloadLink(platform) {
+        let buttonId;
+        let manifestKey;
+
+        switch(platform) {
+          case 'ios':
+            buttonId = 'download-ios';
+            // For now, direct to App Store - you can update this when iOS builds are available
+            document.getElementById(buttonId).href = 'https://apps.apple.com';
+            return;
+          case 'android':
+            buttonId = 'download-android';
+            manifestKey = 'android_aab';
+            break;
+          default:
+            buttonId = `download-${platform}`;
+            manifestKey = platform;
+            break;
+        }
+
+        const button = document.getElementById(buttonId);
+        if (manifestData.platforms[manifestKey] && manifestData.platforms[manifestKey] !== '#') {
+          button.href = `/downloads/${manifestData.platforms[manifestKey]}`;
+        } else {
+          button.href = '#';
+          button.disabled = true;
+          if (platform === 'android') {
+            button.textContent = 'Coming Soon';
+          } else {
+            button.textContent = 'Coming Soon';
+          }
+        }
+      }
+
+      // Track download events (you can send this to your analytics)
+      function trackDownload(platform) {
+        console.log(`Download initiated for: ${platform}`);
+
+        // Example: Send to Google Analytics
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'download', {
+            'platform': platform,
+            'version': manifestData.version || 'unknown'
+          });
+        }
+
+        // Example: Send to Plausible Analytics
+        if (typeof plausible !== 'undefined') {
+          plausible('Download', { props: { platform: platform } });
+        }
+      }
+
+      // Load manifest on page load
+      loadManifest();
+    </script>
+  </body>
+</html>

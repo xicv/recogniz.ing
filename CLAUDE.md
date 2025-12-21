@@ -131,6 +131,8 @@ The app follows a Clean Architecture pattern with clear separation of concerns:
 
 1. **Core Layer** (`lib/core/`)
    - **Models**: Data structures with Hive serialization (`Transcription`, `AppSettings`, `CustomPrompt`, `VocabularySet`)
+     - `CustomPrompt.promptTemplate` (not `template`)
+     - All models require unique `@HiveType` IDs
    - **Services**: Business logic and external integrations (`AudioService`, `GeminiService`, `StorageService`, `TrayService`, `HotkeyService`, `VersionService`)
    - **Providers**: Riverpod state management organized by domain
    - **Interfaces**: Service interfaces for dependency injection and testing
@@ -144,28 +146,36 @@ The app follows a Clean Architecture pattern with clear separation of concerns:
    - **Settings**: API key management, vocabulary/prompts configuration, hotkey setup
    - **Recording**: Recording overlay and voice activity detection UI
    - **Transcriptions**: Transcription management and editing
+   - **Dictionaries**: Custom vocabulary management (moved from Settings)
+   - **Prompts**: AI prompt template management (moved from Settings)
 
-3. **Shared Widget Layer** (`lib/widgets/`)
+3. **Navigation** (`lib/features/app_shell_drawer.dart`)
+   - Collapsible left drawer with 5 menu items (replaces bottom tabs)
+   - Navigation indices: 0-Transcriptions, 1-Dashboard, 2-Dictionaries, 3-Prompts, 4-Settings
+   - Menubar "Settings..." navigates to index 4
+
+4. **Shared Widget Layer** (`lib/widgets/`)
    - **Shared Components**: Comprehensive reusable UI widgets for consistency
    - `app_bars.dart`, `app_buttons.dart`, `app_cards.dart`, `app_chips.dart`
    - `app_dialogs.dart`, `app_inputs.dart`, `app_lists.dart`
    - `loading_indicators.dart`, `global_loading_overlay.dart`
    - `widgets.dart` - Barrel export for easy imports
+   - **Navigation**: `AppNavigationDrawer` for collapsible sidebar navigation
 
-4. **Data Flow**
+5. **Data Flow**
    - State management uses Riverpod with providers for services, settings, and UI state
    - Hive for local persistence with type adapters for models
    - Global providers handle cross-feature state like recording state and navigation
    - Use cases orchestrate complex workflows across multiple services
 
-5. **Error Handling System** (`lib/core/error/`)
+6. **Error Handling System** (`lib/core/error/`)
    - `AppException` base class for all custom exceptions
    - `ErrorHandler` service for centralized error processing
    - Categorized error types: `AudioError`, `ApiError`, `StorageError`, etc.
    - Error metadata includes retry timing, action hints, and severity levels
    - Global error state management through `errorProvider`
 
-6. **Configuration System** (`config/`)
+7. **Configuration System** (`config/`)
    - External JSON configuration for themes, prompts, vocabulary, and app settings
    - Runtime loading of configurations without code changes
    - Type-safe config classes in `lib/core/config/`
@@ -216,6 +226,7 @@ The app follows a Clean Architecture pattern with clear separation of concerns:
     - `ui_providers.dart` - UI state management
     - `loading_providers.dart` - Global loading indicators
   - `lib/features/app_shell.dart` - Main provider aggregation for features
+  - `lib/features/app_shell_drawer.dart` - Updated shell with drawer navigation
 
 ### Interface-Based Design
 Services implement interfaces for testability:
@@ -270,12 +281,36 @@ If pub get is extremely slow (>5 minutes):
 5. Result is saved via `StorageService` and optionally copied to clipboard
 6. UI updates through state providers with success/error notifications
 
+### Provider Naming Conventions
+- Services use singular form: `settingsProvider`, `transcriptionsProvider`
+- State notifiers use plural form: `promptsProvider` (not `customPromptProvider`)
+- Navigation uses `currentPageProvider` with 0-based indices
+- Check provider files in `lib/core/providers/` for correct names
+
+### Widget Naming Notes
+- Custom widget named `AppNavigationDrawer` (not Flutter's built-in `NavigationDrawer`)
+- `HotkeyEditorDialog` is the actual widget name (not `HotkeyEditor`)
+- `SettingsPageRefactored` is the new settings implementation
+
 ### Error Handling
 - Enhanced error system with `EnhancedErrorHandler` for categorization
 - Errors are displayed through `lastErrorProvider` with SnackBar notifications
 - Service-level errors are logged to console for debugging
 - Recording gracefully handles permission denial and API failures
 - Error metadata includes retry timing, action hints, and severity levels
+
+### API Key Management
+- API key validation uses `GeminiService.validateApiKey()` method
+- Settings page validates keys before saving via `updateApiKey()` provider method
+- Fallback logic for keys starting with "AIza" and length > 30
+
+### Navigation Architecture Update (Latest)
+The app recently transitioned from bottom tabs to a collapsible left drawer:
+- **Old Structure**: 3 bottom tabs (Transcriptions, Dashboard, Settings)
+- **New Structure**: 5-item collapsible drawer with separate Dictionaries and Prompts screens
+- **Widget**: `AppNavigationDrawer` handles expand/collapse with 200ms animations
+- **State**: `currentPageProvider` manages active page (0-4)
+- **Responsive**: Collapsed state shows centered icons, expanded shows full labels
 
 ### Testing Considerations
 Test structure:

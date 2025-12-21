@@ -11,6 +11,9 @@ AI-powered voice typing application built with Flutter, featuring modern Materia
 - **🏗️ Deployment System**: Automated build and deployment pipeline for all platforms
 - **📱 Code Signing**: macOS code signing and notarization support for distribution
 - **📋 Landing Page**: New landing page with download management system
+- **🎨 Enhanced UI Components**: New modern transcription tiles with improved interactions
+- **📊 Simplified Dashboard**: Consolidated stats display with expandable details
+- **🧩 Shared Widget Library**: Comprehensive reusable UI components for consistency
 
 ### **Previous Improvements (v2.0)**
 - **⚡ Performance Optimizations**: Single API call mode reduces transcription time by up to 50%
@@ -136,6 +139,7 @@ flutter run -d linux
   - Social Media Post - Optimizes for social platforms
 - Custom prompt creation with template variables
 - Prompt categories for easy organization
+- Editable critical instructions for fine-tuning AI behavior
 
 ### 📚 **Enhanced Vocabulary Management**
 - **6 Pre-configured Vocabulary Sets:**
@@ -160,9 +164,11 @@ flutter run -d linux
 ### 📊 **Advanced Dashboard**
 - Real-time usage statistics (total recordings, total time)
 - Searchable transcription history with highlighting
-- Inline transcription editing capabilities
+- Inline transcription editing capabilities with keyboard shortcuts
 - Pagination for large transcription sets
 - Export and share functionality
+- **Simplified Stats Card**: Consolidated metrics display with expandable details
+- **Visual Data Representation**: Clean, intuitive data visualization
 
 ### ⚡ **Performance & Reliability**
 - Optimized for Flutter 3.38+ with clean architecture
@@ -191,27 +197,46 @@ Customize themes, prompts, and vocabulary by editing the JSON files without touc
 ```
 lib/
 ├── core/                    # Business logic and infrastructure
-│   ├── constants/          # App-wide constants
-│   ├── error/              # Error handling system
+│   ├── constants/          # App-wide constants and UI dimensions
+│   ├── config/             # Type-safe configuration classes
+│   ├── error/              # Enhanced error handling system
+│   ├── interfaces/         # Service interfaces for testing
 │   ├── models/             # Data models with Hive serialization
 │   ├── providers/          # Riverpod state providers
 │   ├── services/           # External service integrations
 │   ├── theme/              # Material Design 3 theming
-│   └── use_cases/          # Business use cases
+│   ├── use_cases/          # Business use cases
+│   └── utils/              # Helper utilities
 ├── features/               # Feature-based organization
 │   ├── dashboard/          # Main dashboard feature
+│   │   └── widgets/
+│   │       └── simplified_stats_card.dart
 │   ├── recording/          # Voice recording UI
-│   └── settings/           # Settings management
+│   ├── settings/           # Settings management
+│   └── transcriptions/     # Transcription management
+│       └── widgets/
+│           ├── compact_transcription_tile.dart
+│           └── modern_transcription_tile.dart
 └── widgets/                # Reusable UI components
     └── shared/             # Cross-feature components
+        ├── app_bars.dart
+        ├── app_buttons.dart
+        ├── app_cards.dart
+        ├── app_chips.dart
+        ├── app_dialogs.dart
+        ├── app_inputs.dart
+        ├── app_lists.dart
+        └── loading_indicators.dart
 ```
 
 ### Key Services
 - **AudioService**: Handles recording with VAD and background processing
 - **GeminiService**: Manages AI transcription with optimized API calls
 - **StorageService**: Centralized Hive database operations
+- **VersionService**: Semantic version management and dynamic version reading
 - **TrayService**: Desktop system tray integration
 - **HotkeyService**: Global hotkey management
+- **AudioAnalyzer**: Pre-validates audio with RMS-based speech detection
 
 ### State Management
 - Uses Riverpod for reactive state management

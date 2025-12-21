@@ -185,26 +185,31 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
         icon: LucideIcons.fileText,
         label: 'Transcriptions',
         index: 0,
+        shortcut: '⌘1',
       ),
       NavigationItem(
         icon: LucideIcons.layoutDashboard,
         label: 'Stats',
         index: 1,
+        shortcut: '⌘2',
       ),
       NavigationItem(
         icon: LucideIcons.bookOpen,
         label: 'Dictionaries',
         index: 2,
+        shortcut: '⌘3',
       ),
       NavigationItem(
         icon: LucideIcons.messageSquare,
         label: 'Prompts',
         index: 3,
+        shortcut: '⌘4',
       ),
       NavigationItem(
         icon: LucideIcons.settings,
         label: 'Settings',
         index: 4,
+        shortcut: '⌘5',
       ),
     ];
 
@@ -219,12 +224,16 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
                 ? Theme.of(context).colorScheme.primaryContainer
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
-            child: InkWell(
-              onTap: () {
-                ref.read(currentPageProvider.notifier).state = item.index;
-              },
-              borderRadius: BorderRadius.circular(12),
-              child: AnimatedContainer(
+            child: Tooltip(
+              message: _isExpanded ? '' : '${item.label} (${item.shortcut})',
+              child: InkWell(
+                onTap: () {
+                  ref.read(currentPageProvider.notifier).state = item.index;
+                },
+                borderRadius: BorderRadius.circular(12),
+                hoverColor: Theme.of(context).hoverColor,
+                splashColor: Theme.of(context).splashColor,
+                child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 padding: EdgeInsets.symmetric(
                   vertical: 12,
@@ -269,6 +278,7 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
                           size: 24,
                         ),
                       ),
+                ),
               ),
             ),
           ),
@@ -287,10 +297,12 @@ class NavigationItem {
   final IconData icon;
   final String label;
   final int index;
+  final String? shortcut;
 
   NavigationItem({
     required this.icon,
     required this.label,
     required this.index,
+    this.shortcut,
   });
 }

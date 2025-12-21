@@ -2,6 +2,8 @@ import 'dart:typed_data';
 import '../models/transcription.dart';
 import '../models/transcription_result.dart';
 import '../models/app_settings.dart';
+import '../models/custom_prompt.dart';
+import '../models/vocabulary.dart';
 
 // Audio analysis result
 class AudioAnalysis {
@@ -42,7 +44,9 @@ abstract class StorageServiceInterface {
   Future<List<Transcription>> getTranscriptions();
   Future<void> deleteTranscription(String id);
   Future<void> updateTranscription(String id, String newText);
-  AppSettings getSettings();
+  Future<AppSettings> getSettings();
+  Future<CustomPrompt?> getPrompt(String id);
+  Future<VocabularySet?> getVocabulary(String id);
 }
 
 abstract class NotificationServiceInterface {

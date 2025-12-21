@@ -36,10 +36,11 @@ flutter run -d web       # Web
 
 ### Core Functionality
 - **Voice Recording** with smart activity detection and RMS-based audio analysis
-- **AI-Powered Transcription** using Gemini 3 Flash (latest model)
+- **AI-Powered Transcription** using Gemini API with optimized processing
 - **Real-time Processing** with customizable prompts and vocabulary
 - **Audio Duration Tracking** for accurate usage statistics
 - **Smart Retry Mechanism** with automatic error recovery
+- **Keyboard Shortcuts**: Cmd/Ctrl+S for saving edited transcriptions
 
 ### User Experience
 - **Enhanced Error Handling** with Lucide icons and rich metadata
@@ -54,6 +55,7 @@ flutter run -d web       # Web
 - **6 Industry Vocabulary Sets**: General, Technology, Business, Medical, Legal, Finance
 - **Visual Vocabulary Display** with expandable tiles showing actual words
 - **Custom Prompt Creation** with template variables
+- **Modern & Compact UI**: Two transcription tile styles for different viewing preferences
 
 ### Platform Features
 - **Global Hotkeys** on desktop (Cmd+Shift+Space / Ctrl+Shift+Space)

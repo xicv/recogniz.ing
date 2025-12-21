@@ -108,7 +108,19 @@ class StorageService implements StorageServiceInterface {
 
   // Interface implementation
   @override
-  AppSettings getSettings() => settings;
+  Future<AppSettings> getSettings() async => settings;
+
+  @override
+  Future<CustomPrompt?> getPrompt(String id) async {
+    final box = Hive.box<CustomPrompt>(promptsBox);
+    return box.get(id);
+  }
+
+  @override
+  Future<VocabularySet?> getVocabulary(String id) async {
+    final box = Hive.box<VocabularySet>(vocabularyBox);
+    return box.get(id);
+  }
 
   @override
   Future<void> saveTranscription(Transcription transcription) async {

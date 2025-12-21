@@ -11,7 +11,7 @@ import 'core/services/hotkey_service.dart';
 import 'core/services/storage_service.dart';
 import 'core/services/tray_service.dart';
 import 'core/theme/app_theme.dart';
-import 'features/app_shell_drawer.dart';
+import 'features/app_shell.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -212,7 +212,7 @@ class _RecognizingAppState extends ConsumerState<RecognizingApp>
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
-      home: const AppShellWithDrawer(),
+      home: const AppShell(),
     );
   }
 }

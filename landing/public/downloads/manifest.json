@@ -1,8 +1,9 @@
 {
   "version": "1.0.2",
   "build_date": "2025-12-19",
+  "release_notes": "AI-powered voice typing with customizable prompts and vocabulary",
   "platforms": {
-    "macos": "macos/1.0.2/recognizing-1.0.2-macos.zip",
+    "macos": "https://github.com/xicv/recogniz.ing/releases/latest/download/recognizing-1.0.2-macos.zip",
     "windows": "#",
     "linux": "#",
     "android_aab": "#"

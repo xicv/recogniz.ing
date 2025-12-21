@@ -286,7 +286,7 @@ class _CriticalInstructionsEditorState
             ),
             const SizedBox(height: 12),
             Text(
-              '⚠️ Warning: Custom instructions may cause unexpected behavior:\n'
+              'Warning: Custom instructions may cause unexpected behavior:\n'
               '• Too strict: Might miss valid speech\n'
               '• Too lenient: Might transcribe noise as speech\n'
               '• Invalid format: May cause API errors',

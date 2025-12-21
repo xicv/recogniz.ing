@@ -3,10 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../constants/constants.dart';
 import '../models/transcription.dart';
+import '../models/transcription_result.dart';
 import '../providers/ui_providers.dart';
-import '../services/storage_service.dart';
 import '../interfaces/audio_service_interface.dart';
-import '../services/audio_service.dart';
 
 class VoiceRecordingUseCase {
   final AudioServiceInterface _audioService;
@@ -98,7 +97,7 @@ class VoiceRecordingUseCase {
 
   Future<void> _processAudio(
       List<int> audioData, double audioDurationSeconds) async {
-    final settings = _storageService.getSettings();
+    final settings = await _storageService.getSettings();
 
     if (!settings.hasApiKey) {
       _showErrorAndReset(
@@ -109,10 +108,14 @@ class VoiceRecordingUseCase {
     try {
       debugPrint('Sending to transcription service...');
 
+      // Get vocabulary and prompt through storage service
+      final vocabulary = await _storageService.getVocabulary(settings.selectedVocabularyId);
+      final prompt = await _storageService.getPrompt(settings.selectedPromptId);
+
       final result = await _transcriptionService.transcribeAudio(
         audioBytes: Uint8List.fromList(audioData),
-        vocabulary: _getVocabularyWords(settings.selectedVocabularyId),
-        promptTemplate: _getPromptTemplate(settings.selectedPromptId),
+        vocabulary: vocabulary?.words.join(', ') ?? '',
+        promptTemplate: prompt?.promptTemplate ?? AppConstants.defaultPromptTemplate,
         criticalInstructions: settings.effectiveCriticalInstructions,
       );
 
@@ -173,36 +176,6 @@ class VoiceRecordingUseCase {
       return 'Network error. Please check your connection.';
     } else {
       return 'An unexpected error occurred. Please try again.';
-    }
-  }
-
-  String _getPromptTemplate(String promptId) {
-    try {
-      final prompts = StorageService.prompts.values;
-      final prompt = prompts.firstWhere(
-        (p) => p.id == promptId,
-        orElse: () =>
-            prompts.firstWhere((p) => p.id == AppConstants.defaultPromptId),
-      );
-      return prompt.promptTemplate;
-    } catch (e) {
-      debugPrint('[VoiceRecordingUseCase] Error getting prompt template: $e');
-      return AppConstants.defaultPromptTemplate;
-    }
-  }
-
-  String _getVocabularyWords(String vocabularyId) {
-    try {
-      final vocabularies = StorageService.vocabulary.values;
-      final vocabulary = vocabularies.firstWhere(
-        (v) => v.id == vocabularyId,
-        orElse: () => vocabularies
-            .firstWhere((v) => v.id == AppConstants.defaultVocabularyId),
-      );
-      return vocabulary.words.join(', ');
-    } catch (e) {
-      debugPrint('[VoiceRecordingUseCase] Error getting vocabulary: $e');
-      return '';
     }
   }
 }
