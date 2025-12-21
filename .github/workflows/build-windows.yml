@@ -58,7 +58,7 @@ jobs:
       - name: Create distribution package
         run: |
           New-Item -ItemType Directory -Path "dist/windows" -Force
-          Copy-Item -Path "build\windows\runner\Release\*" -Destination "dist\windows" -Recurse
+          Copy-Item -Path "build\windows\x64\runner\Release\*" -Destination "dist\windows" -Recurse
           Set-Location "dist\windows"
           7z a -tzip "recognizing-${{ steps.version.outputs.version }}-windows.zip" *
 
