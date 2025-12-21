@@ -69,10 +69,10 @@ class AppTheme {
       ),
       scaffoldBackgroundColor: AppColors.backgroundLight,
       textTheme: GoogleFonts.interTextTheme(base.textTheme),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
         ),
         color: AppColors.surfaceLight,
       ),
@@ -116,10 +116,10 @@ class AppTheme {
       ),
       scaffoldBackgroundColor: AppColors.backgroundDark,
       textTheme: GoogleFonts.interTextTheme(base.textTheme),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
         ),
         color: AppColors.surfaceDark,
       ),
