@@ -14,9 +14,8 @@ import '../widgets/navigation/navigation_drawer.dart';
 import 'dashboard/dashboard_page.dart';
 import 'dictionaries/dictionaries_page.dart';
 import 'prompts/prompts_page.dart';
-import 'recording/vad_recording_overlay.dart';
 import 'settings/settings_page_refactored.dart';
-import 'transcriptions/transcriptions_page_paginated.dart';
+import 'transcriptions/transcriptions_page.dart';
 
 class AppShell extends ConsumerStatefulWidget {
   const AppShell({super.key});
@@ -139,27 +138,27 @@ return CallbackShortcuts(
             child: Builder(
               builder: (mainContentContext) => Stack(
                 children: [
-                IndexedStack(
-                  index: currentPage,
-                  children: const [
-                    TranscriptionsPagePaginated(),
-                    DashboardPage(),
-                    DictionariesPage(),
-                    PromptsPage(),
-                    SettingsPageRefactored(),
-                  ],
-                ),
-                if (recordingState != RecordingState.idle) const VadRecordingOverlay(),
-                // Store context reference for notifications
-                Builder(
-                  builder: (context) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      _mainContentContext = mainContentContext;
-                    });
-                    return const SizedBox.shrink();
-                  },
-                ),
-              ],
+                  IndexedStack(
+                    index: currentPage,
+                    children: const [
+                      TranscriptionsPage(),
+                      DashboardPage(),
+                      DictionariesPage(),
+                      PromptsPage(),
+                      SettingsPageRefactored(),
+                    ],
+                  ),
+                  // Store context reference for notifications
+                  Builder(
+                    builder: (context) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        _mainContentContext = mainContentContext;
+                      });
+                      return const SizedBox.shrink();
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ],
