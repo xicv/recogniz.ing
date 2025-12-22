@@ -10,21 +10,24 @@ final settingsProvider =
   return SettingsNotifier();
 });
 
-/// Get initial settings with fallback
-AppSettings _getInitialSettings() {
-  try {
-    return StorageService.settings;
-  } catch (e) {
-    if (kDebugMode) {
-      debugPrint('[SettingsNotifier] Failed to load settings: $e');
-    }
-    return AppSettings();
-  }
-}
-
 /// Notifier for managing app settings
 class SettingsNotifier extends StateNotifier<AppSettings> {
-  SettingsNotifier() : super(_getInitialSettings());
+  SettingsNotifier() : super(AppSettings()) {
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    try {
+      // Use a small delay to ensure Hive is initialized
+      await Future.delayed(const Duration(milliseconds: 100));
+      final settings = StorageService.settings;
+      state = settings;
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[SettingsNotifier] Failed to load settings: $e');
+      }
+    }
+  }
 
   Future<void> updateApiKey(String apiKey) async {
     final newState = state.copyWith(geminiApiKey: apiKey);

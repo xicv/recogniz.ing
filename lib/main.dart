@@ -75,6 +75,9 @@ class _RecognizingAppState extends ConsumerState<RecognizingApp>
   }
 
   Future<void> _initializeServices() async {
+    // Wait for a frame to ensure providers are initialized
+    await Future.delayed(const Duration(milliseconds: 200));
+
     // Initialize tray service
     _trayService = TrayService();
     await _trayService.initialize();
@@ -202,6 +205,13 @@ class _RecognizingAppState extends ConsumerState<RecognizingApp>
           debugPrint('[MainApp] Hotkey changed from $prev to $next');
         }
         _hotkeyService.initialize(next);
+      }
+    });
+
+    // Debug print for theme changes
+    ref.listen(settingsProvider.select((s) => s.darkMode), (prev, next) {
+      if (kDebugMode && prev != next) {
+        debugPrint('[MainApp] Dark mode changed from $prev to $next');
       }
     });
 
