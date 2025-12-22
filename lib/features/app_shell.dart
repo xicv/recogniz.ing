@@ -16,6 +16,7 @@ import 'dictionaries/dictionaries_page.dart';
 import 'prompts/prompts_page.dart';
 import 'settings/settings_page_refactored.dart';
 import 'transcriptions/transcriptions_page.dart';
+import '../features/recording/vad_recording_overlay.dart';
 
 class AppShell extends ConsumerStatefulWidget {
   const AppShell({super.key});
@@ -148,6 +149,8 @@ return CallbackShortcuts(
                       SettingsPageRefactored(),
                     ],
                   ),
+                  // VAD Recording Overlay
+                  if (recordingState != RecordingState.idle) VadRecordingOverlay(),
                   // Store context reference for notifications
                   Builder(
                     builder: (context) {

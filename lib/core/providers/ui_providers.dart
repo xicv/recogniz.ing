@@ -14,6 +14,11 @@ final recordingStateProvider = StateProvider<RecordingState>((ref) {
   return RecordingState.idle;
 });
 
+/// Recording duration provider
+final recordingDurationProvider = StateProvider<Duration>((ref) {
+  return Duration.zero;
+});
+
 /// Current page index for navigation
 final currentPageProvider = StateProvider<int>((ref) => 0);
 
