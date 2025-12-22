@@ -6,6 +6,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import 'package:uuid/uuid.dart';
 import 'audio_processor.dart';
+import 'audio_compression_service.dart';
+import 'audio_enhancement_service.dart';
 import '../config/app_config.dart';
 import '../constants/constants.dart';
 import '../interfaces/audio_service_interface.dart';
@@ -67,15 +69,9 @@ class AudioService implements AudioServiceInterface {
       debugPrint('[AudioService] Recording to: $_currentRecordingPath');
     }
 
-    // Start with optimized config for better performance
-    await _recorder.start(
-      const RecordConfig(
-        encoder: AudioEncoder.aacLc,
-        bitRate: 128000,
-        sampleRate: 44100,
-      ),
-      path: _currentRecordingPath!,
-    );
+    // Start with voice-optimized config
+    final config = AudioCompressionService.getVoiceOptimizedConfig();
+    await _recorder.start(config, path: _currentRecordingPath!);
 
     _isRecording = true;
     _recordingStartTime = DateTime.now();
@@ -155,6 +151,39 @@ class AudioService implements AudioServiceInterface {
     final config = await AppConfig.fromAsset();
     final audioConfig = config.audio;
 
+    // Apply audio enhancement and compression
+    Uint8List finalBytes = bytes;
+    try {
+      // First enhance the audio
+      final enhancedBytes = AudioEnhancementService.enhanceVoice(bytes);
+
+      // Then compress it
+      final compressedBytes = await AudioCompressionService.compressAudioBytes(
+        audioBytes: enhancedBytes,
+        sampleRate: audioConfig.sampleRate,
+        bitRate: 64000, // 64kbps optimized for voice
+      );
+
+      if (compressedBytes != null) {
+        finalBytes = compressedBytes;
+        final stats = AudioCompressionService.getCompressionStats(
+          originalSize: bytes.length,
+          compressedSize: compressedBytes.length,
+          durationSeconds: duration,
+        );
+
+        // Get audio stats
+        final audioStats = AudioEnhancementService.getAudioStats(enhancedBytes);
+        debugPrint('[AudioEnhancement] RMS: ${audioStats['rms']}, Peak: ${audioStats['peak']}');
+        debugPrint('[AudioCompression] ${stats['compressionRatio']} compression, ${stats['savingsPercent']} savings');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[AudioService] Enhancement/Compression failed, using original: $e');
+      }
+      // Continue with original audio if enhancement/compression fails
+    }
+
     // Validate recording has minimum duration and content
     if (duration < audioConfig.minDuration) {
       if (kDebugMode) {
@@ -176,7 +205,7 @@ class AudioService implements AudioServiceInterface {
     }
 
     // Analyze audio to detect speech using background analyzer
-    final audioBytes = Uint8List.fromList(bytes);
+    final audioBytes = Uint8List.fromList(finalBytes);
     final analysis = await AudioProcessor.analyzeAudio(
       audioBytes: audioBytes,
       amplitudeThreshold: audioConfig.amplitudeThreshold,
@@ -201,7 +230,7 @@ class AudioService implements AudioServiceInterface {
 
     return RecordingResult(
       path: path,
-      bytes: bytes,
+      bytes: finalBytes,
       durationSeconds: duration,
       analysis: analysis,
     );
