@@ -98,11 +98,10 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.primary,
                       borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(
-                      LucideIcons.mic,
-                      color: Colors.white,
-                      size: 24,
+                      image: const DecorationImage(
+                        image: AssetImage('assets/icons/app_icon.png'),
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
 
@@ -153,11 +152,10 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.primary,
                       borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(
-                      LucideIcons.mic,
-                      color: Colors.white,
-                      size: 24,
+                      image: const DecorationImage(
+                        image: AssetImage('assets/icons/app_icon.png'),
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 8),
