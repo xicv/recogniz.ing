@@ -1,0 +1,208 @@
+name: Release Windows App
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build and release (e.g., 1.0.3)'
+        required: true
+        type: string
+      create_release:
+        description: 'Create GitHub release with the build'
+        required: false
+        default: true
+        type: boolean
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release-windows:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+      releases: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Get version from tag or input
+        id: version
+        run: |
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            $VERSION = "${{ github.event.inputs.version }}"
+          } else {
+            # Extract version from tag (remove 'v' prefix)
+            $VERSION = "${{ github.ref_name }}" -replace "^v", ""
+          }
+          echo "version=$VERSION" >> $env:GITHUB_OUTPUT
+          Write-Host "Building version: $VERSION"
+
+      - name: Change to recognizing directory
+        run: cd recognizing
+
+      - name: Install dependencies
+        run: |
+          cd recognizing
+          flutter pub get
+
+      - name: Generate code
+        run: |
+          cd recognizing
+          flutter packages pub run build_runner build --delete-conflicting-outputs
+
+      - name: Build Windows Release
+        run: |
+          cd recognizing
+          flutter build windows --release
+
+      - name: Create Windows installer (NSIS)
+        run: |
+          cd recognizing
+
+          # Create NSIS installer script
+          @"
+          !define APPNAME "Recogniz.ing"
+          !define VERSION "${{ steps.version.outputs.version }}"
+          !define PUBLISHER "Recogniz.ing"
+          !define DESCRIPTION "AI-powered voice typing application"
+          !define URL "https://github.com/xicv/recogniz.ing"
+
+          !include "MUI2.nsh"
+
+          Name "${APPNAME}"
+          OutFile "recognizing-${VERSION}-windows.exe"
+          InstallDir "$PROGRAMFILES64\${APPNAME}"
+          RequestExecutionLevel admin
+
+          VIProductVersion "${VERSION}.0"
+          VIAddVersionKey "ProductName" "${APPNAME}"
+          VIAddVersionKey "CompanyName" "${PUBLISHER}"
+          VIAddVersionKey "FileDescription" "${DESCRIPTION}"
+          VIAddVersionKey "FileVersion" "${VERSION}"
+          VIAddVersionKey "ProductVersion" "${VERSION}"
+          VIAddVersionKey "LegalCopyright" "© ${PUBLISHER}"
+          VIAddVersionKey "OriginalFilename" "recognizing-${VERSION}-windows.exe"
+
+          ; Modern UI
+          !define MUI_ABORTWARNING
+          !define MUI_ICON "build\windows\runner\Release\resources\app_icon.ico"
+          !define MUI_UNICON "build\windows\runner\Release\resources\app_icon.ico"
+
+          ; Pages
+          !insertmacro MUI_PAGE_WELCOME
+          !insertmacro MUI_PAGE_LICENSE "LICENSE"
+          !insertmacro MUI_PAGE_COMPONENTS
+          !insertmacro MUI_PAGE_DIRECTORY
+          !insertmacro MUI_PAGE_INSTFILES
+          !insertmacro MUI_PAGE_FINISH
+
+          !insertmacro MUI_UNPAGE_WELCOME
+          !insertmacro MUI_UNPAGE_CONFIRM
+          !insertmacro MUI_UNPAGE_INSTFILES
+          !insertmacro MUI_UNPAGE_FINISH
+
+          ; Languages
+          !insertmacro MUI_LANGUAGE "English"
+
+          ; Installer sections
+          Section "Main Application" SEC01
+              SetOutPath "$INSTDIR"
+              File /r "build\windows\runner\Release\*"
+              CreateDirectory "$SMPROGRAMS\${APPNAME}"
+              CreateShortCut "$SMPROGRAMS\${APPNAME}\${APPNAME}.lnk" "$INSTDIR\recognizing.exe"
+              CreateShortCut "$DESKTOP\${APPNAME}.lnk" "$INSTDIR\recognizing.exe"
+              WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "DisplayName" "${APPNAME}"
+              WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "UninstallString" "$INSTDIR\uninstall.exe"
+              WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "DisplayVersion" "${VERSION}"
+              WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "Publisher" "${PUBLISHER}"
+              WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "URLInfoAbout" "${URL}"
+              WriteUninstaller "$INSTDIR\uninstall.exe"
+          SectionEnd
+
+          ; Uninstaller section
+          Section "Uninstall"
+              Delete "$INSTDIR\uninstall.exe"
+              Delete "$SMPROGRAMS\${APPNAME}\${APPNAME}.lnk"
+              Delete "$DESKTOP\${APPNAME}.lnk"
+              RMDir /r "$SMPROGRAMS\${APPNAME}"
+              RMDir /r "$INSTDIR"
+              DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}"
+          SectionEnd
+          "@ | Out-File -FilePath "installer.nsi" -Encoding utf8
+
+          # Try to create NSIS installer if makensis is available
+          if (Get-Command makensis -ErrorAction SilentlyContinue) {
+            Write-Host "Creating NSIS installer..."
+            makensis installer.nsi
+          } else {
+            Write-Host "NSIS not found, creating simple ZIP package..."
+
+            # Create ZIP package as fallback
+            7z a -tzip "recognizing-${VERSION}-windows.zip" "build\windows\runner\Release\*"
+          }
+
+      - name: Create release package
+        id: package
+        run: |
+          cd recognizing
+
+          # Determine which file was created
+          if (Test-Path "recognizing-${{ steps.version.outputs.version }}-windows.exe") {
+            echo "package_file=recognizing-${{ steps.version.outputs.version }}-windows.exe" >> $env:GITHUB_OUTPUT
+            echo "package_type=exe" >> $env:GITHUB_OUTPUT
+            Write-Host "Created Windows installer: recognizing-${{ steps.version.outputs.version }}-windows.exe"
+          } elseif (Test-Path "recognizing-${{ steps.version.outputs.version }}-windows.zip") {
+            echo "package_file=recognizing-${{ steps.version.outputs.version }}-windows.zip" >> $env:GITHUB_OUTPUT
+            echo "package_type=zip" >> $env:GITHUB_OUTPUT
+            Write-Host "Created Windows ZIP package: recognizing-${{ steps.version.outputs.version }}-windows.zip"
+          } else {
+            Write-Error "No package file created!"
+            exit 1
+          }
+
+      - name: Create GitHub Release
+        if: (github.event.inputs.create_release == 'true' || github.event_name == 'push')
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Recogniz.ing v${{ steps.version.outputs.version }}
+          body: |
+            ## Recogniz.ing v${{ steps.version.outputs.version }}
+
+            AI-powered voice typing application with real-time transcription.
+
+            ### 📥 Downloads
+            - **Windows**: recognizing-${{ steps.version.outputs.version }}-windows.${{ steps.package.outputs.package_type }}
+
+            ### 🚀 Features
+            - Voice recording with smart activity detection
+            - AI-powered transcription via Google Gemini API
+            - Custom prompts and vocabulary for specialized domains
+            - Cross-platform support (Windows, macOS, Linux, iOS, Android)
+            - Material Design 3 UI with dark/light themes
+
+            ### ⚙️ Requirements
+            - Windows 10 or later
+            - Google Gemini API key (get it free from [Google AI Studio](https://aistudio.google.com/app/apikey)
+
+            ---
+            Get more information at [https://xicv.github.io/recogniz.ing/](https://xicv.github.io/recogniz.ing/)
+          files: |
+            recognizing/recognizing-${{ steps.version.outputs.version }}-windows.${{ steps.package.outputs.package_type }}
+          draft: false
+          prerelease: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload artifact for manual review
+        uses: actions/upload-artifact@v4
+        with:
+          name: recognizing-windows-${{ steps.version.outputs.version }}
+          path: recognizing/recognizing-${{ steps.version.outputs.version }}-windows.${{ steps.package.outputs.package_type }}
+          retention-days: 30
