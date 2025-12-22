@@ -227,31 +227,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Simplified Build Numbers**: Removed unnecessary complexity from version display
 - **Better Tooling**: Improved development workflow with automation
 
-## 🆕 v1.2.0 (Previous)
-
-### Major Fixes
-- **Transcription History**: Fixed issue where transcriptions weren't appearing in recent history
-- **Prompt Processing**: Resolved AI confusion between prompt IDs and actual prompt templates
-- **Audio Duration**: Now correctly captures and displays recording duration
-- **State Management**: Improved provider usage for better UI updates
-
-### Enhanced Error Handling
-- **Lucide Icons**: Replaced all emojis with professional Lucide icons
-- **Rich Error Metadata**: Added retry timing, action hints, and error categorization
-- **Smart Retry**: Automatic retry mechanism with countdown timers
-- **Color Coding**: Visual differentiation of error types
-- **Better UX**: Direct navigation to Settings for API key issues
-
-### Architecture Improvements
-- **Use Cases Layer**: Added RecordingUseCase for better business logic separation
-- **Shared Widgets**: Created comprehensive widget library for code reuse
-- **Provider Organization**: Better structured Riverpod providers
-- **Error System**: Complete error handling overhaul with metadata
-
-### v1.1.0
-- **Editable Critical Instructions**: Customize AI behavior directly in settings with built-in safety warnings
-- **Vocabulary Word Preview**: Expand vocabulary sets to see all words in an elegant chip layout
-- **Audio Analysis Improvements**: Fixed RMS calculation bug for accurate speech detection
 
 ### v1.0.0
 - **Initial Release**: Core voice typing with Material Design 3

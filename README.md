@@ -365,25 +365,6 @@ MIT License
 - **REFACTOR**: Simplified version format (removed unnecessary build numbers)
 - **REFACTOR**: All version display now uses clean semantic versions
 
-### v1.2.0
-- **FIXED**: Transcriptions now properly appear in recent history
-- **FIXED**: Prompt processing no longer confuses AI with IDs vs templates
-- **FIXED**: Audio duration is now correctly captured and displayed
-- **NEW**: Enhanced error handling with Lucide icons instead of emojis
-- **NEW**: Rich error metadata with retry timing and action hints
-- **NEW**: Smart retry mechanism with countdown timers
-- **NEW**: Color-coded error messages for better UX
-- **REFACTOR**: Improved code architecture with use cases layer
-- **REFACTOR**: Added comprehensive shared widget components
-- **ENHANCED**: Better prompt templates for clearer AI instructions
-
-### v1.1.0
-- **NEW**: Editable critical instructions in settings with safety warnings
-- **NEW**: Expandable vocabulary tiles showing actual words in chip format
-- **FIXED**: Audio analyzer RMS calculation bug causing false negatives
-- **IMPROVED**: Lower audio detection thresholds for better speech sensitivity
-- **ENHANCED**: Comprehensive debug logging for audio analysis
-- **MIGRATION**: Seamless database migration for new features
 
 ### v1.0.0
 - Initial release with core voice typing functionality
