@@ -163,7 +163,7 @@ const faqs = [
           <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
             <RouterLink to="/downloads" class="group">
               <div class="bg-white p-8 rounded-2xl border border-slate-200 hover:border-slate-300 transition-all duration-300">
-                <svg fill="#000000" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 346.435 346.435" xml:space="preserve">
+                <svg class="w-12 h-12 mx-auto mb-4" fill="#000000" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 346.435 346.435" xml:space="preserve">
                   <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                   <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
                   <g id="SVGRepo_iconCarrier">
