@@ -25,11 +25,19 @@ class AppShell extends ConsumerStatefulWidget {
   ConsumerState<AppShell> createState() => _AppShellState();
 }
 
+// Global key for the inner Scaffold (main content area)
+final GlobalKey<NavigatorState> contentNavigatorKey = GlobalKey<NavigatorState>();
+
 class _AppShellState extends ConsumerState<AppShell> {
   BuildContext? _mainContentContext;
 @override
   void initState() {
     super.initState();
+    // Set the content navigator key for notification service
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final notificationService = ref.read(notificationServiceProvider);
+      notificationService.setContentNavigatorKey(contentNavigatorKey);
+    });
   }
 
   @override
@@ -166,8 +174,6 @@ return CallbackShortcuts(
           ),
         ],
       ),
-      floatingActionButton: _buildRecordFab(context, ref, recordingState),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     ),
   );
   }

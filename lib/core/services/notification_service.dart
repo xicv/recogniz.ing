@@ -7,9 +7,15 @@ class NotificationService implements NotificationServiceInterface {
   NotificationService._internal();
 
   GlobalKey<NavigatorState>? _navigatorKey;
+  GlobalKey<NavigatorState>? _contentNavigatorKey;
 
   void setNavigatorKey(GlobalKey<NavigatorState> navigatorKey) {
     _navigatorKey = navigatorKey;
+  }
+
+  @override
+  void setContentNavigatorKey(GlobalKey<NavigatorState> contentNavigatorKey) {
+    _contentNavigatorKey = contentNavigatorKey;
   }
 
   @override
@@ -25,14 +31,16 @@ class NotificationService implements NotificationServiceInterface {
   @override
   void clearError() {
     // Clear any existing snackbars
-    final context = _navigatorKey?.currentContext;
+    // Prefer the content navigator key to clear notifications in the main content area
+    final context = _contentNavigatorKey?.currentContext ?? _navigatorKey?.currentContext;
     if (context != null) {
       ScaffoldMessenger.of(context).clearSnackBars();
     }
   }
 
   void _showSnackBar(String message, {required bool isError}) {
-    final context = _navigatorKey?.currentContext;
+    // Prefer the content navigator key to show notifications in the main content area
+    final context = _contentNavigatorKey?.currentContext ?? _navigatorKey?.currentContext;
     if (context == null) return;
 
     ScaffoldMessenger.of(context).showSnackBar(

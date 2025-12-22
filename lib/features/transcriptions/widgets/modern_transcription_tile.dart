@@ -401,9 +401,36 @@ class _ModernTranscriptionTileState extends State<ModernTranscriptionTile>
   }
 
   void _startEditing() {
-    setState(() {
-      _isEditing = true;
-    });
+    // Show full-screen modal for editing
+    Navigator.of(context).push(
+      PageRouteBuilder<void>(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            _TranscriptionEditModal(
+              transcription: widget.transcription,
+              initialText: widget.transcription.processedText,
+              onSave: (text) {
+                if (widget.onUpdate != null) {
+                  widget.onUpdate!(text);
+                }
+              },
+            ),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return SlideTransition(
+            position: animation.drive(
+              Tween(
+                begin: const Offset(0.0, 1.0),
+                end: Offset.zero,
+              ).chain(CurveTween(curve: Curves.easeOutCubic)),
+            ),
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 300),
+        barrierDismissible: true,
+        barrierColor: Colors.black54,
+        fullscreenDialog: true,
+      ),
+    );
   }
 
   void _saveChanges() {
@@ -684,8 +711,233 @@ class _TranscriptionDetailsPage extends StatelessWidget {
   }
 
   String _formatDuration(double seconds) {
-    final minutes = (seconds / 60).floor();
-    final remainingSeconds = (seconds % 60).floor();
-    return '${minutes}m ${remainingSeconds}s';
+    final duration = Duration(seconds: seconds.round());
+    final minutes = duration.inMinutes;
+    final remainingSeconds = duration.inSeconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
+  }
+
+}
+
+class _TranscriptionEditModal extends StatefulWidget {
+  final Transcription transcription;
+  final String initialText;
+  final Function(String) onSave;
+
+  const _TranscriptionEditModal({
+    super.key,
+    required this.transcription,
+    required this.initialText,
+    required this.onSave,
+  });
+
+  @override
+  State<_TranscriptionEditModal> createState() => _TranscriptionEditModalState();
+}
+
+class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
+  late TextEditingController _controller;
+  bool _hasChanges = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialText);
+    _controller.addListener(() {
+      setState(() {
+        _hasChanges = _controller.text != widget.initialText;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  String _formatDuration(double seconds) {
+    if (seconds < 60) {
+      return '${seconds.round()}s';
+    } else {
+      final minutes = seconds ~/ 60;
+      final remainingSeconds = seconds % 60;
+      return '${minutes}m ${remainingSeconds.round()}s';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Edit Transcription'),
+        backgroundColor: colorScheme.surface,
+        elevation: 0,
+        scrolledUnderElevation: 1,
+        actions: [
+          TextButton(
+            onPressed: _hasChanges
+                ? () {
+                    widget.onSave(_controller.text);
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Transcription saved'),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  }
+                : null,
+            child: Text(
+              'Save',
+              style: TextStyle(
+                color: _hasChanges ? colorScheme.primary : colorScheme.outline,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          // Transcription metadata
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            margin: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceVariant.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Recording Details',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(
+                      LucideIcons.calendar,
+                      size: 16,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      DateFormat('MMM d, yyyy • h:mm a').format(widget.transcription.createdAt),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(
+                      LucideIcons.clock,
+                      size: 16,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Duration: ${_formatDuration(widget.transcription.audioDurationSeconds)}',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // Text editor
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: TextField(
+                controller: _controller,
+                maxLines: null,
+                expands: true,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: 'Edit transcription text...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: colorScheme.outline),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: colorScheme.primary),
+                  ),
+                  filled: true,
+                  fillColor: colorScheme.surface,
+                  contentPadding: const EdgeInsets.all(16),
+                ),
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  height: 1.6,
+                  fontFamily: 'monospace',
+                ),
+              ),
+            ),
+          ),
+          // Bottom action bar
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      _controller.text = widget.initialText;
+                      setState(() {
+                        _hasChanges = false;
+                      });
+                    },
+                    child: const Text('Reset'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _hasChanges
+                        ? () {
+                            widget.onSave(_controller.text);
+                            Navigator.of(context).pop();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Transcription saved'),
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          }
+                        : null,
+                    child: const Text('Save Changes'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

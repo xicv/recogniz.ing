@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:flutter/material.dart';
 import '../models/transcription.dart';
 import '../models/transcription_result.dart';
 import '../models/app_settings.dart';
@@ -53,4 +54,5 @@ abstract class NotificationServiceInterface {
   void showError(String message);
   void showSuccess(String message);
   void clearError();
+  void setContentNavigatorKey(GlobalKey<NavigatorState> contentNavigatorKey);
 }

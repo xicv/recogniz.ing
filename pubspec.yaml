@@ -23,10 +23,12 @@ dependencies:
 
   # Audio Recording
   record: ^5.2.0
+  flutter_sound: ^9.12.5
   path_provider: ^2.1.4
 
   # AI Integration - updated version
   google_generative_ai: ^0.4.0
+  flutter_gemini: ^2.0.0
 
   # Hotkeys (Desktop)
   hotkey_manager: ^0.2.0
@@ -48,6 +50,7 @@ dependencies:
   intl: ^0.20.2
   url_launcher: ^6.2.2
   share_plus: ^10.0.0
+  http: ^1.2.0
 
   # Clipboard
   super_clipboard: ^0.8.4
