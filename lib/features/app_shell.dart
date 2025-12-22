@@ -26,7 +26,8 @@ class AppShell extends ConsumerStatefulWidget {
 }
 
 class _AppShellState extends ConsumerState<AppShell> {
-  @override
+  BuildContext? _mainContentContext;
+@override
   void initState() {
     super.initState();
   }
@@ -55,7 +56,7 @@ class _AppShellState extends ConsumerState<AppShell> {
     } else if (lastError != null) {
       // Fallback for simple errors
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(_mainContentContext ?? context).showSnackBar(
           SnackBar(
             content: Text(lastError),
             backgroundColor: Theme.of(context).colorScheme.error,
@@ -135,8 +136,9 @@ return CallbackShortcuts(
 
           // Main Content
           Expanded(
-            child: Stack(
-              children: [
+            child: Builder(
+              builder: (mainContentContext) => Stack(
+                children: [
                 IndexedStack(
                   index: currentPage,
                   children: const [
@@ -148,6 +150,15 @@ return CallbackShortcuts(
                   ],
                 ),
                 if (recordingState != RecordingState.idle) const RecordingOverlay(),
+                // Store context reference for notifications
+                Builder(
+                  builder: (context) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _mainContentContext = mainContentContext;
+                    });
+                    return const SizedBox.shrink();
+                  },
+                ),
               ],
             ),
           ),
@@ -315,7 +326,7 @@ return CallbackShortcuts(
     }
 
     final snackBar = _buildErrorSnackBar(context, ref, errorResult);
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    ScaffoldMessenger.of(_mainContentContext ?? context).showSnackBar(snackBar);
   }
 
   SnackBar _buildErrorSnackBar(

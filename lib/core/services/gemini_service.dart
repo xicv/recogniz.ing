@@ -25,7 +25,7 @@ class GeminiService implements TranscriptionServiceInterface {
   GenerativeModel? _model;
   GenerativeModel? _lightningModel;
 
-  static const String _modelName = 'gemini-3-flash-preview';
+
 
   // Simple LRU cache for transcription results
   final Map<String, TranscriptionResult> _cache = {};

@@ -375,6 +375,31 @@ class _ModernTranscriptionTileState extends State<ModernTranscriptionTile>
     return preview.isEmpty ? lines.first.substring(0, 200) : preview;
   }
 
+  void _openFullscreenEdit(BuildContext context) {
+    Navigator.of(context).push(
+      PageRouteBuilder<void>(
+        pageBuilder: (context, animation, _) => FullscreenTranscriptionEdit(
+          transcription: widget.transcription,
+          onSave: (newText) {
+            if (widget.onUpdate != null) {
+              widget.onUpdate(newText);
+            }
+          },
+        ),
+        transitionDuration: const Duration(milliseconds: 300),
+        transitionsBuilder: (_, animation, __, child) {
+          return SlideTransition(
+            position: animation.drive(
+              Tween(begin: const Offset(1, 0), end: Offset.zero)
+                  .chain(CurveTween(curve: Curves.easeInOut)),
+            ),
+            child: child,
+          );
+        },
+      ),
+    );
+  }
+
   void _startEditing() {
     setState(() {
       _isEditing = true;
