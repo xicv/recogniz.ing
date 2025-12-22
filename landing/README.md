@@ -2,6 +2,14 @@
 
 A modern, minimalist landing page for the Recogniz.ing AI voice typing application.
 
+## Latest Version: 1.0.3 (December 21, 2025)
+
+### Recent Updates
+- **🎨 Updated Platform Icons**: Better visual representation with iMac for macOS and Apple logo for iOS
+- **📦 Improved Downloads**: Enhanced download management with version 1.0.3 builds
+- **🔐 macOS Security**: Fixed Gatekeeper verification issues
+- **🪟 Windows Support**: Initial Windows release with native installer
+
 ## About Recogniz.ing
 
 Recogniz.ing is an AI-powered voice typing application built with Flutter that:

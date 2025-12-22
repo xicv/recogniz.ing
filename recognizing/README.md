@@ -189,7 +189,25 @@ flutter pub get
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆕 Latest Updates (v1.0.2)
+## 🆕 Latest Updates (v1.0.3) - December 21, 2025
+
+### 🔐 Security & Platform Support
+- **macOS Gatekeeper Fix**: Resolved verification issues with improved app signing
+- **Windows Release**: First official Windows release with native installer
+- **Build System Improvements**: Fixed `make quick-run` to prevent code signing errors
+- **Cross-Platform Stability**: Enhanced performance across all platforms
+
+### 🎨 UI/UX Updates
+- **Platform Icons**: Updated landing page with better visual representation
+  - macOS: iMac icon for desktop clarity
+  - iOS: Apple brand logo for consistency
+- **Download Management**: Improved version tracking and download links
+
+### 🛠️ Development Tools
+- **Makefile Enhancements**: Better error handling for macOS builds
+- **Clean Build Process**: Automatic cleanup of problematic extended attributes
+
+## 🆕 Previous Updates (v1.0.2)
 
 ### 📦 Version Management & Deployment
 - **Semantic Versioning**: Clean version format (MAJOR.MINOR.PATCH) without build numbers

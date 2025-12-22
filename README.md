@@ -4,7 +4,15 @@ AI-powered voice typing application built with Flutter, featuring modern Materia
 
 ## ✨ What's New
 
-### **Latest Version: 1.0.2**
+### **Latest Version: 1.0.3** (December 21, 2025)
+- **🔐 macOS Security**: Fixed macOS Gatekeeper verification issues with improved app signing
+- **🪟 Windows Release**: Initial Windows release with native installer support
+- **🛠️ Build System**: Improved build scripts and Makefile with `make quick-run` fix
+- **🎨 UI Updates**: Updated platform icons on landing page (iMac for macOS, Apple logo for iOS)
+- **⚡ Performance**: Enhanced stability and performance across all platforms
+- **📦 Downloads**: Updated download links and version management
+
+### **Previous Improvements (v1.0.2)**
 - **📦 Version Management System**: Implemented proper semantic versioning with automated tools
 - **⌨️ Keyboard Shortcuts**: Added Cmd/Ctrl+S to save edited transcriptions
 - **🔧 Settings Navigation**: Fixed menu bar Settings navigation to open correct tab
@@ -14,13 +22,6 @@ AI-powered voice typing application built with Flutter, featuring modern Materia
 - **🎨 Enhanced UI Components**: New modern transcription tiles with improved interactions
 - **📊 Simplified Dashboard**: Consolidated stats display with expandable details
 - **🧩 Shared Widget Library**: Comprehensive reusable UI components for consistency
-
-### **Previous Improvements (v2.0)**
-- **⚡ Performance Optimizations**: Single API call mode reduces transcription time by up to 50%
-- **🎨 Enhanced UI/UX**: Theme-consistent components with improved dark mode support
-- **🔧 Better Error Handling**: Categorized error messages with actionable recovery options
-- **📦 Component Library**: Standardized, reusable UI components for consistency
-- **🔐 Improved Security**: Better password field handling and input validation
 
 ## Prerequisites
 
@@ -343,7 +344,17 @@ MIT License
 
 ## Changelog
 
-### v1.0.2 (Latest)
+### v1.0.3 (Latest) - December 21, 2025
+- **FIXED**: macOS Gatekeeper verification issues with improved app signing
+- **NEW**: Initial Windows release with native installer (.exe)
+- **FIXED**: `make quick-run` command now properly cleans build directory to prevent code signing errors
+- **NEW**: Updated platform icons on landing page
+  - macOS: iMac/desktop icon for better platform representation
+  - iOS: Apple brand logo for consistency
+- **ENHANCED**: Overall stability and performance improvements
+- **UPDATED**: Download links and version management system
+
+### v1.0.2
 - **NEW**: Comprehensive version management system with semantic versioning
 - **NEW**: Version management tools (Dart script, shell script, Makefile targets)
 - **NEW**: Keyboard shortcut (Cmd/Ctrl+S) for saving edited transcriptions
