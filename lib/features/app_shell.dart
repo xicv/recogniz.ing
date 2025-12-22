@@ -14,9 +14,9 @@ import '../widgets/navigation/navigation_drawer.dart';
 import 'dashboard/dashboard_page.dart';
 import 'dictionaries/dictionaries_page.dart';
 import 'prompts/prompts_page.dart';
-import 'recording/recording_overlay.dart';
+import 'recording/vad_recording_overlay.dart';
 import 'settings/settings_page_refactored.dart';
-import 'transcriptions/transcriptions_page.dart';
+import 'transcriptions/transcriptions_page_paginated.dart';
 
 class AppShell extends ConsumerStatefulWidget {
   const AppShell({super.key});
@@ -142,14 +142,14 @@ return CallbackShortcuts(
                 IndexedStack(
                   index: currentPage,
                   children: const [
-                    TranscriptionsPage(),
+                    TranscriptionsPagePaginated(),
                     DashboardPage(),
                     DictionariesPage(),
                     PromptsPage(),
                     SettingsPageRefactored(),
                   ],
                 ),
-                if (recordingState != RecordingState.idle) const RecordingOverlay(),
+                if (recordingState != RecordingState.idle) const VadRecordingOverlay(),
                 // Store context reference for notifications
                 Builder(
                   builder: (context) {
