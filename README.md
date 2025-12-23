@@ -12,7 +12,18 @@ AI-powered voice typing application built with Flutter, featuring modern Materia
 
 ## ✨ What's New
 
-### **Latest Version: 1.0.3** (December 21, 2025)
+### **Latest Version: 1.0.4** (December 23, 2025)
+- **📋 Changelog System**: New structured changelog with JSON format and auto-generated Markdown
+- **🔄 Single Source of Truth**: CHANGELOG.json is now the authoritative source, CHANGELOG.md is auto-generated
+- **📦 Automated Version Management**: Updated version_manager.dart with changelog entry templates
+- **🌐 Landing Page Updates**: Added Android platform downloads with proper installation instructions
+- **🐛 Fixed Downloads**: Corrected download URLs to point to GitHub Pages instead of GitHub Releases
+- **🔧 Build System**: Upgraded Android Gradle Plugin to 8.10, Gradle to 8.11.1, Kotlin to 2.1.0
+- **🏗️ Deployment**: Fixed detached HEAD issue in GitHub Actions release workflow
+- **📱 Android Support**: Fixed Android build with AGP 8.10 compatibility
+- **🎨 UI Enhancements**: User preferences with persistent desktop settings, VAD modal UI fixes
+
+### **Previous Improvements (v1.0.3)**
 - **🔐 macOS Security**: Fixed macOS Gatekeeper verification issues with improved app signing
 - **🪟 Windows Release**: Initial Windows release with native installer support
 - **🛠️ Build System**: Improved build scripts and Makefile with `make quick-run` fix
@@ -71,11 +82,18 @@ flutter run -d web        # Web browser
 The project includes a comprehensive Makefile for common tasks:
 
 ```bash
+# Dependencies & Development
 make get              # Install Flutter dependencies
 make run-macos        # Run on macOS
 make dev              # get + analyze + format + test
 make quick-run        # get + run-macos (quick start)
+
+# Version Management
 make version          # Show current version
+make changelog        # Generate CHANGELOG.md from CHANGELOG.json
+make verify-changelog # Verify changelogs are in sync
+make bump-patch       # Bump patch version
+make bump-patch-entry # Bump patch + add changelog entry template
 make release          # Bump patch + deploy all platforms
 ```
 
@@ -217,6 +235,47 @@ npm run build   # Build for production
 
 ---
 
+## Changelog Management
+
+The project uses a single-source-of-truth changelog system where `CHANGELOG.json` is the authoritative source and `CHANGELOG.md` is auto-generated.
+
+### Changelog Workflow
+
+```bash
+# 1. Bump version with entry template
+make bump-patch-entry
+
+# 2. Edit CHANGELOG.json with actual changes
+#    - Update highlights
+#    - Add/modify change entries (categories: added, changed, fixed, removed, security)
+
+# 3. Generate Markdown from JSON
+make changelog
+
+# 4. Commit both files together
+git add CHANGELOG.json CHANGELOG.md pubspec.yaml
+git commit -m "chore: bump version to X.Y.Z and update changelog"
+```
+
+### Version Manager Commands
+
+```bash
+dart scripts/version_manager.dart --help              # Show all options
+dart scripts/version_manager.dart --current           # Show current version
+dart scripts/version_manager.dart --changelog         # Generate CHANGELOG.md
+dart scripts/version_manager.dart --verify-changelog  # Check if files are in sync
+dart scripts/version_manager.dart --bump patch --add-entry  # Bump + add template
+```
+
+### Why JSON as Source of Truth?
+
+1. **Programmatic Access**: JSON is easier to parse and render in UI components
+2. **Validation**: Schema can be validated, reducing errors
+3. **Automation**: CI/CD can easily read and process changelog data
+4. **Single Source**: Edit one file, generate the other automatically
+
+---
+
 ## Development
 
 ### Code Quality
@@ -286,7 +345,18 @@ MIT License
 
 ## Changelog
 
-### v1.0.3 (Latest) - December 21, 2025
+### v1.0.4 (Latest) - December 23, 2025
+- **NEW**: Changelog synchronization system with JSON as single source of truth
+- **NEW**: Version manager with `--changelog`, `--add-entry`, and `--verify-changelog` flags
+- **NEW**: Added Android platform downloads to landing page
+- **FIXED**: Download URLs now point to GitHub Pages instead of GitHub Releases
+- **FIXED**: Detached HEAD issue in GitHub Actions release workflow
+- **FIXED**: Android build compatibility with AGP 8.10 and Gradle 8.11.1
+- **FIXED**: PWA build error by excluding downloads folder from precaching
+- **ENHANCED**: User preferences with persistent desktop settings
+- **ENHANCED**: VAD modal UI fixes and audio processing improvements
+
+### v1.0.3 - December 21, 2025
 - **FIXED**: macOS Gatekeeper verification issues with improved app signing
 - **NEW**: Initial Windows release with native installer
 - **FIXED**: `make quick-run` command now properly cleans build directory
