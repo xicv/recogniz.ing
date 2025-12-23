@@ -42,7 +42,6 @@ dependencies:
 
   # Audio Processing
   ffmpeg_kit_flutter: ^6.0.3
-  path_provider: ^2.1.2
   vad: ^1.0.1
 
   # Utilities
