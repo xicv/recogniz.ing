@@ -174,7 +174,7 @@ const settings = [
                 </svg>
               </div>
               <h3 class="text-lg font-medium mb-2">AI-Powered Transcription</h3>
-              <p class="text-slate-600 text-sm leading-relaxed">Gemini 1.5 with single API optimization</p>
+              <p class="text-slate-600 text-sm leading-relaxed">Gemini 3.0 Flash with intelligent optimization</p>
             </div>
 
             <!-- Dashboard & Analytics -->

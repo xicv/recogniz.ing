@@ -123,7 +123,7 @@ make release          # Bump patch + deploy all platforms
 - Background audio analysis in isolates for smooth UI performance
 
 ### 🤖 AI-Powered Transcription
-- Powered by Google's Gemini 1.5 Flash model
+- Powered by Google's Gemini 3.0 Flash model
 - Intelligent noise filtering and silence detection
 - Real-time transcription with customizable processing
 - Automatic retry mechanism with exponential backoff

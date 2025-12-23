@@ -163,7 +163,7 @@
         {
           "category": "added",
           "title": "AI Transcription",
-          "description": "Powered by Google Gemini 1.5 Flash with intelligent noise filtering and silence detection."
+          "description": "Powered by Google Gemini 3.0 Flash with intelligent noise filtering and silence detection."
         },
         {
           "category": "added",

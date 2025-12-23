@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **Voice Recording** - Smart voice activity detection (VAD) with configurable sensitivity and RMS-based audio analysis.
-- **AI Transcription** - Powered by Google Gemini 1.5 Flash with intelligent noise filtering and silence detection.
+- **AI Transcription** - Powered by Google Gemini 3.0 Flash with intelligent noise filtering and silence detection.
 - **Custom Prompts** - 6 pre-configured prompts (Clean, Formal, Bullets, Email, Meeting Notes, Social Media) with custom prompt creation.
 - **Vocabulary Sets** - 6 industry vocabulary sets (General, Technology, Business, Medical, Legal, Finance).
 - **Dashboard** - Real-time transcription history with search, usage statistics, and inline editing.
