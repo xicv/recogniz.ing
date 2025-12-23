@@ -216,8 +216,7 @@ lib/
 │   ├── settings/           # Settings management
 │   └── transcriptions/     # Transcription management
 │       └── widgets/
-│           ├── compact_transcription_tile.dart
-│           └── modern_transcription_tile.dart
+│           └── transcription_card.dart
 └── widgets/                # Reusable UI components
     └── shared/             # Cross-feature components
         ├── app_bars.dart

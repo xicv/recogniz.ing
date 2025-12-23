@@ -7,7 +7,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/providers/app_providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/models/app_settings.dart';
-import 'widgets/compact_transcription_tile.dart';
 import 'widgets/transcription_card.dart';
 
 class TranscriptionsPage extends ConsumerStatefulWidget {
