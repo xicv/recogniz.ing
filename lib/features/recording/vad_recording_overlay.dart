@@ -1,7 +1,8 @@
+import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'dart:math';
 import '../../core/services/vad_service.dart';
 import '../../core/constants/ui_constants.dart';
 import '../../core/providers/recording_providers.dart';
@@ -24,6 +25,10 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
   bool _isInitialized = false;
   double _speechProbability = 0.0;
   bool _hasDetectedSpeech = false;
+
+  // Duration tracking
+  DateTime? _recordingStartTime;
+  Timer? _durationTimer;
 
   @override
   void initState() {
@@ -57,6 +62,7 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
   void dispose() {
     _pulseController.dispose();
     _waveController.dispose();
+    _durationTimer?.cancel();
     VadService.stopListening();
     super.dispose();
   }
@@ -98,7 +104,9 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
   @override
   Widget build(BuildContext context) {
     final recordingState = ref.watch(recordingStateProvider);
-    final duration = ref.watch(recordingDurationProvider);
+
+    // Manage timer based on recording state
+    _manageDurationTimer(recordingState);
 
     return Container(
       color: Colors.black.withOpacity(0.85),
@@ -115,35 +123,40 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
                   // Wave visualization
                   _buildWaveVisualization(),
 
-                  // Recording button
-                  AnimatedBuilder(
-                    animation: _pulseAnimation,
-                    builder: (context, child) {
-                      return Container(
-                        width: 56.0, // FAB size
-                        height: 56.0,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: _hasDetectedSpeech
-                              ? Theme.of(context).colorScheme.secondary
-                              : Theme.of(context).colorScheme.primary,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Theme.of(context).colorScheme.primary,
-                              blurRadius: 30 * _pulseAnimation.value,
-                              spreadRadius: 5 * _pulseAnimation.value,
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          recordingState == RecordingState.recording
-                              ? LucideIcons.mic
-                              : LucideIcons.mic,
-                          color: Colors.white,
-                          size: 32,
-                        ),
-                      );
-                    },
+                  // Recording button with stop functionality
+                  GestureDetector(
+                    onTap: recordingState == RecordingState.recording
+                        ? _stopRecording
+                        : null,
+                    child: AnimatedBuilder(
+                      animation: _pulseAnimation,
+                      builder: (context, child) {
+                        return Container(
+                          width: 80.0,
+                          height: 80.0,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: _hasDetectedSpeech
+                                ? Theme.of(context).colorScheme.secondary
+                                : Theme.of(context).colorScheme.primary,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Theme.of(context).colorScheme.primary,
+                                blurRadius: 30 * _pulseAnimation.value,
+                                spreadRadius: 5 * _pulseAnimation.value,
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            recordingState == RecordingState.recording
+                                ? LucideIcons.square
+                                : LucideIcons.mic,
+                            color: Colors.white,
+                            size: 32,
+                          ),
+                        );
+                      },
+                    ),
                   ),
 
                   // VAD status indicator
@@ -171,9 +184,39 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
 
               const SizedBox(height: 40),
 
+              // Stop button (shown when recording)
+              if (recordingState == RecordingState.recording)
+                GestureDetector(
+                  onTap: _stopRecording,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(LucideIcons.square, color: Colors.white, size: 16),
+                        SizedBox(width: 8),
+                        Text(
+                          'Stop Recording',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+              const SizedBox(height: 40),
+
               // Recording info
               Text(
-                _formatDuration(duration),
+                _formatDuration(_currentDuration),
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 48,
@@ -183,9 +226,9 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
 
               const SizedBox(height: 16),
 
-              // VAD status text
+              // Recording status text - reflects actual recording state
               Text(
-                _getVadStatusText(),
+                _getRecordingStatusText(recordingState),
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.9),
                   fontSize: 16,
@@ -322,12 +365,73 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
     return '🎤 Listening...';
   }
 
+  String _getRecordingStatusText(RecordingState state) {
+    switch (state) {
+      case RecordingState.idle:
+        return 'Ready to record';
+      case RecordingState.recording:
+        return _getVadStatusText();
+      case RecordingState.processing:
+        return '⏳ Processing transcription...';
+    }
+  }
+
   Color _getVadStatusColor() {
     if (_hasDetectedSpeech) {
       return Colors.green;
     }
 
     return Theme.of(context).colorScheme.primary;
+  }
+
+  Duration get _currentDuration {
+    if (_recordingStartTime == null) {
+      return Duration.zero;
+    }
+    return DateTime.now().difference(_recordingStartTime!);
+  }
+
+  void _manageDurationTimer(RecordingState state) {
+    if (state == RecordingState.recording) {
+      // Start timer if not already running
+      if (_durationTimer == null || !_durationTimer!.isActive) {
+        if (_recordingStartTime == null) {
+          _recordingStartTime = DateTime.now();
+        }
+        _durationTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+          if (mounted) {
+            setState(() {});
+          }
+        });
+      }
+    } else {
+      // Stop timer and reset if not recording
+      _durationTimer?.cancel();
+      _durationTimer = null;
+      if (state == RecordingState.idle) {
+        _recordingStartTime = null;
+      }
+    }
+  }
+
+  Future<void> _stopRecording() async {
+    final currentState = ref.read(recordingStateProvider);
+
+    if (currentState != RecordingState.recording) {
+      debugPrint('[VadRecordingOverlay] Not recording, ignoring stop');
+      return;
+    }
+
+    debugPrint('[VadRecordingOverlay] Stopping recording...');
+    final voiceRecordingUseCase = ref.read(voiceRecordingUseCaseProvider);
+
+    try {
+      await voiceRecordingUseCase.stopRecording();
+      debugPrint('[VadRecordingOverlay] Recording stopped successfully');
+    } catch (e) {
+      debugPrint('[VadRecordingOverlay] Error stopping recording: $e');
+      rethrow;
+    }
   }
 }
 

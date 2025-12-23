@@ -8,6 +8,7 @@ class NotificationService implements NotificationServiceInterface {
 
   GlobalKey<NavigatorState>? _navigatorKey;
   GlobalKey<NavigatorState>? _contentNavigatorKey;
+  GlobalKey<ScaffoldState>? _scaffoldKey;
 
   void setNavigatorKey(GlobalKey<NavigatorState> navigatorKey) {
     _navigatorKey = navigatorKey;
@@ -16,6 +17,11 @@ class NotificationService implements NotificationServiceInterface {
   @override
   void setContentNavigatorKey(GlobalKey<NavigatorState> contentNavigatorKey) {
     _contentNavigatorKey = contentNavigatorKey;
+  }
+
+  @override
+  void setScaffoldKey(GlobalKey<ScaffoldState> scaffoldKey) {
+    _scaffoldKey = scaffoldKey;
   }
 
   @override
@@ -31,16 +37,26 @@ class NotificationService implements NotificationServiceInterface {
   @override
   void clearError() {
     // Clear any existing snackbars
-    // Prefer the content navigator key to clear notifications in the main content area
-    final context = _contentNavigatorKey?.currentContext ?? _navigatorKey?.currentContext;
-    if (context != null) {
-      ScaffoldMessenger.of(context).clearSnackBars();
+    // Prefer the scaffold key for main content area, then fall back to navigator keys
+    if (_scaffoldKey?.currentContext != null) {
+      ScaffoldMessenger.of(_scaffoldKey!.currentContext!).clearSnackBars();
+    } else {
+      final context = _contentNavigatorKey?.currentContext ?? _navigatorKey?.currentContext;
+      if (context != null) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+      }
     }
   }
 
   void _showSnackBar(String message, {required bool isError}) {
-    // Prefer the content navigator key to show notifications in the main content area
-    final context = _contentNavigatorKey?.currentContext ?? _navigatorKey?.currentContext;
+    // Prefer the scaffold key for main content area, then fall back to navigator keys
+    BuildContext? context;
+    if (_scaffoldKey?.currentContext != null) {
+      context = _scaffoldKey!.currentContext;
+    } else {
+      context = _contentNavigatorKey?.currentContext ?? _navigatorKey?.currentContext;
+    }
+
     if (context == null) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -53,7 +69,7 @@ class NotificationService implements NotificationServiceInterface {
           label: 'Dismiss',
           textColor: Colors.white,
           onPressed: () {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            ScaffoldMessenger.of(context!).hideCurrentSnackBar();
           },
         ),
       ),

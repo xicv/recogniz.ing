@@ -55,4 +55,5 @@ abstract class NotificationServiceInterface {
   void showSuccess(String message);
   void clearError();
   void setContentNavigatorKey(GlobalKey<NavigatorState> contentNavigatorKey);
+  void setScaffoldKey(GlobalKey<ScaffoldState> scaffoldKey);
 }

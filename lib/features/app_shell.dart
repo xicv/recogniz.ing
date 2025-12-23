@@ -9,7 +9,6 @@ import '../core/constants/constants.dart';
 import '../core/error/error_components.dart';
 import '../core/error/enhanced_error_handler.dart';
 import '../core/providers/app_providers.dart';
-import '../core/providers/recording_providers.dart';
 import '../widgets/navigation/navigation_drawer.dart';
 import 'dashboard/dashboard_page.dart';
 import 'dictionaries/dictionaries_page.dart';
@@ -26,17 +25,17 @@ class AppShell extends ConsumerStatefulWidget {
 }
 
 // Global key for the inner Scaffold (main content area)
-final GlobalKey<NavigatorState> contentNavigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<ScaffoldState> mainContentScaffoldKey = GlobalKey<ScaffoldState>();
 
 class _AppShellState extends ConsumerState<AppShell> {
   BuildContext? _mainContentContext;
 @override
   void initState() {
     super.initState();
-    // Set the content navigator key for notification service
+    // Set the main content scaffold key for notification service
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final notificationService = ref.read(notificationServiceProvider);
-      notificationService.setContentNavigatorKey(contentNavigatorKey);
+      notificationService.setScaffoldKey(mainContentScaffoldKey);
     });
   }
 
@@ -137,38 +136,43 @@ final Map<LogicalKeySet, VoidCallback> shortcuts = {
 return CallbackShortcuts(
   bindings: shortcuts,
   child: Scaffold(
+    floatingActionButton: _buildRecordFab(context, ref, recordingState),
     body: Row(
       children: [
           // Navigation Drawer
           const AppNavigationDrawer(),
 
-          // Main Content
+          // Main Content with separate Scaffold for SnackBar isolation
           Expanded(
-            child: Builder(
-              builder: (mainContentContext) => Stack(
-                children: [
-                  IndexedStack(
-                    index: currentPage,
-                    children: const [
-                      TranscriptionsPage(),
-                      DashboardPage(),
-                      DictionariesPage(),
-                      PromptsPage(),
-                      SettingsPageRefactored(),
-                    ],
-                  ),
-                  // VAD Recording Overlay
-                  if (recordingState != RecordingState.idle) VadRecordingOverlay(),
-                  // Store context reference for notifications
-                  Builder(
-                    builder: (context) {
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        _mainContentContext = mainContentContext;
-                      });
-                      return const SizedBox.shrink();
-                    },
-                  ),
-                ],
+            child: Scaffold(
+              key: mainContentScaffoldKey,
+              backgroundColor: Colors.transparent,
+              body: Builder(
+                builder: (mainContentContext) => Stack(
+                  children: [
+                    IndexedStack(
+                      index: currentPage,
+                      children: const [
+                        TranscriptionsPage(),
+                        DashboardPage(),
+                        DictionariesPage(),
+                        PromptsPage(),
+                        SettingsPageRefactored(),
+                      ],
+                    ),
+                    // VAD Recording Overlay
+                    if (recordingState != RecordingState.idle) VadRecordingOverlay(),
+                    // Store context reference for notifications
+                    Builder(
+                      builder: (context) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          _mainContentContext = mainContentContext;
+                        });
+                        return const SizedBox.shrink();
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

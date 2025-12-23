@@ -151,37 +151,47 @@ class AudioService implements AudioServiceInterface {
     final config = await AppConfig.fromAsset();
     final audioConfig = config.audio;
 
-    // Apply audio enhancement and compression
+    // For AAC/M4A compressed audio, enhancement is not needed
+    // The enhancement service expects raw PCM format and will fail on compressed data
+    final isCompressedFormat = path.endsWith('.m4a') || path.endsWith('.aac');
+
+    // Apply audio enhancement and compression only for uncompressed formats
     Uint8List finalBytes = bytes;
-    try {
-      // First enhance the audio
-      final enhancedBytes = AudioEnhancementService.enhanceVoice(bytes);
+    if (!isCompressedFormat) {
+      try {
+        // First enhance the audio
+        final enhancedBytes = AudioEnhancementService.enhanceVoice(bytes);
 
-      // Then compress it
-      final compressedBytes = await AudioCompressionService.compressAudioBytes(
-        audioBytes: enhancedBytes,
-        sampleRate: audioConfig.sampleRate,
-        bitRate: 64000, // 64kbps optimized for voice
-      );
-
-      if (compressedBytes != null) {
-        finalBytes = compressedBytes;
-        final stats = AudioCompressionService.getCompressionStats(
-          originalSize: bytes.length,
-          compressedSize: compressedBytes.length,
-          durationSeconds: duration,
+        // Then compress it
+        final compressedBytes = await AudioCompressionService.compressAudioBytes(
+          audioBytes: enhancedBytes,
+          sampleRate: audioConfig.sampleRate,
+          bitRate: 64000, // 64kbps optimized for voice
         );
 
-        // Get audio stats
-        final audioStats = AudioEnhancementService.getAudioStats(enhancedBytes);
-        debugPrint('[AudioEnhancement] RMS: ${audioStats['rms']}, Peak: ${audioStats['peak']}');
-        debugPrint('[AudioCompression] ${stats['compressionRatio']} compression, ${stats['savingsPercent']} savings');
+        if (compressedBytes != null) {
+          finalBytes = compressedBytes;
+          final stats = AudioCompressionService.getCompressionStats(
+            originalSize: bytes.length,
+            compressedSize: compressedBytes.length,
+            durationSeconds: duration,
+          );
+
+          // Get audio stats
+          final audioStats = AudioEnhancementService.getAudioStats(enhancedBytes);
+          debugPrint('[AudioEnhancement] RMS: ${audioStats['rms']}, Peak: ${audioStats['peak']}');
+          debugPrint('[AudioCompression] ${stats['compressionRatio']} compression, ${stats['savingsPercent']} savings');
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          debugPrint('[AudioService] Enhancement/Compression failed, using original: $e');
+        }
+        // Continue with original audio if enhancement/compression fails
       }
-    } catch (e) {
+    } else {
       if (kDebugMode) {
-        debugPrint('[AudioService] Enhancement/Compression failed, using original: $e');
+        debugPrint('[AudioService] Using compressed AAC audio directly (enhancement not needed)');
       }
-      // Continue with original audio if enhancement/compression fails
     }
 
     // Validate recording has minimum duration and content
@@ -204,28 +214,46 @@ class AudioService implements AudioServiceInterface {
       return null;
     }
 
-    // Analyze audio to detect speech using background analyzer
-    final audioBytes = Uint8List.fromList(finalBytes);
-    final analysis = await AudioProcessor.analyzeAudio(
-      audioBytes: audioBytes,
-      amplitudeThreshold: audioConfig.amplitudeThreshold,
-      speechRatioThreshold: audioConfig.speechRatioThreshold,
-      sampleRate: audioConfig.sampleRate,
-      bitDepth: audioConfig.bitDepth,
-    );
+    // For compressed formats (AAC/M4A), skip PCM-based analysis
+    // The audio is already compressed and we can't analyze raw PCM samples
+    AudioAnalysisResult? analysis;
+    if (!isCompressedFormat) {
+      // Analyze audio to detect speech using background analyzer
+      final audioBytes = Uint8List.fromList(finalBytes);
+      analysis = await AudioProcessor.analyzeAudio(
+        audioBytes: audioBytes,
+        amplitudeThreshold: audioConfig.amplitudeThreshold,
+        speechRatioThreshold: audioConfig.speechRatioThreshold,
+        sampleRate: audioConfig.sampleRate,
+        bitDepth: audioConfig.bitDepth,
+      );
 
-    // Additional check: if no speech detected, delete the recording
-    if (!analysis.containsSpeech) {
-      if (kDebugMode) {
-        debugPrint(
-            '[AudioService] No speech detected, deleting recording: ${analysis.reason}');
+      // Additional check: if no speech detected, delete the recording
+      if (!analysis.containsSpeech) {
+        if (kDebugMode) {
+          debugPrint(
+              '[AudioService] No speech detected, deleting recording: ${analysis.reason}');
+        }
+        await file.delete();
+        return null;
       }
-      await file.delete();
-      return null;
-    }
 
-    if (kDebugMode) {
-      debugPrint('[AudioService] Recording validation passed');
+      if (kDebugMode) {
+        debugPrint('[AudioService] Recording validation passed');
+      }
+    } else {
+      // For compressed formats, create a basic analysis result
+      // We assume the audio is valid if it passed duration and file size checks
+      analysis = const AudioAnalysisResult(
+        containsSpeech: true,
+        reason: 'Compressed AAC format - validation bypassed',
+        averageAmplitude: 0.1,
+        maxAmplitude: 0.2,
+        speechRatio: 0.5,
+      );
+      if (kDebugMode) {
+        debugPrint('[AudioService] Compressed format validation passed (PCM analysis skipped)');
+      }
     }
 
     return RecordingResult(
