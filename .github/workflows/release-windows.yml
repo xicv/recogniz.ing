@@ -45,28 +45,17 @@ jobs:
           echo "version=$VERSION" >> $env:GITHUB_OUTPUT
           Write-Host "Building version: $VERSION"
 
-      - name: Change to recognizing directory
-        run: cd recognizing
-
       - name: Install dependencies
-        run: |
-          cd recognizing
-          flutter pub get
+        run: flutter pub get
 
       - name: Generate code
-        run: |
-          cd recognizing
-          flutter packages pub run build_runner build --delete-conflicting-outputs
+        run: flutter packages pub run build_runner build --delete-conflicting-outputs
 
       - name: Build Windows Release
-        run: |
-          cd recognizing
-          flutter build windows --release
+        run: flutter build windows --release
 
       - name: Create Windows installer (NSIS)
         run: |
-          cd recognizing
-
           # Create NSIS installer script
           @"
           !define APPNAME "Recogniz.ing"
@@ -93,8 +82,8 @@ jobs:
 
           ; Modern UI
           !define MUI_ABORTWARNING
-          !define MUI_ICON "build\windows\runner\Release\resources\app_icon.ico"
-          !define MUI_UNICON "build\windows\runner\Release\resources\app_icon.ico"
+          !define MUI_ICON "windows\runner\resources\app_icon.ico"
+          !define MUI_UNICON "windows\runner\resources\app_icon.ico"
 
           ; Pages
           !insertmacro MUI_PAGE_WELCOME
@@ -115,7 +104,7 @@ jobs:
           ; Installer sections
           Section "Main Application" SEC01
               SetOutPath "$INSTDIR"
-              File /r "build\windows\runner\Release\*"
+              File /r "build\windows\x64\runner\Release\*"
               CreateDirectory "$SMPROGRAMS\${APPNAME}"
               CreateShortCut "$SMPROGRAMS\${APPNAME}\${APPNAME}.lnk" "$INSTDIR\recognizing.exe"
               CreateShortCut "$DESKTOP\${APPNAME}.lnk" "$INSTDIR\recognizing.exe"
@@ -146,14 +135,12 @@ jobs:
             Write-Host "NSIS not found, creating simple ZIP package..."
 
             # Create ZIP package as fallback
-            7z a -tzip "recognizing-${VERSION}-windows.zip" "build\windows\runner\Release\*"
+            7z a -tzip "recognizing-${VERSION}-windows.zip" "build\windows\x64\runner\Release\*"
           }
 
       - name: Create release package
         id: package
         run: |
-          cd recognizing
-
           # Determine which file was created
           if (Test-Path "recognizing-${{ steps.version.outputs.version }}-windows.exe") {
             echo "package_file=recognizing-${{ steps.version.outputs.version }}-windows.exe" >> $env:GITHUB_OUTPUT
@@ -195,7 +182,7 @@ jobs:
             ---
             Get more information at [https://xicv.github.io/recogniz.ing/](https://xicv.github.io/recogniz.ing/)
           files: |
-            recognizing/recognizing-${{ steps.version.outputs.version }}-windows.${{ steps.package.outputs.package_type }}
+            recognizing-${{ steps.version.outputs.version }}-windows.${{ steps.package.outputs.package_type }}
           draft: false
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -204,5 +191,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: recognizing-windows-${{ steps.version.outputs.version }}
-          path: recognizing/recognizing-${{ steps.version.outputs.version }}-windows.${{ steps.package.outputs.package_type }}
+          path: recognizing-${{ steps.version.outputs.version }}-windows.${{ steps.package.outputs.package_type }}
           retention-days: 30

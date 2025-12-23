@@ -48,24 +48,18 @@ jobs:
           Write-Host "Building version: $VERSION"
 
       - name: Install dependencies
-        run: |
-          cd recognizing
-          flutter pub get
+        run: flutter pub get
 
       - name: Generate code
-        run: |
-          cd recognizing
-          flutter packages pub run build_runner build --delete-conflicting-outputs
+        run: flutter packages pub run build_runner build --delete-conflicting-outputs
 
       - name: Build Windows Release
-        run: |
-          cd recognizing
-          flutter build windows --release
+        run: flutter build windows --release
 
       - name: Create distribution package
         run: |
           New-Item -ItemType Directory -Path "dist/windows" -Force
-          Copy-Item -Path "recognizing\build\windows\x64\runner\Release\*" -Destination "dist\windows" -Recurse
+          Copy-Item -Path "build\windows\x64\runner\Release\*" -Destination "dist\windows" -Recurse
 
           # Create NSIS installer script
           @"
@@ -93,8 +87,8 @@ jobs:
 
           ; Modern UI
           !define MUI_ABORTWARNING
-          !define MUI_ICON "build\windows\runner\Release\resources\app_icon.ico"
-          !define MUI_UNICON "build\windows\runner\Release\resources\app_icon.ico"
+          !define MUI_ICON "windows\runner\resources\app_icon.ico"
+          !define MUI_UNICON "windows\runner\resources\app_icon.ico"
 
           ; Pages
           !insertmacro MUI_PAGE_WELCOME
