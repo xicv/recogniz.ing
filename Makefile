@@ -7,7 +7,9 @@
 .PHONY: generate debug-release install-release logs deploy deploy-all
 .PHONY: package-macos package-windows package-linux package-android package-web
 .PHONY: sign-macos notarize-macos codesign-setup
-.PHONY: version bump-patch bump-minor bump-major bump-prerelease
+.PHONY: version changelog verify-changelog
+.PHONY: bump-patch bump-minor bump-major bump-prerelease
+.PHONY: bump-patch-entry bump-minor-entry bump-major-entry
 
 # Default target
 help: ## Show this help message
@@ -347,20 +349,31 @@ version: ## Show current version
 	@echo "📋 Current version:"
 	@dart scripts/version_manager.dart --current
 
+changelog: ## Generate CHANGELOG.md from CHANGELOG.json
+	@echo "📝 Generating changelog..."
+	@dart scripts/version_manager.dart --changelog
+
+verify-changelog: ## Verify JSON and Markdown changelogs are in sync
+	@echo "🔍 Verifying changelogs..."
+	@dart scripts/version_manager.dart --verify-changelog
+
 bump-patch: ## Bump patch version (e.g., 1.0.0 → 1.0.1)
 	@echo "🔖 Bumping patch version..."
 	@dart scripts/version_manager.dart --bump patch --pub-get
 	@echo "✅ Patch version bumped"
+	@echo "💡 Use 'make bump-patch-entry' to also add a changelog entry"
 
 bump-minor: ## Bump minor version (e.g., 1.0.0 → 1.1.0)
 	@echo "🔖 Bumping minor version..."
 	@dart scripts/version_manager.dart --bump minor --pub-get
 	@echo "✅ Minor version bumped"
+	@echo "💡 Use 'make bump-minor-entry' to also add a changelog entry"
 
 bump-major: ## Bump major version (e.g., 1.0.0 → 2.0.0)
 	@echo "🔖 Bumping major version..."
 	@dart scripts/version_manager.dart --bump major --pub-get
 	@echo "✅ Major version bumped"
+	@echo "💡 Use 'make bump-major-entry' to also add a changelog entry"
 
 bump-prerelease: ## Create pre-release version (usage: make bump-prerelease PRE=alpha)
 	@echo "🔖 Creating pre-release version..."
@@ -371,12 +384,38 @@ bump-prerelease: ## Create pre-release version (usage: make bump-prerelease PRE=
 	@dart scripts/version_manager.dart --bump prerelease $(PRE) --pub-get
 	@echo "✅ Pre-release version created: $(PRE)"
 
+bump-patch-entry: ## Bump patch version and add changelog entry template
+	@echo "🔖 Bumping patch version with changelog entry..."
+	@dart scripts/version_manager.dart --bump patch --add-entry --pub-get
+	@echo "✅ Patch version bumped with changelog entry"
+	@echo "📝 Edit CHANGELOG.json to add actual changes"
+	@echo "   Then run: make changelog"
+
+bump-minor-entry: ## Bump minor version and add changelog entry template
+	@echo "🔖 Bumping minor version with changelog entry..."
+	@dart scripts/version_manager.dart --bump minor --add-entry --pub-get
+	@echo "✅ Minor version bumped with changelog entry"
+	@echo "📝 Edit CHANGELOG.json to add actual changes"
+	@echo "   Then run: make changelog"
+
+bump-major-entry: ## Bump major version and add changelog entry template
+	@echo "🔖 Bumping major version with changelog entry..."
+	@dart scripts/version_manager.dart --bump major --add-entry --pub-get
+	@echo "✅ Major version bumped with changelog entry"
+	@echo "📝 Edit CHANGELOG.json to add actual changes"
+	@echo "   Then run: make changelog"
+
 release: ## Create a release (bump patch, build, and deploy)
 	@echo "🚀 Creating release..."
-	@$(MAKE) bump-patch
+	@$(MAKE) bump-patch-entry
+	@echo "⏳ Pausing for changelog edits..."
+	@echo "   1. Edit CHANGELOG.json to add actual changes"
+	@echo "   2. Press Enter to continue..."
+	@read -r
+	@$(MAKE) changelog
 	@$(MAKE) deploy-all
 	@echo "✅ Release complete!"
 	@echo "📋 Don't forget to:"
-	@echo "   1. Commit the version changes: git add pubspec.yaml && git commit -m 'chore: bump version'"
+	@echo "   1. Commit the changes: git add pubspec.yaml CHANGELOG.json CHANGELOG.md && git commit -m 'chore: bump version and update changelog'"
 	@echo "   2. Create a git tag: git tag v$$(dart scripts/version_manager.dart --current | sed 's/.*: //' | sed 's/+.*//')"
 	@echo "   3. Push to remote: git push && git push --tags"
