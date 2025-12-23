@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/app_settings.dart';
 import '../services/storage_service.dart';
+import '../services/start_at_login_service.dart';
 
 /// Settings state management
 final settingsProvider =
@@ -75,6 +76,39 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> updateCriticalInstructions(String instructions) async {
     final newState = state.copyWith(criticalInstructions: instructions);
+    await StorageService.saveSettings(newState);
+    state = newState;
+  }
+
+  Future<void> toggleAutoStopAfterSilence() async {
+    final newState =
+        state.copyWith(autoStopAfterSilence: !state.autoStopAfterSilence);
+    await StorageService.saveSettings(newState);
+    state = newState;
+  }
+
+  Future<void> updateSilenceDuration(int duration) async {
+    final newState = state.copyWith(silenceDuration: duration);
+    await StorageService.saveSettings(newState);
+    state = newState;
+  }
+
+  Future<void> toggleStartAtLogin() async {
+    final newValue = !state.startAtLogin;
+    final service = StartAtLoginService();
+
+    // Initialize the service if not already initialized
+    await service.initialize();
+
+    // Enable or disable at OS level
+    if (newValue) {
+      await service.enable();
+    } else {
+      await service.disable();
+    }
+
+    // Update the settings state
+    final newState = state.copyWith(startAtLogin: newValue);
     await StorageService.saveSettings(newState);
     state = newState;
   }

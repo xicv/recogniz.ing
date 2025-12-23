@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/transcription.dart';
 import '../models/custom_prompt.dart';
@@ -12,6 +13,11 @@ class StorageService implements StorageServiceInterface {
   static const String promptsBox = 'prompts';
   static const String vocabularyBox = 'vocabulary';
   static const String settingsBox = 'settings';
+
+  /// Check if a box is already open
+  static bool _isBoxOpen(String name) {
+    return Hive.isBoxOpen(name);
+  }
 
   static Future<void> initialize() async {
     // Register adapters
@@ -99,10 +105,24 @@ class StorageService implements StorageServiceInterface {
       Hive.box<VocabularySet>(vocabularyBox);
 
   // Settings
-  static AppSettings get settings =>
-      Hive.box<AppSettings>(settingsBox).get('settings') ?? AppSettings();
+  static AppSettings get settings {
+    if (!_isBoxOpen(settingsBox)) {
+      debugPrint('[StorageService] Settings box not open, returning defaults');
+      return AppSettings();
+    }
+    return Hive.box<AppSettings>(settingsBox).get('settings') ?? AppSettings();
+  }
 
   static Future<void> saveSettings(AppSettings settings) async {
+    if (!_isBoxOpen(settingsBox)) {
+      debugPrint('[StorageService] Settings box not open, attempting to open it');
+      try {
+        await Hive.openBox<AppSettings>(settingsBox);
+      } catch (e) {
+        debugPrint('[StorageService] Failed to open settings box: $e');
+        return;
+      }
+    }
     await Hive.box<AppSettings>(settingsBox).put('settings', settings);
   }
 

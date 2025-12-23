@@ -35,8 +35,9 @@ class StreamingVoiceRecordingUseCase {
   int _totalChunks = 0;
   DateTime? _lastSpeechTime;
 
-  // Configuration
-  final Duration _autoStopSilence = const Duration(seconds: 3);
+  // Configuration (loaded from settings)
+  bool _autoStopAfterSilence = true;
+  Duration _autoStopSilence = const Duration(seconds: 3);
   final Duration _minRecordingDuration = const Duration(seconds: 1);
   Timer? _autoStopTimer;
 
@@ -120,6 +121,11 @@ class StreamingVoiceRecordingUseCase {
         );
         return;
       }
+
+      // Load auto-stop settings
+      _autoStopAfterSilence = settings.autoStopAfterSilence;
+      _autoStopSilence = Duration(seconds: settings.silenceDuration);
+      debugPrint('[StreamingVoiceRecordingUseCase] Auto-stop: $_autoStopAfterSilence, duration: $_autoStopSilence');
 
       // Initialize transcription service if needed
       if (!_transcriptionService.isInitialized && settings.geminiApiKey?.isNotEmpty == true) {
@@ -248,12 +254,14 @@ class StreamingVoiceRecordingUseCase {
   /// Handle transcription chunks
   void _handleTranscriptionChunk(TranscriptionChunk chunk) {
     if (chunk.isPartial) {
-      // Auto-stop timer for silence detection
+      // Auto-stop timer for silence detection (only if enabled)
       _autoStopTimer?.cancel();
-      _autoStopTimer = Timer(_autoStopSilence, () {
-        debugPrint('[StreamingVoiceRecordingUseCase] Auto-stopping due to silence');
-        unawaited(stopRecording());
-      });
+      if (_autoStopAfterSilence) {
+        _autoStopTimer = Timer(_autoStopSilence, () {
+          debugPrint('[StreamingVoiceRecordingUseCase] Auto-stopping due to silence');
+          unawaited(stopRecording());
+        });
+      }
     }
   }
 

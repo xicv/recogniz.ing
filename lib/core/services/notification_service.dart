@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../interfaces/audio_service_interface.dart';
+import 'storage_service.dart';
 
 class NotificationService implements NotificationServiceInterface {
   static final NotificationService _instance = NotificationService._internal();
@@ -26,18 +27,22 @@ class NotificationService implements NotificationServiceInterface {
 
   @override
   void showError(String message) {
+    // Errors always show - critical feedback
     _showSnackBar(message, isError: true);
   }
 
   @override
   void showSuccess(String message) {
-    _showSnackBar(message, isError: false);
+    // Respect user notification preference for success messages
+    final settings = StorageService.settings;
+    if (settings.showNotifications) {
+      _showSnackBar(message, isError: false);
+    }
   }
 
   @override
   void clearError() {
     // Clear any existing snackbars
-    // Prefer the scaffold key for main content area, then fall back to navigator keys
     if (_scaffoldKey?.currentContext != null) {
       ScaffoldMessenger.of(_scaffoldKey!.currentContext!).clearSnackBars();
     } else {
@@ -49,7 +54,6 @@ class NotificationService implements NotificationServiceInterface {
   }
 
   void _showSnackBar(String message, {required bool isError}) {
-    // Prefer the scaffold key for main content area, then fall back to navigator keys
     BuildContext? context;
     if (_scaffoldKey?.currentContext != null) {
       context = _scaffoldKey!.currentContext;

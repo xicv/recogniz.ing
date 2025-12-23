@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/services/vad_service.dart';
 import '../../core/constants/ui_constants.dart';
 import '../../core/providers/recording_providers.dart';
+import '../../core/providers/settings_providers.dart';
 
 class VadRecordingOverlay extends ConsumerStatefulWidget {
   const VadRecordingOverlay({super.key});
@@ -233,12 +234,20 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
                         fontSize: 14,
                       ),
                     ),
-                    Text(
-                      'Recording will automatically stop after silence',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.6),
-                        fontSize: 12,
-                      ),
+                    Consumer(
+                      builder: (context, ref, _) {
+                        final settings = ref.watch(settingsProvider);
+                        final message = settings.autoStopAfterSilence
+                            ? 'Auto-stops after ${settings.silenceDuration}s of silence'
+                            : 'Press stop button when finished';
+                        return Text(
+                          message,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.6),
+                            fontSize: 12,
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),

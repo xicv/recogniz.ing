@@ -36,6 +36,9 @@ dependencies:
   # System Tray / Menu Bar (Desktop)
   tray_manager: ^0.5.2
 
+  # Start at Login (Desktop)
+  launch_at_startup: ^0.3.1
+
   # UI Components
   flutter_animate: ^4.3.0
   google_fonts: ^6.1.0

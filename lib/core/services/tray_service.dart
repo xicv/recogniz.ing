@@ -49,8 +49,10 @@ class TrayService with TrayListener {
     _normalIconPath = '${tempDir.path}/recognizing_tray.png';
     _recordingIconPath = '${tempDir.path}/recognizing_tray_rec.png';
 
-    // Create normal icon (black microphone)
-    await _createMicrophoneIcon(_normalIconPath!, 0xFF1E293B, false);
+    // Create normal icon - use white for macOS menu bar visibility
+    // 0xFFFFFFFF = white, which matches standard macOS menu bar icons
+    final normalIconColor = Platform.isMacOS ? 0xFFFFFFFF : 0xFF1E293B;
+    await _createMicrophoneIcon(_normalIconPath!, normalIconColor, false);
 
     // Create recording icon (red microphone with dot)
     await _createMicrophoneIcon(_recordingIconPath!, 0xFFEF4444, true);

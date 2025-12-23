@@ -9,7 +9,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/providers/app_providers.dart';
 import '../../core/services/gemini_service.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/models/app_settings.dart';
 import '../../core/constants/app_constants.dart';
 import 'widgets/critical_instructions_editor.dart';
 import 'widgets/hotkey_editor.dart';
@@ -48,45 +47,46 @@ class _SettingsPageRefactoredState extends ConsumerState<SettingsPageRefactored>
 
             const SizedBox(height: 20),
 
-            // Hotkey Settings
-            SettingsSection(
-              title: 'Hotkey',
-              icon: LucideIcons.keyboard,
-              children: [
-                ListTile(
-                  title: const Text('Global Hotkey'),
-                  subtitle: Text(
-                    'Press to start/stop recording',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(6),
+            // Hotkey Settings - Desktop only
+            if (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
+              SettingsSection(
+                title: 'Hotkey',
+                icon: LucideIcons.keyboard,
+                children: [
+                  ListTile(
+                    title: const Text('Global Hotkey'),
+                    subtitle: Text(
+                      'Press to start/stop recording',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            _formatHotkeyForDisplay(settings.globalHotkey),
+                            style:
+                                Theme.of(context).textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.primary,
+                                      letterSpacing: Platform.isMacOS ? 2 : 0,
+                                    ),
+                          ),
                         ),
-                        child: Text(
-                          _formatHotkeyForDisplay(settings.globalHotkey),
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.primary,
-                                    letterSpacing: Platform.isMacOS ? 2 : 0,
-                                  ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Icon(LucideIcons.chevronRight, size: 18),
-                    ],
+                        const SizedBox(width: 8),
+                        const Icon(LucideIcons.chevronRight, size: 18),
+                      ],
+                    ),
+                    onTap: () => _showHotkeyEditor(context),
                   ),
-                  onTap: () => _showHotkeyEditor(context),
-                ),
-              ],
-            ).animate().fadeIn(duration: 300.ms, delay: 150.ms),
+                ],
+              ).animate().fadeIn(duration: 300.ms, delay: 150.ms),
 
             const SizedBox(height: 20),
 
@@ -190,6 +190,75 @@ class _SettingsPageRefactoredState extends ConsumerState<SettingsPageRefactored>
                     });
                   },
                 ),
+                // Auto-stop After Silence
+                SwitchListTile(
+                  title: const Text('Auto-stop After Silence'),
+                  subtitle: Text(settings.autoStopAfterSilence
+                      ? 'Stop automatically when silent'
+                      : 'Manual stop only'),
+                  value: settings.autoStopAfterSilence,
+                  onChanged: (value) {
+                    SchedulerBinding.instance.addPostFrameCallback((_) {
+                      ref.read(settingsProvider.notifier).toggleAutoStopAfterSilence();
+                    });
+                  },
+                ),
+                if (settings.autoStopAfterSilence)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Silence Duration',
+                              style: Theme.of(context).textTheme.titleSmall,
+                            ),
+                            Text(
+                              '${settings.silenceDuration}s',
+                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    color: Theme.of(context).colorScheme.primary,
+                                  ),
+                            ),
+                          ],
+                        ),
+                        Slider(
+                          value: settings.silenceDuration.toDouble(),
+                          min: 1,
+                          max: 10,
+                          divisions: 9,
+                          label: '${settings.silenceDuration}s',
+                          onChanged: (value) {
+                            SchedulerBinding.instance.addPostFrameCallback((_) {
+                              ref.read(settingsProvider.notifier).updateSilenceDuration(value.toInt());
+                            });
+                          },
+                        ),
+                        Text(
+                          'Recording will stop after this many seconds of silence',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: Colors.grey,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                // Start at Login - Desktop only
+                if (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
+                  SwitchListTile(
+                    title: const Text('Start at Login'),
+                    subtitle: Text(settings.startAtLogin
+                        ? 'App will launch automatically on login'
+                        : 'Launch app manually'),
+                    value: settings.startAtLogin,
+                    onChanged: (value) {
+                      SchedulerBinding.instance.addPostFrameCallback((_) {
+                        ref.read(settingsProvider.notifier).toggleStartAtLogin();
+                      });
+                    },
+                  ),
               ],
             ).animate().fadeIn(duration: 300.ms, delay: 300.ms),
 
