@@ -26,6 +26,10 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         // Don't cache the 404.html for SPA routing
         navigateFallback: null,
+        // Exclude downloads folder from PWA precaching (contains large Flutter web builds)
+        globIgnores: ['**/downloads/**'],
+        // Increase max file size to 10MB for larger assets
+        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
       },
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
