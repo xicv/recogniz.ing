@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// Downloads page - Updated for v1.0.4
 import { ref, onMounted } from 'vue'
 
 interface Platform {
