@@ -118,6 +118,8 @@ coverage/
 *.g.dart
 *.freezed.dart
 *.gr.dart
+# Exception: Hive type adapters need to be committed for production builds
+!lib/core/models/*.g.dart
 
 # Test related
 .test_coverage.dart
