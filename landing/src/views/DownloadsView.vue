@@ -12,15 +12,27 @@ interface Platform {
 
 const platforms = ref<Platform[]>([
   {
+    name: 'Android',
+    icon: 'M17.523 15.3414c-.5511 0-.9996-.4485-.9996-.9996s.4485-.9996.9996-.9996c.5511 0 .9996.4485.9996.9996s-.4485.9996-.9996.9996m-11.046 0c-.5511 0-.9996-.4485-.9996-.9996s.4485-.9996.9996-.9996c.5511 0 .9996.4485.9996.9996s-.4485.9996-.9996.9996m11.4045-6.02l2.1451-3.7138c.1099-.1907.0446-.4347-.1461-.5446-.1907-.1099-.4347-.0446-.5446.1461l-2.1675 3.7548C15.6766 8.3494 14.6236 8.06 13.5 8.06c-1.1236 0-2.1766.2894-3.0684.8039l-2.1675-3.7548c-.1099-.1907-.3539-.256-.5446-.1461-.1907.1099-.256.3539-.1461.5446l2.1451 3.7138C6.2932 10.1828 4.96 12.3459 4.96 14.7992h17.08c0-2.4533-1.3332-4.6164-3.3594-6.0185',
+    version: '1.0.4',
+    releaseDate: '2025-12-23',
+    downloadUrl: 'https://xicv.github.io/recogniz.ing/downloads/android/1.0.4/recognizing-1.0.4.apk',
+    changelog: [
+      'Standalone APK - no Google Play required',
+      'Works on Android 8.0+ (API 26)',
+      'Optimized for both phones and tablets'
+    ]
+  },
+  {
     name: 'macOS',
     icon: 'M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z',
     version: '1.0.4',
     releaseDate: '2025-12-23',
-    downloadUrl: 'https://github.com/xicv/recogniz.ing/releases/download/v1.0.4/recognizing-1.0.4-macos.zip',
+    downloadUrl: 'https://xicv.github.io/recogniz.ing/downloads/macos/1.0.4/recognizing-1.0.4-macos.zip',
     changelog: [
-      'New changelog system with JSON and Markdown formats',
-      'Simplified single-repository deployment architecture',
-      'Updated landing page with modern design and navigation'
+      'User preferences with persistent desktop settings',
+      'Desktop-specific features: auto-start, minimize to tray',
+      'VAD modal UI fixes and audio processing improvements'
     ]
   },
   {
@@ -28,10 +40,10 @@ const platforms = ref<Platform[]>([
     icon: 'M3,12V6.75L9,5.43v6.48L3,12M20,3v8.75L10,11.9V5.21L20,3M3,13l6,.09V19.9L3,18.75V13m17,.25V22L10,20.09v-7Z',
     version: '1.0.4',
     releaseDate: '2025-12-23',
-    downloadUrl: 'https://github.com/xicv/recogniz.ing/releases/download/v1.0.4/recognizing-1.0.4-windows.zip',
+    downloadUrl: '#',
     changelog: [
       'Updated to match macOS release',
-      'Enhanced stability and performance'
+      'Coming soon - check back later!'
     ]
   },
   {
@@ -120,7 +132,8 @@ const downloadPlatform = (platform: Platform) => {
 
                 <!-- Requirements -->
                 <div class="space-y-2 text-sm text-slate-600">
-                  <div v-if="platform.name === 'macOS'">macOS 10.15 or later</div>
+                  <div v-if="platform.name === 'Android'">Android 8.0+ (API 26)</div>
+                  <div v-else-if="platform.name === 'macOS'">macOS 10.15 or later</div>
                   <div v-else-if="platform.name === 'Windows'">Windows 10 or later</div>
                   <div v-else>Ubuntu 18.04 or later</div>
                 </div>
@@ -159,7 +172,15 @@ const downloadPlatform = (platform: Platform) => {
             <div>
               <h3 class="text-2xl font-medium mb-4">2. Download & Install</h3>
               <div class="bg-white rounded-lg border border-slate-200 p-6">
-                <h4 class="font-medium mb-2">macOS:</h4>
+                <h4 class="font-medium mb-2">Android:</h4>
+                <ol class="list-decimal list-inside text-slate-600 space-y-1 mb-4">
+                  <li>Download the APK file</li>
+                  <li>Enable "Install from unknown sources" in your device settings</li>
+                  <li>Open the APK file and tap "Install"</li>
+                  <li>Launch the app from your home screen</li>
+                </ol>
+
+                <h4 class="font-medium mb-2 mt-6">macOS:</h4>
                 <ol class="list-decimal list-inside text-slate-600 space-y-1 mb-4">
                   <li>Download the .app file</li>
                   <li>Drag the .app file to Applications folder</li>
@@ -207,6 +228,30 @@ const downloadPlatform = (platform: Platform) => {
           <h2 class="text-4xl font-light mb-12 text-center">What's New</h2>
 
           <div class="space-y-8">
+            <div class="bg-white rounded-lg border border-slate-200 p-8">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-medium">Version 1.0.4</h3>
+                <span class="text-sm text-slate-500">December 23, 2025</span>
+              </div>
+              <ul class="space-y-2 text-slate-600">
+                <li class="flex items-start">
+                  <span class="text-green-500 mr-2">✓</span>
+                  User preferences with persistent desktop settings
+                </li>
+                <li class="flex items-start">
+                  <span class="text-green-500 mr-2">✓</span>
+                  Desktop-specific features: auto-start, minimize to tray
+                </li>
+                <li class="flex items-start">
+                  <span class="text-green-500 mr-2">✓</span>
+                  VAD modal UI fixes and audio processing improvements
+                </li>
+                <li class="flex items-start">
+                  <span class="text-green-500 mr-2">✓</span>
+                  Fixed Android build with AGP 8.10 and Gradle 8.11.1
+                </li>
+              </ul>
+            </div>
             <div class="bg-white rounded-lg border border-slate-200 p-8">
               <div class="flex items-center justify-between mb-4">
                 <h3 class="text-xl font-medium">Version 1.0.3</h3>
