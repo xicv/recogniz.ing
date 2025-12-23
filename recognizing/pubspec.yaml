@@ -42,7 +42,7 @@ dependencies:
 
   # Audio Processing
   ffmpeg_kit_flutter: ^6.0.3
-  vad: ^1.0.1
+  vad: ^0.0.4
 
   # Utilities
   uuid: ^4.2.2
