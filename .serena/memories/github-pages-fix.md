@@ -10,7 +10,12 @@ GitHub Pages Deployment Issues and Fixes:
    - GitHub Pages might need time to propagate
    - The path in index.html is correct: "/assets/icons/app_icon.svg"
 
-3. Main solution:
+3. Workflow fix (Dec 2025):
+   - Updated landing-deploy.yml to use single deploy job (matches Vite docs)
+   - Fixed npm cache path from 'landing/**/package-lock.json' to 'landing/package-lock.json'
+   - Used setup-node's built-in npm cache instead of separate cache step
+
+4. Main solution:
    - Add proper MIME type configuration via .nojekyll
    - Ensure GitHub Pages has proper time to deploy
    - Check if GitHub Pages is using the correct branch (gh-pages or main)
