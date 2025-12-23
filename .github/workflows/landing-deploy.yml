@@ -1,26 +1,34 @@
-name: Deploy to GitHub Pages
+# Simple workflow for deploying static content to GitHub Pages
+name: Deploy landing to GitHub Pages
 
 on:
-  # Triggered when main project commits landing downloads
+  # Triggered when main project commits landing files
   push:
-    branches: [main]
+    branches: ['main']
     paths:
       - 'landing/**'
       - '.github/workflows/landing-deploy.yml'
   # Allow manual triggering
   workflow_dispatch:
 
+# Sets the GITHUB_TOKEN permissions to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
+# Allow one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
-  group: "pages"
+  group: 'pages'
   cancel-in-progress: false
 
 jobs:
-  build-and-deploy:
+  # Single deploy job since we're just deploying
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -35,24 +43,18 @@ jobs:
           git lfs install
           git lfs pull
 
-      - name: Setup Node.js
+      - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Setup npm cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('landing/**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          cache: 'npm'
+          cache-dependency-path: landing/package-lock.json
 
       - name: Install dependencies
         working-directory: ./landing
         run: npm ci
 
-      - name: Build with Vite
+      - name: Build
         working-directory: ./landing
         run: npm run build
         env:
@@ -64,15 +66,9 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: ./landing/dist
+          # Upload dist folder
+          path: './landing/dist'
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build-and-deploy
-    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
