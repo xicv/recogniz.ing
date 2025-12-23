@@ -64,6 +64,12 @@ build: build-macos ## Build for release (defaults to macOS)
 
 build-macos: ## Build for macOS release
 	@echo "🔨 Building for macOS..."
+	@if [ "$(PLATFORM)" != "darwin" ]; then \
+		echo "❌ macOS builds can only be built on macOS host"; \
+		echo "📊 Current platform: $(PLATFORM)"; \
+		echo "💡 Use GitHub Actions to build macOS releases"; \
+		exit 1; \
+	fi
 	flutter build macos --release
 
 build-ios: ## Build for iOS release
@@ -84,10 +90,23 @@ build-web: ## Build for Web release
 
 build-windows: ## Build for Windows release
 	@echo "🔨 Building for Windows..."
+	@case "$(PLATFORM)" in \
+		*mingw*|*msys*|*windows_nt*) ;; \
+		*) echo "❌ Windows builds can only be built on Windows host"; \
+		   echo "📊 Current platform: $(PLATFORM)"; \
+		   echo "💡 Use GitHub Actions to build Windows releases"; \
+		   exit 1 ;; \
+	esac
 	flutter build windows --release
 
 build-linux: ## Build for Linux release
 	@echo "🔨 Building for Linux..."
+	@if [ "$(PLATFORM)" != "linux" ]; then \
+		echo "❌ Linux builds can only be built on Linux host"; \
+		echo "📊 Current platform: $(PLATFORM)"; \
+		echo "💡 Use GitHub Actions to build Linux releases"; \
+		exit 1; \
+	fi
 	flutter build linux --release
 
 # Code Quality
@@ -249,18 +268,26 @@ deploy-android: package-android ## Deploy Android releases to landing page
 
 deploy-web: package-web ## Deploy Web release to landing page
 
-# Deploy all platforms
-deploy-all: ## Build and deploy all platform releases
+# Deploy all platforms (builds only platforms supported on current host)
+deploy-all: ## Build and deploy all platform releases (host-aware)
 	@echo "🚀 Building and deploying all platforms..."
-	@$(MAKE) package-macos
-	@$(MAKE) package-windows
-	@$(MAKE) package-linux
+	@echo "📊 Detected platform: $(PLATFORM)"
+	@echo "📦 Building macOS (will skip if not on macOS)..."
+	@$(MAKE) package-macos || true
+	@echo "📦 Building Windows (will skip if not on Windows)..."
+	@$(MAKE) package-windows || true
+	@echo "📦 Building Linux (will skip if not on Linux)..."
+	@$(MAKE) package-linux || true
+	@echo "📦 Building Android..."
 	@$(MAKE) package-android
+	@echo "📦 Building Web..."
 	@$(MAKE) package-web
 	@echo "📋 Generating download manifest..."
 	@echo '{"version": "$(VERSION)", "platforms": {"macos": "downloads/macos/$(VERSION)/recognizing-$(VERSION)-macos.zip", "windows": "downloads/windows/$(VERSION)/recognizing-$(VERSION)-windows.zip", "linux": "downloads/linux/$(VERSION)/recognizing-$(VERSION)-linux.tar.gz", "android_apk": "downloads/android/$(VERSION)/recognizing-$(VERSION).apk", "android_aab": "downloads/android/$(VERSION)/recognizing-$(VERSION).aab", "web": "downloads/web/$(VERSION)/recognizing-$(VERSION)-web.zip"}, "build_date": "'$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")'"}' > landing/public/downloads/manifest.json
-	@echo "✅ All platforms deployed successfully!"
+	@echo "✅ Supported platforms deployed successfully!"
 	@echo "📋 Download manifest created: landing/public/downloads/manifest.json"
+	@echo ""
+	@echo "💡 For full multi-platform releases, use GitHub Actions:"
 
 # Code Signing & Notarization
 codesign-setup: ## Set up code signing configuration
