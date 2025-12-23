@@ -1,9 +1,23 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
 const route = useRoute()
+
+const isScrolled = ref(false)
+
+const handleScroll = () => {
+  isScrolled.value = window.scrollY > 20
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
 
 const isActive = (path: string) => {
   return route.path === path
@@ -17,62 +31,53 @@ const navLinks = [
 </script>
 
 <template>
-  <nav class="fixed top-0 w-full bg-white/80 backdrop-blur-xl z-50 border-b border-slate-100">
-    <div class="container-custom px-6 py-4">
-      <div class="flex items-center justify-between">
+  <nav
+    class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+    :class="[
+      'bg-white/80 backdrop-blur-xl',
+      isScrolled ? 'border-b border-slate-200/60 shadow-sm' : 'border-b border-transparent'
+    ]"
+  >
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <!-- Logo -->
         <RouterLink
           to="/"
-          class="flex items-center space-x-3 hover:opacity-80 transition-opacity"
+          class="flex items-center gap-3 hover:opacity-80 transition-opacity"
         >
-          <svg class="w-8 h-8" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#0EA5E9"/>
-                <stop offset="50%" stop-color="#0284C7"/>
-                <stop offset="100%" stop-color="#0369A1"/>
-              </linearGradient>
-              <linearGradient id="innerGlow" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stop-color="rgba(255,255,255,0.15)"/>
-                <stop offset="100%" stop-color="rgba(0,0,0,0.1)"/>
-              </linearGradient>
-              <linearGradient id="iconGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stop-color="#FFFFFF"/>
-                <stop offset="100%" stop-color="#E0F2FE"/>
-              </linearGradient>
-            </defs>
-            <rect width="1024" height="1024" rx="224" fill="url(#bgGradient)"/>
-            <rect width="1024" height="1024" rx="224" fill="url(#innerGlow)"/>
-            <g transform="translate(512, 512)">
-              <path d="M -280 -120 A 180 180 0 0 0 -280 120" stroke="url(#iconGradient)" stroke-width="44" fill="none" stroke-linecap="round" opacity="0.5"/>
-              <path d="M -200 -80 A 120 120 0 0 0 -200 80" stroke="url(#iconGradient)" stroke-width="44" fill="none" stroke-linecap="round" opacity="0.75"/>
-              <path d="M -120 -40 A 60 60 0 0 0 -120 40" stroke="url(#iconGradient)" stroke-width="44" fill="none" stroke-linecap="round"/>
-              <circle cx="-40" cy="0" r="32" fill="url(#iconGradient)"/>
-              <rect x="40" y="-100" width="240" height="36" rx="18" fill="url(#iconGradient)"/>
-              <rect x="40" y="-18" width="200" height="36" rx="18" fill="url(#iconGradient)" opacity="0.85"/>
-              <rect x="40" y="64" width="160" height="36" rx="18" fill="url(#iconGradient)" opacity="0.7"/>
-            </g>
-          </svg>
-          <span class="text-2xl font-display font-light tracking-tight text-slate-900">
+          <img src="/app-icon.svg" alt="Recogniz.ing" class="w-10 h-10" />
+          <span class="text-xl font-semibold tracking-tight text-slate-950">
             Recogniz.ing
           </span>
         </RouterLink>
 
-        <nav class="flex items-center space-x-8">
+        <!-- Navigation Links -->
+        <nav class="flex items-center gap-1">
           <RouterLink
             v-for="link in navLinks"
             :key="link.path"
             :to="link.path"
-            class="transition-colors"
+            class="relative px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200"
             :class="[
-              'font-medium',
               isActive(link.path)
-                ? 'text-slate-900'
-                : 'text-slate-700 hover:text-slate-900'
+                ? 'text-slate-950 bg-slate-100'
+                : 'text-slate-600 hover:text-slate-950 hover:bg-slate-50'
             ]"
           >
             {{ link.label }}
           </RouterLink>
         </nav>
+
+        <!-- CTA Button -->
+        <RouterLink
+          to="/downloads"
+          class="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-slate-950 hover:bg-slate-900 rounded-full transition-all duration-200 hover:shadow-lg hover:shadow-slate-900/20 hover:-translate-y-0.5"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+          </svg>
+          Download
+        </RouterLink>
       </div>
     </div>
   </nav>

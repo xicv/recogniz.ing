@@ -9,6 +9,7 @@ import '../services/notification_service.dart';
 import '../providers/app_providers.dart';
 import '../providers/streaming_providers.dart';
 import '../providers/settings_providers.dart';
+import '../providers/config_providers.dart';
 import '../models/app_settings.dart';
 import '../../main.dart';
 
@@ -32,8 +33,14 @@ final transcriptionServiceProvider =
 final geminiServiceProvider = Provider<GeminiService>((ref) {
   final service = GeminiService();
   final settings = ref.watch(appSettingsProvider);
+  final config = ref.read(appConfigProvider);
+
+  // Get model name from config or use default
+  String modelName = 'gemini-3-flash-preview';
+  config.whenData((value) => modelName = value.api.model);
+
   if (settings.geminiApiKey?.isNotEmpty == true) {
-    service.initialize(settings.geminiApiKey!);
+    service.initialize(settings.geminiApiKey!, model: modelName);
   }
   return service;
 });

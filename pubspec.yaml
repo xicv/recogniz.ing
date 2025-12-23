@@ -91,11 +91,23 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-  web:
-    generate: true
-  macos:
-    generate: true
   image_path: "assets/icons/app_icon.png"
+  remove_alpha_ios: true  # Remove alpha channel for App Store compliance
   # Adaptive icons for Android
   adaptive_icon_background: "#ffffff"
   adaptive_icon_foreground: "assets/icons/app_icon_adaptive.png"
+  # Web icons
+  web:
+    generate: true
+    image_path: "assets/icons/app_icon.png"
+    background_color: "#0ea5e9"
+    theme_color: "#0ea5e9"
+  # Windows icons
+  windows:
+    generate: true
+    image_path: "assets/icons/app_icon.png"
+    icon_size: 48
+  # macOS icons
+  macos:
+    generate: true
+    image_path: "assets/icons/app_icon.png"

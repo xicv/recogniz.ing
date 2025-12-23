@@ -26,7 +26,8 @@ class GeminiService implements TranscriptionServiceInterface {
   GenerativeModel? _lightningModel;
 
   // Model name from configuration
-  static const String _modelName = 'gemini-3-flash-preview';
+  static const String _defaultModelName = 'gemini-3-flash-preview';
+  String _modelName = _defaultModelName;
 
   // Simple LRU cache for transcription results
   final Map<String, TranscriptionResult> _cache = {};
@@ -34,8 +35,15 @@ class GeminiService implements TranscriptionServiceInterface {
 
   bool get isInitialized => _model != null;
 
-  void initialize(String apiKey) {
-    debugPrint('[GeminiService] Initializing with models...');
+  /// Get the current model name
+  String get modelName => _modelName;
+
+  /// Initialize the service with API key and optional model name
+  void initialize(String apiKey, {String? model}) {
+    if (model != null) {
+      _modelName = model;
+    }
+    debugPrint('[GeminiService] Initializing with model: $_modelName...');
     _model = GenerativeModel(
       model: _modelName,
       apiKey: apiKey,

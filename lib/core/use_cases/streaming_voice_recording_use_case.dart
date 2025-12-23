@@ -7,6 +7,7 @@ import '../providers/ui_providers.dart';
 import '../interfaces/audio_service_interface.dart';
 import '../services/streaming_audio_recorder.dart';
 import '../services/streaming_gemini_service.dart';
+import '../config/app_config.dart';
 
 /// Enhanced voice recording use case with real-time processing
 /// Supports streaming transcription with immediate feedback
@@ -122,7 +123,14 @@ class StreamingVoiceRecordingUseCase {
 
       // Initialize transcription service if needed
       if (!_transcriptionService.isInitialized && settings.geminiApiKey?.isNotEmpty == true) {
-        _transcriptionService.initialize(settings.geminiApiKey!);
+        // Load config to get the model name
+        try {
+          final config = await AppConfig.fromAsset();
+          _transcriptionService.initialize(settings.geminiApiKey!, model: config.api.model);
+        } catch (e) {
+          debugPrint('[StreamingVoiceRecordingUseCase] Failed to load config, using default model: $e');
+          _transcriptionService.initialize(settings.geminiApiKey!);
+        }
       }
 
       // Start streaming session

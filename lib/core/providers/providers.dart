@@ -1,6 +1,9 @@
 // Barrel export for all providers
 // This maintains backward compatibility for existing imports
 
+// Config providers
+export 'config_providers.dart';
+
 // Core service providers
 export 'service_providers.dart';
 

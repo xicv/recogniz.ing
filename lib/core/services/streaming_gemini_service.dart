@@ -11,6 +11,10 @@ class StreamingGeminiService implements TranscriptionServiceInterface {
   late final GenerativeModel _model;
   bool _initialized = false;
 
+  // Model name from configuration
+  static const String _defaultModelName = 'gemini-3-flash-preview';
+  String _modelName = _defaultModelName;
+
   // Streaming state
   final StreamController<TranscriptionChunk> _chunkController =
       StreamController<TranscriptionChunk>.broadcast();
@@ -32,11 +36,17 @@ class StreamingGeminiService implements TranscriptionServiceInterface {
   @override
   bool get isInitialized => _initialized;
 
+  /// Get the current model name
+  String get modelName => _modelName;
+
   /// Initialize the Gemini service with streaming configuration
-  void initialize(String apiKey) {
+  void initialize(String apiKey, {String? model}) {
+    if (model != null) {
+      _modelName = model;
+    }
     try {
       _model = GenerativeModel(
-        model: 'gemini-3-flash-preview',
+        model: _modelName,
         apiKey: apiKey,
         generationConfig: GenerationConfig(
           temperature: 0.1,
@@ -47,7 +57,7 @@ class StreamingGeminiService implements TranscriptionServiceInterface {
       );
       _initialized = true;
 
-      debugPrint('[StreamingGeminiService] Initialized successfully');
+      debugPrint('[StreamingGeminiService] Initialized with model: $_modelName');
     } catch (e) {
       debugPrint('[StreamingGeminiService] Initialization failed: $e');
       rethrow;
@@ -406,7 +416,7 @@ Please continue the transcription from where it left off.''';
   Future<(bool isValid, String? error)> validateApiKey(String apiKey) async {
     try {
       final model = GenerativeModel(
-        model: 'gemini-3-flash-preview',
+        model: _modelName,
         apiKey: apiKey,
       );
       final response = await model.generateContent([Content.text('Say "OK"')]);
