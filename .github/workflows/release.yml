@@ -180,3 +180,16 @@ jobs:
             # Build and notarize
             make notarize-macos
           fi
+
+      - name: Commit landing downloads (triggers deployment)
+        if: github.event_name == 'push'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Add landing downloads
+          git add landing/public/downloads/
+
+          # Commit and push (this triggers the landing deployment workflow)
+          git commit -m "chore: update landing downloads for v${{ steps.version.outputs.version_name }}" || echo "No changes to commit"
+          git push

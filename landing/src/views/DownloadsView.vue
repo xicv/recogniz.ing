@@ -29,7 +29,7 @@ const platforms = ref<Platform[]>([
     icon: 'M3,12V6.75L9,5.43v6.48L3,12M20,3v8.75L10,11.9V5.21L20,3M3,13l6,.09V19.9L3,18.75V13m17,.25V22L10,20.09v-7Z',
     version: '1.0.3',
     releaseDate: '2025-12-21',
-    downloadUrl: 'https://github.com/xicv/recogniz.ing/releases/download/v1.0.3/recognizing-1.0.3-windows.exe',
+    downloadUrl: 'https://github.com/xicv/recogniz.ing/releases/download/v1.0.3/recognizing-1.0.3-windows.zip',
     changelog: [
       'Initial Windows release',
       'Native Windows installer support',

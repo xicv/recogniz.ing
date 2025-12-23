@@ -1,8 +1,13 @@
 name: Deploy to GitHub Pages
 
 on:
+  # Triggered when main project commits landing downloads
   push:
-    branches: [ main ]
+    branches: [main]
+    paths:
+      - 'landing/**'
+      - '.github/workflows/landing-deploy.yml'
+  # Allow manual triggering
   workflow_dispatch:
 
 permissions:
@@ -15,16 +20,22 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Fetch git history for Git LFS
-          lfs: true # Checkout LFS objects
+          # Fetch landing subdirectory history for Git LFS
+          fetch-depth: 0
+          lfs: true
 
-      - name: Setup Node
+      - name: Setup Git LFS
+        run: |
+          git lfs install
+          git lfs pull
+
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -33,19 +44,16 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('landing/**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
 
       - name: Install dependencies
+        working-directory: ./landing
         run: npm ci
 
-      - name: Setup Git LFS
-        run: |
-          git lfs install
-          git lfs pull
-
       - name: Build with Vite
+        working-directory: ./landing
         run: npm run build
         env:
           VITE_GIT_SHA: ${{ github.sha }}
@@ -54,16 +62,16 @@ jobs:
         uses: actions/configure-pages@v4
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
-          path: ./dist
+          path: ./landing/dist
 
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: build
+    needs: build-and-deploy
     steps:
       - name: Deploy to GitHub Pages
         id: deployment

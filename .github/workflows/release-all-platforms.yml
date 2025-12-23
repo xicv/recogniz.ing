@@ -172,3 +172,69 @@ jobs:
           prerelease: ${{ contains(steps.version.outputs.version_name, '-') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update landing downloads manifest
+        run: |
+          VERSION="${{ steps.version.outputs.version_name }}"
+
+          # Update manifest.json
+          if [ -f "landing/public/downloads/manifest.json" ]; then
+            echo "Updating existing manifest.json"
+          else
+            echo "Creating new manifest.json"
+            echo '{"versions":[]}' > landing/public/downloads/manifest.json
+          fi
+
+          # Create Python script to update manifest
+          cat > /tmp/update_manifest.py << 'EOF'
+          import json
+          import sys
+          from datetime import datetime, timezone
+
+          version = sys.argv[1]
+          manifest_path = "landing/public/downloads/manifest.json"
+
+          with open(manifest_path, "r") as f:
+              data = json.load(f)
+
+          # Check if version already exists
+          existing = next((v for v in data.get("versions", []) if v["version"] == version), None)
+
+          if not existing:
+              new_version = {
+                  "version": version,
+                  "released_at": datetime.now(timezone.utc).isoformat(),
+                  "downloads": {
+                      "macos": f"downloads/{version}/macos/recognizing-{version}-macos.zip",
+                      "windows": f"downloads/{version}/windows/recognizing-{version}-windows.zip",
+                      "linux": f"downloads/{version}/linux/recognizing-{version}-linux.tar.gz",
+                      "android_apk": f"downloads/{version}/android/recognizing-{version}.apk",
+                      "android_aab": f"downloads/{version}/android/recognizing-{version}.aab",
+                      "web": f"downloads/{version}/web/recognizing-{version}-web.zip"
+                  }
+              }
+
+              if "versions" not in data:
+                  data["versions"] = []
+              data["versions"].insert(0, new_version)
+              data["current_version"] = version
+
+              with open(manifest_path, "w") as f:
+                  json.dump(data, f, indent=2)
+
+          EOF
+
+          python3 /tmp/update_manifest.py "$VERSION"
+          cat landing/public/downloads/manifest.json
+
+      - name: Commit landing downloads (triggers deployment)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Add landing downloads and manifest
+          git add landing/public/downloads/
+
+          # Commit and push (this triggers the landing deployment workflow)
+          git commit -m "chore: update landing downloads for v${{ steps.version.outputs.version_name }}" || echo "No changes to commit"
+          git push
