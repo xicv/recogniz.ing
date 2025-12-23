@@ -23,7 +23,6 @@ dependencies:
 
   # Audio Recording
   record: ^5.2.0
-  flutter_sound: ^9.12.5
   path_provider: ^2.1.4
 
   # AI Integration - updated version
