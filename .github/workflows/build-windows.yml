@@ -12,9 +12,8 @@ on:
         required: false
         default: true
         type: boolean
-  push:
-    tags:
-      - 'v*'
+  repository_dispatch:
+    types: [build-windows]
 
 jobs:
   build-windows:
@@ -25,6 +24,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -36,6 +37,8 @@ jobs:
         id: version
         run: |
           if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            $VERSION = "${{ github.event.inputs.version }}"
+          } elseif ("${{ github.event_name }}" -eq "repository_dispatch") {
             $VERSION = "${{ github.event.inputs.version }}"
           } else {
             # Extract version from tag (remove 'v' prefix)
@@ -163,7 +166,7 @@ jobs:
           retention-days: 30
 
       - name: Create complete release package
-        if: github.event_name == 'push'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch'
         run: |
           # Create directories
           New-Item -ItemType Directory -Path "landing/public/downloads/${{ steps.version.outputs.version }}/windows" -Force
@@ -172,10 +175,10 @@ jobs:
           Copy-Item -Path "dist/windows/recognizing-${{ steps.version.outputs.version }}-windows.zip" -Destination "landing/public/downloads/${{ steps.version.outputs.version }}/windows/"
 
       - name: Commit downloads to main
-        if: github.event_name == 'push'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch'
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add landing/public/downloads/${{ steps.version.outputs.version }}/windows/
           git commit -m "build: Add Windows v${{ steps.version.outputs.version }} download" || echo "No changes to commit"
-          git push
+          git push origin main
