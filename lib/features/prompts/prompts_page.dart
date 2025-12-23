@@ -46,10 +46,12 @@ class _PromptsPageState extends ConsumerState<PromptsPage> {
     // Filter prompts based on search
     final filteredPrompts = _searchQuery.isEmpty
         ? prompts
-        : prompts.where((prompt) =>
-            prompt.name.toLowerCase().contains(_searchQuery) ||
-            prompt.description.toLowerCase().contains(_searchQuery) ||
-            prompt.promptTemplate.toLowerCase().contains(_searchQuery)).toList();
+        : prompts
+            .where((prompt) =>
+                prompt.name.toLowerCase().contains(_searchQuery) ||
+                prompt.description.toLowerCase().contains(_searchQuery) ||
+                prompt.promptTemplate.toLowerCase().contains(_searchQuery))
+            .toList();
 
     return Scaffold(
       appBar: AppBars.primary(
@@ -119,8 +121,8 @@ class _PromptsPageState extends ConsumerState<PromptsPage> {
           Text(
             isSearching ? 'No prompts found' : 'No prompts yet',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
           ),
           const SizedBox(height: 8),
           Text(
@@ -128,8 +130,8 @@ class _PromptsPageState extends ConsumerState<PromptsPage> {
                 ? 'Try adjusting your search terms'
                 : 'Create your first custom prompt',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
           ),
           if (!isSearching) ...[
             const SizedBox(height: 24),
@@ -178,7 +180,9 @@ class _PromptsPageState extends ConsumerState<PromptsPage> {
           InkWell(
             onTap: () {
               if (!isSelected) {
-                ref.read(settingsProvider.notifier).updateSelectedPrompt(prompt.id);
+                ref
+                    .read(settingsProvider.notifier)
+                    .updateSelectedPrompt(prompt.id);
               }
               setState(() {
                 _expandedPrompt = isExpanded ? null : prompt;
@@ -197,7 +201,10 @@ class _PromptsPageState extends ConsumerState<PromptsPage> {
                         height: 48,
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
+                              ? Theme.of(context)
+                                  .colorScheme
+                                  .primary
+                                  .withOpacity(0.1)
                               : Theme.of(context).colorScheme.surfaceVariant,
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -220,28 +227,35 @@ class _PromptsPageState extends ConsumerState<PromptsPage> {
                                 Flexible(
                                   child: Text(
                                     prompt.name,
-                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                   ),
                                 ),
                                 if (isSelected)
                                   Container(
                                     margin: const EdgeInsets.only(left: 8),
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 4,
+                                      horizontal: 8,
+                                      vertical: 4,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Theme.of(context).colorScheme.primary,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(
                                       'Active',
-                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                     ),
                                   ),
                               ],
@@ -249,9 +263,14 @@ class _PromptsPageState extends ConsumerState<PromptsPage> {
                             const SizedBox(height: 4),
                             Text(
                               prompt.description,
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -265,7 +284,8 @@ class _PromptsPageState extends ConsumerState<PromptsPage> {
                         children: [
                           if (!prompt.isDefault)
                             PopupMenuButton(
-                              icon: const Icon(LucideIcons.moreVertical, size: 20),
+                              icon: const Icon(LucideIcons.moreVertical,
+                                  size: 20),
                               itemBuilder: (context) => [
                                 PopupMenuItem(
                                   value: 'edit',
@@ -300,7 +320,8 @@ class _PromptsPageState extends ConsumerState<PromptsPage> {
                               ],
                               onSelected: (value) {
                                 if (value == 'edit') {
-                                  _showPromptEditor(context, ref, prompt: prompt);
+                                  _showPromptEditor(context, ref,
+                                      prompt: prompt);
                                 } else if (value == 'delete') {
                                   _showDeleteDialog(context, ref, prompt);
                                 } else if (value == 'duplicate') {
@@ -309,9 +330,12 @@ class _PromptsPageState extends ConsumerState<PromptsPage> {
                               },
                             ),
                           Icon(
-                            isExpanded ? LucideIcons.chevronUp : LucideIcons.chevronDown,
+                            isExpanded
+                                ? LucideIcons.chevronUp
+                                : LucideIcons.chevronDown,
                             size: 20,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ],
                       ),
@@ -329,7 +353,10 @@ class _PromptsPageState extends ConsumerState<PromptsPage> {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .surfaceVariant
+                      .withOpacity(0.5),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
@@ -338,8 +365,9 @@ class _PromptsPageState extends ConsumerState<PromptsPage> {
                     Text(
                       'Template Preview',
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
                     ),
                     const SizedBox(height: 8),
                     Text(

@@ -15,10 +15,12 @@ class FullscreenTranscriptionEdit extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<FullscreenTranscriptionEdit> createState() => _FullscreenTranscriptionEditState();
+  ConsumerState<FullscreenTranscriptionEdit> createState() =>
+      _FullscreenTranscriptionEditState();
 }
 
-class _FullscreenTranscriptionEditState extends ConsumerState<FullscreenTranscriptionEdit> {
+class _FullscreenTranscriptionEditState
+    extends ConsumerState<FullscreenTranscriptionEdit> {
   late TextEditingController _rawTextController;
   late TextEditingController _processedTextController;
   bool _hasChanges = false;
@@ -26,8 +28,10 @@ class _FullscreenTranscriptionEditState extends ConsumerState<FullscreenTranscri
   @override
   void initState() {
     super.initState();
-    _rawTextController = TextEditingController(text: widget.transcription.rawText);
-    _processedTextController = TextEditingController(text: widget.transcription.processedText);
+    _rawTextController =
+        TextEditingController(text: widget.transcription.rawText);
+    _processedTextController =
+        TextEditingController(text: widget.transcription.processedText);
   }
 
   @override
@@ -38,9 +42,10 @@ class _FullscreenTranscriptionEditState extends ConsumerState<FullscreenTranscri
   }
 
   void _onTextChanged() {
-    final hasChanges = _rawTextController.text != widget.transcription.rawText ||
-                      _processedTextController.text != widget.transcription.processedText;
-    
+    final hasChanges =
+        _rawTextController.text != widget.transcription.rawText ||
+            _processedTextController.text != widget.transcription.processedText;
+
     if (_hasChanges != hasChanges) {
       setState(() {
         _hasChanges = hasChanges;
@@ -51,7 +56,7 @@ class _FullscreenTranscriptionEditState extends ConsumerState<FullscreenTranscri
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
@@ -114,7 +119,7 @@ class _FullscreenTranscriptionEditState extends ConsumerState<FullscreenTranscri
     required VoidCallback onChanged,
   }) {
     final theme = Theme.of(context);
-    
+
     return Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -195,7 +200,8 @@ class _FullscreenTranscriptionEditState extends ConsumerState<FullscreenTranscri
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('Unsaved Changes'),
-          content: const Text('You have unsaved changes. Are you sure you want to exit?'),
+          content: const Text(
+              'You have unsaved changes. Are you sure you want to exit?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -233,10 +239,10 @@ class _FullscreenTranscriptionEditState extends ConsumerState<FullscreenTranscri
 
   void _saveChanges() {
     // Save both raw and processed text
-    final updatedProcessedText = _processedTextController.text.isEmpty 
-        ? _rawTextController.text 
+    final updatedProcessedText = _processedTextController.text.isEmpty
+        ? _rawTextController.text
         : _processedTextController.text;
-    
+
     widget.onSave(updatedProcessedText);
     Navigator.of(context).pop();
   }

@@ -52,15 +52,18 @@ class AudioEnhancementService {
     final normalizationFactor = targetPeak / peak;
 
     // Apply normalization
-    final normalizedSamples = samples.map((s) => s * normalizationFactor).toList();
+    final normalizedSamples =
+        samples.map((s) => s * normalizationFactor).toList();
 
     return _samplesToBytes(normalizedSamples);
   }
 
   /// Apply high-pass filter to remove low-frequency noise
-  static Uint8List applyHighPassFilter(Uint8List audioData, {double cutoffFrequency = 80.0}) {
+  static Uint8List applyHighPassFilter(Uint8List audioData,
+      {double cutoffFrequency = 80.0}) {
     if (kDebugMode) {
-      debugPrint('[AudioEnhancement] Applying high-pass filter at ${cutoffFrequency}Hz');
+      debugPrint(
+          '[AudioEnhancement] Applying high-pass filter at ${cutoffFrequency}Hz');
     }
 
     final samples = _bytesToSamples(audioData);
@@ -153,8 +156,10 @@ class AudioEnhancementService {
       'peak': peak.toStringAsFixed(4),
       'zeroCrossingRate': zeroCrossingRate.toStringAsFixed(6),
       'samples': samples.length,
-      'duration': '${(samples.length / 16000).toStringAsFixed(2)}s', // Assuming 16kHz
-      'hasVoice': rms > 0.01 && zeroCrossingRate > 0.01, // Simple voice detection
+      'duration':
+          '${(samples.length / 16000).toStringAsFixed(2)}s', // Assuming 16kHz
+      'hasVoice':
+          rms > 0.01 && zeroCrossingRate > 0.01, // Simple voice detection
     };
   }
 }

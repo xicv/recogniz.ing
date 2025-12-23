@@ -37,7 +37,8 @@ final streamingGeminiServiceProvider = Provider<StreamingGeminiService>((ref) {
 });
 
 // Streaming Voice Recording Use Case Provider
-final streamingVoiceRecordingUseCaseProvider = Provider<StreamingVoiceRecordingUseCase>((ref) {
+final streamingVoiceRecordingUseCaseProvider =
+    Provider<StreamingVoiceRecordingUseCase>((ref) {
   return StreamingVoiceRecordingUseCase(
     audioRecorder: ref.watch(streamingAudioRecorderProvider),
     transcriptionService: ref.watch(streamingGeminiServiceProvider),
@@ -59,7 +60,9 @@ final streamingVoiceRecordingUseCaseProvider = Provider<StreamingVoiceRecordingU
 });
 
 // Recording State Provider for Streaming
-final streamingRecordingStateProvider = StateNotifierProvider<RecordingStateNotifier, StreamingRecordingState>((ref) {
+final streamingRecordingStateProvider =
+    StateNotifierProvider<RecordingStateNotifier, StreamingRecordingState>(
+        (ref) {
   return RecordingStateNotifier();
 });
 
@@ -72,7 +75,8 @@ class RecordingStateNotifier extends StateNotifier<StreamingRecordingState> {
 }
 
 // Current Transcription Text Provider
-final currentTranscriptionTextProvider = StateNotifierProvider<CurrentTranscriptionTextNotifier, String>((ref) {
+final currentTranscriptionTextProvider =
+    StateNotifierProvider<CurrentTranscriptionTextNotifier, String>((ref) {
   return CurrentTranscriptionTextNotifier();
 });
 

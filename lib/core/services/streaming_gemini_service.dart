@@ -57,7 +57,8 @@ class StreamingGeminiService implements TranscriptionServiceInterface {
       );
       _initialized = true;
 
-      debugPrint('[StreamingGeminiService] Initialized with model: $_modelName');
+      debugPrint(
+          '[StreamingGeminiService] Initialized with model: $_modelName');
     } catch (e) {
       debugPrint('[StreamingGeminiService] Initialization failed: $e');
       rethrow;
@@ -132,7 +133,8 @@ class StreamingGeminiService implements TranscriptionServiceInterface {
     // Process accumulated chunks periodically
     Timer.periodic(const Duration(milliseconds: 500), (timer) {
       if (_audioChunks.isNotEmpty) {
-        _processAccumulatedChunks(vocabulary, promptTemplate, criticalInstructions);
+        _processAccumulatedChunks(
+            vocabulary, promptTemplate, criticalInstructions);
       }
     });
   }
@@ -185,14 +187,16 @@ class StreamingGeminiService implements TranscriptionServiceInterface {
       // Process when we have enough data
       if (buffer.length >= _maxChunkSize) {
         final audioBytes = buffer.takeBytes();
-        yield* _processStreamChunk(audioBytes, vocabulary, promptTemplate, criticalInstructions);
+        yield* _processStreamChunk(
+            audioBytes, vocabulary, promptTemplate, criticalInstructions);
       }
     }
 
     // Process final chunk
     if (buffer.isNotEmpty) {
       final audioBytes = buffer.toBytes();
-      yield* _processStreamChunk(audioBytes, vocabulary, promptTemplate, criticalInstructions);
+      yield* _processStreamChunk(
+          audioBytes, vocabulary, promptTemplate, criticalInstructions);
     }
   }
 
@@ -213,7 +217,8 @@ class StreamingGeminiService implements TranscriptionServiceInterface {
     _audioChunks.clear();
 
     try {
-      final prompt = _buildStreamingPrompt(vocabulary, promptTemplate, criticalInstructions, _currentTranscription);
+      final prompt = _buildStreamingPrompt(vocabulary, promptTemplate,
+          criticalInstructions, _currentTranscription);
 
       // Quick transcription
       final response = await _model.generateContent([Content.text(prompt)]);
@@ -222,7 +227,8 @@ class StreamingGeminiService implements TranscriptionServiceInterface {
       if (text.isNotEmpty) {
         // Calculate new content
         String newText = text;
-        if (_currentTranscription.isNotEmpty && text.startsWith(_currentTranscription)) {
+        if (_currentTranscription.isNotEmpty &&
+            text.startsWith(_currentTranscription)) {
           newText = text.substring(_currentTranscription.length);
         }
 
@@ -252,7 +258,8 @@ class StreamingGeminiService implements TranscriptionServiceInterface {
     String? criticalInstructions,
   ) async* {
     try {
-      final prompt = _buildPrompt(vocabulary, promptTemplate, criticalInstructions);
+      final prompt =
+          _buildPrompt(vocabulary, promptTemplate, criticalInstructions);
 
       // Use Gemini's streaming capability
       final response = await _model.generateContent([Content.text(prompt)]);
@@ -277,10 +284,13 @@ class StreamingGeminiService implements TranscriptionServiceInterface {
     final results = <String>[];
 
     for (int i = 0; i < chunks.length; i++) {
-      debugPrint('[StreamingGeminiService] Processing chunk ${i + 1}/${chunks.length}');
+      debugPrint(
+          '[StreamingGeminiService] Processing chunk ${i + 1}/${chunks.length}');
 
-      final chunkPrompt = _buildChunkPrompt(prompt, results.join('\n'), i, chunks.length);
-      final response = await _model.generateContent([Content.text(chunkPrompt)]);
+      final chunkPrompt =
+          _buildChunkPrompt(prompt, results.join('\n'), i, chunks.length);
+      final response =
+          await _model.generateContent([Content.text(chunkPrompt)]);
 
       final text = response.text ?? '';
       if (text.isNotEmpty) {
@@ -316,7 +326,9 @@ class StreamingGeminiService implements TranscriptionServiceInterface {
 
     for (int i = 0; i < audioBytes.length; i += chunkSize) {
       final start = (i == 0) ? 0 : i;
-      final end = (i + chunkSize < audioBytes.length) ? i + chunkSize : audioBytes.length;
+      final end = (i + chunkSize < audioBytes.length)
+          ? i + chunkSize
+          : audioBytes.length;
 
       if (i == 0) {
         // First chunk includes header
@@ -337,7 +349,8 @@ class StreamingGeminiService implements TranscriptionServiceInterface {
     String promptTemplate,
     String? criticalInstructions,
   ) {
-    var prompt = criticalInstructions ?? '''
+    var prompt = criticalInstructions ??
+        '''
 Transcribe the audio accurately.
 
 CRITICAL INSTRUCTIONS:
@@ -365,7 +378,8 @@ Remember: Only transcribe what is actually spoken.''';
     String? criticalInstructions,
     String previousText,
   ) {
-    var prompt = criticalInstructions ?? '''
+    var prompt = criticalInstructions ??
+        '''
 Continue transcribing the audio chunk.
 
 Previous transcription:
@@ -387,7 +401,8 @@ Reference vocabulary: $vocabulary''';
   }
 
   /// Build prompt for chunk processing
-  String _buildChunkPrompt(String basePrompt, String previousText, int chunkIndex, int totalChunks) {
+  String _buildChunkPrompt(
+      String basePrompt, String previousText, int chunkIndex, int totalChunks) {
     return '''
 $basePrompt
 
@@ -436,7 +451,10 @@ Please continue the transcription from where it left off.''';
       if (errorStr.contains('429')) {
         return (false, 'Rate limited');
       }
-      return (false, errorStr.length > 100 ? errorStr.substring(0, 100) : errorStr);
+      return (
+        false,
+        errorStr.length > 100 ? errorStr.substring(0, 100) : errorStr
+      );
     }
   }
 

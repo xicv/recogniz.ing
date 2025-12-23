@@ -18,10 +18,12 @@ class SettingsPageRefactored extends ConsumerStatefulWidget {
   const SettingsPageRefactored({super.key});
 
   @override
-  ConsumerState<SettingsPageRefactored> createState() => _SettingsPageRefactoredState();
+  ConsumerState<SettingsPageRefactored> createState() =>
+      _SettingsPageRefactoredState();
 }
 
-class _SettingsPageRefactoredState extends ConsumerState<SettingsPageRefactored> {
+class _SettingsPageRefactoredState
+    extends ConsumerState<SettingsPageRefactored> {
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsProvider);
@@ -71,12 +73,14 @@ class _SettingsPageRefactoredState extends ConsumerState<SettingsPageRefactored>
                           ),
                           child: Text(
                             _formatHotkeyForDisplay(settings.globalHotkey),
-                            style:
-                                Theme.of(context).textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.primary,
-                                      letterSpacing: Platform.isMacOS ? 2 : 0,
-                                    ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primary,
+                                  letterSpacing: Platform.isMacOS ? 2 : 0,
+                                ),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -116,7 +120,8 @@ class _SettingsPageRefactoredState extends ConsumerState<SettingsPageRefactored>
                   ),
                   trailing: const Icon(LucideIcons.chevronRight),
                   onTap: () {
-                    ref.read(currentPageProvider.notifier).state = 2; // Dictionaries
+                    ref.read(currentPageProvider.notifier).state =
+                        2; // Dictionaries
                   },
                 ),
                 ListTile(
@@ -199,13 +204,16 @@ class _SettingsPageRefactoredState extends ConsumerState<SettingsPageRefactored>
                   value: settings.autoStopAfterSilence,
                   onChanged: (value) {
                     SchedulerBinding.instance.addPostFrameCallback((_) {
-                      ref.read(settingsProvider.notifier).toggleAutoStopAfterSilence();
+                      ref
+                          .read(settingsProvider.notifier)
+                          .toggleAutoStopAfterSilence();
                     });
                   },
                 ),
                 if (settings.autoStopAfterSilence)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -218,8 +226,12 @@ class _SettingsPageRefactoredState extends ConsumerState<SettingsPageRefactored>
                             ),
                             Text(
                               '${settings.silenceDuration}s',
-                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                    color: Theme.of(context).colorScheme.primary,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall
+                                  ?.copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
                                   ),
                             ),
                           ],
@@ -232,15 +244,18 @@ class _SettingsPageRefactoredState extends ConsumerState<SettingsPageRefactored>
                           label: '${settings.silenceDuration}s',
                           onChanged: (value) {
                             SchedulerBinding.instance.addPostFrameCallback((_) {
-                              ref.read(settingsProvider.notifier).updateSilenceDuration(value.toInt());
+                              ref
+                                  .read(settingsProvider.notifier)
+                                  .updateSilenceDuration(value.toInt());
                             });
                           },
                         ),
                         Text(
                           'Recording will stop after this many seconds of silence',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Colors.grey,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Colors.grey,
+                                  ),
                         ),
                       ],
                     ),
@@ -255,7 +270,9 @@ class _SettingsPageRefactoredState extends ConsumerState<SettingsPageRefactored>
                     value: settings.startAtLogin,
                     onChanged: (value) {
                       SchedulerBinding.instance.addPostFrameCallback((_) {
-                        ref.read(settingsProvider.notifier).toggleStartAtLogin();
+                        ref
+                            .read(settingsProvider.notifier)
+                            .toggleStartAtLogin();
                       });
                     },
                   ),
@@ -324,8 +341,8 @@ class _SettingsPageRefactoredState extends ConsumerState<SettingsPageRefactored>
           Text(
             'Your API key is stored locally and never shared.',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
           ),
           const SizedBox(height: 16),
           ValueListenableBuilder(
@@ -356,65 +373,80 @@ class _SettingsPageRefactoredState extends ConsumerState<SettingsPageRefactored>
                                 ? SizedBox(
                                     width: 20,
                                     height: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2),
                                   )
                                 : Icon(LucideIcons.check),
                             onPressed: validating
                                 ? null
                                 : () async {
-                                  isValidating.value = true;
-                                  final trimmedKey = controller.text.trim();
+                                    isValidating.value = true;
+                                    final trimmedKey = controller.text.trim();
 
-                                  try {
-                                    // Use GeminiService to validate the API key
-                                    final geminiService = GeminiService();
-                                    final (isValid, error) = await geminiService.validateApiKey(trimmedKey);
+                                    try {
+                                      // Use GeminiService to validate the API key
+                                      final geminiService = GeminiService();
+                                      final (isValid, error) =
+                                          await geminiService
+                                              .validateApiKey(trimmedKey);
 
-                                    if (isValid) {
-                                      await ref.read(settingsProvider.notifier).updateApiKey(trimmedKey);
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(
-                                            content: Text('API key saved successfully'),
-                                            backgroundColor: Colors.green,
-                                          ),
-                                        );
+                                      if (isValid) {
+                                        await ref
+                                            .read(settingsProvider.notifier)
+                                            .updateApiKey(trimmedKey);
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                  'API key saved successfully'),
+                                              backgroundColor: Colors.green,
+                                            ),
+                                          );
+                                        }
+                                      } else {
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                  error ?? 'Invalid API key'),
+                                              backgroundColor: Colors.red,
+                                            ),
+                                          );
+                                        }
                                       }
-                                    } else {
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                            content: Text(error ?? 'Invalid API key'),
-                                            backgroundColor: Colors.red,
-                                          ),
-                                        );
+                                    } catch (e) {
+                                      if (trimmedKey.startsWith('AIza') &&
+                                          trimmedKey.length > 30) {
+                                        await ref
+                                            .read(settingsProvider.notifier)
+                                            .updateApiKey(trimmedKey);
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Text('API key saved'),
+                                              backgroundColor: Colors.green,
+                                            ),
+                                          );
+                                        }
+                                      } else {
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                  'Error: ${e.toString()}'),
+                                              backgroundColor: Colors.red,
+                                            ),
+                                          );
+                                        }
                                       }
+                                    } finally {
+                                      isValidating.value = false;
                                     }
-                                  } catch (e) {
-                                    if (trimmedKey.startsWith('AIza') && trimmedKey.length > 30) {
-                                      await ref.read(settingsProvider.notifier).updateApiKey(trimmedKey);
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(
-                                            content: Text('API key saved'),
-                                            backgroundColor: Colors.green,
-                                          ),
-                                        );
-                                      }
-                                    } else {
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                            content: Text('Error: ${e.toString()}'),
-                                            backgroundColor: Colors.red,
-                                          ),
-                                        );
-                                      }
-                                    }
-                                  } finally {
-                                    isValidating.value = false;
-                                  }
-                                },
+                                  },
                           ),
                         ],
                       ),

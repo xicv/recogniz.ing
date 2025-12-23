@@ -24,6 +24,12 @@ const routes: RouteRecordRaw[] = [
         name: 'Downloads',
         component: () => import('@/views/DownloadsView.vue'),
         meta: { title: 'Download - Recogniz.ing' }
+      },
+      {
+        path: 'changelog',
+        name: 'Changelog',
+        component: () => import('@/views/ChangelogView.vue'),
+        meta: { title: 'Changelog - Recogniz.ing' }
       }
     ]
   },

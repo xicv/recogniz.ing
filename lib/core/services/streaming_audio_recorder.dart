@@ -61,7 +61,8 @@ class StreamingAudioRecorder implements AudioServiceInterface {
       await AdvancedAudioProcessor.initialize();
 
       // Listen to VAD events
-      _vadSubscription = AdvancedAudioProcessor.vadEvents.listen(_handleVadEvent);
+      _vadSubscription =
+          AdvancedAudioProcessor.vadEvents.listen(_handleVadEvent);
 
       debugPrint('[StreamingAudioRecorder] Initialized successfully');
     } catch (e) {
@@ -103,9 +104,9 @@ class StreamingAudioRecorder implements AudioServiceInterface {
       await _recorder.start(
         const RecordConfig(
           encoder: AudioEncoder.wav,
-          sampleRate: 16000,  // Optimized for speech
+          sampleRate: 16000, // Optimized for speech
           bitRate: 128000,
-          numChannels: 1,  // Mono for speech
+          numChannels: 1, // Mono for speech
         ),
         path: _currentRecordingPath!,
       );
@@ -312,14 +313,15 @@ class StreamingAudioRecorder implements AudioServiceInterface {
 
   /// Get recording statistics
   RecordingStats get stats => RecordingStats(
-    duration: _recordingStartTime != null
-        ? DateTime.now().difference(_recordingStartTime!).inMilliseconds / 1000.0
-        : 0.0,
-    bytesRecorded: _audioBuffer.length,
-    isPaused: _isPaused,
-  );
+        duration: _recordingStartTime != null
+            ? DateTime.now().difference(_recordingStartTime!).inMilliseconds /
+                1000.0
+            : 0.0,
+        bytesRecorded: _audioBuffer.length,
+        isPaused: _isPaused,
+      );
 
-void dispose() {
+  void dispose() {
     _chunkTimer?.cancel();
     _silenceTimer?.cancel();
     _recordingSubscription?.cancel();

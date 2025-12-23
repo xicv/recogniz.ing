@@ -26,7 +26,8 @@ const isActive = (path: string) => {
 const navLinks = [
   { path: '/', label: 'Home' },
   { path: '/features', label: 'Features' },
-  { path: '/downloads', label: 'Download' }
+  { path: '/downloads', label: 'Download' },
+  { path: '/changelog', label: 'Changelog' }
 ]
 </script>
 

@@ -85,7 +85,8 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
                 if (transcriptions.isNotEmpty) ...[
                   const SizedBox(width: 8),
                   IconButton(
-                    onPressed: () => _showClearAllDialog(context, transcriptions.length),
+                    onPressed: () =>
+                        _showClearAllDialog(context, transcriptions.length),
                     icon: const Icon(LucideIcons.trash2),
                     tooltip: 'Clear All',
                     visualDensity: VisualDensity.compact,
@@ -349,7 +350,9 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(isFiltered ? 'Clear Filtered Transcriptions?' : 'Clear All Transcriptions?'),
+        title: Text(isFiltered
+            ? 'Clear Filtered Transcriptions?'
+            : 'Clear All Transcriptions?'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -359,8 +362,8 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
             Text(
               'This action cannot be undone.',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.outline,
-              ),
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
             ),
           ],
         ),
@@ -376,8 +379,8 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(isFiltered
-                    ? '$count transcription${count != 1 ? 's' : ''} deleted'
-                    : 'All transcriptions deleted'),
+                      ? '$count transcription${count != 1 ? 's' : ''} deleted'
+                      : 'All transcriptions deleted'),
                   behavior: SnackBarBehavior.floating,
                   duration: const Duration(seconds: 3),
                   action: SnackBarAction(
@@ -648,7 +651,9 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
     // Extract IDs and delete all at once for better performance
     final ids = transcriptions.map((t) => t.id).toList();
     if (ids.isNotEmpty) {
-      await ref.read(transcriptionsProvider.notifier).deleteMultipleTranscriptions(ids);
+      await ref
+          .read(transcriptionsProvider.notifier)
+          .deleteMultipleTranscriptions(ids);
     }
 
     // Clear search if it was active

@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Repository
+
+- **Repository**: `xicv/recogniz.ing` (https://github.com/xicv/recogniz.ing)
+- **Landing Page**: https://recogniz.ing/ (deployed via GitHub Pages)
+- **Single Repository**: Both Flutter app and Vue 3 landing page are in the same repository
+
 ## Project Overview
 
 This is an AI-powered voice typing application built with Flutter, supporting desktop (macOS, Windows, Linux), iOS, and Android platforms. The app provides real-time voice activity detection, transcription using Google Gemini API, and customized output through user-defined vocabulary and prompts.
@@ -179,3 +185,60 @@ final voiceRecordingUseCaseProvider = Provider<VoiceRecordingUseCase>((ref) {
 - **Hive Type IDs**: Must be unique across all models (check existing IDs before adding new)
 - **Static vs Async**: Use async interface methods in use cases, not static StorageService methods
 - **Type Imports**: Import from `audio_service_interface.dart` for all service interfaces
+
+## Landing Page Deployment
+
+The repository includes a Vue 3 + Vite landing page in the `landing/` folder, deployed to GitHub Pages at https://recogniz.ing/
+
+### Architecture
+
+```
+xicv/recogniz.ing (Single Repository)
+├── .github/workflows/
+│   ├── release-all-platforms.yml  # Builds app, creates releases
+│   ├── release.yml                 # Alternative release workflow
+│   └── landing-deploy.yml         # Deploys landing to GitHub Pages
+└── landing/                        # Vue 3 + Vite landing page
+    ├── src/
+    ├── public/downloads/           # App download artifacts (Git LFS)
+    │   └── manifest.json           # Version manifest for downloads
+    └── package.json
+```
+
+### Automated Deployment Flow
+
+1. **Tag Push**: Push a version tag (`v1.0.4`) → triggers release workflow
+2. **Build & Release**: GitHub Actions builds all platforms, creates GitHub Release
+3. **Update Downloads**: Workflow commits artifacts to `landing/public/downloads/[version]/` and updates `manifest.json`
+4. **Deploy Landing**: Commit triggers `landing-deploy.yml` → builds and deploys to GitHub Pages
+
+### Landing Page Development
+
+```bash
+cd landing
+
+# Install dependencies
+npm install
+
+# Start dev server (Vite)
+npm run dev
+
+# Build for production
+npm run build
+```
+
+### Download Links Configuration
+
+Download URLs in `landing/src/views/DownloadsView.vue` point to GitHub releases:
+```
+https://github.com/xicv/recogniz.ing/releases/download/v{VERSION}/recognizing-{VERSION}-{platform}.zip
+```
+
+Update this file when adding new versions or platforms.
+
+### GitHub Pages Settings
+
+- Source: **GitHub Actions** (not Deploy from a branch)
+- Custom domain: `recogniz.ing`
+- Workflow: `.github/workflows/landing-deploy.yml`
+- Trigger: Push to `main` with changes to `landing/**` files

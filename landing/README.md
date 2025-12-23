@@ -2,6 +2,11 @@
 
 A modern, minimalist landing page for the Recogniz.ing AI voice typing application.
 
+**Live Site**: https://recogniz.ing/
+**Repository**: https://github.com/xicv/recogniz.ing
+
+---
+
 ## Latest Version: 1.0.3 (December 21, 2025)
 
 ### Recent Updates
@@ -9,6 +14,9 @@ A modern, minimalist landing page for the Recogniz.ing AI voice typing applicati
 - **📦 Improved Downloads**: Enhanced download management with version 1.0.3 builds
 - **🔐 macOS Security**: Fixed Gatekeeper verification issues
 - **🪟 Windows Support**: Initial Windows release with native installer
+- **🏗️ Deployment**: Simplified single-repository deployment architecture
+
+---
 
 ## About Recogniz.ing
 
@@ -19,13 +27,18 @@ Recogniz.ing is an AI-powered voice typing application built with Flutter that:
 - Offers customizable prompts and vocabulary for specialized domains
 - Provides Material Design 3 UI with dark/light theme support
 
+---
+
 ## Tech Stack
 
 - **Vue 3.5+** with Composition API and `<script setup>`
 - **Vite 7.0** for ultra-fast development and building
 - **Tailwind CSS 3.4** for utility-first styling
 - **TypeScript** for type safety
-- **Lucide Icons** for beautiful, minimal icons
+- **Vue Router** for SPA navigation
+- **Git LFS** for large download file storage
+
+---
 
 ## Features
 
@@ -35,25 +48,59 @@ Recogniz.ing is an AI-powered voice typing application built with Flutter that:
 - 🎨 Smooth animations and transitions
 - ♿ Accessibility-first approach
 - 🔍 SEO optimized meta tags
-- 📦 PWA ready with service worker
 - 🔗 Links to app downloads and documentation
 - 📦 **Download Management**: Automated platform-specific downloads with semantic versioning
-- 📋 **Version Manifest**: JSON-based download system with version tracking (manifest.json)
-- 🔄 **CI/CD Integration**: Automated build and deployment pipeline with Makefile support
+- 📋 **Version Manifest**: JSON-based download system with version tracking
+- 🔄 **CI/CD Integration**: Automated build and deployment via GitHub Actions
 - 🔐 **Code Signing**: macOS builds support code signing and notarization
-- 📱 **Cross-Platform Downloads**: Support for macOS, Windows, Linux, Android, and Web platforms
+
+---
+
+## Deployment Architecture
+
+This landing page is part of a single-repository architecture that houses both the Flutter app and the Vue 3 landing page.
+
+### Repository Structure
+
+```
+xicv/recogniz.ing (Single Repository)
+├── .github/workflows/
+│   ├── release-all-platforms.yml  # Builds app, creates releases
+│   ├── release.yml                 # Alternative release workflow
+│   └── landing-deploy.yml         # Deploys landing to GitHub Pages
+├── [Flutter App Source Code]
+└── landing/                        # This folder
+    ├── src/
+    ├── public/downloads/           # App download artifacts (Git LFS)
+    │   └── manifest.json           # Version manifest
+    └── package.json
+```
+
+### Automated Deployment Flow
+
+1. **Tag Push**: Push a version tag (e.g., `v1.0.4`) to main branch
+2. **Build & Release**: GitHub Actions builds all platforms and creates a GitHub Release
+3. **Update Downloads**: Workflow commits artifacts to `landing/public/downloads/[version]/`
+4. **Deploy Landing**: Commit triggers `landing-deploy.yml` → deploys to GitHub Pages
+
+### GitHub Pages Settings
+
+- **Source**: GitHub Actions (not Deploy from a branch)
+- **Custom Domain**: `recogniz.ing`
+- **Workflow**: `.github/workflows/landing-deploy.yml`
+
+---
 
 ## Getting Started
 
 ### Prerequisites
-- Node.js 18+ (required for Vite 7)
-- npm or pnpm
+- Node.js 20+ (required for Vite 7)
+- npm
 
 ### Installation
 
 ```bash
-# Clone the repository
-git clone [repository-url]
+# Navigate to landing folder
 cd landing
 
 # Install dependencies
@@ -61,53 +108,82 @@ npm install
 
 # Start development server
 npm run dev
-```
 
-### Build for Production
-
-```bash
-# Build the project
+# Build for production
 npm run build
 
 # Preview production build
 npm run preview
 ```
 
+---
+
 ## Project Structure
 
 ```
 landing/
-├── public/              # Static assets
-│   └── downloads/       # Platform-specific app downloads
-│       └── manifest.json # Version manifest for downloads
+├── public/                  # Static assets
+│   ├── downloads/           # Platform-specific app downloads (Git LFS)
+│   │   ├── 1.0.3/          # Version-specific downloads
+│   │   │   ├── macos/
+│   │   │   ├── windows/
+│   │   │   ├── linux/
+│   │   │   └── android/
+│   │   └── manifest.json   # Version manifest for downloads
+│   └── assets/             # Images, icons, etc.
 ├── src/
-│   ├── App.vue          # Main component
-│   ├── main.ts          # Entry point
-│   └── style.css        # Global styles
-├── index.html           # HTML template
-├── downloads.html       # Standalone download page
-├── tailwind.config.js
-├── vite.config.ts
+│   ├── App.vue             # Root component
+│   ├── main.ts             # Entry point
+│   ├── router/             # Vue Router configuration
+│   │   └── index.ts
+│   ├── views/              # Page components
+│   │   ├── HomeView.vue
+│   │   ├── DownloadsView.vue
+│   │   └── FeaturesView.vue
+│   ├── components/
+│   │   └── layout/         # Layout components
+│   │       ├── AppHeader.vue
+│   │       ├── AppFooter.vue
+│   │       └── MainLayout.vue
+│   └── style.css           # Global styles
+├── index.html              # HTML template
+├── vite.config.ts          # Vite configuration
+├── tailwind.config.js      # Tailwind CSS configuration
 └── package.json
 ```
 
-### Download System
+---
+
+## Download System
 
 The landing page includes an automated download management system:
-- Apps are built and placed in versioned directories (`public/downloads/vX.X.X/`)
-- Each platform has its own folder (macos, windows, linux, android, web)
-- `manifest.json` tracks current version and download paths
-- Downloads page dynamically loads version information from manifest
-- Supports semantic versioning (MAJOR.MINOR.PATCH) without build numbers
-- Automated through Makefile targets (`make deploy-all`, `make release`)
-- Version bumping tools available (Dart script, shell script, Makefile)
 
-#### Build Artifacts
-- **macOS**: Signed .app bundle and .dmg installer (with code signing support)
-- **Windows**: Portable executable in .zip archive
-- **Linux**: Tar.gz archive for distribution
-- **Android**: Both APK and AAB formats for flexibility
-- **Web**: Complete web build in .zip archive
+### How Downloads Work
+
+1. **Release Builds**: When a version tag is pushed, GitHub Actions builds all platforms
+2. **Artifact Storage**: Build artifacts are committed to `landing/public/downloads/[version]/`
+3. **Manifest Update**: `manifest.json` is updated with new version info
+4. **GitHub Release**: Official release created with all artifacts attached
+5. **Download Links**: Landing page displays links to both GitHub Releases and local LFS files
+
+### Download URLs
+
+Download URLs in `src/views/DownloadsView.vue` point to GitHub releases:
+```
+https://github.com/xicv/recogniz.ing/releases/download/v{VERSION}/recognizing-{VERSION}-{platform}.zip
+```
+
+### Supported Platforms
+
+| Platform | File Format | Code Signing |
+|----------|-------------|--------------|
+| macOS | `.zip` (app bundle) | ✅ Signed & Notarized |
+| Windows | `.zip` (portable) | Planned |
+| Linux | `.tar.gz` | N/A |
+| Android | `.apk`, `.aab` | Planned |
+| Web | `.zip` | N/A |
+
+---
 
 ## Design Principles
 
@@ -117,12 +193,17 @@ The landing page includes an automated download management system:
 4. **Accessibility** - Semantic HTML and ARIA labels
 5. **Mobile-first** - Responsive design approach
 
+---
+
 ## Customization
 
-- Colors and fonts are configured in `tailwind.config.js`
-- Adjust content in `src/App.vue`
+- Colors configured in `tailwind.config.js`
+- Content in `src/views/` components
 - Meta tags in `index.html`
+- Download versions in `src/views/DownloadsView.vue`
+
+---
 
 ## License
 
-MIT License - feel free to use this as a template for your own projects.
+MIT License

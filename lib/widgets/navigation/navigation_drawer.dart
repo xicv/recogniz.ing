@@ -11,7 +11,8 @@ class AppNavigationDrawer extends ConsumerStatefulWidget {
   const AppNavigationDrawer({super.key});
 
   @override
-  ConsumerState<AppNavigationDrawer> createState() => _AppNavigationDrawerState();
+  ConsumerState<AppNavigationDrawer> createState() =>
+      _AppNavigationDrawerState();
 }
 
 class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
@@ -113,15 +114,19 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
                       children: [
                         Text(
                           'Recogniz.ing',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                         Text(
                           'Voice Typing',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
                         ),
                       ],
                     ),
@@ -232,50 +237,69 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
                 hoverColor: Theme.of(context).hoverColor,
                 splashColor: Theme.of(context).splashColor,
                 child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: EdgeInsets.symmetric(
-                  vertical: 12,
-                  horizontal: _isExpanded ? 16 : 8,
-                ),
-                child: _isExpanded
-                    ? Row(
-                        children: [
-                          Icon(
-                            item.icon,
-                            color: isSelected
-                                ? Theme.of(context).colorScheme.onPrimaryContainer
-                                : Theme.of(context).colorScheme.onSurfaceVariant,
-                            size: 24,
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Text(
-                              item.label,
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                color: isSelected
-                                    ? Theme.of(context).colorScheme.onPrimaryContainer
-                                    : Theme.of(context).colorScheme.onSurface,
-                                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                  duration: const Duration(milliseconds: 200),
+                  padding: EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: _isExpanded ? 16 : 8,
+                  ),
+                  child: _isExpanded
+                      ? Row(
+                          children: [
+                            Icon(
+                              item.icon,
+                              color: isSelected
+                                  ? Theme.of(context)
+                                      .colorScheme
+                                      .onPrimaryContainer
+                                  : Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                              size: 24,
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Text(
+                                item.label,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.copyWith(
+                                      color: isSelected
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .onPrimaryContainer
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                      fontWeight: isSelected
+                                          ? FontWeight.w600
+                                          : FontWeight.normal,
+                                    ),
                               ),
                             ),
+                            if (isSelected)
+                              Icon(
+                                LucideIcons.chevronRight,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer,
+                                size: 16,
+                              ),
+                          ],
+                        )
+                      : Center(
+                          child: Icon(
+                            item.icon,
+                            color: isSelected
+                                ? Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer
+                                : Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
+                            size: 24,
                           ),
-                          if (isSelected)
-                            Icon(
-                              LucideIcons.chevronRight,
-                              color: Theme.of(context).colorScheme.onPrimaryContainer,
-                              size: 16,
-                            ),
-                        ],
-                      )
-                    : Center(
-                        child: Icon(
-                          item.icon,
-                          color: isSelected
-                              ? Theme.of(context).colorScheme.onPrimaryContainer
-                              : Theme.of(context).colorScheme.onSurfaceVariant,
-                          size: 24,
                         ),
-                      ),
                 ),
               ),
             ),

@@ -116,7 +116,8 @@ class VadService {
   }
 
   /// Get speech segments from audio data
-  static List<SpeechSegment> getSpeechSegments(List<double> audioData, {int sampleRate = _sampleRate}) {
+  static List<SpeechSegment> getSpeechSegments(List<double> audioData,
+      {int sampleRate = _sampleRate}) {
     if (!_isInitialized) {
       return [];
     }

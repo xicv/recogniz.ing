@@ -163,7 +163,8 @@ class AudioService implements AudioServiceInterface {
         final enhancedBytes = AudioEnhancementService.enhanceVoice(bytes);
 
         // Then compress it
-        final compressedBytes = await AudioCompressionService.compressAudioBytes(
+        final compressedBytes =
+            await AudioCompressionService.compressAudioBytes(
           audioBytes: enhancedBytes,
           sampleRate: audioConfig.sampleRate,
           bitRate: 64000, // 64kbps optimized for voice
@@ -178,19 +179,24 @@ class AudioService implements AudioServiceInterface {
           );
 
           // Get audio stats
-          final audioStats = AudioEnhancementService.getAudioStats(enhancedBytes);
-          debugPrint('[AudioEnhancement] RMS: ${audioStats['rms']}, Peak: ${audioStats['peak']}');
-          debugPrint('[AudioCompression] ${stats['compressionRatio']} compression, ${stats['savingsPercent']} savings');
+          final audioStats =
+              AudioEnhancementService.getAudioStats(enhancedBytes);
+          debugPrint(
+              '[AudioEnhancement] RMS: ${audioStats['rms']}, Peak: ${audioStats['peak']}');
+          debugPrint(
+              '[AudioCompression] ${stats['compressionRatio']} compression, ${stats['savingsPercent']} savings');
         }
       } catch (e) {
         if (kDebugMode) {
-          debugPrint('[AudioService] Enhancement/Compression failed, using original: $e');
+          debugPrint(
+              '[AudioService] Enhancement/Compression failed, using original: $e');
         }
         // Continue with original audio if enhancement/compression fails
       }
     } else {
       if (kDebugMode) {
-        debugPrint('[AudioService] Using compressed AAC audio directly (enhancement not needed)');
+        debugPrint(
+            '[AudioService] Using compressed AAC audio directly (enhancement not needed)');
       }
     }
 
@@ -252,7 +258,8 @@ class AudioService implements AudioServiceInterface {
         speechRatio: 0.5,
       );
       if (kDebugMode) {
-        debugPrint('[AudioService] Compressed format validation passed (PCM analysis skipped)');
+        debugPrint(
+            '[AudioService] Compressed format validation passed (PCM analysis skipped)');
       }
     }
 

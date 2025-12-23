@@ -25,11 +25,12 @@ class AppShell extends ConsumerStatefulWidget {
 }
 
 // Global key for the inner Scaffold (main content area)
-final GlobalKey<ScaffoldState> mainContentScaffoldKey = GlobalKey<ScaffoldState>();
+final GlobalKey<ScaffoldState> mainContentScaffoldKey =
+    GlobalKey<ScaffoldState>();
 
 class _AppShellState extends ConsumerState<AppShell> {
   BuildContext? _mainContentContext;
-@override
+  @override
   void initState() {
     super.initState();
     // Set the main content scaffold key for notification service
@@ -82,104 +83,105 @@ class _AppShellState extends ConsumerState<AppShell> {
     }
 
     // Define keyboard shortcuts
-final Map<LogicalKeySet, VoidCallback> shortcuts = {
-  // Ctrl/Cmd + 1-5 for navigation
-  if (kIsWeb)
-    LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit1): () =>
-      ref.read(currentPageProvider.notifier).state = 0,
-  if (kIsWeb)
-    LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit2): () =>
-      ref.read(currentPageProvider.notifier).state = 1,
-  if (kIsWeb)
-    LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit3): () =>
-      ref.read(currentPageProvider.notifier).state = 2,
-  if (kIsWeb)
-    LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit4): () =>
-      ref.read(currentPageProvider.notifier).state = 3,
-  if (kIsWeb)
-    LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit5): () =>
-      ref.read(currentPageProvider.notifier).state = 4,
-  // Meta(Cmd) + 1-5 for macOS
-  if (!kIsWeb && Platform.isMacOS)
-    LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.digit1): () =>
-      ref.read(currentPageProvider.notifier).state = 0,
-  if (!kIsWeb && Platform.isMacOS)
-    LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.digit2): () =>
-      ref.read(currentPageProvider.notifier).state = 1,
-  if (!kIsWeb && Platform.isMacOS)
-    LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.digit3): () =>
-      ref.read(currentPageProvider.notifier).state = 2,
-  if (!kIsWeb && Platform.isMacOS)
-    LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.digit4): () =>
-      ref.read(currentPageProvider.notifier).state = 3,
-  if (!kIsWeb && Platform.isMacOS)
-    LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.digit5): () =>
-      ref.read(currentPageProvider.notifier).state = 4,
-  // Ctrl + 1-5 for Windows/Linux
-  if (!kIsWeb && (Platform.isWindows || Platform.isLinux))
-    LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit1): () =>
-      ref.read(currentPageProvider.notifier).state = 0,
-  if (!kIsWeb && (Platform.isWindows || Platform.isLinux))
-    LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit2): () =>
-      ref.read(currentPageProvider.notifier).state = 1,
-  if (!kIsWeb && (Platform.isWindows || Platform.isLinux))
-    LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit3): () =>
-      ref.read(currentPageProvider.notifier).state = 2,
-  if (!kIsWeb && (Platform.isWindows || Platform.isLinux))
-    LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit4): () =>
-      ref.read(currentPageProvider.notifier).state = 3,
-  if (!kIsWeb && (Platform.isWindows || Platform.isLinux))
-    LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit5): () =>
-      ref.read(currentPageProvider.notifier).state = 4,
-};
+    final Map<LogicalKeySet, VoidCallback> shortcuts = {
+      // Ctrl/Cmd + 1-5 for navigation
+      if (kIsWeb)
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit1):
+            () => ref.read(currentPageProvider.notifier).state = 0,
+      if (kIsWeb)
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit2):
+            () => ref.read(currentPageProvider.notifier).state = 1,
+      if (kIsWeb)
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit3):
+            () => ref.read(currentPageProvider.notifier).state = 2,
+      if (kIsWeb)
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit4):
+            () => ref.read(currentPageProvider.notifier).state = 3,
+      if (kIsWeb)
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit5):
+            () => ref.read(currentPageProvider.notifier).state = 4,
+      // Meta(Cmd) + 1-5 for macOS
+      if (!kIsWeb && Platform.isMacOS)
+        LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.digit1): () =>
+            ref.read(currentPageProvider.notifier).state = 0,
+      if (!kIsWeb && Platform.isMacOS)
+        LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.digit2): () =>
+            ref.read(currentPageProvider.notifier).state = 1,
+      if (!kIsWeb && Platform.isMacOS)
+        LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.digit3): () =>
+            ref.read(currentPageProvider.notifier).state = 2,
+      if (!kIsWeb && Platform.isMacOS)
+        LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.digit4): () =>
+            ref.read(currentPageProvider.notifier).state = 3,
+      if (!kIsWeb && Platform.isMacOS)
+        LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.digit5): () =>
+            ref.read(currentPageProvider.notifier).state = 4,
+      // Ctrl + 1-5 for Windows/Linux
+      if (!kIsWeb && (Platform.isWindows || Platform.isLinux))
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit1):
+            () => ref.read(currentPageProvider.notifier).state = 0,
+      if (!kIsWeb && (Platform.isWindows || Platform.isLinux))
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit2):
+            () => ref.read(currentPageProvider.notifier).state = 1,
+      if (!kIsWeb && (Platform.isWindows || Platform.isLinux))
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit3):
+            () => ref.read(currentPageProvider.notifier).state = 2,
+      if (!kIsWeb && (Platform.isWindows || Platform.isLinux))
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit4):
+            () => ref.read(currentPageProvider.notifier).state = 3,
+      if (!kIsWeb && (Platform.isWindows || Platform.isLinux))
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit5):
+            () => ref.read(currentPageProvider.notifier).state = 4,
+    };
 
-return CallbackShortcuts(
-  bindings: shortcuts,
-  child: Scaffold(
-    floatingActionButton: _buildRecordFab(context, ref, recordingState),
-    body: Row(
-      children: [
-          // Navigation Drawer
-          const AppNavigationDrawer(),
+    return CallbackShortcuts(
+      bindings: shortcuts,
+      child: Scaffold(
+        floatingActionButton: _buildRecordFab(context, ref, recordingState),
+        body: Row(
+          children: [
+            // Navigation Drawer
+            const AppNavigationDrawer(),
 
-          // Main Content with separate Scaffold for SnackBar isolation
-          Expanded(
-            child: Scaffold(
-              key: mainContentScaffoldKey,
-              backgroundColor: Colors.transparent,
-              body: Builder(
-                builder: (mainContentContext) => Stack(
-                  children: [
-                    IndexedStack(
-                      index: currentPage,
-                      children: const [
-                        TranscriptionsPage(),
-                        DashboardPage(),
-                        DictionariesPage(),
-                        PromptsPage(),
-                        SettingsPageRefactored(),
-                      ],
-                    ),
-                    // VAD Recording Overlay
-                    if (recordingState != RecordingState.idle) VadRecordingOverlay(),
-                    // Store context reference for notifications
-                    Builder(
-                      builder: (context) {
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          _mainContentContext = mainContentContext;
-                        });
-                        return const SizedBox.shrink();
-                      },
-                    ),
-                  ],
+            // Main Content with separate Scaffold for SnackBar isolation
+            Expanded(
+              child: Scaffold(
+                key: mainContentScaffoldKey,
+                backgroundColor: Colors.transparent,
+                body: Builder(
+                  builder: (mainContentContext) => Stack(
+                    children: [
+                      IndexedStack(
+                        index: currentPage,
+                        children: const [
+                          TranscriptionsPage(),
+                          DashboardPage(),
+                          DictionariesPage(),
+                          PromptsPage(),
+                          SettingsPageRefactored(),
+                        ],
+                      ),
+                      // VAD Recording Overlay
+                      if (recordingState != RecordingState.idle)
+                        VadRecordingOverlay(),
+                      // Store context reference for notifications
+                      Builder(
+                        builder: (context) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            _mainContentContext = mainContentContext;
+                          });
+                          return const SizedBox.shrink();
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
+    );
   }
 
   Widget? _buildRecordFab(
@@ -200,7 +202,8 @@ return CallbackShortcuts(
             : Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         shape: const CircleBorder(),
-        elevation: state == RecordingState.recording ? 8 : UIConstants.fabElevation,
+        elevation:
+            state == RecordingState.recording ? 8 : UIConstants.fabElevation,
         hoverElevation: 12,
         hoverColor: state == RecordingState.recording
             ? Colors.red[300]
@@ -222,7 +225,8 @@ return CallbackShortcuts(
                   state == RecordingState.recording
                       ? LucideIcons.micOff
                       : LucideIcons.mic,
-                  key: ValueKey(state == RecordingState.recording ? 'off' : 'on'),
+                  key: ValueKey(
+                      state == RecordingState.recording ? 'off' : 'on'),
                   size: 24,
                   color: Colors.white,
                 ),

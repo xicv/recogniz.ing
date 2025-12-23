@@ -73,9 +73,9 @@ class RecordingOverlay extends ConsumerWidget {
                         ),
                   ),
                   const SizedBox(height: 24),
-                const _RecordingTimer(),
-                // Show live transcription during recording
-                _LiveTranscriptionText(),
+                  const _RecordingTimer(),
+                  // Show live transcription during recording
+                  _LiveTranscriptionText(),
                 ] else if (state == RecordingState.processing) ...[
                   LoadingIndicators.medium(
                       color: Theme.of(context).colorScheme.primary),
@@ -204,8 +204,8 @@ class _LiveTranscriptionText extends ConsumerWidget {
               Text(
                 'Live Transcription',
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
               ),
             ],
           ),
@@ -215,16 +215,13 @@ class _LiveTranscriptionText extends ConsumerWidget {
               child: SelectableText(
                 currentText,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  height: 1.5,
-                ),
+                      height: 1.5,
+                    ),
               ),
             ),
           ),
         ],
       ),
-    )
-        .animate()
-        .slideY(begin: 0.1, end: 0.0)
-        .fadeIn(duration: 300.ms);
+    ).animate().slideY(begin: 0.1, end: 0.0).fadeIn(duration: 300.ms);
   }
 }

@@ -157,7 +157,8 @@ class _RecognizingAppState extends ConsumerState<RecognizingApp>
 
   void _openSettings() {
     _showApp();
-    ref.read(currentPageProvider.notifier).state = 4; // Settings (now page 4 with 5 pages)
+    ref.read(currentPageProvider.notifier).state =
+        4; // Settings (now page 4 with 5 pages)
   }
 
   void _copyLastTranscription() {

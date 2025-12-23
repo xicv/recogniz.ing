@@ -46,7 +46,8 @@ class NotificationService implements NotificationServiceInterface {
     if (_scaffoldKey?.currentContext != null) {
       ScaffoldMessenger.of(_scaffoldKey!.currentContext!).clearSnackBars();
     } else {
-      final context = _contentNavigatorKey?.currentContext ?? _navigatorKey?.currentContext;
+      final context =
+          _contentNavigatorKey?.currentContext ?? _navigatorKey?.currentContext;
       if (context != null) {
         ScaffoldMessenger.of(context).clearSnackBars();
       }
@@ -58,7 +59,8 @@ class NotificationService implements NotificationServiceInterface {
     if (_scaffoldKey?.currentContext != null) {
       context = _scaffoldKey!.currentContext;
     } else {
-      context = _contentNavigatorKey?.currentContext ?? _navigatorKey?.currentContext;
+      context =
+          _contentNavigatorKey?.currentContext ?? _navigatorKey?.currentContext;
     }
 
     if (context == null) return;

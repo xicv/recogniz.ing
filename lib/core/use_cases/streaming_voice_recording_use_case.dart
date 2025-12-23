@@ -86,7 +86,8 @@ class StreamingVoiceRecordingUseCase {
     });
 
     // Listen to transcription chunks
-    _chunkSubscription = _transcriptionService.transcriptionChunks.listen((chunk) {
+    _chunkSubscription =
+        _transcriptionService.transcriptionChunks.listen((chunk) {
       _handleTranscriptionChunk(chunk);
     });
 
@@ -102,7 +103,8 @@ class StreamingVoiceRecordingUseCase {
   /// Start real-time recording session
   Future<void> startRecording() async {
     try {
-      debugPrint('[StreamingVoiceRecordingUseCase] Starting recording session...');
+      debugPrint(
+          '[StreamingVoiceRecordingUseCase] Starting recording session...');
 
       // Check permissions
       final hasPermission = await _audioRecorder.hasPermission();
@@ -125,16 +127,20 @@ class StreamingVoiceRecordingUseCase {
       // Load auto-stop settings
       _autoStopAfterSilence = settings.autoStopAfterSilence;
       _autoStopSilence = Duration(seconds: settings.silenceDuration);
-      debugPrint('[StreamingVoiceRecordingUseCase] Auto-stop: $_autoStopAfterSilence, duration: $_autoStopSilence');
+      debugPrint(
+          '[StreamingVoiceRecordingUseCase] Auto-stop: $_autoStopAfterSilence, duration: $_autoStopSilence');
 
       // Initialize transcription service if needed
-      if (!_transcriptionService.isInitialized && settings.geminiApiKey?.isNotEmpty == true) {
+      if (!_transcriptionService.isInitialized &&
+          settings.geminiApiKey?.isNotEmpty == true) {
         // Load config to get the model name
         try {
           final config = await AppConfig.fromAsset();
-          _transcriptionService.initialize(settings.geminiApiKey!, model: config.api.model);
+          _transcriptionService.initialize(settings.geminiApiKey!,
+              model: config.api.model);
         } catch (e) {
-          debugPrint('[StreamingVoiceRecordingUseCase] Failed to load config, using default model: $e');
+          debugPrint(
+              '[StreamingVoiceRecordingUseCase] Failed to load config, using default model: $e');
           _transcriptionService.initialize(settings.geminiApiKey!);
         }
       }
@@ -180,7 +186,8 @@ class StreamingVoiceRecordingUseCase {
 
       // Validate recording
       if (result == null) {
-        _showErrorAndReset('No audio recorded. Please speak clearly and try again.');
+        _showErrorAndReset(
+            'No audio recorded. Please speak clearly and try again.');
         return;
       }
 
@@ -195,7 +202,8 @@ class StreamingVoiceRecordingUseCase {
 
       // Create transcription
       final transcription = Transcription(
-        id: _currentSession?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+        id: _currentSession?.id ??
+            DateTime.now().millisecondsSinceEpoch.toString(),
         rawText: streamResult.rawText,
         processedText: streamResult.processedText,
         createdAt: DateTime.now(),
@@ -258,7 +266,8 @@ class StreamingVoiceRecordingUseCase {
       _autoStopTimer?.cancel();
       if (_autoStopAfterSilence) {
         _autoStopTimer = Timer(_autoStopSilence, () {
-          debugPrint('[StreamingVoiceRecordingUseCase] Auto-stopping due to silence');
+          debugPrint(
+              '[StreamingVoiceRecordingUseCase] Auto-stopping due to silence');
           unawaited(stopRecording());
         });
       }
@@ -291,7 +300,8 @@ class StreamingVoiceRecordingUseCase {
       final vocabularySet = await _storageService.getVocabulary('default');
       return vocabularySet?.words.join(', ') ?? '';
     } catch (e) {
-      debugPrint('[StreamingVoiceRecordingUseCase] Error getting vocabulary: $e');
+      debugPrint(
+          '[StreamingVoiceRecordingUseCase] Error getting vocabulary: $e');
       return '';
     }
   }

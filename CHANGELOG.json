@@ -1,0 +1,196 @@
+{
+  "title": "Recogniz.ing Changelog",
+  "description": "AI-powered voice typing with real-time transcription powered by Google's Gemini AI.",
+  "categories": {
+    "added": {
+      "label": "Added",
+      "icon": "plus-circle",
+      "color": "bg-emerald-500"
+    },
+    "changed": {
+      "label": "Changed",
+      "icon": "refresh-cw",
+      "color": "bg-blue-500"
+    },
+    "fixed": {
+      "label": "Fixed",
+      "icon": "bug",
+      "color": "bg-amber-500"
+    },
+    "removed": {
+      "label": "Removed",
+      "icon": "trash-2",
+      "color": "bg-red-500"
+    },
+    "security": {
+      "label": "Security",
+      "icon": "shield",
+      "color": "bg-purple-500"
+    }
+  },
+  "versions": [
+    {
+      "version": "1.0.4",
+      "date": "2025-12-23",
+      "stable": true,
+      "highlights": [
+        "New Changelog system with JSON and Markdown formats",
+        "Simplified single-repository deployment architecture",
+        "Updated landing page with modern design"
+      ],
+      "changes": [
+        {
+          "category": "added",
+          "title": "Changelog System",
+          "description": "New structured changelog with JSON format for landing page display and Markdown for GitHub. Includes beautiful Vue component with filtering and search."
+        },
+        {
+          "category": "added",
+          "title": "Deployment Architecture",
+          "description": "Simplified single-repository deployment using GitHub Actions. Release workflow automatically commits downloads to landing folder and triggers GitHub Pages deployment."
+        },
+        {
+          "category": "changed",
+          "title": "Repository Structure",
+          "description": "Consolidated to xicv/recogniz.ing as the single source of truth. Both Flutter app and Vue landing page now in one repository."
+        },
+        {
+          "category": "changed",
+          "title": "Documentation",
+          "description": "Updated README.md files with latest deployment architecture, added CLAUDE.md section for landing page deployment."
+        },
+        {
+          "category": "removed",
+          "title": "Outdated Files",
+          "description": "Removed outdated DEPLOYMENT.md and Flutter-generated recognizing/README.md files."
+        }
+      ]
+    },
+    {
+      "version": "1.0.3",
+      "date": "2025-12-21",
+      "stable": true,
+      "highlights": [
+        "macOS Gatekeeper verification fixed",
+        "Initial Windows release with native installer",
+        "Improved build scripts and Makefile"
+      ],
+      "changes": [
+        {
+          "category": "fixed",
+          "title": "macOS Gatekeeper",
+          "description": "Fixed macOS Gatekeeper verification issues with improved app signing and notarization."
+        },
+        {
+          "category": "added",
+          "title": "Windows Release",
+          "description": "Initial Windows release with native installer support. Download as recognizing-{version}-windows.zip"
+        },
+        {
+          "category": "fixed",
+          "title": "Build System",
+          "description": "Fixed make quick-run command to properly clean build directory and prevent code signing errors."
+        },
+        {
+          "category": "changed",
+          "title": "Platform Icons",
+          "description": "Updated landing page platform icons - iMac for macOS, Apple logo for iOS for better visual representation."
+        },
+        {
+          "category": "changed",
+          "title": "Performance",
+          "description": "Enhanced stability and performance improvements across all platforms."
+        }
+      ]
+    },
+    {
+      "version": "1.0.2",
+      "date": "2024-12-15",
+      "stable": true,
+      "highlights": [
+        "Version management system with semantic versioning",
+        "Keyboard shortcuts (Cmd/Ctrl+S to save)",
+        "Automated deployment pipeline"
+      ],
+      "changes": [
+        {
+          "category": "added",
+          "title": "Version Management",
+          "description": "Comprehensive semantic versioning system with automated tools (Dart script, shell script, Makefile targets)."
+        },
+        {
+          "category": "added",
+          "title": "Keyboard Shortcuts",
+          "description": "Added Cmd/Ctrl+S keyboard shortcut for saving edited transcriptions."
+        },
+        {
+          "category": "fixed",
+          "title": "Settings Navigation",
+          "description": "Fixed menu bar Settings navigation to open correct Settings tab."
+        },
+        {
+          "category": "added",
+          "title": "Deployment System",
+          "description": "Automated build and deployment pipeline for all platforms to landing page."
+        },
+        {
+          "category": "added",
+          "title": "Code Signing",
+          "description": "macOS code signing and notarization support for distribution."
+        },
+        {
+          "category": "added",
+          "title": "Landing Page",
+          "description": "New landing page with download management system and version tracking."
+        }
+      ]
+    },
+    {
+      "version": "1.0.0",
+      "date": "2024-11-01",
+      "stable": true,
+      "highlights": [
+        "Initial release with core voice typing functionality",
+        "Material Design 3 UI",
+        "Cross-platform support"
+      ],
+      "changes": [
+        {
+          "category": "added",
+          "title": "Voice Recording",
+          "description": "Smart voice activity detection (VAD) with configurable sensitivity and RMS-based audio analysis."
+        },
+        {
+          "category": "added",
+          "title": "AI Transcription",
+          "description": "Powered by Google Gemini 1.5 Flash with intelligent noise filtering and silence detection."
+        },
+        {
+          "category": "added",
+          "title": "Custom Prompts",
+          "description": "6 pre-configured prompts (Clean, Formal, Bullets, Email, Meeting Notes, Social Media) with custom prompt creation."
+        },
+        {
+          "category": "added",
+          "title": "Vocabulary Sets",
+          "description": "6 industry vocabulary sets (General, Technology, Business, Medical, Legal, Finance)."
+        },
+        {
+          "category": "added",
+          "title": "Dashboard",
+          "description": "Real-time transcription history with search, usage statistics, and inline editing."
+        },
+        {
+          "category": "added",
+          "title": "Global Hotkeys",
+          "description": "Desktop global hotkey support (Cmd+Shift+Space / Ctrl+Shift+Space) with system tray integration."
+        },
+        {
+          "category": "added",
+          "title": "Themes",
+          "description": "Material Design 3 UI with dark/light theme support and system preference detection."
+        }
+      ]
+    }
+  ]
+}

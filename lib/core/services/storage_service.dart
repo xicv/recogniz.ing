@@ -115,7 +115,8 @@ class StorageService implements StorageServiceInterface {
 
   static Future<void> saveSettings(AppSettings settings) async {
     if (!_isBoxOpen(settingsBox)) {
-      debugPrint('[StorageService] Settings box not open, attempting to open it');
+      debugPrint(
+          '[StorageService] Settings box not open, attempting to open it');
       try {
         await Hive.openBox<AppSettings>(settingsBox);
       } catch (e) {

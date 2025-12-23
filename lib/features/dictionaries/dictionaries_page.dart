@@ -47,9 +47,12 @@ class _DictionariesPageState extends ConsumerState<DictionariesPage> {
     // Filter vocabulary based on search
     final filteredVocabulary = _searchQuery.isEmpty
         ? vocabulary
-        : vocabulary.where((vocab) =>
-            vocab.name.toLowerCase().contains(_searchQuery) ||
-            vocab.words.any((word) => word.toLowerCase().contains(_searchQuery))).toList();
+        : vocabulary
+            .where((vocab) =>
+                vocab.name.toLowerCase().contains(_searchQuery) ||
+                vocab.words
+                    .any((word) => word.toLowerCase().contains(_searchQuery)))
+            .toList();
 
     return Scaffold(
       appBar: AppBars.primary(
@@ -96,7 +99,8 @@ class _DictionariesPageState extends ConsumerState<DictionariesPage> {
                     itemCount: filteredVocabulary.length,
                     itemBuilder: (context, index) {
                       final vocab = filteredVocabulary[index];
-                      return _buildVocabularyTile(context, ref, vocab, settings);
+                      return _buildVocabularyTile(
+                          context, ref, vocab, settings);
                     },
                   ),
           ),
@@ -119,8 +123,8 @@ class _DictionariesPageState extends ConsumerState<DictionariesPage> {
           Text(
             isSearching ? 'No dictionaries found' : 'No dictionaries yet',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
           ),
           const SizedBox(height: 8),
           Text(
@@ -128,8 +132,8 @@ class _DictionariesPageState extends ConsumerState<DictionariesPage> {
                 ? 'Try adjusting your search terms'
                 : 'Create your first custom dictionary',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
           ),
           if (!isSearching) ...[
             const SizedBox(height: 24),
@@ -195,8 +199,8 @@ class _DictionariesPageState extends ConsumerState<DictionariesPage> {
             title: Text(
               vocab.name,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+                    fontWeight: FontWeight.w600,
+                  ),
             ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,15 +209,15 @@ class _DictionariesPageState extends ConsumerState<DictionariesPage> {
                 Text(
                   '${vocab.words.length} words',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                 ),
                 if (!isExpanded && vocab.words.isNotEmpty)
                   Text(
                     vocab.words.take(3).join(', '),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -224,7 +228,8 @@ class _DictionariesPageState extends ConsumerState<DictionariesPage> {
               children: [
                 if (isSelected)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.primary,
                       borderRadius: BorderRadius.circular(20),
@@ -232,9 +237,9 @@ class _DictionariesPageState extends ConsumerState<DictionariesPage> {
                     child: Text(
                       'Active',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
                     ),
                   ),
                 const SizedBox(width: 8),
@@ -282,7 +287,9 @@ class _DictionariesPageState extends ConsumerState<DictionariesPage> {
                     });
                   },
                   icon: Icon(
-                    isExpanded ? LucideIcons.chevronUp : LucideIcons.chevronDown,
+                    isExpanded
+                        ? LucideIcons.chevronUp
+                        : LucideIcons.chevronDown,
                     size: 20,
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -290,7 +297,9 @@ class _DictionariesPageState extends ConsumerState<DictionariesPage> {
               ],
             ),
             onTap: () {
-              ref.read(settingsProvider.notifier).updateSelectedVocabulary(vocab.id);
+              ref
+                  .read(settingsProvider.notifier)
+                  .updateSelectedVocabulary(vocab.id);
             },
           ),
           if (isExpanded && vocab.words.isNotEmpty)
@@ -302,11 +311,14 @@ class _DictionariesPageState extends ConsumerState<DictionariesPage> {
                 children: vocab.words.map((word) {
                   return Chip(
                     label: Text(word),
-                    backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                    backgroundColor:
+                        Theme.of(context).colorScheme.surfaceVariant,
                     deleteIcon: const Icon(LucideIcons.x, size: 16),
-                    onDeleted: !vocab.isDefault ? () {
-                      // TODO: Implement word removal
-                    } : null,
+                    onDeleted: !vocab.isDefault
+                        ? () {
+                            // TODO: Implement word removal
+                          }
+                        : null,
                   );
                 }).toList(),
               ),

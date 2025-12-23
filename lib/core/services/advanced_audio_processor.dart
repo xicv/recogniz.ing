@@ -34,7 +34,8 @@ class AdvancedAudioProcessor {
       */
 
       _initialized = true;
-      debugPrint('[AdvancedAudioProcessor] RMS-based VAD initialized (fallback mode)');
+      debugPrint(
+          '[AdvancedAudioProcessor] RMS-based VAD initialized (fallback mode)');
     } catch (e) {
       debugPrint('[AdvancedAudioProcessor] Initialization failed: $e');
       // Fallback to RMS-based processing
@@ -64,8 +65,8 @@ class AdvancedAudioProcessor {
   }) async {
     // TODO: Use VAD analysis when package is available
     // For now, use RMS-based fallback
-    return _rmsAnalysis(audioBytes, amplitudeThreshold,
-                      speechRatioThreshold, sampleRate, bitDepth);
+    return _rmsAnalysis(audioBytes, amplitudeThreshold, speechRatioThreshold,
+        sampleRate, bitDepth);
   }
 
   /// Start real-time monitoring

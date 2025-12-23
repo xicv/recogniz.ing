@@ -109,13 +109,15 @@ class VoiceRecordingUseCase {
       debugPrint('Sending to transcription service...');
 
       // Get vocabulary and prompt through storage service
-      final vocabulary = await _storageService.getVocabulary(settings.selectedVocabularyId);
+      final vocabulary =
+          await _storageService.getVocabulary(settings.selectedVocabularyId);
       final prompt = await _storageService.getPrompt(settings.selectedPromptId);
 
       final result = await _transcriptionService.transcribeAudio(
         audioBytes: Uint8List.fromList(audioData),
         vocabulary: vocabulary?.words.join(', ') ?? '',
-        promptTemplate: prompt?.promptTemplate ?? AppConstants.defaultPromptTemplate,
+        promptTemplate:
+            prompt?.promptTemplate ?? AppConstants.defaultPromptTemplate,
         criticalInstructions: settings.effectiveCriticalInstructions,
       );
 

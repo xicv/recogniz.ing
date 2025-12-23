@@ -93,7 +93,8 @@ class _TranscriptionCardState extends State<TranscriptionCard>
       context: context,
       builder: (context) => AlertDialog.adaptive(
         title: const Text('Delete Transcription'),
-        content: const Text('Are you sure you want to delete this transcription?'),
+        content:
+            const Text('Are you sure you want to delete this transcription?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -158,9 +159,11 @@ class _TranscriptionCardState extends State<TranscriptionCard>
     return CallbackShortcuts(
       bindings: {
         if (_isEditing && _hasChanges)
-          const SingleActivator(LogicalKeyboardKey.keyS, control: true): _saveChanges,
+          const SingleActivator(LogicalKeyboardKey.keyS, control: true):
+              _saveChanges,
         if (_isEditing && _hasChanges)
-          const SingleActivator(LogicalKeyboardKey.keyS, meta: true): _saveChanges,
+          const SingleActivator(LogicalKeyboardKey.keyS, meta: true):
+              _saveChanges,
         const SingleActivator(LogicalKeyboardKey.escape): () {
           if (_isEditing) {
             setState(() {
@@ -203,7 +206,8 @@ class _TranscriptionCardState extends State<TranscriptionCard>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                dateFormat.format(widget.transcription.createdAt),
+                                dateFormat
+                                    .format(widget.transcription.createdAt),
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: colorScheme.onSurfaceVariant,
                                   fontWeight: FontWeight.w500,
@@ -219,7 +223,8 @@ class _TranscriptionCardState extends State<TranscriptionCard>
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    _formatDuration(widget.transcription.audioDurationSeconds),
+                                    _formatDuration(widget
+                                        .transcription.audioDurationSeconds),
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       color: colorScheme.outline,
                                     ),
@@ -237,7 +242,8 @@ class _TranscriptionCardState extends State<TranscriptionCard>
                               IconButton.outlined(
                                 onPressed: () {
                                   setState(() {
-                                    _controller.text = widget.transcription.processedText;
+                                    _controller.text =
+                                        widget.transcription.processedText;
                                     _hasChanges = false;
                                     _isEditing = false;
                                   });
@@ -316,11 +322,13 @@ class _TranscriptionCardState extends State<TranscriptionCard>
                           ),
                           contentPadding: const EdgeInsets.all(12),
                           filled: true,
-                          fillColor: colorScheme.surfaceVariant.withOpacity(0.3),
+                          fillColor:
+                              colorScheme.surfaceVariant.withOpacity(0.3),
                         ),
                         onChanged: (value) {
                           setState(() {
-                            _hasChanges = value != widget.transcription.processedText;
+                            _hasChanges =
+                                value != widget.transcription.processedText;
                           });
                         },
                         onSubmitted: (_) => _saveChanges(),
@@ -420,7 +428,8 @@ class _TranscriptionMenuButton extends StatefulWidget {
   });
 
   @override
-  State<_TranscriptionMenuButton> createState() => _TranscriptionMenuButtonState();
+  State<_TranscriptionMenuButton> createState() =>
+      _TranscriptionMenuButtonState();
 }
 
 class _TranscriptionMenuButtonState extends State<_TranscriptionMenuButton> {
@@ -653,7 +662,8 @@ class _TranscriptionEditModal extends StatefulWidget {
   });
 
   @override
-  State<_TranscriptionEditModal> createState() => _TranscriptionEditModalState();
+  State<_TranscriptionEditModal> createState() =>
+      _TranscriptionEditModalState();
 }
 
 class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
@@ -663,7 +673,8 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.transcription.processedText);
+    _controller =
+        TextEditingController(text: widget.transcription.processedText);
     _controller.addListener(() {
       setState(() {
         _hasChanges = _controller.text != widget.transcription.processedText;
@@ -692,9 +703,12 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
 
     return CallbackShortcuts(
       bindings: {
-        const SingleActivator(LogicalKeyboardKey.keyS, control: true): _saveChanges,
-        const SingleActivator(LogicalKeyboardKey.keyS, meta: true): _saveChanges,
-        const SingleActivator(LogicalKeyboardKey.escape): () => Navigator.pop(context),
+        const SingleActivator(LogicalKeyboardKey.keyS, control: true):
+            _saveChanges,
+        const SingleActivator(LogicalKeyboardKey.keyS, meta: true):
+            _saveChanges,
+        const SingleActivator(LogicalKeyboardKey.escape): () =>
+            Navigator.pop(context),
       },
       child: Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
@@ -726,7 +740,8 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
                 icon: const Icon(LucideIcons.check, size: 18),
                 label: const Text('Save'),
                 style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
               ),
           ],
@@ -738,7 +753,8 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
               children: [
                 // Word count and duration info
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
                     color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
                     borderRadius: BorderRadius.circular(12),
@@ -814,7 +830,8 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
                       ),
                       contentPadding: const EdgeInsets.all(20),
                       filled: true,
-                      fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                      fillColor:
+                          colorScheme.surfaceContainerHighest.withOpacity(0.3),
                     ),
                   ),
                 ),
@@ -822,7 +839,8 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
                 // Save hint
                 if (_hasChanges)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
                       color: colorScheme.primaryContainer.withOpacity(0.5),
                       borderRadius: BorderRadius.circular(12),

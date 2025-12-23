@@ -342,7 +342,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               ),
               if (settings.autoStopAfterSilence)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -355,7 +356,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                           ),
                           Text(
                             '${settings.silenceDuration}s',
-                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall
+                                ?.copyWith(
                                   color: Theme.of(context).colorScheme.primary,
                                 ),
                           ),
@@ -369,7 +373,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         label: '${settings.silenceDuration}s',
                         onChanged: (value) {
                           SchedulerBinding.instance.addPostFrameCallback((_) {
-                            ref.read(settingsProvider.notifier).updateSilenceDuration(value.toInt());
+                            ref
+                                .read(settingsProvider.notifier)
+                                .updateSilenceDuration(value.toInt());
                           });
                         },
                       ),
@@ -390,7 +396,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 value: settings.autoStopAfterSilence,
                 onChanged: (value) {
                   SchedulerBinding.instance.addPostFrameCallback((_) {
-                    ref.read(settingsProvider.notifier).toggleAutoStopAfterSilence();
+                    ref
+                        .read(settingsProvider.notifier)
+                        .toggleAutoStopAfterSilence();
                   });
                 },
               ),

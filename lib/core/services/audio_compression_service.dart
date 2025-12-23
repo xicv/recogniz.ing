@@ -20,7 +20,8 @@ class AudioCompressionService {
       }
 
       final tempDir = await getTemporaryDirectory();
-      final outputFileName = 'compressed_${DateTime.now().millisecondsSinceEpoch}.m4a';
+      final outputFileName =
+          'compressed_${DateTime.now().millisecondsSinceEpoch}.m4a';
       final outputPath = path.join(tempDir.path, outputFileName);
 
       // For now, we'll use a simpler approach
@@ -33,7 +34,8 @@ class AudioCompressionService {
         // If file is already small enough, just copy it
         if (fileSize < _getMaxFileSizeForBitRate(bitRate)) {
           if (kDebugMode) {
-            debugPrint('[AudioCompression] File already optimized: ${fileSize} bytes');
+            debugPrint(
+                '[AudioCompression] File already optimized: ${fileSize} bytes');
           }
           return inputPath;
         }
@@ -62,7 +64,8 @@ class AudioCompressionService {
   }) async {
     try {
       if (kDebugMode) {
-        debugPrint('[AudioCompression] Compressing ${audioBytes.length} bytes of audio');
+        debugPrint(
+            '[AudioCompression] Compressing ${audioBytes.length} bytes of audio');
       }
 
       // Calculate compression ratio
@@ -70,7 +73,8 @@ class AudioCompressionService {
       final compressionRatio = audioBytes.length / targetSize;
 
       if (kDebugMode) {
-        debugPrint('[AudioCompression] Target compression ratio: ${compressionRatio.toStringAsFixed(2)}x');
+        debugPrint(
+            '[AudioCompression] Target compression ratio: ${compressionRatio.toStringAsFixed(2)}x');
       }
 
       // For voice audio, we can apply a simple compression by:
@@ -82,7 +86,8 @@ class AudioCompressionService {
 
       if (kDebugMode) {
         final actualRatio = audioBytes.length / compressedBytes.length;
-        debugPrint('[AudioCompression] Actual compression: ${actualRatio.toStringAsFixed(2)}x');
+        debugPrint(
+            '[AudioCompression] Actual compression: ${actualRatio.toStringAsFixed(2)}x');
       }
 
       return compressedBytes;
@@ -118,14 +123,17 @@ class AudioCompressionService {
       case 'aac_lc':
         return aacEfficiency * (targetBitRate / originalBitRate);
       case 'mp3':
-        return aacEfficiency * 0.8 * (targetBitRate / originalBitRate); // MP3 is less efficient
+        return aacEfficiency *
+            0.8 *
+            (targetBitRate / originalBitRate); // MP3 is less efficient
       default:
         return 1.0;
     }
   }
 
   /// Apply basic voice compression to raw bytes
-  static Uint8List _applyVoiceCompression(Uint8List bytes, int targetSampleRate) {
+  static Uint8List _applyVoiceCompression(
+      Uint8List bytes, int targetSampleRate) {
     // This is a simplified compression that:
     // 1. Reduces dynamic range for voice
     // 2. Removes frequencies outside voice range (80Hz - 8kHz)
@@ -161,7 +169,8 @@ class AudioCompressionService {
     required double durationSeconds,
   }) {
     final compressionRatio = originalSize / compressedSize;
-    final savingsPercent = ((originalSize - compressedSize) / originalSize * 100).round();
+    final savingsPercent =
+        ((originalSize - compressedSize) / originalSize * 100).round();
     final finalBitRate = (compressedSize * 8) ~/ durationSeconds;
 
     return {

@@ -84,7 +84,8 @@ final voiceRecordingUseCaseProvider = Provider<VoiceRecordingUseCase>((ref) {
 });
 
 // Streaming Recording use case provider (new implementation)
-final streamingVoiceRecordingUseCaseProvider = Provider<StreamingVoiceRecordingUseCase>((ref) {
+final streamingVoiceRecordingUseCaseProvider =
+    Provider<StreamingVoiceRecordingUseCase>((ref) {
   final storageService = ref.watch(storageServiceProvider);
   final notificationService = ref.watch(notificationServiceProvider);
 

@@ -13,7 +13,8 @@ class VadRecordingOverlay extends ConsumerStatefulWidget {
   const VadRecordingOverlay({super.key});
 
   @override
-  ConsumerState<VadRecordingOverlay> createState() => _VadRecordingOverlayState();
+  ConsumerState<VadRecordingOverlay> createState() =>
+      _VadRecordingOverlayState();
 }
 
 class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
@@ -190,7 +191,8 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
                 GestureDetector(
                   onTap: _stopRecording,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
                     decoration: BoxDecoration(
                       color: Colors.red.withOpacity(0.8),
                       borderRadius: BorderRadius.circular(24),
@@ -258,7 +260,8 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
 
               // Instructions
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
@@ -474,8 +477,14 @@ class WavePainter extends CustomPainter {
 
       final path = Path();
       for (double angle = 0; angle <= 2 * 3.14159; angle += 0.1) {
-        final x = center.dx + waveRadius * cos(angle) * (1 + waveHeight * sin(frequency * angle + phase) / 100);
-        final y = center.dy + waveRadius * sin(angle) * (1 + waveHeight * cos(frequency * angle + phase) / 100);
+        final x = center.dx +
+            waveRadius *
+                cos(angle) *
+                (1 + waveHeight * sin(frequency * angle + phase) / 100);
+        final y = center.dy +
+            waveRadius *
+                sin(angle) *
+                (1 + waveHeight * cos(frequency * angle + phase) / 100);
 
         if (angle == 0) {
           path.moveTo(x, y);
