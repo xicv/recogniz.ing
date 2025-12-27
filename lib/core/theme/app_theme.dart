@@ -122,23 +122,112 @@ class AppTheme {
   }
 
   /// Builds text theme with consistent color mapping to ColorScheme.
+  ///
+  /// Material 3 Type Scale:
+  /// - Display: Largest text, reserved for short, important text (57/45/36sp)
+  /// - Headline: High-emphasis text, shorter than body text (32/28/24sp)
+  /// - Title: Medium-emphasis text, shorter than body (22/16/14sp)
+  /// - Body: Longer body text and lists (16/14/12sp)
+  /// - Label: Smaller, utilitarian text (14/12/11sp)
+  ///
+  /// Reference: https://m3.material.io/styles/typography/type-scale-tokens
   static TextTheme _buildTextTheme(TextTheme base, ColorScheme colorScheme) {
     return base.copyWith(
-      displayLarge: base.displayLarge?.copyWith(color: colorScheme.onSurface),
-      displayMedium: base.displayMedium?.copyWith(color: colorScheme.onSurface),
-      displaySmall: base.displaySmall?.copyWith(color: colorScheme.onSurface),
-      headlineLarge: base.headlineLarge?.copyWith(color: colorScheme.onSurface),
-      headlineMedium: base.headlineMedium?.copyWith(color: colorScheme.onSurface),
-      headlineSmall: base.headlineSmall?.copyWith(color: colorScheme.onSurface),
-      titleLarge: base.titleLarge?.copyWith(color: colorScheme.onSurface),
-      titleMedium: base.titleMedium?.copyWith(color: colorScheme.onSurface),
-      titleSmall: base.titleSmall?.copyWith(color: colorScheme.onSurface),
-      bodyLarge: base.bodyLarge?.copyWith(color: colorScheme.onSurface),
-      bodyMedium: base.bodyMedium?.copyWith(color: colorScheme.onSurface),
-      bodySmall: base.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
-      labelLarge: base.labelLarge?.copyWith(color: colorScheme.onSurface),
-      labelMedium: base.labelMedium?.copyWith(color: colorScheme.onSurfaceVariant),
-      labelSmall: base.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
+      // Display styles - reserved for shortest, highest-emphasis text
+      displayLarge: base.displayLarge?.copyWith(
+        fontSize: 57,
+        fontWeight: FontWeight.w400,
+        letterSpacing: -0.25,
+        color: colorScheme.onSurface,
+      ),
+      displayMedium: base.displayMedium?.copyWith(
+        fontSize: 45,
+        fontWeight: FontWeight.w400,
+        color: colorScheme.onSurface,
+      ),
+      displaySmall: base.displaySmall?.copyWith(
+        fontSize: 36,
+        fontWeight: FontWeight.w400,
+        color: colorScheme.onSurface,
+      ),
+
+      // Headline styles - high-emphasis, shorter than body
+      headlineLarge: base.headlineLarge?.copyWith(
+        fontSize: 32,
+        fontWeight: FontWeight.w400,
+        color: colorScheme.onSurface,
+      ),
+      headlineMedium: base.headlineMedium?.copyWith(
+        fontSize: 28,
+        fontWeight: FontWeight.w400,
+        color: colorScheme.onSurface,
+      ),
+      headlineSmall: base.headlineSmall?.copyWith(
+        fontSize: 24,
+        fontWeight: FontWeight.w400,
+        color: colorScheme.onSurface,
+      ),
+
+      // Title styles - medium-emphasis, shorter than body
+      titleLarge: base.titleLarge?.copyWith(
+        fontSize: 22,
+        fontWeight: FontWeight.w400,
+        color: colorScheme.onSurface,
+      ),
+      titleMedium: base.titleMedium?.copyWith(
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+        letterSpacing: 0.15,
+        color: colorScheme.onSurface,
+      ),
+      titleSmall: base.titleSmall?.copyWith(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        letterSpacing: 0.1,
+        color: colorScheme.onSurface,
+      ),
+
+      // Body styles - main content text
+      bodyLarge: base.bodyLarge?.copyWith(
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        letterSpacing: 0.5,
+        height: 1.5,
+        color: colorScheme.onSurface,
+      ),
+      bodyMedium: base.bodyMedium?.copyWith(
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+        letterSpacing: 0.25,
+        height: 1.5,
+        color: colorScheme.onSurface,
+      ),
+      bodySmall: base.bodySmall?.copyWith(
+        fontSize: 12,
+        fontWeight: FontWeight.w400,
+        letterSpacing: 0.4,
+        color: colorScheme.onSurfaceVariant,
+      ),
+
+      // Label styles - smaller, utilitarian text
+      labelLarge: base.labelLarge?.copyWith(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        letterSpacing: 0.1,
+        color: colorScheme.onSurface,
+      ),
+      labelMedium: base.labelMedium?.copyWith(
+        fontSize: 12,
+        fontWeight: FontWeight.w500,
+        letterSpacing: 0.5,
+        color: colorScheme.onSurfaceVariant,
+      ),
+      labelSmall: base.labelSmall?.copyWith(
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+        letterSpacing: 0.5,
+        color: colorScheme.onSurfaceVariant,
+      ),
     );
   }
 
