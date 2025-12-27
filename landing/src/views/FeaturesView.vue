@@ -131,14 +131,24 @@ const settings = [
 <template>
   <div>
     <!-- Hero Section -->
-    <section class="pt-32 pb-24 section-padding bg-gradient-to-br from-slate-50 to-white">
+    <section
+      class="pt-32 pb-24 section-padding bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-[#0a0a0a] transition-colors duration-300"
+    >
       <div class="container-custom">
         <div class="text-center max-w-4xl mx-auto animate-fade-in">
-          <h1 class="text-5xl sm:text-6xl lg:text-7xl font-light leading-tight mb-6 tracking-tight">
+          <h1
+            class="text-5xl sm:text-6xl lg:text-7xl font-light leading-tight mb-6 tracking-tight text-slate-950 dark:text-slate-50 transition-colors duration-300"
+          >
             Powerful Features for
-            <span class="font-medium bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">Voice Typing</span>
+            <span
+              class="font-medium bg-gradient-to-r from-primary-600 to-primary-800 dark:from-sky-400 dark:to-cyan-400 bg-clip-text text-transparent transition-colors duration-300"
+            >
+              Voice Typing
+            </span>
           </h1>
-          <p class="text-xl text-slate-600 leading-relaxed">
+          <p
+            class="text-xl leading-relaxed text-slate-600 dark:text-slate-400 transition-colors duration-300"
+          >
             Everything you need to transform your voice into perfect text, tailored to your workflow
           </p>
         </div>
@@ -149,55 +159,123 @@ const settings = [
     <section class="py-32 section-padding">
       <div class="container-custom">
         <div class="text-center mb-16">
-          <h2 class="text-4xl font-light mb-4">Core Features</h2>
-          <p class="text-xl text-slate-600">Designed for productivity and ease of use</p>
+          <h2
+            class="text-4xl font-light mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+          >
+            Core Features
+          </h2>
+          <p
+            class="text-xl text-slate-600 dark:text-slate-400 transition-colors duration-300"
+          >
+            Designed for productivity and ease of use
+          </p>
         </div>
 
         <div class="max-w-6xl mx-auto">
           <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
             <!-- Smart Voice Recording -->
             <div class="feature-item group">
-              <div class="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center mx-auto mb-6 group-hover:bg-slate-200 transition-colors">
-                <svg class="w-8 h-8 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div
+                class="w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-6 bg-slate-100 group-hover:bg-slate-200 dark:bg-slate-800 dark:group-hover:bg-slate-700 transition-colors duration-300"
+              >
+                <svg
+                  class="w-8 h-8 text-slate-700 dark:text-slate-300 transition-colors duration-300"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
                 </svg>
               </div>
-              <h3 class="text-lg font-medium mb-2">Smart Voice Recording</h3>
-              <p class="text-slate-600 text-sm leading-relaxed">VAD with global hotkeys & system tray</p>
+              <h3
+                class="text-lg font-medium mb-2 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+              >
+                Smart Voice Recording
+              </h3>
+              <p
+                class="text-sm leading-relaxed text-slate-600 dark:text-slate-400 transition-colors duration-300"
+              >
+                VAD with global hotkeys & system tray
+              </p>
             </div>
 
             <!-- AI Transcription -->
             <div class="feature-item group">
-              <div class="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center mx-auto mb-6 group-hover:bg-slate-200 transition-colors">
-                <svg class="w-8 h-8 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div
+                class="w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-6 bg-slate-100 group-hover:bg-slate-200 dark:bg-slate-800 dark:group-hover:bg-slate-700 transition-colors duration-300"
+              >
+                <svg
+                  class="w-8 h-8 text-slate-700 dark:text-slate-300 transition-colors duration-300"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                 </svg>
               </div>
-              <h3 class="text-lg font-medium mb-2">AI-Powered Transcription</h3>
-              <p class="text-slate-600 text-sm leading-relaxed">Gemini 3.0 Flash with intelligent optimization</p>
+              <h3
+                class="text-lg font-medium mb-2 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+              >
+                AI-Powered Transcription
+              </h3>
+              <p
+                class="text-sm leading-relaxed text-slate-600 dark:text-slate-400 transition-colors duration-300"
+              >
+                Gemini 3.0 Flash with intelligent optimization
+              </p>
             </div>
 
             <!-- Dashboard & Analytics -->
             <div class="feature-item group">
-              <div class="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center mx-auto mb-6 group-hover:bg-slate-200 transition-colors">
-                <svg class="w-8 h-8 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div
+                class="w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-6 bg-slate-100 group-hover:bg-slate-200 dark:bg-slate-800 dark:group-hover:bg-slate-700 transition-colors duration-300"
+              >
+                <svg
+                  class="w-8 h-8 text-slate-700 dark:text-slate-300 transition-colors duration-300"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                 </svg>
               </div>
-              <h3 class="text-lg font-medium mb-2">Dashboard & Analytics</h3>
-              <p class="text-slate-600 text-sm leading-relaxed">Searchable history with editing & stats</p>
+              <h3
+                class="text-lg font-medium mb-2 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+              >
+                Dashboard & Analytics
+              </h3>
+              <p
+                class="text-sm leading-relaxed text-slate-600 dark:text-slate-400 transition-colors duration-300"
+              >
+                Searchable history with editing & stats
+              </p>
             </div>
 
             <!-- Customization -->
             <div class="feature-item group">
-              <div class="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center mx-auto mb-6 group-hover:bg-slate-200 transition-colors">
-                <svg class="w-8 h-8 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div
+                class="w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-6 bg-slate-100 group-hover:bg-slate-200 dark:bg-slate-800 dark:group-hover:bg-slate-700 transition-colors duration-300"
+              >
+                <svg
+                  class="w-8 h-8 text-slate-700 dark:text-slate-300 transition-colors duration-300"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                 </svg>
               </div>
-              <h3 class="text-lg font-medium mb-2">Customization</h3>
-              <p class="text-slate-600 text-sm leading-relaxed">Custom prompts & vocabulary sets</p>
+              <h3
+                class="text-lg font-medium mb-2 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+              >
+                Customization
+              </h3>
+              <p
+                class="text-sm leading-relaxed text-slate-600 dark:text-slate-400 transition-colors duration-300"
+              >
+                Custom prompts & vocabulary sets
+              </p>
             </div>
           </div>
         </div>
@@ -205,17 +283,29 @@ const settings = [
     </section>
 
     <!-- Customization Section -->
-    <section class="py-32 section-padding bg-slate-50">
+    <section
+      class="py-32 section-padding bg-slate-50 dark:bg-slate-900/30 transition-colors duration-300"
+    >
       <div class="container-custom">
         <div class="text-center mb-16">
-          <h2 class="text-4xl font-light mb-4">Customization</h2>
-          <p class="text-xl text-slate-600">Tailor Recogniz.ing to your exact needs</p>
+          <h2
+            class="text-4xl font-light mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+          >
+            Customization
+          </h2>
+          <p
+            class="text-xl text-slate-600 dark:text-slate-400 transition-colors duration-300"
+          >
+            Tailor Recogniz.ing to your exact needs
+          </p>
         </div>
 
         <!-- Interactive Tabs -->
         <div class="max-w-5xl mx-auto">
           <div class="flex justify-center mb-12">
-            <div class="inline-flex rounded-lg p-1 bg-slate-100">
+            <div
+              class="inline-flex rounded-lg p-1 bg-slate-100 dark:bg-slate-800 transition-colors duration-300"
+            >
               <button
                 v-for="(items, tab) in { prompts, vocabulary, settings }"
                 :key="tab"
@@ -223,8 +313,8 @@ const settings = [
                 class="px-6 py-3 rounded-md font-medium transition-all capitalize"
                 :class="[
                   activeTab === tab
-                    ? 'bg-slate-900 text-white'
-                    : 'text-slate-600 hover:bg-slate-200'
+                    ? 'bg-slate-900 text-white dark:bg-slate-700'
+                    : 'text-slate-600 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200'
                 ]"
               >
                 {{ tab === 'prompts' ? 'Smart Prompts' : tab === 'vocabulary' ? 'Vocabulary Sets' : 'Settings' }}
@@ -237,13 +327,30 @@ const settings = [
             <div
               v-for="item in (activeTab === 'prompts' ? prompts : activeTab === 'vocabulary' ? vocabulary : settings)"
               :key="item.title"
-              class="bg-white p-6 rounded-2xl border border-slate-200"
+              class="p-6 rounded-2xl border bg-white dark:bg-slate-800 dark:border-slate-700 border-slate-200 transition-colors duration-300"
             >
-              <div :class="`w-12 h-12 bg-${item.color}-100 rounded-lg flex items-center justify-center mb-4`">
-                <svg :class="`w-6 h-6 text-${item.color}-600`" fill="none" stroke="currentColor" viewBox="0 0 24 24" v-html="item.icon"/>
+              <div
+                class="w-12 h-12 rounded-lg flex items-center justify-center mb-4"
+                :class="`bg-${item.color}-100`"
+              >
+                <svg
+                  :class="`w-6 h-6 text-${item.color}-600`"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  v-html="item.icon"
+                />
               </div>
-              <h3 class="text-lg font-medium mb-2">{{ item.title }}</h3>
-              <p class="text-slate-600 text-sm">{{ item.description }}</p>
+              <h3
+                class="text-lg font-medium mb-2 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+              >
+                {{ item.title }}
+              </h3>
+              <p
+                class="text-sm text-slate-600 dark:text-slate-400 transition-colors duration-300"
+              >
+                {{ item.description }}
+              </p>
             </div>
           </div>
         </div>
@@ -256,97 +363,208 @@ const settings = [
         <div class="max-w-6xl mx-auto">
           <div class="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <h2 class="text-4xl font-light mb-6">Built for Performance</h2>
-              <p class="text-xl text-slate-600 mb-8">
+              <h2
+                class="text-4xl font-light mb-6 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+              >
+                Built for Performance
+              </h2>
+              <p
+                class="text-xl mb-8 text-slate-600 dark:text-slate-400 transition-colors duration-300"
+              >
                 Optimized for speed and efficiency with intelligent caching and background processing.
               </p>
 
               <div class="space-y-6">
                 <div class="flex items-start space-x-4">
-                  <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                  <div
+                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1 bg-green-100 dark:bg-emerald-900/50 transition-colors duration-300"
+                  >
+                    <svg
+                      class="w-4 h-4 text-green-600 dark:text-emerald-400 transition-colors duration-300"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
                       <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                     </svg>
                   </div>
                   <div>
-                    <h3 class="text-lg font-medium mb-1">Single API Call Mode</h3>
-                    <p class="text-slate-600">Reduces transcription time by up to 50%</p>
+                    <h3
+                      class="text-lg font-medium mb-1 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                    >
+                      Single API Call Mode
+                    </h3>
+                    <p
+                      class="text-slate-600 dark:text-slate-400 transition-colors duration-300"
+                    >
+                      Reduces transcription time by up to 50%
+                    </p>
                   </div>
                 </div>
 
                 <div class="flex items-start space-x-4">
-                  <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                  <div
+                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1 bg-green-100 dark:bg-emerald-900/50 transition-colors duration-300"
+                  >
+                    <svg
+                      class="w-4 h-4 text-green-600 dark:text-emerald-400 transition-colors duration-300"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
                       <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                     </svg>
                   </div>
                   <div>
-                    <h3 class="text-lg font-medium mb-1">Background Processing</h3>
-                    <p class="text-slate-600">Audio analysis in isolates for smooth UI</p>
+                    <h3
+                      class="text-lg font-medium mb-1 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                    >
+                      Background Processing
+                    </h3>
+                    <p
+                      class="text-slate-600 dark:text-slate-400 transition-colors duration-300"
+                    >
+                      Audio analysis in isolates for smooth UI
+                    </p>
                   </div>
                 </div>
 
                 <div class="flex items-start space-x-4">
-                  <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                  <div
+                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1 bg-green-100 dark:bg-emerald-900/50 transition-colors duration-300"
+                  >
+                    <svg
+                      class="w-4 h-4 text-green-600 dark:text-emerald-400 transition-colors duration-300"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
                       <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                     </svg>
                   </div>
                   <div>
-                    <h3 class="text-lg font-medium mb-1">Pre-validation</h3>
-                    <p class="text-slate-600">Filters non-speech audio to reduce costs</p>
+                    <h3
+                      class="text-lg font-medium mb-1 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                    >
+                      Pre-validation
+                    </h3>
+                    <p
+                      class="text-slate-600 dark:text-slate-400 transition-colors duration-300"
+                    >
+                      Filters non-speech audio to reduce costs
+                    </p>
                   </div>
                 </div>
 
                 <div class="flex items-start space-x-4">
-                  <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                  <div
+                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1 bg-green-100 dark:bg-emerald-900/50 transition-colors duration-300"
+                  >
+                    <svg
+                      class="w-4 h-4 text-green-600 dark:text-emerald-400 transition-colors duration-300"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
                       <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                     </svg>
                   </div>
                   <div>
-                    <h3 class="text-lg font-medium mb-1">Smart Retry Logic</h3>
-                    <p class="text-slate-600">Intelligent policies with circuit breaker</p>
+                    <h3
+                      class="text-lg font-medium mb-1 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                    >
+                      Smart Retry Logic
+                    </h3>
+                    <p
+                      class="text-slate-600 dark:text-slate-400 transition-colors duration-300"
+                    >
+                      Intelligent policies with circuit breaker
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- Performance Metrics Visualization -->
-            <div class="bg-slate-100 rounded-2xl p-8">
+            <div
+              class="rounded-2xl p-8 bg-slate-100 dark:bg-slate-800 transition-colors duration-300"
+            >
               <div class="text-center mb-8">
-                <div class="text-5xl font-light text-slate-900 mb-2">2x</div>
-                <div class="text-slate-600">Faster than traditional transcription</div>
+                <div
+                  class="text-5xl font-light mb-2 text-slate-900 dark:text-slate-50 transition-colors duration-300"
+                >
+                  2x
+                </div>
+                <div
+                  class="text-slate-600 dark:text-slate-400 transition-colors duration-300"
+                >
+                  Faster than traditional transcription
+                </div>
               </div>
 
               <div class="space-y-4">
                 <div>
                   <div class="flex justify-between text-sm mb-2">
-                    <span class="text-slate-600">API Efficiency</span>
-                    <span class="text-slate-900 font-medium">95%</span>
+                    <span
+                      class="text-slate-600 dark:text-slate-400 transition-colors duration-300"
+                    >
+                      API Efficiency
+                    </span>
+                    <span
+                      class="font-medium text-slate-900 dark:text-slate-50 transition-colors duration-300"
+                    >
+                      95%
+                    </span>
                   </div>
-                  <div class="w-full bg-slate-300 rounded-full h-2">
-                    <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full" style="width: 95%"></div>
+                  <div
+                    class="w-full rounded-full h-2 bg-slate-300 dark:bg-slate-700 transition-colors duration-300"
+                  >
+                    <div
+                      class="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full"
+                      style="width: 95%"
+                    ></div>
                   </div>
                 </div>
 
                 <div>
                   <div class="flex justify-between text-sm mb-2">
-                    <span class="text-slate-600">Accuracy Rate</span>
-                    <span class="text-slate-900 font-medium">98%</span>
+                    <span
+                      class="text-slate-600 dark:text-slate-400 transition-colors duration-300"
+                    >
+                      Accuracy Rate
+                    </span>
+                    <span
+                      class="font-medium text-slate-900 dark:text-slate-50 transition-colors duration-300"
+                    >
+                      98%
+                    </span>
                   </div>
-                  <div class="w-full bg-slate-300 rounded-full h-2">
-                    <div class="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full" style="width: 98%"></div>
+                  <div
+                    class="w-full rounded-full h-2 bg-slate-300 dark:bg-slate-700 transition-colors duration-300"
+                  >
+                    <div
+                      class="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full"
+                      style="width: 98%"
+                    ></div>
                   </div>
                 </div>
 
                 <div>
                   <div class="flex justify-between text-sm mb-2">
-                    <span class="text-slate-600">Cost Reduction</span>
-                    <span class="text-slate-900 font-medium">50%</span>
+                    <span
+                      class="text-slate-600 dark:text-slate-400 transition-colors duration-300"
+                    >
+                      Cost Reduction
+                    </span>
+                    <span
+                      class="font-medium text-slate-900 dark:text-slate-50 transition-colors duration-300"
+                    >
+                      50%
+                    </span>
                   </div>
-                  <div class="w-full bg-slate-300 rounded-full h-2">
-                    <div class="bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full" style="width: 50%"></div>
+                  <div
+                    class="w-full rounded-full h-2 bg-slate-300 dark:bg-slate-700 transition-colors duration-300"
+                  >
+                    <div
+                      class="bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full"
+                      style="width: 50%"
+                    ></div>
                   </div>
                 </div>
               </div>
@@ -357,7 +575,9 @@ const settings = [
     </section>
 
     <!-- CTA Section -->
-    <section class="py-32 section-padding bg-gradient-to-br from-slate-900 to-slate-800">
+    <section
+      class="py-32 section-padding bg-gradient-to-br from-slate-900 to-slate-800 transition-colors duration-300"
+    >
       <div class="container-custom text-center">
         <h2 class="text-4xl font-light text-white mb-6">
           Ready to Transform Your Workflow?
@@ -369,7 +589,7 @@ const settings = [
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
           <RouterLink
             to="/downloads"
-            class="bg-white text-slate-900 hover:bg-slate-100 px-10 py-5 rounded-full font-medium text-lg transition-all duration-300 hover:scale-105"
+            class="text-slate-900 hover:bg-slate-100 px-10 py-5 rounded-full font-medium text-lg transition-all duration-300 hover:scale-105 bg-white"
           >
             Get Started Free
           </RouterLink>

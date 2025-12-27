@@ -81,17 +81,25 @@ const downloadPlatform = (platform: Platform) => {
 <template>
   <div>
     <!-- Hero Section -->
-    <section class="pt-32 pb-24 section-padding bg-gradient-to-br from-slate-50 to-white">
+    <section
+      class="pt-32 pb-24 section-padding bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-[#0a0a0a] transition-colors duration-300"
+    >
       <div class="container-custom text-center">
         <div class="max-w-4xl mx-auto animate-fade-in">
-          <h1 class="text-5xl sm:text-6xl lg:text-7xl font-light leading-tight mb-6 tracking-tight">
+          <h1
+            class="text-5xl sm:text-6xl lg:text-7xl font-light leading-tight mb-6 tracking-tight text-slate-950 dark:text-slate-50 transition-colors duration-300"
+          >
             Download
             <span class="font-medium">Recogniz.ing</span>
           </h1>
-          <p class="text-xl text-slate-600 mb-12">
+          <p
+            class="text-xl mb-12 text-slate-600 dark:text-slate-400 transition-colors duration-300"
+          >
             Free AI-powered voice typing. Available for all platforms.
           </p>
-          <div class="text-center text-slate-500">
+          <div
+            class="text-center text-slate-500 transition-colors duration-300"
+          >
             <span class="font-medium">{{ downloadCount.toLocaleString() }}</span> downloads and counting
           </div>
         </div>
@@ -106,18 +114,36 @@ const downloadPlatform = (platform: Platform) => {
             <div
               v-for="platform in platforms"
               :key="platform.name"
-              class="bg-white rounded-2xl border border-slate-200 hover:border-slate-300 transition-all duration-300 overflow-hidden"
+              class="rounded-2xl border bg-white dark:bg-slate-800 dark:border-slate-700 border-slate-200 hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300 overflow-hidden"
             >
               <!-- Platform Icon -->
-              <div class="p-8 text-center border-b border-slate-100">
+              <div
+                class="p-8 text-center border-b border-slate-100 dark:border-slate-700 transition-colors duration-300"
+              >
                 <div class="w-16 h-16 mx-auto mb-4">
-                  <svg viewBox="0 0 24 24" fill="currentColor" class="w-16 h-16 text-slate-700">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    class="w-16 h-16 text-slate-700 dark:text-slate-300 transition-colors duration-300"
+                  >
                     <path :d="platform.icon"/>
                   </svg>
                 </div>
-                <h3 class="text-2xl font-light mb-2">{{ platform.name }}</h3>
-                <p class="text-slate-500">Version {{ platform.version }}</p>
-                <p class="text-sm text-slate-400">{{ platform.releaseDate }}</p>
+                <h3
+                  class="text-2xl font-light mb-2 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                >
+                  {{ platform.name }}
+                </h3>
+                <p
+                  class="text-slate-500 transition-colors duration-300"
+                >
+                  Version {{ platform.version }}
+                </p>
+                <p
+                  class="text-sm text-slate-400 dark:text-slate-600 transition-colors duration-300"
+                >
+                  {{ platform.releaseDate }}
+                </p>
               </div>
 
               <!-- Download Button -->
@@ -125,14 +151,20 @@ const downloadPlatform = (platform: Platform) => {
                 <button
                   @click="downloadPlatform(platform)"
                   :disabled="platform.downloadUrl === '#'"
-                  :class="platform.downloadUrl === '#' ? 'bg-slate-300 text-slate-500 cursor-not-allowed' : 'bg-slate-900 hover:bg-slate-800 text-white hover:scale-105'"
-                  class="w-full px-8 py-4 rounded-full font-medium transition-all duration-300 mb-6"
+                  class="w-full px-8 py-4 rounded-full font-medium transition-all duration-300 mb-6 text-white hover:scale-105"
+                  :class="[
+                    platform.downloadUrl === '#'
+                      ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                      : 'bg-slate-900 hover:bg-slate-800 dark:bg-sky-500 dark:hover:bg-sky-400'
+                  ]"
                 >
                   {{ platform.downloadUrl === '#' ? 'Coming Soon' : `Download for ${platform.name}` }}
                 </button>
 
                 <!-- Requirements -->
-                <div class="space-y-2 text-sm text-slate-600">
+                <div
+                  class="space-y-2 text-sm text-slate-600 dark:text-slate-400 transition-colors duration-300"
+                >
                   <div v-if="platform.name === 'Android'">Android 8.0+ (API 26)</div>
                   <div v-else-if="platform.name === 'macOS'">macOS 10.15 or later</div>
                   <div v-else-if="platform.name === 'Windows'">Windows 10 or later</div>
@@ -146,22 +178,34 @@ const downloadPlatform = (platform: Platform) => {
     </section>
 
     <!-- Installation Instructions -->
-    <section class="py-32 section-padding bg-slate-50">
+    <section
+      class="py-32 section-padding bg-slate-50 dark:bg-slate-900/30 transition-colors duration-300"
+    >
       <div class="container-custom">
         <div class="max-w-4xl mx-auto">
-          <h2 class="text-4xl font-light mb-12 text-center">Installation Instructions</h2>
+          <h2
+            class="text-4xl font-light mb-12 text-center text-slate-950 dark:text-slate-50 transition-colors duration-300"
+          >
+            Installation Instructions
+          </h2>
 
           <div class="space-y-12">
             <div>
-              <h3 class="text-2xl font-medium mb-4">1. Get API Key</h3>
-              <p class="text-slate-600 mb-4">
+              <h3
+                class="text-2xl font-medium mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+              >
+                1. Get API Key
+              </h3>
+              <p
+                class="mb-4 text-slate-600 dark:text-slate-400 transition-colors duration-300"
+              >
                 Get your free Gemini API key from Google AI Studio. The app will not work without an API key.
               </p>
               <a
                 href="https://aistudio.google.com/app/apikey"
                 target="_blank"
                 rel="noopener"
-                class="inline-flex items-center space-x-2 bg-white border border-slate-300 hover:border-slate-400 text-slate-700 px-6 py-3 rounded-lg font-medium transition-all"
+                class="inline-flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all bg-white border border-slate-300 hover:border-slate-400 text-slate-700 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:text-slate-50"
               >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
@@ -171,10 +215,18 @@ const downloadPlatform = (platform: Platform) => {
             </div>
 
             <div>
-              <h3 class="text-2xl font-medium mb-4">2. Download & Install</h3>
-              <div class="bg-white rounded-lg border border-slate-200 p-6">
+              <h3
+                class="text-2xl font-medium mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+              >
+                2. Download & Install
+              </h3>
+              <div
+                class="rounded-lg border p-6 bg-white dark:bg-slate-800 dark:border-slate-700 border-slate-200 transition-colors duration-300"
+              >
                 <h4 class="font-medium mb-2">Android:</h4>
-                <ol class="list-decimal list-inside text-slate-600 space-y-1 mb-4">
+                <ol
+                  class="list-decimal list-inside space-y-1 mb-4 text-slate-600 dark:text-slate-400 transition-colors duration-300"
+                >
                   <li>Download the APK file</li>
                   <li>Enable "Install from unknown sources" in your device settings</li>
                   <li>Open the APK file and tap "Install"</li>
@@ -182,16 +234,20 @@ const downloadPlatform = (platform: Platform) => {
                 </ol>
 
                 <h4 class="font-medium mb-2 mt-6">macOS:</h4>
-                <ol class="list-decimal list-inside text-slate-600 space-y-1 mb-4">
+                <ol
+                  class="list-decimal list-inside space-y-1 mb-4 text-slate-600 dark:text-slate-400 transition-colors duration-300"
+                >
                   <li>Download the .app file</li>
                   <li>Drag the .app file to Applications folder</li>
                   <li>If you see a warning "Apple could not verify 'recognizing.app' is free of malware", click "Done", then go to Settings → Privacy & Security, and click "Open Anyway"</li>
-                  <li>Alternatively, run <code class="bg-slate-100 px-2 py-1 rounded text-sm">sudo codesign -fs Recognizing /Applications/Recognizing.app</code> from Terminal.app</li>
+                  <li>Alternatively, run <code class="px-2 py-1 rounded text-sm bg-slate-100 dark:bg-slate-900">sudo codesign -fs Recognizing /Applications/Recognizing.app</code> from Terminal.app</li>
                   <li>Launch from Applications or Spotlight</li>
                 </ol>
 
                 <h4 class="font-medium mb-2 mt-6">Windows:</h4>
-                <ol class="list-decimal list-inside text-slate-600 space-y-1 mb-4">
+                <ol
+                  class="list-decimal list-inside space-y-1 mb-4 text-slate-600 dark:text-slate-400 transition-colors duration-300"
+                >
                   <li>Download the .exe installer</li>
                   <li>Run the installer as Administrator</li>
                   <li>Follow the installation wizard</li>
@@ -199,17 +255,25 @@ const downloadPlatform = (platform: Platform) => {
                 </ol>
 
                 <h4 class="font-medium mb-2 mt-6">Linux:</h4>
-                <ol class="list-decimal list-inside text-slate-600 space-y-1">
+                <ol
+                  class="list-decimal list-inside space-y-1 text-slate-600 dark:text-slate-400 transition-colors duration-300"
+                >
                   <li>Download the .AppImage file</li>
-                  <li>Make it executable: <code class="bg-slate-100 px-2 py-1 rounded">chmod +x recognizing-linux.AppImage</code></li>
+                  <li>Make it executable: <code class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-900">chmod +x recognizing-linux.AppImage</code></li>
                   <li>Run the AppImage</li>
                 </ol>
               </div>
             </div>
 
             <div>
-              <h3 class="text-2xl font-medium mb-4">3. Setup</h3>
-              <ol class="list-decimal list-inside text-slate-600 space-y-2">
+              <h3
+                class="text-2xl font-medium mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+              >
+                3. Setup
+              </h3>
+              <ol
+                class="list-decimal list-inside space-y-2 text-slate-600 dark:text-slate-400 transition-colors duration-300"
+              >
                 <li>Launch the app</li>
                 <li>Go to Settings tab</li>
                 <li>Enter your Gemini API key</li>
@@ -226,15 +290,31 @@ const downloadPlatform = (platform: Platform) => {
     <section class="py-32 section-padding">
       <div class="container-custom">
         <div class="max-w-4xl mx-auto">
-          <h2 class="text-4xl font-light mb-12 text-center">What's New</h2>
+          <h2
+            class="text-4xl font-light mb-12 text-center text-slate-950 dark:text-slate-50 transition-colors duration-300"
+          >
+            What's New
+          </h2>
 
           <div class="space-y-8">
-            <div class="bg-white rounded-lg border border-slate-200 p-8">
+            <div
+              class="rounded-lg border p-8 bg-white dark:bg-slate-800 dark:border-slate-700 border-slate-200 transition-colors duration-300"
+            >
               <div class="flex items-center justify-between mb-4">
-                <h3 class="text-xl font-medium">Version 1.0.4</h3>
-                <span class="text-sm text-slate-500">December 23, 2025</span>
+                <h3
+                  class="text-xl font-medium text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                >
+                  Version 1.0.4
+                </h3>
+                <span
+                  class="text-sm text-slate-500 transition-colors duration-300"
+                >
+                  December 23, 2025
+                </span>
               </div>
-              <ul class="space-y-2 text-slate-600">
+              <ul
+                class="space-y-2 text-slate-600 dark:text-slate-400 transition-colors duration-300"
+              >
                 <li class="flex items-start">
                   <span class="text-green-500 mr-2">✓</span>
                   User preferences with persistent desktop settings
@@ -253,12 +333,24 @@ const downloadPlatform = (platform: Platform) => {
                 </li>
               </ul>
             </div>
-            <div class="bg-white rounded-lg border border-slate-200 p-8">
+            <div
+              class="rounded-lg border p-8 bg-white dark:bg-slate-800 dark:border-slate-700 border-slate-200 transition-colors duration-300"
+            >
               <div class="flex items-center justify-between mb-4">
-                <h3 class="text-xl font-medium">Version 1.0.3</h3>
-                <span class="text-sm text-slate-500">December 21, 2025</span>
+                <h3
+                  class="text-xl font-medium text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                >
+                  Version 1.0.3
+                </h3>
+                <span
+                  class="text-sm text-slate-500 transition-colors duration-300"
+                >
+                  December 21, 2025
+                </span>
               </div>
-              <ul class="space-y-2 text-slate-600">
+              <ul
+                class="space-y-2 text-slate-600 dark:text-slate-400 transition-colors duration-300"
+              >
                 <li class="flex items-start">
                   <span class="text-green-500 mr-2">✓</span>
                   Fixed macOS Gatekeeper verification issues
@@ -277,12 +369,24 @@ const downloadPlatform = (platform: Platform) => {
                 </li>
               </ul>
             </div>
-            <div class="bg-white rounded-lg border border-slate-200 p-8">
+            <div
+              class="rounded-lg border p-8 bg-white dark:bg-slate-800 dark:border-slate-700 border-slate-200 transition-colors duration-300"
+            >
               <div class="flex items-center justify-between mb-4">
-                <h3 class="text-xl font-medium">Version 1.0.2</h3>
-                <span class="text-sm text-slate-500">December 15, 2024</span>
+                <h3
+                  class="text-xl font-medium text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                >
+                  Version 1.0.2
+                </h3>
+                <span
+                  class="text-sm text-slate-500 transition-colors duration-300"
+                >
+                  December 15, 2024
+                </span>
               </div>
-              <ul class="space-y-2 text-slate-600">
+              <ul
+                class="space-y-2 text-slate-600 dark:text-slate-400 transition-colors duration-300"
+              >
                 <li class="flex items-start">
                   <span class="text-green-500 mr-2">✓</span>
                   Added comprehensive version management system
@@ -307,22 +411,30 @@ const downloadPlatform = (platform: Platform) => {
     </section>
 
     <!-- Support Section -->
-    <section class="py-32 section-padding bg-slate-50">
+    <section
+      class="py-32 section-padding bg-slate-50 dark:bg-slate-900/30 transition-colors duration-300"
+    >
       <div class="container-custom text-center">
-        <h2 class="text-4xl font-light mb-6">Need Help?</h2>
-        <p class="text-xl text-slate-600 mb-12">
+        <h2
+          class="text-4xl font-light mb-6 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+        >
+          Need Help?
+        </h2>
+        <p
+          class="text-xl mb-12 text-slate-600 dark:text-slate-400 transition-colors duration-300"
+        >
           Check our documentation or report issues on GitHub
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a
             href="#"
-            class="bg-white border border-slate-300 hover:border-slate-400 text-slate-700 px-8 py-4 rounded-full font-medium transition-all"
+            class="px-8 py-4 rounded-full font-medium transition-all bg-white border border-slate-300 hover:border-slate-400 text-slate-700 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-600"
           >
             Documentation
           </a>
           <a
             href="#"
-            class="bg-white border border-slate-300 hover:border-slate-400 text-slate-700 px-8 py-4 rounded-full font-medium transition-all"
+            class="px-8 py-4 rounded-full font-medium transition-all bg-white border border-slate-300 hover:border-slate-400 text-slate-700 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-600"
           >
             Report Issue
           </a>

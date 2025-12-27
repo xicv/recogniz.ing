@@ -4,15 +4,20 @@
 
 @layer base {
   :root {
-    /* Modern dark color palette */
+    /* Light theme */
     --color-bg-primary: #ffffff;
     --color-bg-secondary: #fafafa;
     --color-bg-tertiary: #f5f5f5;
+    --color-bg-glass: rgba(255, 255, 255, 0.8);
     --color-text-primary: #0a0a0a;
     --color-text-secondary: #525252;
     --color-text-tertiary: #a3a3a3;
     --color-border: #e5e5e5;
     --color-border-hover: #d4d4d4;
+    --color-card-bg: #ffffff;
+    --color-card-border: rgba(226, 232, 240, 0.6);
+    --color-glow-bg: rgba(14, 165, 233, 0.08);
+    --color-grid-line: rgba(0, 0, 0, 0.03);
 
     /* Accent colors */
     --color-accent: #0ea5e9;
@@ -24,21 +29,54 @@
     --glow-medium: 0 0 60px rgba(14, 165, 233, 0.12);
   }
 
+  .dark {
+    /* Dark theme */
+    --color-bg-primary: #0a0a0a;
+    --color-bg-secondary: #171717;
+    --color-bg-tertiary: #262626;
+    --color-bg-glass: rgba(10, 10, 10, 0.8);
+    --color-text-primary: #fafafa;
+    --color-text-secondary: #a3a3a3;
+    --color-text-tertiary: #525252;
+    --color-border: #262626;
+    --color-border-hover: #404040;
+    --color-card-bg: #171717;
+    --color-card-border: rgba(64, 64, 64, 0.6);
+    --color-glow-bg: rgba(14, 165, 233, 0.15);
+    --color-grid-line: rgba(255, 255, 255, 0.03);
+
+    /* Dark mode glow effects */
+    --glow-subtle: 0 0 40px rgba(14, 165, 233, 0.15);
+    --glow-medium: 0 0 60px rgba(14, 165, 233, 0.25);
+  }
+
   html {
     scroll-behavior: smooth;
   }
 
   body {
-    @apply bg-white text-slate-950 font-sans antialiased;
+    @apply bg-white text-slate-950 font-sans antialiased transition-colors duration-300;
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
+  .dark body {
+    @apply bg-[#0a0a0a] text-slate-50;
+  }
+
   /* Modern typography with better hierarchy */
   h1, h2, h3, h4, h5, h6 {
-    @apply tracking-tight font-semibold text-slate-950;
+    @apply tracking-tight font-semibold;
     letter-spacing: -0.025em;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--color-text-primary);
+  }
+
+  .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+    @apply text-slate-50;
   }
 
   h1 {
@@ -54,12 +92,20 @@
   }
 
   p {
-    @apply leading-relaxed text-slate-600;
+    color: var(--color-text-secondary);
+  }
+
+  a {
+    color: var(--color-text-primary);
   }
 
   /* Selection color */
   ::selection {
     @apply bg-sky-100 text-sky-900;
+  }
+
+  .dark ::selection {
+    @apply bg-sky-900 text-sky-100;
   }
 }
 
@@ -86,46 +132,65 @@
 
   /* Modern card styles */
   .card {
-    @apply bg-white rounded-3xl border border-slate-200/60 p-6 sm:p-8;
+    background-color: var(--color-card-bg);
+    border-color: var(--color-card-border);
+    @apply rounded-3xl border p-6 sm:p-8;
     box-shadow: var(--glow-subtle);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .card:hover {
-    @apply border-slate-300 shadow-lg;
+    border-color: var(--color-border-hover);
     box-shadow: var(--glow-medium), 0 4px 24px rgba(0, 0, 0, 0.06);
     transform: translateY(-2px);
   }
 
   /* Bento grid card */
   .bento-card {
-    @apply bg-gradient-to-br from-white to-slate-50/50 rounded-3xl border border-slate-200/60 p-8;
+    background: linear-gradient(to bottom right, var(--color-card-bg), var(--color-bg-secondary));
+    border-color: var(--color-card-border);
+    @apply rounded-3xl border p-8;
     box-shadow: var(--glow-subtle);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
+  .dark .bento-card {
+    background: linear-gradient(to bottom right, #171717, #262626);
+  }
+
   .bento-card:hover {
-    @apply border-slate-300/80;
+    border-color: var(--color-border-hover);
     box-shadow: var(--glow-medium), 0 8px 32px rgba(0, 0, 0, 0.08);
     transform: translateY(-4px) scale-[1.01];
   }
 
   /* Platform icon card */
   .platform-card {
-    @apply bg-white rounded-2xl border border-slate-200/60 p-6 text-center;
+    background-color: var(--color-card-bg);
+    border-color: var(--color-card-border);
+    @apply rounded-2xl border p-6 text-center;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .platform-card:hover {
-    @apply border-slate-300 shadow-lg;
+    border-color: var(--color-border-hover);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
     transform: translateY(-4px);
   }
 
   /* Button styles */
   .btn-primary {
-    @apply bg-slate-950 hover:bg-slate-900 text-white px-8 py-4 rounded-full font-semibold text-base;
+    @apply text-white px-8 py-4 rounded-full font-semibold text-base;
     @apply transition-all duration-300;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  }
+
+  .btn-primary {
+    @apply bg-slate-950 hover:bg-slate-900;
+  }
+
+  .dark .btn-primary {
+    @apply bg-sky-500 hover:bg-sky-400;
   }
 
   .btn-primary:hover {
@@ -134,13 +199,16 @@
   }
 
   .btn-secondary {
-    @apply bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 hover:border-slate-300;
-    @apply px-8 py-4 rounded-full font-semibold text-base;
+    background-color: var(--color-card-bg);
+    border-color: var(--color-border);
+    color: var(--color-text-primary);
+    @apply px-8 py-4 rounded-full font-semibold text-base border;
     @apply transition-all duration-300;
   }
 
   .btn-secondary:hover {
-    @apply shadow-md;
+    border-color: var(--color-border-hover);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
   }
 
@@ -220,8 +288,8 @@
   /* Subtle background patterns */
   .bg-grid {
     background-image:
-      linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+      linear-gradient(to right, var(--color-grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--color-grid-line) 1px, transparent 1px);
     background-size: 64px 64px;
   }
 
@@ -230,14 +298,20 @@
     background-size: 24px 24px;
   }
 
+  .dark .bg-dots {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  }
+
   /* FAQ accordion styles */
   .faq-item {
-    @apply bg-white rounded-2xl border border-slate-200/60 overflow-hidden;
+    background-color: var(--color-card-bg);
+    border-color: var(--color-card-border);
+    @apply rounded-2xl border overflow-hidden;
     transition: all 0.3s ease;
   }
 
   .faq-item:hover {
-    @apply border-slate-300/80;
+    border-color: var(--color-border-hover);
   }
 
   /* Badge styles */

@@ -1,16 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
+import { useScrollAnimations } from '@/composables/useScrollAnimations'
 
-const isVisible = ref(false)
-
-onMounted(() => {
-  isVisible.value = true
-})
-
-const scrollToSection = (sectionId: string) => {
-  const element = document.getElementById(sectionId)
-  element?.scrollIntoView({ behavior: 'smooth' })
-}
+useScrollAnimations()
 
 // FAQ state management
 const openFaq = ref<number | null>(null)
@@ -36,6 +28,10 @@ const faqs = [
   {
     question: "Is my data secure?",
     answer: "Yes. Recordings and transcriptions are stored locally on your device."
+  },
+  {
+    question: "What's the BYOK model?",
+    answer: "Bring Your Own Key means you use your own Gemini API key. Your data, your cost, full transparency."
   }
 ]
 
@@ -45,37 +41,37 @@ const features = [
     icon: 'lightning',
     title: 'Lightning Fast',
     description: 'Instant transcription with auto-copy to clipboard',
-    gradient: 'from-amber-500 to-orange-500'
+    gradient: 'bg-gradient-to-br from-amber-500 to-orange-500'
   },
   {
     icon: 'sparkles',
     title: 'AI-Powered',
     description: 'Powered by Google Gemini for accurate transcription',
-    gradient: 'from-sky-500 to-cyan-500'
+    gradient: 'bg-gradient-to-br from-sky-500 to-cyan-500'
   },
   {
     icon: 'document',
     title: 'Custom Prompts',
     description: 'Templates for any workflow or use case',
-    gradient: 'from-violet-500 to-purple-500'
+    gradient: 'bg-gradient-to-br from-violet-500 to-purple-500'
   },
   {
     icon: 'book',
     title: 'Smart Vocabulary',
     description: 'Industry-specific terms and custom dictionaries',
-    gradient: 'from-emerald-500 to-teal-500'
+    gradient: 'bg-gradient-to-br from-emerald-500 to-teal-500'
   },
   {
     icon: 'desktop',
     title: 'Cross-Platform',
     description: 'Works everywhere you do - desktop and mobile',
-    gradient: 'from-rose-500 to-pink-500'
+    gradient: 'bg-gradient-to-br from-rose-500 to-pink-500'
   },
   {
     icon: 'lock',
     title: 'Private & Secure',
     description: 'All data stored locally on your device',
-    gradient: 'from-slate-600 to-slate-800'
+    gradient: 'bg-gradient-to-br from-slate-600 to-slate-800'
   }
 ]
 
@@ -88,25 +84,45 @@ const icons = {
   desktop: 'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
   lock: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z'
 }
+
+// Demo feature data
+const demoFeatures = [
+  {
+    title: 'Custom Vocabulary',
+    description: 'Add industry terms, names, and jargon that the AI will recognize perfectly',
+    icon: icons.book
+  },
+  {
+    title: 'Smart Prompts',
+    description: 'Choose from templates or create your own for custom output formats',
+    icon: icons.document
+  },
+  {
+    title: 'Privacy First',
+    description: 'All recordings and transcriptions stored locally on your device',
+    icon: icons.lock
+  }
+]
 </script>
 
 <template>
   <div>
-    <!-- Hero Section - Modern, Clean, Centered -->
+    <!-- Hero Section - Enhanced with better value proposition -->
     <section class="min-h-[90vh] flex items-center justify-center relative overflow-hidden bg-grid">
       <!-- Subtle gradient glow -->
-      <div class="absolute inset-0 bg-gradient-to-b from-slate-50/50 via-transparent to-transparent"></div>
-      <div class="absolute top-20 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-sky-400/10 rounded-full blur-3xl"></div>
+      <div
+        class="absolute inset-0 bg-gradient-to-b from-slate-50/50 dark:from-slate-900/50 via-transparent to-transparent transition-colors duration-300"
+      ></div>
+      <div
+        class="absolute top-20 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full blur-3xl bg-sky-400/10 dark:bg-sky-500/10 transition-colors duration-300"
+      ></div>
 
       <div class="container-custom relative z-10 text-center pt-20 pb-16">
-        <div
-          :class="[
-            'max-w-4xl mx-auto stagger-children',
-            isVisible ? '' : 'opacity-0'
-          ]"
-        >
+        <div class="max-w-4xl mx-auto">
           <!-- Badge -->
-          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 border border-slate-200 text-sm text-slate-600 mb-8">
+          <div
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm mb-8 transition-all duration-300 animate-fade-in bg-slate-100 border-slate-200 text-slate-600 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400"
+          >
             <span class="relative flex h-2 w-2">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
               <span class="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
@@ -114,23 +130,32 @@ const icons = {
             v1.0.4 — Now Available
           </div>
 
-          <!-- Headline -->
-          <h1 class="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-6 text-slate-950">
-            Voice Typing
+          <!-- Headline - Enhanced value proposition -->
+          <h1
+            class="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-6 text-slate-950 dark:text-slate-50 transition-colors duration-300 animate-fade-in"
+            style="animation-delay: 100ms"
+          >
+            Free AI Voice Typing
             <br>
-            <span class="gradient-text-accent">That Understands</span>
+            <span class="gradient-text-accent">Your Way, Zero Fees</span>
           </h1>
 
           <!-- Subheading -->
-          <p class="text-xl sm:text-2xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed font-normal">
-            Free AI-powered voice typing. Your words, your vocabulary, your style.
+          <p
+            class="text-xl sm:text-2xl mb-10 max-w-2xl mx-auto leading-relaxed font-normal text-slate-600 dark:text-slate-400 transition-colors duration-300 animate-fade-in"
+            style="animation-delay: 200ms"
+          >
+            Your vocabulary, your style, your API key. Privacy-first voice typing that adapts to <strong>you</strong>.
           </p>
 
           <!-- CTA Buttons -->
-          <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+          <div
+            class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 animate-fade-in"
+            style="animation-delay: 300ms"
+          >
             <RouterLink
               to="/downloads"
-              class="btn-primary inline-flex items-center gap-2 text-lg"
+              class="btn-primary inline-flex items-center gap-2 text-lg bg-slate-950 hover:bg-slate-900 dark:bg-sky-500 dark:hover:bg-sky-400"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
@@ -152,24 +177,33 @@ const icons = {
           </div>
 
           <!-- Trust indicators -->
-          <div class="flex flex-wrap items-center justify-center gap-8 text-sm text-slate-500">
+          <div
+            class="flex flex-wrap items-center justify-center gap-8 text-sm text-slate-500 transition-colors duration-300 animate-fade-in"
+            style="animation-delay: 400ms"
+          >
             <div class="flex items-center gap-2">
-              <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
               </svg>
               <span>Forever Free</span>
             </div>
             <div class="flex items-center gap-2">
-              <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
               </svg>
               <span>All Platforms</span>
             </div>
             <div class="flex items-center gap-2">
-              <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
               </svg>
               <span>Private & Secure</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+              <span>No Subscription</span>
             </div>
           </div>
         </div>
@@ -177,11 +211,20 @@ const icons = {
     </section>
 
     <!-- Features Bento Grid Section -->
-    <section class="py-24 lg:py-32 bg-slate-50/50">
+    <section
+      class="py-24 lg:py-32 bg-slate-50/50 dark:bg-slate-900/30 transition-colors duration-300"
+      data-animate-id="features"
+    >
       <div class="container-custom">
-        <div class="max-w-3xl mx-auto text-center mb-16">
-          <h2 class="text-4xl sm:text-5xl font-semibold mb-4">Everything You Need</h2>
-          <p class="text-xl text-slate-600">Powerful features for effortless voice typing</p>
+        <div class="max-w-3xl mx-auto text-center mb-16 scroll-reveal" data-animate-id="features-title">
+          <h2
+            class="text-4xl sm:text-5xl font-semibold mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+          >
+            Everything You Need
+          </h2>
+          <p class="text-xl text-slate-600 dark:text-slate-400">
+            Powerful features for effortless voice typing
+          </p>
         </div>
 
         <!-- Bento Grid -->
@@ -189,90 +232,178 @@ const icons = {
           <div
             v-for="(feature, index) in features"
             :key="feature.title"
-            class="bento-card"
-            :style="{ animationDelay: `${index * 100}ms` }"
+            class="bento-card scroll-reveal"
+            :data-animate-id="'feature-' + index"
           >
             <!-- Icon with gradient background -->
-            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br flex items-center justify-center mb-5" :class="feature.gradient">
+            <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-5" :class="feature.gradient">
               <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" :d="icons[feature.icon]"/>
               </svg>
             </div>
-            <h3 class="text-xl font-semibold mb-2">{{ feature.title }}</h3>
-            <p class="text-slate-600">{{ feature.description }}</p>
+            <h3
+              class="text-xl font-semibold mb-2 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+            >
+              {{ feature.title }}
+            </h3>
+            <p class="text-slate-600 dark:text-slate-400">{{ feature.description }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Product Demo Section - NEW -->
+    <section class="py-24 lg:py-32" data-animate-id="demo">
+      <div class="container-custom">
+        <div class="max-w-6xl mx-auto">
+          <div class="text-center mb-16 scroll-reveal" data-animate-id="demo-title">
+            <h2
+              class="text-4xl sm:text-5xl font-semibold mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+            >
+              See It In Action
+            </h2>
+            <p class="text-xl text-slate-600 dark:text-slate-400">
+              How Recogniz.ing transforms your voice into perfect text
+            </p>
+          </div>
+
+          <div class="grid md:grid-cols-3 gap-8">
+            <div
+              v-for="(demo, index) in demoFeatures"
+              :key="demo.title"
+              class="card scroll-reveal"
+              :data-animate-id="'demo-' + index"
+            >
+              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center mb-5">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" :d="demo.icon"/>
+                </svg>
+              </div>
+              <h3
+                class="text-lg font-semibold mb-2 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+              >
+                {{ demo.title }}
+              </h3>
+              <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                {{ demo.description }}
+              </p>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- Download Section -->
-    <section id="download" class="py-24 lg:py-32">
+    <section
+      id="download"
+      class="py-24 lg:py-32"
+      data-animate-id="download"
+    >
       <div class="container-custom">
-        <div class="max-w-5xl mx-auto text-center mb-16">
-          <h2 class="text-4xl sm:text-5xl font-semibold mb-4">Get Started Today</h2>
-          <p class="text-xl text-slate-600">Available on all platforms. Always free.</p>
+        <div class="max-w-5xl mx-auto text-center mb-16 scroll-reveal" data-animate-id="download-title">
+          <h2
+            class="text-4xl sm:text-5xl font-semibold mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+          >
+            Get Started Today
+          </h2>
+          <p class="text-xl text-slate-600 dark:text-slate-400">
+            Available on all platforms. Always free.
+          </p>
         </div>
 
         <!-- Platform Cards -->
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
-          <RouterLink to="/downloads" class="platform-card group">
-            <div class="w-14 h-14 mx-auto mb-4 rounded-xl bg-slate-100 group-hover:bg-slate-200 transition-colors flex items-center justify-center">
+          <RouterLink
+            to="/downloads"
+            class="platform-card group scroll-reveal"
+            :data-animate-id="'platform-macos'"
+          >
+            <div
+              class="w-14 h-14 mx-auto mb-4 rounded-xl flex items-center justify-center bg-slate-100 group-hover:bg-slate-200 dark:bg-slate-800 dark:group-hover:bg-slate-700 transition-colors duration-300"
+            >
               <!-- macOS Icon -->
-              <svg class="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+              <svg class="w-8 h-8 text-slate-700 dark:text-slate-300" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
               </svg>
             </div>
-            <h3 class="font-semibold mb-1">macOS</h3>
-            <p class="text-sm text-slate-500">10.15+</p>
+            <h3 class="font-semibold mb-1 text-slate-950 dark:text-slate-50 transition-colors duration-300">macOS</h3>
+            <p class="text-sm text-slate-500 transition-colors duration-300">10.15+</p>
           </RouterLink>
 
-          <RouterLink to="/downloads" class="platform-card group">
-            <div class="w-14 h-14 mx-auto mb-4 rounded-xl bg-slate-100 group-hover:bg-slate-200 transition-colors flex items-center justify-center">
+          <RouterLink
+            to="/downloads"
+            class="platform-card group scroll-reveal"
+            :data-animate-id="'platform-windows'"
+          >
+            <div
+              class="w-14 h-14 mx-auto mb-4 rounded-xl flex items-center justify-center bg-slate-100 group-hover:bg-slate-200 dark:bg-slate-800 dark:group-hover:bg-slate-700 transition-colors duration-300"
+            >
               <!-- Windows Icon -->
-              <svg class="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M3,12V6.75L9,5.43v6.48L3,12M20,3v8.75L10,11.9V5.21L20,3M3,13l6,.09V19.9L3,18.75V13m17,.25V22L10,20.09v-7Z"/>
+              <svg class="w-8 h-8 text-slate-700 dark:text-slate-300 transition-colors duration-300" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3,12V6.75L9,5.43v6.48L3,12M20,3v8.75L10,11.9V5.21L20,3M3,13l6 .09V19.9L3,18.75V13m17 .25V22L10,20.09v-7Z"/>
               </svg>
             </div>
-            <h3 class="font-semibold mb-1">Windows</h3>
+            <h3 class="font-semibold mb-1 text-slate-950 dark:text-slate-50 transition-colors duration-300">Windows</h3>
             <p class="text-sm text-slate-500">10+</p>
           </RouterLink>
 
-          <RouterLink to="/downloads" class="platform-card group">
-            <div class="w-14 h-14 mx-auto mb-4 rounded-xl bg-slate-100 group-hover:bg-slate-200 transition-colors flex items-center justify-center">
+          <RouterLink
+            to="/downloads"
+            class="platform-card group scroll-reveal"
+            :data-animate-id="'platform-linux'"
+          >
+            <div
+              class="w-14 h-14 mx-auto mb-4 rounded-xl flex items-center justify-center bg-slate-100 group-hover:bg-slate-200 dark:bg-slate-800 dark:group-hover:bg-slate-700 transition-colors duration-300"
+            >
               <!-- Linux Icon -->
-              <svg class="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+              <svg class="w-8 h-8 text-slate-700 dark:text-slate-300 transition-colors duration-300" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489a.424.424 0 0 0-.11.135c-.26.268-.45.6-.663.839-.199.199-.485.267-.797.4-.313.136-.658.269-.864.68-.09.189-.136.394-.132.602 0 .199.027.4.055.536.058.399.116.728.04.97-.249.68-.28 1.145-.106 1.484.174.334.535.47.94.601.81.2 1.91.135 2.774.6.926.466 1.866.67 2.616.47.526-.116.97-.464 1.208-.946.587-.003 1.23-.269 2.26-.334.699-.058 1.574.267 2.577.2.025.134.063.198.114.333l.003.003c.391.778 1.113 1.132 1.884 1.071.771-.06 1.592-.536 2.257-1.306.631-.765 1.683-1.084 2.378-1.503.348-.199.629-.469.649-.853.023-.4-.2-.811-.714-1.376v-.097l-.003-.003c-.17-.2-.25-.535-.338-.926-.085-.401-.182-.786-.492-1.046h-.003c-.059-.054-.123-.067-.188-.135a.357.357 0 0 0-.19-.064c.431-1.278.264-2.55-.173-3.694-.533-1.41-1.465-2.638-2.175-3.483-.796-1.005-1.576-1.957-1.56-3.368.026-2.152.236-6.133-3.544-6.139z"/>
               </svg>
             </div>
-            <h3 class="font-semibold mb-1">Linux</h3>
+            <h3 class="font-semibold mb-1 text-slate-950 dark:text-slate-50 transition-colors duration-300">Linux</h3>
             <p class="text-sm text-slate-500">Ubuntu 18.04+</p>
           </RouterLink>
 
-          <RouterLink to="/downloads" class="platform-card group">
-            <div class="w-14 h-14 mx-auto mb-4 rounded-xl bg-slate-100 group-hover:bg-slate-200 transition-colors flex items-center justify-center">
+          <RouterLink
+            to="/downloads"
+            class="platform-card group scroll-reveal"
+            :data-animate-id="'platform-ios'"
+          >
+            <div
+              class="w-14 h-14 mx-auto mb-4 rounded-xl flex items-center justify-center bg-slate-100 group-hover:bg-slate-200 dark:bg-slate-800 dark:group-hover:bg-slate-700 transition-colors duration-300"
+            >
               <!-- iOS Icon -->
-              <svg class="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+              <svg class="w-8 h-8 text-slate-700 dark:text-slate-300 transition-colors duration-300" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
               </svg>
             </div>
-            <h3 class="font-semibold mb-1">iOS</h3>
+            <h3 class="font-semibold mb-1 text-slate-950 dark:text-slate-50 transition-colors duration-300">iOS</h3>
             <p class="text-sm text-slate-500">15.0+</p>
           </RouterLink>
         </div>
 
-        <p class="text-center text-slate-500 mt-8">
+        <p class="text-center mt-8 text-slate-500 transition-colors duration-300">
           Also available on Android and iPadOS
         </p>
       </div>
     </section>
 
     <!-- FAQ Section -->
-    <section class="py-24 lg:py-32 bg-slate-50/50">
+    <section
+      class="py-24 lg:py-32 bg-slate-50/50 dark:bg-slate-900/30 transition-colors duration-300"
+      data-animate-id="faq"
+    >
       <div class="container-custom">
         <div class="max-w-3xl mx-auto">
-          <div class="text-center mb-12">
-            <h2 class="text-4xl sm:text-5xl font-semibold mb-4">Questions?</h2>
-            <p class="text-xl text-slate-600">We're here to help</p>
+          <div class="text-center mb-12 scroll-reveal" data-animate-id="faq-title">
+            <h2
+              class="text-4xl sm:text-5xl font-semibold mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+            >
+              Questions?
+            </h2>
+            <p class="text-xl text-slate-600 dark:text-slate-400">
+              We're here to help
+            </p>
           </div>
 
           <!-- FAQ Accordion -->
@@ -280,13 +411,18 @@ const icons = {
             <div
               v-for="(faq, index) in faqs"
               :key="index"
-              class="faq-item"
+              class="faq-item scroll-reveal"
+              :data-animate-id="'faq-' + index"
               @click="toggleFaq(index)"
             >
               <button class="w-full flex items-center justify-between p-6 text-left">
-                <span class="text-lg font-semibold text-slate-900">{{ faq.question }}</span>
+                <span
+                  class="text-lg font-semibold text-slate-900 dark:text-slate-50 transition-colors duration-300"
+                >
+                  {{ faq.question }}
+                </span>
                 <svg
-                  class="w-5 h-5 text-slate-400 transition-transform duration-300 flex-shrink-0 ml-4"
+                  class="w-5 h-5 transition-transform duration-300 flex-shrink-0 ml-4 text-slate-400 dark:text-slate-500"
                   :class="{ 'rotate-180': openFaq === index }"
                   fill="none"
                   stroke="currentColor"
@@ -299,7 +435,7 @@ const icons = {
                 class="px-6 overflow-hidden transition-all duration-300 ease-in-out"
                 :class="openFaq === index ? 'max-h-32 pb-6' : 'max-h-0'"
               >
-                <p class="text-slate-600">{{ faq.answer }}</p>
+                <p class="text-slate-600 dark:text-slate-400">{{ faq.answer }}</p>
               </div>
             </div>
           </div>
@@ -308,16 +444,20 @@ const icons = {
     </section>
 
     <!-- Final CTA Section -->
-    <section class="py-24 lg:py-32">
+    <section class="py-24 lg:py-32" data-animate-id="cta">
       <div class="container-custom">
-        <div class="max-w-3xl mx-auto text-center">
-          <h2 class="text-4xl sm:text-5xl font-semibold mb-6">Ready to Get Started?</h2>
-          <p class="text-xl text-slate-600 mb-10">
+        <div class="max-w-3xl mx-auto text-center scroll-reveal" data-animate-id="cta-title">
+          <h2
+            class="text-4xl sm:text-5xl font-semibold mb-6 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+          >
+            Ready to Get Started?
+          </h2>
+          <p class="text-xl mb-10 text-slate-600 dark:text-slate-400">
             Join thousands of users who are already typing smarter, not harder.
           </p>
           <RouterLink
             to="/downloads"
-            class="btn-primary inline-flex items-center gap-2 text-lg"
+            class="btn-primary inline-flex items-center gap-2 text-lg bg-slate-950 hover:bg-slate-900 dark:bg-sky-500 dark:hover:bg-sky-400"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
@@ -329,3 +469,25 @@ const icons = {
     </section>
   </div>
 </template>
+
+<style scoped>
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scroll-reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger animations for bento grid */
+.bento-card:nth-child(1) { transition-delay: 0ms; }
+.bento-card:nth-child(2) { transition-delay: 100ms; }
+.bento-card:nth-child(3) { transition-delay: 200ms; }
+.bento-card:nth-child(4) { transition-delay: 300ms; }
+.bento-card:nth-child(5) { transition-delay: 400ms; }
+.bento-card:nth-child(6) { transition-delay: 500ms; }
+</style>

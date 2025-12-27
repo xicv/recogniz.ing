@@ -1,20 +1,14 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { RouterView } from 'vue-router'
 import AppHeader from './AppHeader.vue'
 import AppFooter from './AppFooter.vue'
 
 const route = useRoute()
-
-// Compute layout classes based on route
-const layoutClasses = computed(() => ({
-  'min-h-screen bg-white': true
-}))
 </script>
 
 <template>
-  <div :class="layoutClasses">
+  <div class="min-h-screen transition-colors duration-300 bg-white dark:bg-[#0a0a0a]">
     <AppHeader />
     <main>
       <RouterView v-slot="{ Component, route }">
