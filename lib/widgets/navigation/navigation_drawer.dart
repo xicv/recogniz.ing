@@ -216,90 +216,127 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
       ),
     ];
 
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       children: navigationItems.map((item) {
         final isSelected = currentPage == item.index;
 
+        // Different layout for collapsed vs expanded mode
+        if (!_isExpanded) {
+          // Collapsed mode: vertical bar + icon in a rounded container
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            child: Tooltip(
+              message: '${item.label} (${item.shortcut})',
+              waitDuration: const Duration(milliseconds: 500),
+              child: Material(
+                color: isSelected
+                    ? colorScheme.primaryContainer.withOpacity(0.5)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(12),
+                child: InkWell(
+                  onTap: () {
+                    ref.read(currentPageProvider.notifier).state = item.index;
+                  },
+                  borderRadius: BorderRadius.circular(12),
+                  hoverColor: colorScheme.onSurface.withOpacity(0.06),
+                  splashColor: colorScheme.onSurface.withOpacity(0.1),
+                  child: Container(
+                    height: 48,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        // Active indicator bar (left side)
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          width: 4,
+                          height: 24,
+                          margin: const EdgeInsets.only(left: 4, right: 4),
+                          decoration: BoxDecoration(
+                            color: isSelected ? colorScheme.primary : Colors.transparent,
+                            borderRadius: const BorderRadius.only(
+                              topRight: Radius.circular(2),
+                              bottomRight: Radius.circular(2),
+                            ),
+                          ),
+                        ),
+                        // Icon (centered in remaining space)
+                        Expanded(
+                          child: Icon(
+                            item.icon,
+                            color: isSelected
+                                ? colorScheme.primary
+                                : colorScheme.onSurfaceVariant,
+                            size: 24,
+                          ),
+                        ),
+                        // Right spacer for balance
+                        const SizedBox(width: 4),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+
+        // Expanded mode: original horizontal layout
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           child: Material(
             color: isSelected
-                ? Theme.of(context).colorScheme.primaryContainer
+                ? colorScheme.primaryContainer
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
-            child: Tooltip(
-              message: _isExpanded ? '' : '${item.label} (${item.shortcut})',
-              child: InkWell(
-                onTap: () {
-                  ref.read(currentPageProvider.notifier).state = item.index;
-                },
-                borderRadius: BorderRadius.circular(12),
-                hoverColor: Theme.of(context).hoverColor,
-                splashColor: Theme.of(context).splashColor,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: EdgeInsets.symmetric(
-                    vertical: 12,
-                    horizontal: _isExpanded ? 16 : 8,
-                  ),
-                  child: _isExpanded
-                      ? Row(
-                          children: [
-                            Icon(
-                              item.icon,
+            child: InkWell(
+              onTap: () {
+                ref.read(currentPageProvider.notifier).state = item.index;
+              },
+              borderRadius: BorderRadius.circular(12),
+              hoverColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+              splashColor: colorScheme.onSurface.withOpacity(0.08),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 16,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      item.icon,
+                      color: isSelected
+                          ? colorScheme.onPrimaryContainer
+                          : colorScheme.onSurfaceVariant,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Text(
+                        item.label,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyLarge
+                            ?.copyWith(
                               color: isSelected
-                                  ? Theme.of(context)
-                                      .colorScheme
-                                      .onPrimaryContainer
-                                  : Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                              size: 24,
+                                  ? colorScheme.onPrimaryContainer
+                                  : colorScheme.onSurface,
+                              fontWeight: isSelected
+                                  ? FontWeight.w600
+                                  : FontWeight.normal,
                             ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Text(
-                                item.label,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.copyWith(
-                                      color: isSelected
-                                          ? Theme.of(context)
-                                              .colorScheme
-                                              .onPrimaryContainer
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
-                                      fontWeight: isSelected
-                                          ? FontWeight.w600
-                                          : FontWeight.normal,
-                                    ),
-                              ),
-                            ),
-                            if (isSelected)
-                              Icon(
-                                LucideIcons.chevronRight,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onPrimaryContainer,
-                                size: 16,
-                              ),
-                          ],
-                        )
-                      : Center(
-                          child: Icon(
-                            item.icon,
-                            color: isSelected
-                                ? Theme.of(context)
-                                    .colorScheme
-                                    .onPrimaryContainer
-                                : Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
-                            size: 24,
-                          ),
-                        ),
+                      ),
+                    ),
+                    if (isSelected)
+                      Icon(
+                        LucideIcons.chevronRight,
+                        color: colorScheme.onPrimaryContainer,
+                        size: 16,
+                      ),
+                  ],
                 ),
               ),
             ),

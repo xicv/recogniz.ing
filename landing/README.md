@@ -7,11 +7,19 @@ A modern, minimalist landing page for the Recogniz.ing AI voice typing applicati
 
 ---
 
-## Latest Version: 1.0.3 (December 21, 2025)
+## Latest Version: 1.0.4 (December 23, 2025)
 
 ### Recent Updates
+- **📋 Changelog System**: JSON-first changelog with auto-generated Markdown
+- **🌐 Android Downloads**: Added Android platform downloads with installation instructions
+- **🐛 Fixed Download URLs**: Now correctly point to GitHub Pages instead of GitHub Releases
+- **🔧 Build System**: Upgraded Android Gradle Plugin to 8.10, Gradle to 8.11.1, Kotlin to 2.1.0
+- **🏗️ Deployment**: Fixed detached HEAD issue in GitHub Actions release workflow
+- **📱 Android Support**: Fixed Android build with AGP 8.10 compatibility
+- **✨ PWA Support**: Progressive Web App capabilities with offline support
+
+### Previous Updates (v1.0.3)
 - **🎨 Updated Platform Icons**: Better visual representation with iMac for macOS and Apple logo for iOS
-- **📦 Improved Downloads**: Enhanced download management with version 1.0.3 builds
 - **🔐 macOS Security**: Fixed Gatekeeper verification issues
 - **🪟 Windows Support**: Initial Windows release with native installer
 - **🏗️ Deployment**: Simplified single-repository deployment architecture
@@ -31,11 +39,13 @@ Recogniz.ing is an AI-powered voice typing application built with Flutter that:
 
 ## Tech Stack
 
-- **Vue 3.5+** with Composition API and `<script setup>`
-- **Vite 7.0** for ultra-fast development and building
+- **Vue 3.5** with Composition API and `<script setup>` syntax
+- **Vite 6.0** for ultra-fast development and optimized builds
 - **Tailwind CSS 3.4** for utility-first styling
-- **TypeScript** for type safety
-- **Vue Router** for SPA navigation
+- **TypeScript 5.5** for type safety
+- **Vue Router 4.6** for SPA navigation
+- **vite-plugin-pwa 0.21** for Progressive Web App capabilities
+- **Lucide Vue Next 0.460** for modern icons
 - **Git LFS** for large download file storage
 
 ---
@@ -43,16 +53,17 @@ Recogniz.ing is an AI-powered voice typing application built with Flutter that:
 ## Features
 
 - ✨ Minimalist, clean design with beautiful typography
-- 📱 Fully responsive design
-- 🚀 Lightning fast loading with Vite 7
+- 📱 Fully responsive design with mobile-first approach
+- 🚀 Lightning fast loading with Vite 6
 - 🎨 Smooth animations and transitions
-- ♿ Accessibility-first approach
+- ♿ Accessibility-first approach with semantic HTML
 - 🔍 SEO optimized meta tags
 - 🔗 Links to app downloads and documentation
 - 📦 **Download Management**: Automated platform-specific downloads with semantic versioning
 - 📋 **Version Manifest**: JSON-based download system with version tracking
 - 🔄 **CI/CD Integration**: Automated build and deployment via GitHub Actions
 - 🔐 **Code Signing**: macOS builds support code signing and notarization
+- 📲 **PWA Support**: Install as app on supported devices with offline capabilities
 
 ---
 
@@ -68,13 +79,23 @@ xicv/recogniz.ing (Single Repository)
 │   ├── release-all-platforms.yml  # Builds app, creates releases
 │   ├── release.yml                 # Alternative release workflow
 │   └── landing-deploy.yml         # Deploys landing to GitHub Pages
-├── [Flutter App Source Code]
+├── lib/                           # Flutter app source code
+├── android/, ios/, macos/, ...    # Flutter platform folders
+├── pubspec.yaml                   # Flutter dependencies
 └── landing/                        # This folder
     ├── src/
     ├── public/downloads/           # App download artifacts (Git LFS)
+    │   ├── 1.0.4/                 # Latest version downloads
+    │   │   ├── macos/
+    │   │   ├── windows/
+    │   │   ├── linux/
+    │   │   └── android/
     │   └── manifest.json           # Version manifest
+    ├── public/.nojekyll            # Required for GitHub Pages + Vite
     └── package.json
 ```
+
+**Note**: The Flutter project root IS the repository root. All Flutter commands (`flutter pub get`, `flutter run`, etc.) are run from `/recogniz.ing/`, not from a subdirectory.
 
 ### Automated Deployment Flow
 
@@ -88,14 +109,15 @@ xicv/recogniz.ing (Single Repository)
 - **Source**: GitHub Actions (not Deploy from a branch)
 - **Custom Domain**: `recogniz.ing`
 - **Workflow**: `.github/workflows/landing-deploy.yml`
+- **Important**: `.nojekyll` file in `public/` prevents GitHub Pages from ignoring underscore-prefixed files (required for Vite builds)
 
 ---
 
 ## Getting Started
 
 ### Prerequisites
-- Node.js 20+ (required for Vite 7)
-- npm
+- Node.js 18+ or 20+ (recommended)
+- npm or yarn
 
 ### Installation
 
@@ -124,22 +146,26 @@ npm run preview
 landing/
 ├── public/                  # Static assets
 │   ├── downloads/           # Platform-specific app downloads (Git LFS)
-│   │   ├── 1.0.3/          # Version-specific downloads
+│   │   ├── 1.0.4/          # Version-specific downloads
 │   │   │   ├── macos/
 │   │   │   ├── windows/
 │   │   │   ├── linux/
 │   │   │   └── android/
 │   │   └── manifest.json   # Version manifest for downloads
+│   ├── .nojekyll           # Required for GitHub Pages + Vite
 │   └── assets/             # Images, icons, etc.
 ├── src/
 │   ├── App.vue             # Root component
 │   ├── main.ts             # Entry point
 │   ├── router/             # Vue Router configuration
 │   │   └── index.ts
+│   ├── composables/        # Vue composables (shared logic)
 │   ├── views/              # Page components
 │   │   ├── HomeView.vue
 │   │   ├── DownloadsView.vue
-│   │   └── FeaturesView.vue
+│   │   ├── FeaturesView.vue
+│   │   ├── ChangelogView.vue
+│   │   └── ContactView.vue
 │   ├── components/
 │   │   └── layout/         # Layout components
 │   │       ├── AppHeader.vue
@@ -147,7 +173,7 @@ landing/
 │   │       └── MainLayout.vue
 │   └── style.css           # Global styles
 ├── index.html              # HTML template
-├── vite.config.ts          # Vite configuration
+├── vite.config.ts          # Vite configuration + PWA plugin
 ├── tailwind.config.js      # Tailwind CSS configuration
 └── package.json
 ```
@@ -175,13 +201,13 @@ https://github.com/xicv/recogniz.ing/releases/download/v{VERSION}/recognizing-{V
 
 ### Supported Platforms
 
-| Platform | File Format | Code Signing |
-|----------|-------------|--------------|
-| macOS | `.zip` (app bundle) | ✅ Signed & Notarized |
-| Windows | `.zip` (portable) | Planned |
-| Linux | `.tar.gz` | N/A |
-| Android | `.apk`, `.aab` | Planned |
-| Web | `.zip` | N/A |
+| Platform | File Format | Code Signing | Status |
+|----------|-------------|--------------|--------|
+| macOS | `.zip` (app bundle) | ✅ Signed & Notarized | ✅ Available |
+| Windows | `.zip` (portable) | Planned | ✅ Available |
+| Linux | `.tar.gz` | N/A | ✅ Available |
+| Android | `.apk`, `.aab` | Planned | ✅ Available |
+| Web | `.zip` | N/A | ✅ Available |
 
 ---
 

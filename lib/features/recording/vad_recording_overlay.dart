@@ -8,6 +8,7 @@ import '../../core/constants/ui_constants.dart';
 import '../../core/providers/recording_providers.dart';
 import '../../core/providers/ui_providers.dart';
 import '../../core/providers/settings_providers.dart';
+import '../../widgets/recording/audio_waveform_display.dart';
 
 class VadRecordingOverlay extends ConsumerStatefulWidget {
   const VadRecordingOverlay({super.key});
@@ -21,12 +22,15 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
     with TickerProviderStateMixin {
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
-  late AnimationController _waveController;
-  late Animation<double> _waveAnimation;
 
   bool _isInitialized = false;
   double _speechProbability = 0.0;
   bool _hasDetectedSpeech = false;
+
+  // Audio amplitude tracking for waveform visualization
+  final List<double> _audioAmplitudes = [];
+  static const int _maxAmplitudes = 40;
+  Timer? _amplitudeUpdateTimer;
 
   // Duration tracking
   DateTime? _recordingStartTime;
@@ -41,20 +45,9 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
       vsync: this,
     );
 
-    _waveController = AnimationController(
-      duration: const Duration(seconds: 2),
-      vsync: this,
-    );
-
     _pulseAnimation = Tween<double>(begin: 0.7, end: 1.0).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
-
-    _waveAnimation = Tween<double>(begin: 0.3, end: 1.0).animate(
-      CurvedAnimation(parent: _waveController, curve: Curves.easeInOut),
-    );
-
-    _waveController.repeat(reverse: true);
 
     // Initialize VAD
     _initializeVad();
@@ -63,8 +56,8 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
   @override
   void dispose() {
     _pulseController.dispose();
-    _waveController.dispose();
     _durationTimer?.cancel();
+    _amplitudeUpdateTimer?.cancel();
     VadService.stopListening();
     super.dispose();
   }
@@ -103,12 +96,25 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
     }
   }
 
+  void _updateAmplitudes() {
+    if (_audioAmplitudes.length >= _maxAmplitudes) {
+      _audioAmplitudes.removeAt(0);
+    }
+    // Use speech probability as amplitude for visualization
+    // Add some variation for more dynamic appearance
+    final baseAmplitude = _speechProbability;
+    final variation = (Random().nextDouble() - 0.5) * 0.2;
+    final amplitude = (baseAmplitude + variation).clamp(0.0, 1.0);
+    _audioAmplitudes.add(amplitude);
+  }
+
   @override
   Widget build(BuildContext context) {
     final recordingState = ref.watch(recordingStateProvider);
 
     // Manage timer based on recording state
     _manageDurationTimer(recordingState);
+    _manageAmplitudeUpdates(recordingState);
 
     return Container(
       color: Colors.black.withOpacity(0.85),
@@ -118,12 +124,17 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Main recording circle with VAD visualization
+              // Main recording circle with real audio waveform visualization
               Stack(
                 alignment: Alignment.center,
                 children: [
-                  // Wave visualization
-                  _buildWaveVisualization(),
+                  // Real audio waveform visualization
+                  CircularAudioWaveform(
+                    amplitude: _speechProbability,
+                    color: _hasDetectedSpeech
+                        ? Theme.of(context).colorScheme.secondary
+                        : null,
+                  ),
 
                   // Recording button with stop functionality
                   GestureDetector(
@@ -143,7 +154,9 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
                                 : Theme.of(context).colorScheme.primary,
                             boxShadow: [
                               BoxShadow(
-                                color: Theme.of(context).colorScheme.primary,
+                                color: _hasDetectedSpeech
+                                    ? Theme.of(context).colorScheme.secondary
+                                    : Theme.of(context).colorScheme.primary,
                                 blurRadius: 30 * _pulseAnimation.value,
                                 spreadRadius: 5 * _pulseAnimation.value,
                               ),
@@ -185,6 +198,15 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
               ),
 
               const SizedBox(height: 40),
+
+              // Real-time bar waveform visualization
+              AudioWaveformDisplay(
+                amplitudes: _audioAmplitudes,
+                maxBars: _maxAmplitudes,
+                isSpeechDetected: _hasDetectedSpeech,
+              ),
+
+              const SizedBox(height: 32),
 
               // Stop button (shown when recording)
               if (recordingState == RecordingState.recording)
@@ -307,28 +329,6 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
     );
   }
 
-  Widget _buildWaveVisualization() {
-    return AnimatedBuilder(
-      animation: _waveAnimation,
-      builder: (context, child) {
-        return SizedBox(
-          width: UIConstants.fabSize * 2,
-          height: UIConstants.fabSize * 2,
-          child: CustomPaint(
-            painter: WavePainter(
-              amplitude: _waveAnimation.value * 20,
-              frequency: 4,
-              phase: 0,
-              color: _hasDetectedSpeech
-                  ? Theme.of(context).colorScheme.secondary.withOpacity(0.3)
-                  : Theme.of(context).colorScheme.primary.withOpacity(0.3),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   Widget _buildStatusIndicator(String label, bool active, IconData icon) {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -367,14 +367,14 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
     }
 
     if (_hasDetectedSpeech) {
-      return '🎤 Speaking detected';
+      return 'Speaking detected';
     }
 
     if (_speechProbability > 0.1) {
-      return '🔊 Voice detected';
+      return 'Voice detected';
     }
 
-    return '🎤 Listening...';
+    return 'Listening...';
   }
 
   String _getRecordingStatusText(RecordingState state) {
@@ -384,7 +384,7 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
       case RecordingState.recording:
         return _getVadStatusText();
       case RecordingState.processing:
-        return '⏳ Processing transcription...';
+        return 'Processing transcription...';
     }
   }
 
@@ -426,6 +426,25 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
     }
   }
 
+  void _manageAmplitudeUpdates(RecordingState state) {
+    if (state == RecordingState.recording) {
+      // Start amplitude updates if not already running
+      if (_amplitudeUpdateTimer == null || !_amplitudeUpdateTimer!.isActive) {
+        _amplitudeUpdateTimer = Timer.periodic(const Duration(milliseconds: 50), (_) {
+          if (mounted) {
+            setState(() {
+              _updateAmplitudes();
+            });
+          }
+        });
+      }
+    } else {
+      // Stop amplitude updates
+      _amplitudeUpdateTimer?.cancel();
+      _amplitudeUpdateTimer = null;
+    }
+  }
+
   Future<void> _stopRecording() async {
     final currentState = ref.read(recordingStateProvider);
 
@@ -445,59 +464,4 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
       rethrow;
     }
   }
-}
-
-/// Custom painter for wave visualization
-class WavePainter extends CustomPainter {
-  final double amplitude;
-  final int frequency;
-  final double phase;
-  final Color color;
-
-  WavePainter({
-    required this.amplitude,
-    required this.frequency,
-    required this.phase,
-    required this.color,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0;
-
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2;
-
-    for (int i = 0; i < frequency; i++) {
-      final waveRadius = radius - (i * radius / frequency);
-      final waveHeight = amplitude * (1 - i / frequency);
-
-      final path = Path();
-      for (double angle = 0; angle <= 2 * 3.14159; angle += 0.1) {
-        final x = center.dx +
-            waveRadius *
-                cos(angle) *
-                (1 + waveHeight * sin(frequency * angle + phase) / 100);
-        final y = center.dy +
-            waveRadius *
-                sin(angle) *
-                (1 + waveHeight * cos(frequency * angle + phase) / 100);
-
-        if (angle == 0) {
-          path.moveTo(x, y);
-        } else {
-          path.lineTo(x, y);
-        }
-      }
-
-      path.close();
-      canvas.drawPath(path, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }

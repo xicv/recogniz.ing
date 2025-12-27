@@ -184,13 +184,19 @@ lib/
 │   ├── use_cases/          # Business use cases
 │   └── utils/              # Helper utilities
 ├── features/               # Feature-based organization
-│   ├── dashboard/          # Main dashboard feature
-│   ├── recording/          # Voice recording UI
+│   ├── app_shell.dart      # Main app container with navigation
+│   ├── dashboard/          # Statistics and transcription history
+│   ├── dictionaries/       # Vocabulary management
+│   ├── prompts/            # AI prompt templates
+│   ├── recording/          # Voice recording UI with VAD
 │   ├── settings/           # Settings management
-│   └── transcriptions/     # Transcription management
+│   └── transcriptions/     # Transcription cards and display
 └── widgets/                # Reusable UI components
+    ├── navigation/         # Navigation drawer
     └── shared/             # Cross-feature components
 ```
+
+**Note**: The Flutter project root IS the repository root (`/recogniz.ing/`), not a subdirectory. All Flutter commands run from the root.
 
 ### State Management
 - Uses Riverpod for reactive state management
@@ -201,7 +207,7 @@ lib/
 
 ## Landing Page Deployment
 
-The repository includes a Vue 3 + Vite landing page that deploys to GitHub Pages.
+The repository includes a Vue 3 + Vite + TailwindCSS landing page that deploys to GitHub Pages.
 
 ### Deployment Architecture
 
@@ -211,11 +217,15 @@ xicv/recogniz.ing (Single Repository)
 │   ├── release-all-platforms.yml  # Builds app, creates releases
 │   ├── release.yml                 # Alternative release workflow
 │   └── landing-deploy.yml         # Deploys landing to GitHub Pages
-└── landing/                        # Vue 3 + Vite landing page
+└── landing/                        # Vue 3 + Vite + TailwindCSS landing page
     ├── src/
     ├── public/downloads/           # App download artifacts (Git LFS)
+    │   └── manifest.json           # Version manifest for downloads
+    ├── public/.nojekyll            # Required for GitHub Pages + Vite
     └── package.json
 ```
+
+**Tech Stack**: Vue 3.5, Vite 6.0, TailwindCSS 3.4, TypeScript 5.5, PWA (vite-plugin-pwa 0.21)
 
 ### Automated Deployment Flow
 
