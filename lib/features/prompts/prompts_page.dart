@@ -8,6 +8,8 @@ import '../../core/providers/prompt_providers.dart';
 import '../../core/models/custom_prompt.dart';
 import '../../core/models/app_settings.dart';
 import '../../widgets/shared/app_bars.dart';
+import '../../widgets/shared/content_skeletons.dart';
+import '../../widgets/shared/empty_states.dart';
 import '../settings/widgets/prompt_editor.dart';
 
 class PromptsPage extends ConsumerStatefulWidget {
@@ -108,42 +110,10 @@ class _PromptsPageState extends ConsumerState<PromptsPage> {
   }
 
   Widget _buildEmptyState(BuildContext context, bool isSearching) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            isSearching ? LucideIcons.search : LucideIcons.messageSquare,
-            size: 64,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            isSearching ? 'No prompts found' : 'No prompts yet',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            isSearching
-                ? 'Try adjusting your search terms'
-                : 'Create your first custom prompt',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-          ),
-          if (!isSearching) ...[
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () => _showPromptEditor(context, ref),
-              icon: const Icon(LucideIcons.plus),
-              label: const Text('Create Prompt'),
-            ),
-          ],
-        ],
-      ),
-    ).animate().fadeIn();
+    return PromptsEmptyState(
+      isSearching: isSearching,
+      onCreatePrompt: () => _showPromptEditor(context, ref),
+    );
   }
 
   Widget _buildPromptCard(

@@ -9,6 +9,7 @@ import '../core/constants/constants.dart';
 import '../core/error/error_components.dart';
 import '../core/error/enhanced_error_handler.dart';
 import '../core/providers/app_providers.dart';
+import '../core/services/haptic_service.dart';
 import '../widgets/navigation/navigation_drawer.dart';
 import 'dashboard/dashboard_page.dart';
 import 'dictionaries/dictionaries_page.dart';
@@ -241,8 +242,10 @@ class _AppShellState extends ConsumerState<AppShell> {
     final voiceRecordingUseCase = ref.read(voiceRecordingUseCaseProvider);
 
     if (state == RecordingState.idle) {
+      await HapticService.startRecording();
       await voiceRecordingUseCase.startRecording();
     } else if (state == RecordingState.recording) {
+      await HapticService.mediumImpact();
       await voiceRecordingUseCase.stopRecording();
     }
   }

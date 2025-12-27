@@ -7,6 +7,8 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/providers/app_providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/models/app_settings.dart';
+import '../../widgets/shared/content_skeletons.dart';
+import '../../widgets/shared/empty_states.dart';
 import 'widgets/transcription_card.dart';
 
 class TranscriptionsPage extends ConsumerStatefulWidget {
@@ -279,65 +281,23 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
   }
 
   Widget _buildEmptyState(BuildContext context, AppSettings settings) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(40),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  LucideIcons.mic,
-                  size: 48,
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                ),
-              ).animate().scale(duration: 600.ms, curve: Curves.elasticOut),
-              const SizedBox(height: 24),
-              Text(
-                'No transcriptions yet',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ).animate().fadeIn(delay: 200.ms),
-              const SizedBox(height: 8),
-              Text(
-                'Tap the record button to start transcribing',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
-                textAlign: TextAlign.center,
-              ).animate().fadeIn(delay: 300.ms),
-              const SizedBox(height: 32),
-              if (settings.hasApiKey) ...[
-                FilledButton.icon(
-                  onPressed: () {
-                    // Trigger recording
-                    ref.read(currentPageProvider.notifier).state =
-                        0; // Dashboard tab
-                  },
-                  icon: const Icon(LucideIcons.mic),
-                  label: const Text('Start Recording'),
-                ).animate().fadeIn(delay: 400.ms),
-              ] else ...[
-                OutlinedButton.icon(
-                  onPressed: () {
-                    ref.read(currentPageProvider.notifier).state =
-                        2; // Settings tab
-                  },
-                  icon: const Icon(LucideIcons.settings),
-                  label: const Text('Add API Key'),
-                ).animate().fadeIn(delay: 400.ms),
-              ],
-            ],
-          ),
-        ),
-      ),
+    // Show search empty state if user is searching
+    if (_isSearching) {
+      return SearchEmptyState(
+        searchQuery: _searchQuery,
+        onClearSearch: _clearSearch,
+      );
+    }
+
+    // Show appropriate empty state based on API key status
+    return TranscriptionEmptyState(
+      hasApiKey: settings.hasApiKey,
+      onStartRecording: () {
+        // Stay on transcriptions page - user can use the FAB to record
+      },
+      onOpenSettings: () {
+        ref.read(currentPageProvider.notifier).state = 4; // Settings tab
+      },
     );
   }
 

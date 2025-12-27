@@ -7,6 +7,8 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/providers/app_providers.dart';
 import '../../core/providers/transcription_providers.dart';
 import '../../core/theme/app_theme.dart';
+import '../../widgets/shared/content_skeletons.dart';
+import '../../widgets/shared/empty_states.dart';
 import 'widgets/simplified_stats_card.dart';
 import 'widgets/dashboard_metrics.dart';
 
@@ -19,6 +21,16 @@ class DashboardPage extends ConsumerWidget {
     final enhancedStats = ref.watch(enhancedStatisticsProvider);
     final transcriptions = ref.watch(filteredTranscriptionsProvider);
     final settings = ref.watch(settingsProvider);
+
+    // Show empty state if no transcriptions and no API key
+    if (transcriptions.isEmpty && !settings.hasApiKey) {
+      return Scaffold(
+        body: DashboardEmptyState(
+          hasApiKey: false,
+          onOpenSettings: () => ref.read(currentPageProvider.notifier).state = 4,
+        ),
+      );
+    }
 
     return SafeArea(
       child: CustomScrollView(

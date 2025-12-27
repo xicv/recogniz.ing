@@ -9,6 +9,8 @@ import '../../core/models/vocabulary.dart';
 import '../../core/models/app_settings.dart';
 import '../../core/theme/app_theme.dart';
 import '../../widgets/shared/app_bars.dart';
+import '../../widgets/shared/content_skeletons.dart';
+import '../../widgets/shared/empty_states.dart';
 import '../settings/widgets/vocabulary_editor.dart';
 
 class DictionariesPage extends ConsumerStatefulWidget {
@@ -110,42 +112,10 @@ class _DictionariesPageState extends ConsumerState<DictionariesPage> {
   }
 
   Widget _buildEmptyState(BuildContext context, bool isSearching) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            isSearching ? LucideIcons.search : LucideIcons.bookOpen,
-            size: 64,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            isSearching ? 'No dictionaries found' : 'No dictionaries yet',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            isSearching
-                ? 'Try adjusting your search terms'
-                : 'Create your first custom dictionary',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-          ),
-          if (!isSearching) ...[
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () => _showVocabularyEditor(context, ref),
-              icon: const Icon(LucideIcons.plus),
-              label: const Text('Create Dictionary'),
-            ),
-          ],
-        ],
-      ),
-    ).animate().fadeIn();
+    return DictionariesEmptyState(
+      isSearching: isSearching,
+      onCreateDictionary: () => _showVocabularyEditor(context, ref),
+    );
   }
 
   Widget _buildVocabularyTile(

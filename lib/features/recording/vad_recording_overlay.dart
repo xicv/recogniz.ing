@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/services/vad_service.dart';
+import '../../core/services/haptic_service.dart';
 import '../../core/constants/ui_constants.dart';
 import '../../core/providers/recording_providers.dart';
 import '../../core/providers/ui_providers.dart';
@@ -64,6 +65,8 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
 
   Future<void> _initializeVad() async {
     await VadService.initialize();
+    await HapticService.initialize();
+
     setState(() {
       _isInitialized = true;
     });
@@ -72,6 +75,7 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
     try {
       await VadService.startListening(
         onSpeechStart: (audioData) {
+          HapticService.speechDetected();
           setState(() {
             _hasDetectedSpeech = true;
             _speechProbability = 1.0;
@@ -211,7 +215,10 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
               // Stop button (shown when recording)
               if (recordingState == RecordingState.recording)
                 GestureDetector(
-                  onTap: _stopRecording,
+                  onTap: () async {
+                    await HapticService.mediumImpact();
+                    _stopRecording();
+                  },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 24, vertical: 12),
@@ -458,8 +465,10 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
 
     try {
       await voiceRecordingUseCase.stopRecording();
+      await HapticService.stopRecording();
       debugPrint('[VadRecordingOverlay] Recording stopped successfully');
     } catch (e) {
+      await HapticService.error();
       debugPrint('[VadRecordingOverlay] Error stopping recording: $e');
       rethrow;
     }
