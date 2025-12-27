@@ -125,9 +125,11 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
       child: Material(
         color: Colors.transparent,
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(vertical: 40),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
               // Main recording circle with real audio waveform visualization
               Stack(
                 alignment: Alignment.center,
@@ -259,13 +261,18 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
               const SizedBox(height: 16),
 
               // Recording status text - reflects actual recording state
-              Text(
-                _getRecordingStatusText(recordingState),
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.9),
-                  fontSize: 16,
+              MouseRegion(
+                cursor: SystemMouseCursors.basic,
+                child: Text(
+                  _getRecordingStatusText(recordingState),
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.9),
+                    fontSize: 16,
+                    decoration: TextDecoration.none,
+                  ),
+                  textAlign: TextAlign.center,
+                  selectionColor: Colors.transparent,
                 ),
-                textAlign: TextAlign.center,
               ),
 
               const SizedBox(height: 40),
@@ -333,6 +340,7 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
           ),
         ),
       ),
+    ),
     );
   }
 

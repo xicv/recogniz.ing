@@ -181,7 +181,7 @@ class TranscriptionEmptyState extends StatelessWidget {
 
     return EmptyState(
       icon: LucideIcons.key,
-      iconColor: colorScheme.warning,
+      iconColor: colorScheme.error,
       title: 'API Key Required',
       message: 'Add your Gemini API key to start transcribing your voice recordings.',
       actionLabel: 'Add API Key',

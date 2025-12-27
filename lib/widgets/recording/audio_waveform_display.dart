@@ -238,12 +238,6 @@ class _CircularWavePainter extends CustomPainter {
         canvas.drawCircle(center, radius, paint);
       }
     }
-
-    // Draw center circle
-    final centerPaint = Paint()
-      ..color = color.withOpacity(0.4)
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(center, baseRadius - 5, centerPaint);
   }
 
   @override

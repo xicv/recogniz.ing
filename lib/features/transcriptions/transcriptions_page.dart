@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/providers/app_providers.dart';
+import '../../core/services/haptic_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/models/app_settings.dart';
 import '../../widgets/shared/content_skeletons.dart';
@@ -292,8 +293,11 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
     // Show appropriate empty state based on API key status
     return TranscriptionEmptyState(
       hasApiKey: settings.hasApiKey,
-      onStartRecording: () {
-        // Stay on transcriptions page - user can use the FAB to record
+      onStartRecording: () async {
+        // Start recording when user taps the button
+        final voiceRecordingUseCase = ref.read(voiceRecordingUseCaseProvider);
+        await HapticService.startRecording();
+        await voiceRecordingUseCase.startRecording();
       },
       onOpenSettings: () {
         ref.read(currentPageProvider.notifier).state = 4; // Settings tab

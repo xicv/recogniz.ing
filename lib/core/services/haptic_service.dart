@@ -77,10 +77,10 @@ class HapticService {
   static Future<void> success() async {
     if (!_isAvailable) return;
     try {
-      // Notification feedback with success type
-      await HapticFeedback.notificationFeedback(
-        NotificationFeedbackType.success,
-      );
+      // Success pattern: two light impacts
+      await lightImpact();
+      await Future.delayed(const Duration(milliseconds: 50));
+      await lightImpact();
     } catch (_) {
       _isAvailable = false;
     }
@@ -92,9 +92,10 @@ class HapticService {
   static Future<void> warning() async {
     if (!_isAvailable) return;
     try {
-      await HapticFeedback.notificationFeedback(
-        NotificationFeedbackType.warning,
-      );
+      // Warning pattern: medium impact followed by light
+      await mediumImpact();
+      await Future.delayed(const Duration(milliseconds: 100));
+      await lightImpact();
     } catch (_) {
       _isAvailable = false;
     }
@@ -106,9 +107,8 @@ class HapticService {
   static Future<void> error() async {
     if (!_isAvailable) return;
     try {
-      await HapticFeedback.notificationFeedback(
-        NotificationFeedbackType.error,
-      );
+      // Error pattern: heavy impact for emphasis
+      await heavyImpact();
     } catch (_) {
       _isAvailable = false;
     }
@@ -132,7 +132,8 @@ class HapticService {
   static Future<void> keyPress() async {
     if (!_isAvailable) return;
     try {
-      await HapticFeedback.keyboardPress();
+      // Use light impact as keyboard press alternative
+      await lightImpact();
     } catch (_) {
       _isAvailable = false;
     }
