@@ -42,7 +42,7 @@ abstract class TranscriptionServiceInterface {
 
 abstract class StorageServiceInterface {
   Future<void> saveTranscription(Transcription transcription);
-  Future<List<Transcription>> getTranscriptions();
+  Future<List<Transcription>> getTranscriptions({int? limit, int? offset});
   Future<void> deleteTranscription(String id);
   Future<void> updateTranscription(String id, String newText);
   Future<AppSettings> getSettings();

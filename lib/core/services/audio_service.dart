@@ -7,7 +7,7 @@ import 'package:record/record.dart';
 import 'package:uuid/uuid.dart';
 import 'audio_processor.dart';
 import 'audio_compression_service.dart';
-import 'audio_enhancement_service.dart';
+import 'audio_processing_service.dart';
 import '../config/app_config.dart';
 import '../constants/constants.dart';
 import '../interfaces/audio_service_interface.dart';
@@ -151,21 +151,21 @@ class AudioService implements AudioServiceInterface {
     final config = await AppConfig.fromAsset();
     final audioConfig = config.audio;
 
-    // For AAC/M4A compressed audio, enhancement is not needed
-    // The enhancement service expects raw PCM format and will fail on compressed data
+    // For AAC/M4A compressed audio, processing is not needed
+    // The processing service expects raw PCM format and will fail on compressed data
     final isCompressedFormat = path.endsWith('.m4a') || path.endsWith('.aac');
 
-    // Apply audio enhancement and compression only for uncompressed formats
+    // Apply audio processing and compression only for uncompressed formats
     Uint8List finalBytes = bytes;
     if (!isCompressedFormat) {
       try {
-        // First enhance the audio
-        final enhancedBytes = AudioEnhancementService.enhanceVoice(bytes);
+        // First process the audio
+        final processedBytes = AudioProcessingService.processVoice(bytes);
 
         // Then compress it
         final compressedBytes =
             await AudioCompressionService.compressAudioBytes(
-          audioBytes: enhancedBytes,
+          audioBytes: processedBytes,
           sampleRate: audioConfig.sampleRate,
           bitRate: 64000, // 64kbps optimized for voice
         );
@@ -180,23 +180,23 @@ class AudioService implements AudioServiceInterface {
 
           // Get audio stats
           final audioStats =
-              AudioEnhancementService.getAudioStats(enhancedBytes);
+              AudioProcessingService.getAudioStats(processedBytes);
           debugPrint(
-              '[AudioEnhancement] RMS: ${audioStats['rms']}, Peak: ${audioStats['peak']}');
+              '[AudioProcessing] RMS: ${audioStats['rms']}, Peak: ${audioStats['peak']}');
           debugPrint(
               '[AudioCompression] ${stats['compressionRatio']} compression, ${stats['savingsPercent']} savings');
         }
       } catch (e) {
         if (kDebugMode) {
           debugPrint(
-              '[AudioService] Enhancement/Compression failed, using original: $e');
+              '[AudioService] Processing/Compression failed, using original: $e');
         }
-        // Continue with original audio if enhancement/compression fails
+        // Continue with original audio if processing/compression fails
       }
     } else {
       if (kDebugMode) {
         debugPrint(
-            '[AudioService] Using compressed AAC audio directly (enhancement not needed)');
+            '[AudioService] Using compressed AAC audio directly (processing not needed)');
       }
     }
 

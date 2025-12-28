@@ -6,9 +6,9 @@ import 'package:flutter/foundation.dart';
 import '../interfaces/audio_service_interface.dart';
 import '../models/transcription_result.dart';
 
-/// Advanced audio processor with VAD integration
+/// Streaming audio processor with VAD integration
 /// Provides real-time voice activity detection and audio chunking
-class AdvancedAudioProcessor {
+class StreamingAudioProcessor {
   // static vad.MicVAD? _vadInstance; // TODO: Enable when VAD package is available
   static bool _initialized = false;
   static final StreamController<VadEvent> _vadController =
@@ -35,11 +35,32 @@ class AdvancedAudioProcessor {
 
       _initialized = true;
       debugPrint(
-          '[AdvancedAudioProcessor] RMS-based VAD initialized (fallback mode)');
+          '[StreamingAudioProcessor] RMS-based VAD initialized (fallback mode)');
     } catch (e) {
-      debugPrint('[AdvancedAudioProcessor] Initialization failed: $e');
+      debugPrint('[StreamingAudioProcessor] Initialization failed: $e');
       // Fallback to RMS-based processing
     }
+  }
+
+  /// Start real-time monitoring
+  static void startMonitoring() {
+    // TODO: Start VAD monitoring when package is available
+    debugPrint('[StreamingAudioProcessor] Monitoring started (RMS mode)');
+  }
+
+  /// Stop real-time monitoring
+  static void stopMonitoring() {
+    // TODO: Stop VAD monitoring when package is available
+    debugPrint('[StreamingAudioProcessor] Monitoring stopped');
+  }
+
+  /// Dispose resources
+  static void dispose() {
+    // TODO: Dispose VAD instance when package is available
+    _vadController.close();
+    _audioController.close();
+    _initialized = false;
+    debugPrint('[StreamingAudioProcessor] Disposed');
   }
 
   /// Get the VAD event stream for real-time speech detection
@@ -67,27 +88,6 @@ class AdvancedAudioProcessor {
     // For now, use RMS-based fallback
     return _rmsAnalysis(audioBytes, amplitudeThreshold, speechRatioThreshold,
         sampleRate, bitDepth);
-  }
-
-  /// Start real-time monitoring
-  static void startMonitoring() {
-    // TODO: Start VAD monitoring when package is available
-    debugPrint('[AdvancedAudioProcessor] Monitoring started (RMS mode)');
-  }
-
-  /// Stop real-time monitoring
-  static void stopMonitoring() {
-    // TODO: Stop VAD monitoring when package is available
-    debugPrint('[AdvancedAudioProcessor] Monitoring stopped');
-  }
-
-  /// Dispose resources
-  static void dispose() {
-    // TODO: Dispose VAD instance when package is available
-    _vadController.close();
-    _audioController.close();
-    _initialized = false;
-    debugPrint('[AdvancedAudioProcessor] Disposed');
   }
 
   /// Convert int16 audio data to Float32List
@@ -176,10 +176,34 @@ class AdvancedAudioProcessor {
     int sampleRate,
     int bitDepth,
   ) {
-    // Use existing RMS implementation as fallback
-    return const AudioAnalysis(
-      containsSpeech: false,
-      reason: 'Fallback RMS analysis',
+    // Perform actual RMS-based analysis
+    const chunkSize = 512 * 2; // 512 samples * 2 bytes
+    int speechChunks = 0;
+    int totalChunks = 0;
+    double maxProbability = 0.0;
+
+    for (int i = 0; i < audioBytes.length; i += chunkSize) {
+      final end = (i + chunkSize < audioBytes.length)
+          ? i + chunkSize
+          : audioBytes.length;
+      final chunk = audioBytes.sublist(i, end);
+
+      final event = _fallbackAnalysis(chunk);
+      if (event.isSpeech) speechChunks++;
+      totalChunks++;
+      maxProbability = (maxProbability > event.probability)
+          ? maxProbability
+          : event.probability;
+    }
+
+    final speechRatio = totalChunks > 0 ? speechChunks / totalChunks : 0.0;
+    final containsSpeech = speechRatio > speechRatioThreshold;
+
+    return AudioAnalysis(
+      containsSpeech: containsSpeech,
+      reason: containsSpeech
+          ? 'RMS detected speech (${(speechRatio * 100).toStringAsFixed(1)}% of audio)'
+          : 'No speech detected (RMS ${(speechRatio * 100).toStringAsFixed(1)}% below threshold ${(speechRatioThreshold * 100).toStringAsFixed(0)}%)',
     );
   }
 }

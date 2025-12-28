@@ -2,20 +2,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart';
 import '../services/streaming_audio_recorder.dart';
 import '../services/streaming_gemini_service.dart';
-import '../services/advanced_audio_processor.dart';
+import '../services/streaming_audio_processor.dart';
 import '../use_cases/streaming_voice_recording_use_case.dart';
-import '../interfaces/audio_service_interface.dart';
 import '../providers/app_providers.dart';
-import '../models/transcription.dart';
-import '../services/streaming_audio_recorder.dart';
-import 'providers.dart';
 
 // Export the streaming recording state for use in other files
 export '../services/streaming_audio_recorder.dart' show StreamingRecordingState;
 
-// Advanced Audio Processor Provider
-final advancedAudioProcessorProvider = Provider<AdvancedAudioProcessor>((ref) {
-  return AdvancedAudioProcessor();
+// Streaming Audio Processor Provider
+final streamingAudioProcessorProvider = Provider<StreamingAudioProcessor>((ref) {
+  return StreamingAudioProcessor();
 });
 
 // Streaming Audio Recorder Provider
@@ -90,12 +86,12 @@ class CurrentTranscriptionTextNotifier extends StateNotifier<String> {
 
 // Real-time VAD Events Provider
 final vadEventsProvider = StreamProvider<VadEvent>((ref) {
-  return AdvancedAudioProcessor.vadEvents;
+  return StreamingAudioProcessor.vadEvents;
 });
 
 // Audio Chunks Provider
 final audioChunksProvider = StreamProvider<AudioChunk>((ref) {
-  return AdvancedAudioProcessor.audioChunks;
+  return StreamingAudioProcessor.audioChunks;
 });
 
 // Transcription Chunks Provider
@@ -110,8 +106,8 @@ final textUpdatesProvider = StreamProvider<String>((ref) {
 
 // Initialize Streaming Services Provider
 final initializeStreamingServicesProvider = FutureProvider<void>((ref) async {
-  // Initialize advanced audio processor
-  await AdvancedAudioProcessor.initialize();
+  // Initialize streaming audio processor
+  await StreamingAudioProcessor.initialize();
 
   // Initialize audio recorder
   final recorder = ref.read(streamingAudioRecorderProvider);

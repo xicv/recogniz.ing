@@ -5,14 +5,14 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/constants/constants.dart';
 import '../../../core/theme/app_theme.dart';
 
-/// Simplified statistics card with expandable details
-class SimplifiedStatsCard extends StatefulWidget {
+/// Compact statistics card with expandable details
+class CompactStatsCard extends StatefulWidget {
   final int totalUsage;
   final int thisWeekUsage;
   final int totalTokens;
   final double totalDurationMinutes;
 
-  const SimplifiedStatsCard({
+  const CompactStatsCard({
     super.key,
     required this.totalUsage,
     required this.thisWeekUsage,
@@ -21,10 +21,10 @@ class SimplifiedStatsCard extends StatefulWidget {
   });
 
   @override
-  State<SimplifiedStatsCard> createState() => _SimplifiedStatsCardState();
+  State<CompactStatsCard> createState() => _CompactStatsCardState();
 }
 
-class _SimplifiedStatsCardState extends State<SimplifiedStatsCard>
+class _CompactStatsCardState extends State<CompactStatsCard>
     with SingleTickerProviderStateMixin {
   bool _isExpanded = false;
   late AnimationController _controller;

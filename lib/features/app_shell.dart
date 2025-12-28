@@ -7,14 +7,16 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../core/constants/constants.dart';
 import '../core/error/error_components.dart';
-import '../core/error/enhanced_error_handler.dart';
+import '../core/error/error_handler.dart';
+import '../core/error/error_provider.dart';
+import '../core/error/detailed_error_handler.dart';
 import '../core/providers/app_providers.dart';
 import '../core/services/haptic_service.dart';
 import '../widgets/navigation/navigation_drawer.dart' show AppNavigationDrawer;
 import 'dashboard/dashboard_page.dart';
 import 'dictionaries/dictionaries_page.dart';
 import 'prompts/prompts_page.dart';
-import 'settings/settings_page_refactored.dart';
+import 'settings/settings_page.dart';
 import 'transcriptions/transcriptions_page.dart';
 import '../features/recording/vad_recording_overlay.dart';
 
@@ -159,7 +161,7 @@ class _AppShellState extends ConsumerState<AppShell> {
                           DashboardPage(),
                           DictionariesPage(),
                           PromptsPage(),
-                          SettingsPageRefactored(),
+                          SettingsPage(),
                         ],
                       ),
                       // VAD Recording Overlay (V2 with multi-channel state indication)
@@ -255,7 +257,7 @@ class _AppShellState extends ConsumerState<AppShell> {
     showDialog(
       context: context,
       builder: (context) => ErrorDialog(
-        error: EnhancedErrorHandler.enhanceErrorResult(errorResult),
+        error: DetailedErrorHandler.categorizeErrorResult(errorResult),
         additionalActions: [
           if (errorResult.actionHint?.contains('Settings') == true)
             ErrorAction(

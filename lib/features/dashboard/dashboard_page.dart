@@ -9,7 +9,7 @@ import '../../core/providers/transcription_providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../widgets/shared/content_skeletons.dart';
 import '../../widgets/shared/empty_states.dart';
-import 'widgets/simplified_stats_card.dart';
+import 'widgets/compact_stats_card.dart';
 import 'widgets/dashboard_metrics.dart';
 
 class DashboardPage extends ConsumerWidget {
@@ -102,8 +102,8 @@ class DashboardPage extends ConsumerWidget {
 
                   const SizedBox(height: 16),
 
-                  // Simplified stats card
-                  SimplifiedStatsCard(
+                  // Compact stats card
+                  CompactStatsCard(
                     totalUsage: statistics.totalUsage,
                     thisWeekUsage: statistics.thisWeekUsage,
                     totalTokens: statistics.totalTokens,

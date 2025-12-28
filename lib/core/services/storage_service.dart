@@ -150,10 +150,23 @@ class StorageService implements StorageServiceInterface {
   }
 
   @override
-  Future<List<Transcription>> getTranscriptions() async {
+  Future<List<Transcription>> getTranscriptions({int? limit, int? offset}) async {
     final box = Hive.box<Transcription>(transcriptionsBox);
     final values = box.values.toList();
     values.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    // Apply pagination if specified
+    if (offset != null && offset > 0) {
+      if (offset >= values.length) {
+        return [];
+      }
+      values.removeRange(0, offset);
+    }
+
+    if (limit != null && limit > 0 && limit < values.length) {
+      values.removeRange(limit, values.length);
+    }
+
     return values;
   }
 

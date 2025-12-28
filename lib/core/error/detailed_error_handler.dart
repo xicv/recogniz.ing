@@ -3,10 +3,10 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'error_handler.dart';
 import 'error_components.dart';
 
-/// Enhanced error handler with better categorization and recovery options
-class EnhancedErrorHandler {
+/// Detailed error handler with categorization and recovery options
+class DetailedErrorHandler {
   /// Convert ErrorResult to EnhancedErrorResult with proper category
-  static EnhancedErrorResult enhanceErrorResult(
+  static EnhancedErrorResult categorizeErrorResult(
     ErrorResult result, {
     String? technicalDetails,
     StackTrace? stackTrace,
@@ -22,7 +22,7 @@ class EnhancedErrorHandler {
     );
   }
 
-  /// Handle an error with full enhancement
+  /// Handle an error with full categorization
   static EnhancedErrorResult handleError(
     Object error, {
     StackTrace? stackTrace,
@@ -38,7 +38,7 @@ class EnhancedErrorHandler {
           'Error Context:\n${context.entries.map((e) => '${e.key}: ${e.value}').join('\n')}';
     }
 
-    return enhanceErrorResult(
+    return categorizeErrorResult(
       baseResult,
       technicalDetails: technicalDetails,
       stackTrace: stackTrace,

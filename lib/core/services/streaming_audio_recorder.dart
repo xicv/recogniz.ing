@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
-import 'advanced_audio_processor.dart';
+import 'streaming_audio_processor.dart';
 import '../interfaces/audio_service_interface.dart';
 
 /// Recording states for streaming (local enum to avoid conflicts)
@@ -57,12 +57,12 @@ class StreamingAudioRecorder implements AudioServiceInterface {
       // Initialize audio recorder
       _recorder = AudioRecorder();
 
-      // Initialize advanced audio processor
-      await AdvancedAudioProcessor.initialize();
+      // Initialize streaming audio processor
+      await StreamingAudioProcessor.initialize();
 
       // Listen to VAD events
       _vadSubscription =
-          AdvancedAudioProcessor.vadEvents.listen(_handleVadEvent);
+          StreamingAudioProcessor.vadEvents.listen(_handleVadEvent);
 
       debugPrint('[StreamingAudioRecorder] Initialized successfully');
     } catch (e) {
@@ -116,7 +116,7 @@ class StreamingAudioRecorder implements AudioServiceInterface {
       _audioBuffer.clear();
 
       // Start monitoring VAD
-      AdvancedAudioProcessor.startMonitoring();
+      StreamingAudioProcessor.startMonitoring();
 
       // Note: The record package doesn't provide real-time data streams
       // We'll simulate chunking with periodic polling
@@ -153,7 +153,7 @@ class StreamingAudioRecorder implements AudioServiceInterface {
       _silenceTimer?.cancel();
 
       // Stop monitoring
-      AdvancedAudioProcessor.stopMonitoring();
+      StreamingAudioProcessor.stopMonitoring();
 
       // Process any remaining audio data
       if (_audioBuffer.isNotEmpty) {
@@ -174,7 +174,7 @@ class StreamingAudioRecorder implements AudioServiceInterface {
       final bytes = await file.readAsBytes();
 
       // Perform final analysis
-      final analysis = await AdvancedAudioProcessor.analyzeCompleteAudio(
+      final analysis = await StreamingAudioProcessor.analyzeCompleteAudio(
         audioBytes: Uint8List.fromList(bytes),
         amplitudeThreshold: 0.05,
         speechRatioThreshold: 0.3,
@@ -259,7 +259,7 @@ class StreamingAudioRecorder implements AudioServiceInterface {
   /// Process audio chunk with VAD
   Future<void> _processAudioChunk(List<int> chunk) async {
     try {
-      final vadEvent = await AdvancedAudioProcessor.processAudioChunk(chunk);
+      final vadEvent = await StreamingAudioProcessor.processAudioChunk(chunk);
 
       final audioChunk = AudioChunk(
         data: chunk,
@@ -269,7 +269,7 @@ class StreamingAudioRecorder implements AudioServiceInterface {
       );
 
       // Add metadata about speech detection
-      final enrichedChunk = SpeechEnrichedChunk(
+      final annotatedChunk = AnnotatedAudioChunk(
         data: chunk,
         timestamp: audioChunk.timestamp,
         sampleRate: audioChunk.sampleRate,
@@ -278,7 +278,7 @@ class StreamingAudioRecorder implements AudioServiceInterface {
         speechProbability: vadEvent.probability,
       );
 
-      _audioStreamController.add(enrichedChunk);
+      _audioStreamController.add(annotatedChunk);
     } catch (e) {
       debugPrint('[StreamingAudioRecorder] Chunk processing error: $e');
     }
@@ -329,18 +329,18 @@ class StreamingAudioRecorder implements AudioServiceInterface {
     _audioStreamController.close();
     _stateController.close();
     _recorder.dispose();
-    AdvancedAudioProcessor.dispose();
+    StreamingAudioProcessor.dispose();
 
     debugPrint('[StreamingAudioRecorder] Disposed');
   }
 }
 
-/// Enhanced audio chunk with speech detection results
-class SpeechEnrichedChunk extends AudioChunk {
+/// Annotated audio chunk with speech detection results
+class AnnotatedAudioChunk extends AudioChunk {
   final bool isSpeech;
   final double speechProbability;
 
-  const SpeechEnrichedChunk({
+  const AnnotatedAudioChunk({
     required super.data,
     required super.timestamp,
     required super.sampleRate,

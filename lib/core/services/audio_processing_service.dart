@@ -2,12 +2,12 @@ import 'dart:typed_data';
 import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 
-/// Audio enhancement service for improving voice recording quality
-class AudioEnhancementService {
+/// Audio processing service for improving voice recording quality
+class AudioProcessingService {
   /// Apply noise reduction to raw audio data
   static Uint8List applyNoiseReduction(Uint8List audioData) {
     if (kDebugMode) {
-      debugPrint('[AudioEnhancement] Applying noise reduction');
+      debugPrint('[AudioProcessing] Applying noise reduction');
     }
 
     // Convert bytes to 16-bit PCM samples
@@ -34,7 +34,7 @@ class AudioEnhancementService {
   /// Normalize audio levels
   static Uint8List normalizeAudio(Uint8List audioData) {
     if (kDebugMode) {
-      debugPrint('[AudioEnhancement] Normalizing audio levels');
+      debugPrint('[AudioProcessing] Normalizing audio levels');
     }
 
     final samples = _bytesToSamples(audioData);
@@ -63,7 +63,7 @@ class AudioEnhancementService {
       {double cutoffFrequency = 80.0}) {
     if (kDebugMode) {
       debugPrint(
-          '[AudioEnhancement] Applying high-pass filter at ${cutoffFrequency}Hz');
+          '[AudioProcessing] Applying high-pass filter at ${cutoffFrequency}Hz');
     }
 
     final samples = _bytesToSamples(audioData);
@@ -87,9 +87,9 @@ class AudioEnhancementService {
   }
 
   /// Apply voice enhancement (combination of filters)
-  static Uint8List enhanceVoice(Uint8List audioData) {
+  static Uint8List processVoice(Uint8List audioData) {
     if (kDebugMode) {
-      debugPrint('[AudioEnhancement] Applying voice enhancement');
+      debugPrint('[AudioProcessing] Applying voice processing');
     }
 
     // Apply enhancement pipeline
