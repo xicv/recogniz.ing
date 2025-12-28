@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import '../../core/models/transcription.dart';
-import '../widgets/shared/app_bars.dart';
+import '../../../core/models/transcription.dart';
+import '../../../widgets/shared/app_bars.dart';
 
 class FullscreenTranscriptionEdit extends ConsumerStatefulWidget {
   final Transcription transcription;
@@ -169,7 +169,7 @@ class _FullscreenTranscriptionEditState
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              '${widget.transcription.duration.inSeconds}s • ${widget.transcription.tokenUsed} tokens',
+              '${widget.transcription.audioDurationSeconds.toInt()}s • ${widget.transcription.tokenUsage} tokens',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onPrimaryContainer,
                 fontWeight: FontWeight.w500,

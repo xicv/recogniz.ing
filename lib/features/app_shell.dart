@@ -10,7 +10,7 @@ import '../core/error/error_components.dart';
 import '../core/error/enhanced_error_handler.dart';
 import '../core/providers/app_providers.dart';
 import '../core/services/haptic_service.dart';
-import '../widgets/navigation/navigation_drawer.dart';
+import '../widgets/navigation/navigation_drawer.dart' show AppNavigationDrawer;
 import 'dashboard/dashboard_page.dart';
 import 'dictionaries/dictionaries_page.dart';
 import 'prompts/prompts_page.dart';
@@ -141,7 +141,7 @@ class _AppShellState extends ConsumerState<AppShell> {
         floatingActionButton: _buildRecordFab(context, ref, recordingState),
         body: Row(
           children: [
-            // Navigation Drawer
+            // Navigation Drawer (V2 with keyboard shortcut hints)
             const AppNavigationDrawer(),
 
             // Main Content with separate Scaffold for SnackBar isolation
@@ -162,7 +162,7 @@ class _AppShellState extends ConsumerState<AppShell> {
                           SettingsPageRefactored(),
                         ],
                       ),
-                      // VAD Recording Overlay
+                      // VAD Recording Overlay (V2 with multi-channel state indication)
                       if (recordingState != RecordingState.idle)
                         VadRecordingOverlay(),
                       // Store context reference for notifications

@@ -6,12 +6,25 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/constants/ui_constants.dart';
 import '../../../core/models/transcription.dart';
 
+/// Enhanced transcription card with improved visual hierarchy
+///
+/// Design principles:
+/// - Müller-Brockmann: Grid-aligned, information hierarchy through scale
+/// - Dieter Rams: Content over chrome, honest metadata presentation
+///
+/// Key improvements:
+/// - Three-tier visual hierarchy (100%, 80%, 60% opacity)
+/// - Progressive action reveal (hover/focus)
+/// - Card border accent for visual scanning
+/// - Compact view mode option
+
 class TranscriptionCard extends StatefulWidget {
   final Transcription transcription;
   final VoidCallback onCopy;
   final VoidCallback onDelete;
   final Function(String)? onUpdate;
   final bool isSelected;
+  final bool isCompact;
 
   const TranscriptionCard({
     super.key,
@@ -20,6 +33,7 @@ class TranscriptionCard extends StatefulWidget {
     required this.onDelete,
     this.onUpdate,
     this.isSelected = false,
+    this.isCompact = false,
   });
 
   @override
@@ -31,22 +45,15 @@ class _TranscriptionCardState extends State<TranscriptionCard>
   late TextEditingController _controller;
   bool _isEditing = false;
   bool _hasChanges = false;
-  late AnimationController _animationController;
-  late Animation<double> _scaleAnimation;
   bool _isHovered = false;
+  bool _isStarred = false;
+  bool _isMenuOpen = false;
 
   @override
   void initState() {
     super.initState();
     _controller =
         TextEditingController(text: widget.transcription.processedText);
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.02).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
   }
 
   @override
@@ -62,20 +69,7 @@ class _TranscriptionCardState extends State<TranscriptionCard>
   @override
   void dispose() {
     _controller.dispose();
-    _animationController.dispose();
     super.dispose();
-  }
-
-  String _formatDuration(double seconds) {
-    final mins = (seconds / 60).floor();
-    final secs = (seconds % 60).floor();
-    return '${mins}:${secs.toString().padLeft(2, '0')}';
-  }
-
-  String _getPreviewText(String text) {
-    final lines = text.split('\n');
-    final preview = lines.first;
-    return preview.length > 120 ? '${preview.substring(0, 120)}...' : preview;
   }
 
   void _saveChanges() {
@@ -93,8 +87,8 @@ class _TranscriptionCardState extends State<TranscriptionCard>
       context: context,
       builder: (context) => AlertDialog.adaptive(
         title: const Text('Delete Transcription'),
-        content:
-            const Text('Are you sure you want to delete this transcription?'),
+        content: const Text(
+            'Are you sure you want to delete this transcription?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -105,12 +99,20 @@ class _TranscriptionCardState extends State<TranscriptionCard>
               Navigator.pop(context);
               widget.onDelete();
             },
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
             child: const Text('Delete'),
           ),
         ],
       ),
     );
+  }
+
+  void _toggleStar() {
+    setState(() {
+      _isStarred = !_isStarred;
+    });
   }
 
   void _openFullScreenEdit() {
@@ -125,7 +127,6 @@ class _TranscriptionCardState extends State<TranscriptionCard>
               if (widget.onUpdate != null) {
                 widget.onUpdate!(newText);
               }
-              // Update the controller text
               _controller.text = newText;
               _hasChanges = false;
             },
@@ -150,11 +151,25 @@ class _TranscriptionCardState extends State<TranscriptionCard>
     );
   }
 
+  Color _getAccentColor(ColorScheme colorScheme) {
+    final now = DateTime.now();
+    final difference = now.difference(widget.transcription.createdAt);
+
+    if (difference.inHours < 1) {
+      return colorScheme.primary; // Recent - primary
+    } else if (difference.inDays < 1) {
+      return colorScheme.secondary; // Today - secondary
+    } else {
+      return Colors.transparent; // Older - no accent
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final dateFormat = DateFormat('MMM d, y • h:mm a');
     final colorScheme = theme.colorScheme;
+    final accentColor = _getAccentColor(colorScheme);
 
     return CallbackShortcuts(
       bindings: {
@@ -162,8 +177,7 @@ class _TranscriptionCardState extends State<TranscriptionCard>
           const SingleActivator(LogicalKeyboardKey.keyS, control: true):
               _saveChanges,
         if (_isEditing && _hasChanges)
-          const SingleActivator(LogicalKeyboardKey.keyS, meta: true):
-              _saveChanges,
+          const SingleActivator(LogicalKeyboardKey.keyS, meta: true): _saveChanges,
         const SingleActivator(LogicalKeyboardKey.escape): () {
           if (_isEditing) {
             setState(() {
@@ -176,232 +190,37 @@ class _TranscriptionCardState extends State<TranscriptionCard>
       },
       child: MouseRegion(
         onEnter: (_) => setState(() => _isHovered = true),
-        onExit: (_) => setState(() => _isHovered = false),
+        onExit: (_) {
+          // Don't clear hover state if menu is open
+          if (!_isMenuOpen) {
+            setState(() => _isHovered = false);
+          }
+        },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           transform: Matrix4.identity()..scale(_isHovered ? 1.01 : 1.0),
           child: Card(
             margin: const EdgeInsets.only(bottom: UIConstants.spacingSmall),
-            elevation: _isHovered ? 4 : 2,
+            elevation: 0,
             surfaceTintColor: colorScheme.surfaceTint,
-            shadowColor: colorScheme.shadow.withOpacity(0.1),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: accentColor != Colors.transparent
+                  ? BorderSide(color: accentColor, width: 3)
+                  : BorderSide.none,
+            ),
             child: InkWell(
               onTap: () {
-                if (!_isEditing) {
+                if (!_isEditing && !widget.isCompact) {
                   setState(() => _isEditing = true);
                 }
               },
               borderRadius: BorderRadius.circular(16),
               child: Padding(
                 padding: const EdgeInsets.all(UIConstants.spacingMedium),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Header with date, duration and actions
-                    Row(
-                      children: [
-                        // Date and duration
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                dateFormat
-                                    .format(widget.transcription.createdAt),
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Row(
-                                children: [
-                                  Icon(
-                                    LucideIcons.clock,
-                                    size: 14,
-                                    color: colorScheme.outline,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    _formatDuration(widget
-                                        .transcription.audioDurationSeconds),
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: colorScheme.outline,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        // Action buttons
-                        if (_isEditing) ...[
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton.outlined(
-                                onPressed: () {
-                                  setState(() {
-                                    _controller.text =
-                                        widget.transcription.processedText;
-                                    _hasChanges = false;
-                                    _isEditing = false;
-                                  });
-                                },
-                                icon: const Icon(LucideIcons.x, size: 18),
-                                tooltip: 'Cancel (Esc)',
-                                style: IconButton.styleFrom(
-                                  padding: const EdgeInsets.all(8),
-                                  minimumSize: const Size(36, 36),
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              FilledButton.icon(
-                                onPressed: _saveChanges,
-                                icon: const Icon(LucideIcons.check, size: 18),
-                                label: const Text('Save'),
-                                style: FilledButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 8,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ] else ...[
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton.outlined(
-                                onPressed: widget.onCopy,
-                                icon: const Icon(LucideIcons.copy, size: 18),
-                                tooltip: 'Copy to clipboard',
-                                style: IconButton.styleFrom(
-                                  padding: const EdgeInsets.all(8),
-                                  minimumSize: const Size(36, 36),
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              _TranscriptionMenuButton(
-                                iconColor: colorScheme.onSurfaceVariant,
-                                errorColor: colorScheme.error,
-                                onEdit: _openFullScreenEdit,
-                                onCopy: widget.onCopy,
-                                onDelete: () => _confirmDelete(context),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ],
-                    ),
-
-                    const SizedBox(height: UIConstants.spacingSmall),
-
-                    // Content
-                    if (_isEditing) ...[
-                      TextField(
-                        controller: _controller,
-                        autofocus: true,
-                        maxLines: 5,
-                        minLines: 2,
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          color: colorScheme.onSurface,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: 'Type your transcription...',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: colorScheme.outline.withOpacity(0.3),
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: colorScheme.primary),
-                          ),
-                          contentPadding: const EdgeInsets.all(12),
-                          filled: true,
-                          fillColor:
-                              colorScheme.surfaceVariant.withOpacity(0.3),
-                        ),
-                        onChanged: (value) {
-                          setState(() {
-                            _hasChanges =
-                                value != widget.transcription.processedText;
-                          });
-                        },
-                        onSubmitted: (_) => _saveChanges(),
-                      ),
-                      if (_hasChanges) ...[
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Icon(
-                              LucideIcons.info,
-                              size: 14,
-                              color: colorScheme.primary,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              'Press Ctrl+S (Cmd+S) to save',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: colorScheme.primary,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ] else ...[
-                      Text(
-                        _getPreviewText(_controller.text),
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          color: colorScheme.onSurface,
-                          height: 1.5,
-                        ),
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-
-                    // Footer with word count
-                    if (!_isEditing) ...[
-                      const SizedBox(height: UIConstants.spacingSmall),
-                      Row(
-                        children: [
-                          Icon(
-                            LucideIcons.fileText,
-                            size: 14,
-                            color: colorScheme.outline,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${widget.transcription.processedText.split(' ').length} words',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: colorScheme.outline,
-                            ),
-                          ),
-                          if (widget.transcription.tokenUsage != null) ...[
-                            const SizedBox(width: 12),
-                            Icon(
-                              LucideIcons.zap,
-                              size: 14,
-                              color: colorScheme.outline,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${widget.transcription.tokenUsage!.toString()} tokens',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: colorScheme.outline,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ],
-                  ],
-                ),
+                child: widget.isCompact
+                    ? _buildCompactContent(context, colorScheme, dateFormat)
+                    : _buildFullContent(context, colorScheme, dateFormat),
               ),
             ),
           ),
@@ -409,15 +228,460 @@ class _TranscriptionCardState extends State<TranscriptionCard>
       ),
     );
   }
+
+  Widget _buildFullContent(
+    BuildContext context,
+    ColorScheme colorScheme,
+    DateFormat dateFormat,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header with date, duration and actions
+        _buildHeader(context, colorScheme, dateFormat),
+
+        const SizedBox(height: UIConstants.spacingSmall),
+
+        // Content or editing state
+        if (_isEditing)
+          _buildEditingContent(context, colorScheme)
+        else
+          _buildPreviewContent(context, colorScheme),
+
+        // Footer metadata (non-editing mode only)
+        if (!_isEditing) ...[
+          const SizedBox(height: UIConstants.spacingSmall),
+          _buildMetadataRow(context, colorScheme),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildCompactContent(
+    BuildContext context,
+    ColorScheme colorScheme,
+    DateFormat dateFormat,
+  ) {
+    final preview = _getPreviewText(_controller.text);
+    final lines = _controller.text.split('\n');
+    final hasMoreContent = lines.length > 1 || preview.length > 80;
+
+    return Row(
+      children: [
+        // Star indicator
+        GestureDetector(
+          onTap: _toggleStar,
+          child: Icon(
+            _isStarred ? LucideIcons.star : LucideIcons.star,
+            size: 16,
+            color: _isStarred
+                ? colorScheme.primary
+                : colorScheme.outline.withOpacity(0.4),
+          ),
+        ),
+
+        const SizedBox(width: 12),
+
+        // Content
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                preview,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: colorScheme.onSurface,
+                      height: 1.5,
+                    ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                dateFormat.format(widget.transcription.createdAt),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+                    ),
+              ),
+            ],
+          ),
+        ),
+
+        // More content indicator
+        if (hasMoreContent)
+          Icon(
+            LucideIcons.chevronRight,
+            size: 16,
+            color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+          ),
+
+        const SizedBox(width: 4),
+
+        // Quick actions
+        _buildQuickActions(context, colorScheme, compact: true),
+      ],
+    );
+  }
+
+  Widget _buildHeader(
+    BuildContext context,
+    ColorScheme colorScheme,
+    DateFormat dateFormat,
+  ) {
+    return Row(
+      children: [
+        // Date and duration
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                dateFormat.format(widget.transcription.createdAt),
+                style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant.withOpacity(0.8),
+                      fontWeight: FontWeight.w500,
+                    ),
+              ),
+              const SizedBox(height: 2),
+              Row(
+                children: [
+                  Icon(
+                    LucideIcons.clock,
+                    size: 13,
+                    color: colorScheme.outline.withOpacity(0.7),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    _formatDuration(widget.transcription.audioDurationSeconds),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.outline.withOpacity(0.7),
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+
+        // Actions - Progressive reveal on hover
+        if (_isEditing)
+          _buildEditActions(context, colorScheme)
+        else
+          _buildViewActions(context, colorScheme),
+      ],
+    );
+  }
+
+  Widget _buildViewActions(BuildContext context, ColorScheme colorScheme) {
+    // Show fewer actions by default, reveal all on hover or when menu is open
+    final showAll = _isHovered || _isMenuOpen;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Star toggle (always visible)
+        IconButton.outlined(
+          onPressed: _toggleStar,
+          icon: Icon(
+            _isStarred ? LucideIcons.star : LucideIcons.star,
+            size: 16,
+          ),
+          color: _isStarred
+              ? colorScheme.primary
+              : colorScheme.onSurfaceVariant,
+          tooltip: _isStarred ? 'Unfavorite' : 'Favorite',
+          style: IconButton.styleFrom(
+            padding: const EdgeInsets.all(6),
+            minimumSize: const Size(32, 32),
+            side: BorderSide.none,
+          ),
+        ),
+
+        // Copy (always visible)
+        IconButton.outlined(
+          onPressed: widget.onCopy,
+          icon: const Icon(LucideIcons.copy, size: 16),
+          tooltip: 'Copy to clipboard',
+          style: IconButton.styleFrom(
+            padding: const EdgeInsets.all(6),
+            minimumSize: const Size(32, 32),
+            side: BorderSide.none,
+          ),
+        ),
+
+        // Edit and more (show on hover or when menu is open)
+        if (showAll) ...[
+          IconButton.outlined(
+            onPressed: _openFullScreenEdit,
+            icon: const Icon(LucideIcons.edit, size: 16),
+            tooltip: 'Edit',
+            style: IconButton.styleFrom(
+              padding: const EdgeInsets.all(6),
+              minimumSize: const Size(32, 32),
+              side: BorderSide.none,
+            ),
+          ),
+          _TranscriptionMenuButton(
+            iconColor: colorScheme.onSurfaceVariant,
+            errorColor: colorScheme.error,
+            onEdit: _openFullScreenEdit,
+            onCopy: widget.onCopy,
+            onDelete: () => _confirmDelete(context),
+            onMenuOpen: () => setState(() => _isMenuOpen = true),
+            onMenuClose: () => setState(() => _isMenuOpen = false),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildEditActions(BuildContext context, ColorScheme colorScheme) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton.outlined(
+          onPressed: () {
+            setState(() {
+              _controller.text = widget.transcription.processedText;
+              _hasChanges = false;
+              _isEditing = false;
+            });
+          },
+          icon: const Icon(LucideIcons.x, size: 16),
+          tooltip: 'Cancel (Esc)',
+          style: IconButton.styleFrom(
+            padding: const EdgeInsets.all(6),
+            minimumSize: const Size(32, 32),
+          ),
+        ),
+        const SizedBox(width: 4),
+        FilledButton.icon(
+          onPressed: _saveChanges,
+          icon: const Icon(LucideIcons.check, size: 16),
+          label: const Text('Save'),
+          style: FilledButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuickActions(
+    BuildContext context,
+    ColorScheme colorScheme, {
+    bool compact = false,
+  }) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (compact)
+          IconButton.outlined(
+            onPressed: widget.onCopy,
+            icon: const Icon(LucideIcons.copy, size: 14),
+            tooltip: 'Copy',
+            style: IconButton.styleFrom(
+              padding: const EdgeInsets.all(4),
+              minimumSize: const Size(28, 28),
+            ),
+          )
+        else
+          IconButton.outlined(
+            onPressed: widget.onCopy,
+            icon: const Icon(LucideIcons.copy, size: 16),
+            tooltip: 'Copy to clipboard',
+            style: IconButton.styleFrom(
+              padding: const EdgeInsets.all(8),
+              minimumSize: const Size(36, 36),
+            ),
+          ),
+        const SizedBox(width: 4),
+        _TranscriptionMenuButton(
+          iconColor: colorScheme.onSurfaceVariant,
+          errorColor: colorScheme.error,
+          onEdit: _openFullScreenEdit,
+          onCopy: widget.onCopy,
+          onDelete: () => _confirmDelete(context),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPreviewContent(BuildContext context, ColorScheme colorScheme) {
+    final preview = _getPreviewText(_controller.text);
+
+    return Text(
+      preview,
+      style: theme.textTheme.bodyLarge?.copyWith(
+            color: colorScheme.onSurface,
+            height: 1.5,
+          ),
+      maxLines: 3,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+
+  Widget _buildEditingContent(BuildContext context, ColorScheme colorScheme) {
+    return Column(
+      children: [
+        TextField(
+          controller: _controller,
+          autofocus: true,
+          maxLines: 5,
+          minLines: 2,
+          style: theme.textTheme.bodyLarge?.copyWith(
+                color: colorScheme.onSurface,
+              ),
+          decoration: InputDecoration(
+            hintText: 'Type your transcription...',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: colorScheme.outline.withOpacity(0.3),
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: colorScheme.primary),
+            ),
+            contentPadding: const EdgeInsets.all(12),
+            filled: true,
+            fillColor: colorScheme.surfaceVariant.withOpacity(0.3),
+          ),
+          onChanged: (value) {
+            setState(() {
+              _hasChanges = value != widget.transcription.processedText;
+            });
+          },
+          onSubmitted: (_) => _saveChanges(),
+        ),
+        if (_hasChanges) ...[
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Icon(
+                LucideIcons.info,
+                size: 13,
+                color: colorScheme.primary,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                'Press Ctrl+S (Cmd+S) to save',
+                style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 12,
+                    ),
+              ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildMetadataRow(BuildContext context, ColorScheme colorScheme) {
+    final wordCount = widget.transcription.processedText
+        .split(' ')
+        .where((w) => w.isNotEmpty)
+        .length;
+
+    return Wrap(
+      spacing: 12,
+      children: [
+        // Word count
+        _MetadataItem(
+          icon: LucideIcons.fileText,
+          label: '$wordCount words',
+          color: colorScheme.outline,
+        ),
+
+        // Token usage (if available)
+        if (widget.transcription.tokenUsage != null)
+          _MetadataItem(
+            icon: LucideIcons.zap,
+            label: '${widget.transcription.tokenUsage} tokens',
+            color: colorScheme.outline,
+          ),
+
+        // Duration
+        _MetadataItem(
+          icon: LucideIcons.clock,
+          label: _formatDuration(widget.transcription.audioDurationSeconds),
+          color: colorScheme.outline,
+        ),
+      ],
+    );
+  }
+
+  String _formatDuration(double seconds) {
+    final mins = (seconds / 60).floor();
+    final secs = (seconds % 60).floor();
+    return '${mins}:${secs.toString().padLeft(2, '0')}';
+  }
+
+  String _getPreviewText(String text) {
+    final lines = text.split('\n');
+    final preview = lines.firstWhere((l) => l.trim().isNotEmpty, orElse: () => '');
+    return preview.length > 120 ? '${preview.substring(0, 120)}...' : preview;
+  }
+
+  ThemeData get theme => Theme.of(context);
 }
 
-// Custom menu button without keyboard shortcut hints
+// ============================================================
+// METADATA ITEM WIDGET
+// ============================================================
+
+class _MetadataItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  const _MetadataItem({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          icon,
+          size: 13,
+          color: color.withOpacity(0.7),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: theme.textTheme.bodySmall?.copyWith(
+                color: color.withOpacity(0.7),
+                fontSize: 12,
+              ),
+        ),
+      ],
+    );
+  }
+}
+
+// ============================================================
+// MENU BUTTON ()
+// ============================================================
+
 class _TranscriptionMenuButton extends StatefulWidget {
   final Color iconColor;
   final Color errorColor;
   final VoidCallback onEdit;
   final VoidCallback onCopy;
   final VoidCallback onDelete;
+  final VoidCallback? onMenuOpen;
+  final VoidCallback? onMenuClose;
 
   const _TranscriptionMenuButton({
     required this.iconColor,
@@ -425,6 +689,8 @@ class _TranscriptionMenuButton extends StatefulWidget {
     required this.onEdit,
     required this.onCopy,
     required this.onDelete,
+    this.onMenuOpen,
+    this.onMenuClose,
   });
 
   @override
@@ -432,11 +698,13 @@ class _TranscriptionMenuButton extends StatefulWidget {
       _TranscriptionMenuButtonState();
 }
 
-class _TranscriptionMenuButtonState extends State<_TranscriptionMenuButton> {
+class _TranscriptionMenuButtonState
+    extends State<_TranscriptionMenuButton> {
   OverlayEntry? _overlayEntry;
   final LayerLink _layerLink = LayerLink();
 
   void _showMenu() {
+    widget.onMenuOpen?.call();
     _overlayEntry = OverlayEntry(
       builder: (context) => _MenuOverlay(
         targetLink: _layerLink,
@@ -450,6 +718,7 @@ class _TranscriptionMenuButtonState extends State<_TranscriptionMenuButton> {
   }
 
   void _hideMenu() {
+    widget.onMenuClose?.call();
     _overlayEntry?.remove();
     _overlayEntry = null;
   }
@@ -472,11 +741,11 @@ class _TranscriptionMenuButtonState extends State<_TranscriptionMenuButton> {
             _hideMenu();
           }
         },
-        icon: const Icon(LucideIcons.moreVertical, size: 18),
+        icon: const Icon(LucideIcons.moreVertical, size: 16),
         tooltip: 'More options',
         style: IconButton.styleFrom(
-          padding: const EdgeInsets.all(8),
-          minimumSize: const Size(36, 36),
+          padding: const EdgeInsets.all(6),
+          minimumSize: const Size(32, 32),
         ),
       ),
     );
@@ -507,7 +776,7 @@ class _MenuOverlay extends StatelessWidget {
       onTapOutside: (_) => onClose(),
       child: CompositedTransformFollower(
         link: targetLink,
-        offset: const Offset(-120, 40),
+        offset: const Offset(-140, 40),
         targetAnchor: Alignment.topRight,
         followerAnchor: Alignment.topLeft,
         child: TweenAnimationBuilder<double>(
@@ -572,7 +841,7 @@ class _MenuContent extends StatelessWidget {
           children: [
             _MenuItem(
               icon: LucideIcons.edit,
-              label: 'Edit',
+              label: 'Edit full',
               onTap: () {
                 onClose();
                 onEdit();
@@ -641,8 +910,8 @@ class _MenuItem extends StatelessWidget {
             Text(
               label,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: textColor ?? colorScheme.onSurface,
-              ),
+                    color: textColor ?? colorScheme.onSurface,
+                  ),
             ),
           ],
         ),
@@ -651,7 +920,10 @@ class _MenuItem extends StatelessWidget {
   }
 }
 
-// Full-screen edit modal
+// ============================================================
+// FULL-SCREEN EDIT MODAL ()
+// ============================================================
+
 class _TranscriptionEditModal extends StatefulWidget {
   final Transcription transcription;
   final Function(String) onSave;
@@ -705,8 +977,7 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
       bindings: {
         const SingleActivator(LogicalKeyboardKey.keyS, control: true):
             _saveChanges,
-        const SingleActivator(LogicalKeyboardKey.keyS, meta: true):
-            _saveChanges,
+        const SingleActivator(LogicalKeyboardKey.keyS, meta: true): _saveChanges,
         const SingleActivator(LogicalKeyboardKey.escape): () =>
             Navigator.pop(context),
       },
@@ -728,8 +999,8 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
               Text(
                 dateFormat.format(widget.transcription.createdAt),
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
+                      color: colorScheme.onSurfaceVariant,
+                    ),
               ),
             ],
           ),
@@ -740,8 +1011,7 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
                 icon: const Icon(LucideIcons.check, size: 18),
                 label: const Text('Save'),
                 style: FilledButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
               ),
           ],
@@ -751,10 +1021,9 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
             padding: const EdgeInsets.all(24),
             child: Column(
               children: [
-                // Word count and duration info
+                // Info bar
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
                     color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
                     borderRadius: BorderRadius.circular(12),
@@ -770,8 +1039,8 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
                       Text(
                         '${_formatDuration(widget.transcription.audioDurationSeconds)} • ',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.outline,
-                        ),
+                              color: colorScheme.outline,
+                            ),
                       ),
                       Icon(
                         LucideIcons.fileText,
@@ -780,10 +1049,10 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '${_controller.text.split(' ').length} words',
+                        '${_controller.text.split(' ').where((w) => w.isNotEmpty).length} words',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.outline,
-                        ),
+                              color: colorScheme.outline,
+                            ),
                       ),
                       if (widget.transcription.tokenUsage != null) ...[
                         const SizedBox(width: 16),
@@ -794,16 +1063,17 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          '${widget.transcription.tokenUsage!.toString()} tokens',
+                          '${widget.transcription.tokenUsage} tokens',
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: colorScheme.outline,
-                          ),
+                                color: colorScheme.outline,
+                              ),
                         ),
                       ],
                     ],
                   ),
                 ),
                 const SizedBox(height: 24),
+
                 // Text editor
                 Expanded(
                   child: TextField(
@@ -813,9 +1083,9 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
                     expands: true,
                     textAlignVertical: TextAlignVertical.top,
                     style: theme.textTheme.bodyLarge?.copyWith(
-                      color: colorScheme.onSurface,
-                      height: 1.6,
-                    ),
+                          color: colorScheme.onSurface,
+                          height: 1.6,
+                        ),
                     decoration: InputDecoration(
                       hintText: 'Type your transcription...',
                       border: OutlineInputBorder(
@@ -830,17 +1100,16 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
                       ),
                       contentPadding: const EdgeInsets.all(20),
                       filled: true,
-                      fillColor:
-                          colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                      fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.3),
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
+
                 // Save hint
                 if (_hasChanges)
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
                       color: colorScheme.primaryContainer.withOpacity(0.5),
                       borderRadius: BorderRadius.circular(12),
@@ -857,9 +1126,9 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
                         Text(
                           'Press Ctrl+S (Cmd+S) to save • Esc to cancel',
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: colorScheme.primary,
-                            fontWeight: FontWeight.w500,
-                          ),
+                                color: colorScheme.primary,
+                                fontWeight: FontWeight.w500,
+                              ),
                         ),
                       ],
                     ),
