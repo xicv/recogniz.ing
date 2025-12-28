@@ -25,6 +25,9 @@ class Transcription extends HiveObject {
   @HiveField(6)
   final double audioDurationSeconds;
 
+  @HiveField(7)
+  final bool? isFavorite;
+
   Transcription({
     required this.id,
     required this.rawText,
@@ -33,7 +36,8 @@ class Transcription extends HiveObject {
     required this.tokenUsage,
     required this.promptId,
     required this.audioDurationSeconds,
-  });
+    bool? isFavorite,
+  }) : isFavorite = isFavorite ?? false;
 
   Transcription copyWith({
     String? id,
@@ -43,6 +47,7 @@ class Transcription extends HiveObject {
     int? tokenUsage,
     String? promptId,
     double? audioDurationSeconds,
+    bool? isFavorite,
   }) {
     return Transcription(
       id: id ?? this.id,
@@ -52,6 +57,7 @@ class Transcription extends HiveObject {
       tokenUsage: tokenUsage ?? this.tokenUsage,
       promptId: promptId ?? this.promptId,
       audioDurationSeconds: audioDurationSeconds ?? this.audioDurationSeconds,
+      isFavorite: isFavorite ?? this.isFavorite ?? false,
     );
   }
 }

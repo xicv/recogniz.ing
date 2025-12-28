@@ -325,10 +325,8 @@ class AudioProcessor {
 }
 
 /// Audio analysis result
-class AudioAnalysisResult implements AudioAnalysis {
-  @override
+class AudioAnalysisResult {
   final bool containsSpeech;
-  @override
   final String reason;
   final double averageAmplitude;
   final double maxAmplitude;

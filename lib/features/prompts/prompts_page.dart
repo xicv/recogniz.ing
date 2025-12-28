@@ -384,12 +384,14 @@ class _PromptsPageState extends ConsumerState<PromptsPage> {
             child: const Text('Cancel'),
           ),
           FilledButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.of(context).pop();
-              // TODO: Implement prompt deletion
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Prompt "${prompt.name}" deleted')),
-              );
+              await ref.read(promptsProvider.notifier).deletePrompt(prompt.id);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Prompt "${prompt.name}" deleted')),
+                );
+              }
             },
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
@@ -405,8 +407,8 @@ class _PromptsPageState extends ConsumerState<PromptsPage> {
     BuildContext context,
     WidgetRef ref,
     CustomPrompt prompt,
-  ) {
-    final duplicatedPrompt = CustomPrompt(
+  ) async {
+    final newPrompt = CustomPrompt(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       name: '${prompt.name} (Copy)',
       description: prompt.description,
@@ -415,9 +417,12 @@ class _PromptsPageState extends ConsumerState<PromptsPage> {
       createdAt: DateTime.now(),
     );
 
-    // TODO: Add duplicated prompt to storage
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Prompt "${prompt.name}" duplicated')),
-    );
+    await ref.read(promptsProvider.notifier).addPrompt(newPrompt);
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Prompt "${prompt.name}" duplicated')),
+      );
+    }
   }
 }

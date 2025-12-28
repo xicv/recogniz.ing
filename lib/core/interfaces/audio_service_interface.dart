@@ -5,24 +5,14 @@ import '../models/transcription_result.dart';
 import '../models/app_settings.dart';
 import '../models/custom_prompt.dart';
 import '../models/vocabulary.dart';
-
-// Audio analysis result
-class AudioAnalysis {
-  final bool containsSpeech;
-  final String reason;
-
-  const AudioAnalysis({
-    required this.containsSpeech,
-    required this.reason,
-  });
-}
+import '../services/audio_processor.dart' show AudioAnalysisResult;
 
 // Recording result interface
 abstract class RecordingResultInterface {
   String get path;
   List<int> get bytes;
   double get durationSeconds;
-  AudioAnalysis? get analysis;
+  AudioAnalysisResult? get analysis;
 }
 
 abstract class AudioServiceInterface {

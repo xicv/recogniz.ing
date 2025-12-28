@@ -286,7 +286,9 @@ class _DictionariesPageState extends ConsumerState<DictionariesPage> {
                     deleteIcon: const Icon(LucideIcons.x, size: 16),
                     onDeleted: !vocab.isDefault
                         ? () {
-                            // TODO: Implement word removal
+                            final updatedWords = List<String>.from(vocab.words)..remove(word);
+                            final updatedVocab = vocab.copyWith(words: updatedWords);
+                            ref.read(vocabularyProvider.notifier).updateVocabulary(updatedVocab);
                           }
                         : null,
                   );
@@ -327,12 +329,14 @@ class _DictionariesPageState extends ConsumerState<DictionariesPage> {
             child: const Text('Cancel'),
           ),
           FilledButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.of(context).pop();
-              // TODO: Implement vocabulary deletion
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Dictionary "${vocab.name}" deleted')),
-              );
+              await ref.read(vocabularyProvider.notifier).deleteVocabulary(vocab.id);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Dictionary "${vocab.name}" deleted')),
+                );
+              }
             },
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,

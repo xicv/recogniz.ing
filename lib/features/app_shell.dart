@@ -9,7 +9,7 @@ import '../core/constants/constants.dart';
 import '../core/error/error_components.dart';
 import '../core/error/error_handler.dart';
 import '../core/error/error_provider.dart';
-import '../core/error/detailed_error_handler.dart';
+import '../core/error/categorized_error_handler.dart';
 import '../core/providers/app_providers.dart';
 import '../core/services/haptic_service.dart';
 import '../widgets/navigation/navigation_drawer.dart' show AppNavigationDrawer;
@@ -257,7 +257,7 @@ class _AppShellState extends ConsumerState<AppShell> {
     showDialog(
       context: context,
       builder: (context) => ErrorDialog(
-        error: DetailedErrorHandler.categorizeErrorResult(errorResult),
+        error: CategorizedErrorHandler.categorizeErrorResult(errorResult),
         additionalActions: [
           if (errorResult.actionHint?.contains('Settings') == true)
             ErrorAction(

@@ -23,6 +23,7 @@ class TranscriptionCard extends StatefulWidget {
   final VoidCallback onCopy;
   final VoidCallback onDelete;
   final Function(String)? onUpdate;
+  final VoidCallback? onToggleFavorite;
   final bool isSelected;
   final bool isCompact;
 
@@ -32,6 +33,7 @@ class TranscriptionCard extends StatefulWidget {
     required this.onCopy,
     required this.onDelete,
     this.onUpdate,
+    this.onToggleFavorite,
     this.isSelected = false,
     this.isCompact = false,
   });
@@ -54,6 +56,7 @@ class _TranscriptionCardState extends State<TranscriptionCard>
     super.initState();
     _controller =
         TextEditingController(text: widget.transcription.processedText);
+    _isStarred = widget.transcription.isFavorite ?? false;
   }
 
   @override
@@ -113,6 +116,8 @@ class _TranscriptionCardState extends State<TranscriptionCard>
     setState(() {
       _isStarred = !_isStarred;
     });
+    // Notify parent to persist the change
+    widget.onToggleFavorite?.call();
   }
 
   void _openFullScreenEdit() {

@@ -1,10 +1,10 @@
-import 'dart:io';
-import 'dart:typed_data';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:record/record.dart';
+import '../utils/audio_utils.dart';
 
 /// Voice Activity Detection Service
+/// Uses static methods for singleton pattern
 class VadService {
   static bool _isInitialized = false;
   static bool _isListening = false;
@@ -167,21 +167,27 @@ class VadService {
     return segments;
   }
 
-  /// Calculate speech probability (simplified implementation)
+  /// Calculate speech probability using shared AudioUtils
   static double _calculateSpeechProbability(List<double> audioData) {
-    // This is a simplified implementation
-    // Calculate RMS (Root Mean Square) as a simple energy measure
-    double sum = 0;
+    // Calculate RMS using shared utility
+    final rms = AudioUtils.calculateRMSFromSamples(audioData);
+
+    // Calculate speech ratio
+    int speechSamples = 0;
     for (final sample in audioData) {
-      sum += sample * sample;
+      if (sample.abs() > 0.01) {
+        speechSamples++;
+      }
     }
-    final rms = sum > 0 ? sqrt(sum / audioData.length) : 0;
+    final speechRatio = speechSamples / audioData.length;
 
-    // Normalize to 0-1 range
-    final normalizedRms = (rms / 0.3).clamp(0.0, 1.0);
-
-    // Apply some hysteresis
-    return normalizedRms;
+    // Use shared utility for probability calculation
+    return AudioUtils.calculateSpeechProbability(
+      rms: rms,
+      speechRatio: speechRatio,
+      speechThreshold: _speechThreshold,
+      silenceThreshold: _silenceThreshold,
+    );
   }
 
   /// Optimize recording parameters for VAD

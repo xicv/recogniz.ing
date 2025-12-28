@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
+import '../utils/audio_utils.dart';
 
 /// Audio processing service for improving voice recording quality
 class AudioProcessingService {
@@ -10,8 +11,8 @@ class AudioProcessingService {
       debugPrint('[AudioProcessing] Applying noise reduction');
     }
 
-    // Convert bytes to 16-bit PCM samples
-    final samples = _bytesToSamples(audioData);
+    // Convert bytes to 16-bit PCM samples using shared utility
+    final samples = AudioUtils.bytesToSamples(audioData);
 
     // Apply simple noise gate
     final noiseThreshold = 0.01; // Adjust based on environment
@@ -28,7 +29,7 @@ class AudioProcessingService {
       cleanedSamples.add(sample * (samples[i] < 0 ? -1 : 1));
     }
 
-    return _samplesToBytes(cleanedSamples);
+    return AudioUtils.samplesToBytes(cleanedSamples);
   }
 
   /// Normalize audio levels
@@ -37,13 +38,10 @@ class AudioProcessingService {
       debugPrint('[AudioProcessing] Normalizing audio levels');
     }
 
-    final samples = _bytesToSamples(audioData);
+    final samples = AudioUtils.bytesToSamples(audioData);
 
-    // Find peak value
-    double peak = 0;
-    for (final sample in samples) {
-      peak = math.max(peak, sample.abs());
-    }
+    // Find peak value using shared utility
+    final peak = AudioUtils.findPeakAmplitude(audioData);
 
     if (peak == 0) return audioData; // Silent audio
 
@@ -55,7 +53,7 @@ class AudioProcessingService {
     final normalizedSamples =
         samples.map((s) => s * normalizationFactor).toList();
 
-    return _samplesToBytes(normalizedSamples);
+    return AudioUtils.samplesToBytes(normalizedSamples);
   }
 
   /// Apply high-pass filter to remove low-frequency noise
@@ -66,7 +64,7 @@ class AudioProcessingService {
           '[AudioProcessing] Applying high-pass filter at ${cutoffFrequency}Hz');
     }
 
-    final samples = _bytesToSamples(audioData);
+    final samples = AudioUtils.bytesToSamples(audioData);
     final filteredSamples = <double>[];
     const sampleRate = 16000.0;
     final rc = 1.0 / (2.0 * math.pi * cutoffFrequency);
@@ -83,7 +81,7 @@ class AudioProcessingService {
       previousInput = input;
     }
 
-    return _samplesToBytes(filteredSamples);
+    return AudioUtils.samplesToBytes(filteredSamples);
   }
 
   /// Apply voice enhancement (combination of filters)
@@ -100,55 +98,25 @@ class AudioProcessingService {
     return enhanced;
   }
 
-  /// Convert audio bytes to 16-bit PCM samples
-  static List<double> _bytesToSamples(Uint8List bytes) {
-    final samples = <double>[];
-    for (int i = 0; i < bytes.length - 1; i += 2) {
-      final sample = (bytes[i] | (bytes[i + 1] << 8));
-      // Convert to signed 16-bit and normalize to -1.0 to 1.0
-      final normalizedSample = (sample & 0x8000) != 0
-          ? -(65536 - sample) / 32768.0
-          : sample / 32767.0;
-      samples.add(normalizedSample);
-    }
-    return samples;
-  }
-
-  /// Convert samples back to bytes
-  static Uint8List _samplesToBytes(List<double> samples) {
-    final bytes = Uint8List(samples.length * 2);
-    for (int i = 0; i < samples.length; i++) {
-      // Clamp and convert to 16-bit PCM
-      final sample = samples[i].clamp(-1.0, 1.0);
-      final intValue = (sample * 32767).round();
-      bytes[i * 2] = intValue & 0xFF;
-      bytes[i * 2 + 1] = (intValue >> 8) & 0xFF;
-    }
-    return bytes;
-  }
-
-  /// Get audio statistics
+  /// Get audio statistics using shared utilities
   static Map<String, dynamic> getAudioStats(Uint8List audioData) {
-    final samples = _bytesToSamples(audioData);
+    final samples = AudioUtils.bytesToSamples(audioData);
 
-    // Calculate RMS (Root Mean Square)
-    double sum = 0;
-    double peak = 0;
+    // Calculate RMS using shared utility
+    final rms = AudioUtils.calculateRMS(audioData);
+
+    // Find peak using shared utility
+    final peak = AudioUtils.findPeakAmplitude(audioData);
+
+    // Count zero crossings
     int zeroCrossings = 0;
-
-    for (int i = 0; i < samples.length; i++) {
-      final sample = samples[i];
-      sum += sample * sample;
-      peak = math.max(peak, sample.abs());
-
-      // Count zero crossings
-      if (i > 0 && (samples[i - 1] < 0 && sample >= 0) ||
-          (samples[i - 1] >= 0 && sample < 0)) {
+    for (int i = 1; i < samples.length; i++) {
+      if ((samples[i - 1] < 0 && samples[i] >= 0) ||
+          (samples[i - 1] >= 0 && samples[i] < 0)) {
         zeroCrossings++;
       }
     }
 
-    final rms = math.sqrt(sum / samples.length);
     final zeroCrossingRate = zeroCrossings / samples.length;
 
     return {

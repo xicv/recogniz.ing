@@ -5,6 +5,20 @@ import '../models/transcription.dart';
 import '../services/storage_service.dart';
 import '../services/analytics_service.dart';
 
+/// Sort options for transcriptions
+enum SortOption {
+  newest,
+  oldest,
+  duration,
+  favorites,
+}
+
+/// Filter options for transcriptions
+enum FilterOption {
+  all,
+  favorites,
+}
+
 /// Transcription management providers
 final transcriptionsProvider =
     StateNotifierProvider<TranscriptionsNotifier, List<Transcription>>((ref) {
@@ -14,18 +28,58 @@ final transcriptionsProvider =
 /// Search query for filtering transcriptions
 final searchQueryProvider = StateProvider<String>((ref) => '');
 
-/// Filtered transcriptions based on search query
+/// Sort option for transcriptions
+final sortOptionProvider = StateProvider<SortOption>((ref) => SortOption.newest);
+
+/// Filter option for transcriptions
+final filterOptionProvider = StateProvider<FilterOption>((ref) => FilterOption.all);
+
+/// Filtered transcriptions based on search query, filter option, and sort option
 final filteredTranscriptionsProvider = Provider<List<Transcription>>((ref) {
   final transcriptions = ref.watch(transcriptionsProvider);
   final query = ref.watch(searchQueryProvider).toLowerCase();
+  final sortOption = ref.watch(sortOptionProvider);
+  final filterOption = ref.watch(filterOptionProvider);
 
-  if (query.isEmpty) return transcriptions;
+  // Apply filters
+  List<Transcription> filtered = transcriptions;
 
-  return transcriptions
-      .where((t) =>
-          t.rawText.toLowerCase().contains(query) ||
-          t.processedText.toLowerCase().contains(query))
-      .toList();
+  // Filter by search query
+  if (query.isNotEmpty) {
+    filtered = filtered
+        .where((t) =>
+            t.rawText.toLowerCase().contains(query) ||
+            t.processedText.toLowerCase().contains(query))
+        .toList();
+  }
+
+  // Filter by option (favorites only)
+  if (filterOption == FilterOption.favorites) {
+    filtered = filtered.where((t) => t.isFavorite ?? false).toList();
+  }
+
+  // Sort by selected option
+  switch (sortOption) {
+    case SortOption.newest:
+      filtered.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      break;
+    case SortOption.oldest:
+      filtered.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      break;
+    case SortOption.duration:
+      filtered.sort((a, b) => b.audioDurationSeconds.compareTo(a.audioDurationSeconds));
+      break;
+    case SortOption.favorites:
+      filtered.sort((a, b) {
+        if (a.isFavorite == b.isFavorite) {
+          return b.createdAt.compareTo(a.createdAt);
+        }
+        return (a.isFavorite ?? false) ? 1 : -1;
+      });
+      break;
+  }
+
+  return filtered;
 });
 
 /// Enhanced statistics provider for dashboard
@@ -62,10 +116,11 @@ final statisticsProvider = Provider<Statistics>((ref) {
 class TranscriptionsNotifier extends StateNotifier<List<Transcription>> {
   TranscriptionsNotifier() : super(_loadTranscriptions());
 
+  /// Load transcriptions from storage without sorting
+  /// Sorting is handled by filteredTranscriptionsProvider based on user selection
   static List<Transcription> _loadTranscriptions() {
     try {
-      return StorageService.transcriptions.values.toList()
-        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return StorageService.transcriptions.values.toList();
     } catch (e) {
       debugPrint('[TranscriptionsNotifier] Failed to load transcriptions: $e');
       return [];
@@ -81,6 +136,17 @@ class TranscriptionsNotifier extends StateNotifier<List<Transcription>> {
     final existing = StorageService.transcriptions.get(id);
     if (existing != null) {
       final updated = existing.copyWith(processedText: newText);
+      await StorageService.transcriptions.put(id, updated);
+      state = _loadTranscriptions();
+    }
+  }
+
+  Future<void> toggleFavorite(String id) async {
+    final existing = StorageService.transcriptions.get(id);
+    if (existing != null) {
+      final updated = existing.copyWith(
+        isFavorite: !(existing.isFavorite ?? false),
+      );
       await StorageService.transcriptions.put(id, updated);
       state = _loadTranscriptions();
     }

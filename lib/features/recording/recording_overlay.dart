@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/providers/app_providers.dart';
-import '../../core/providers/streaming_providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../widgets/shared/widgets.dart';
 
@@ -74,8 +73,6 @@ class RecordingOverlay extends ConsumerWidget {
                   ),
                   const SizedBox(height: 24),
                   const _RecordingTimer(),
-                  // Show live transcription during recording
-                  _LiveTranscriptionText(),
                 ] else if (state == RecordingState.processing) ...[
                   LoadingIndicators.medium(
                       color: Theme.of(context).colorScheme.primary),
@@ -163,65 +160,5 @@ class _RecordingTimerState extends State<_RecordingTimer> {
         color: AppColors.primaryLight,
       ),
     );
-  }
-}
-
-/// Widget to display live transcription during recording
-class _LiveTranscriptionText extends ConsumerWidget {
-  const _LiveTranscriptionText({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final currentText = ref.watch(currentTranscriptionTextProvider);
-    final hasText = currentText.isNotEmpty;
-
-    if (!hasText) {
-      return const SizedBox.shrink();
-    }
-
-    return Container(
-      width: 400,
-      height: 120,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.waving_hand_outlined,
-                size: 16,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'Live Transcription',
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Expanded(
-            child: SingleChildScrollView(
-              child: SelectableText(
-                currentText,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      height: 1.5,
-                    ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    ).animate().slideY(begin: 0.1, end: 0.0).fadeIn(duration: 300.ms);
   }
 }

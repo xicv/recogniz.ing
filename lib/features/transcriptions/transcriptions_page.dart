@@ -5,10 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/providers/app_providers.dart';
+import '../../core/providers/transcription_providers.dart';
 import '../../core/services/haptic_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/models/app_settings.dart';
-import '../../widgets/shared/content_skeletons.dart';
 import '../../widgets/shared/empty_states.dart';
 import 'widgets/transcription_card.dart';
 
@@ -170,8 +170,8 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
             ),
           ],
 
-          // Transcription Count & Sort
-          if (transcriptions.isNotEmpty) ...[
+          // Transcription Count & Sort (always show if filter is active or has items)
+          if (transcriptions.isNotEmpty || ref.watch(filterOptionProvider) != FilterOption.all) ...[
             SliverToBoxAdapter(
               child: Padding(
                 padding:
@@ -179,50 +179,97 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
                 child: Row(
                   children: [
                     Text(
-                      '${transcriptions.length} transcription${transcriptions.length != 1 ? 's' : ''}',
+                      transcriptions.isNotEmpty
+                          ? '${transcriptions.length} transcription${transcriptions.length != 1 ? 's' : ''}'
+                          : 'No transcriptions',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Theme.of(context).colorScheme.outline,
                           ),
                     ),
+                    const SizedBox(width: 8),
+                    // Favorites filter chip
+                    _FavoritesFilterChip(
+                      currentFilter: ref.watch(filterOptionProvider),
+                      onFilterChanged: (filter) {
+                        ref.read(filterOptionProvider.notifier).state = filter;
+                      },
+                    ),
                     const Spacer(),
-                    PopupMenuButton<String>(
+                    PopupMenuButton<SortOption>(
                       icon: const Icon(LucideIcons.arrowDownUp),
                       tooltip: 'Sort',
                       onSelected: (value) {
-                        // TODO: Implement sorting
+                        ref.read(sortOptionProvider.notifier).state = value;
                       },
-                      itemBuilder: (context) => [
-                        const PopupMenuItem(
-                          value: 'newest',
-                          child: Row(
-                            children: [
-                              Icon(LucideIcons.clock, size: 16),
-                              SizedBox(width: 8),
-                              Text('Newest first'),
-                            ],
+                      itemBuilder: (context) {
+                        final currentSort = ref.watch(sortOptionProvider);
+                        return [
+                          PopupMenuItem(
+                            value: SortOption.newest,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  LucideIcons.clock,
+                                  size: 16,
+                                  color: currentSort == SortOption.newest
+                                      ? Theme.of(context).colorScheme.primary
+                                      : null,
+                                ),
+                                const SizedBox(width: 8),
+                                Text('Newest first'),
+                              ],
+                            ),
                           ),
-                        ),
-                        const PopupMenuItem(
-                          value: 'oldest',
-                          child: Row(
-                            children: [
-                              Icon(LucideIcons.history, size: 16),
-                              SizedBox(width: 8),
-                              Text('Oldest first'),
-                            ],
+                          PopupMenuItem(
+                            value: SortOption.oldest,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  LucideIcons.history,
+                                  size: 16,
+                                  color: currentSort == SortOption.oldest
+                                      ? Theme.of(context).colorScheme.primary
+                                      : null,
+                                ),
+                                const SizedBox(width: 8),
+                                Text('Oldest first'),
+                              ],
+                            ),
                           ),
-                        ),
-                        const PopupMenuItem(
-                          value: 'duration',
-                          child: Row(
-                            children: [
-                              Icon(LucideIcons.timer, size: 16),
-                              SizedBox(width: 8),
-                              Text('Duration'),
-                            ],
+                          PopupMenuItem(
+                            value: SortOption.duration,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  LucideIcons.timer,
+                                  size: 16,
+                                  color: currentSort == SortOption.duration
+                                      ? Theme.of(context).colorScheme.primary
+                                      : null,
+                                ),
+                                const SizedBox(width: 8),
+                                Text('Duration'),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                          PopupMenuItem(
+                            value: SortOption.favorites,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  LucideIcons.star,
+                                  size: 16,
+                                  color: currentSort == SortOption.favorites
+                                      ? Theme.of(context).colorScheme.primary
+                                      : null,
+                                ),
+                                const SizedBox(width: 8),
+                                Text('Favorites'),
+                              ],
+                            ),
+                          ),
+                        ];
+                      },
                     ),
                   ],
                 ),
@@ -258,6 +305,11 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
                                 newText,
                               );
                         },
+                        onToggleFavorite: () {
+                          ref
+                              .read(transcriptionsProvider.notifier)
+                              .toggleFavorite(transcription.id);
+                        },
                       ),
                     )
                         .animate()
@@ -282,6 +334,16 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
   }
 
   Widget _buildEmptyState(BuildContext context, AppSettings settings) {
+    // Show favorites filter empty state if filter is active
+    final currentFilter = ref.watch(filterOptionProvider);
+    if (currentFilter == FilterOption.favorites) {
+      return _FavoritesEmptyState(
+        onClearFilter: () {
+          ref.read(filterOptionProvider.notifier).state = FilterOption.all;
+        },
+      );
+    }
+
     // Show search empty state if user is searching
     if (_isSearching) {
       return SearchEmptyState(
@@ -356,7 +418,13 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
                 ),
               );
             },
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.error,
+              backgroundColor: AppColors.error.withOpacity(0.1),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
             child: const Text('Delete All'),
           ),
         ],
@@ -601,7 +669,13 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
                 ),
               );
             },
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.error,
+              backgroundColor: AppColors.error.withOpacity(0.1),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
             child: const Text('Delete'),
           ),
         ],
@@ -624,5 +698,117 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
     if (_searchQuery.isNotEmpty) {
       _clearSearch();
     }
+  }
+}
+
+/// Favorites filter chip widget
+class _FavoritesFilterChip extends StatelessWidget {
+  final FilterOption currentFilter;
+  final Function(FilterOption) onFilterChanged;
+
+  const _FavoritesFilterChip({
+    required this.currentFilter,
+    required this.onFilterChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isActive = currentFilter == FilterOption.favorites;
+
+    return FilterChip(
+      label: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            LucideIcons.star,
+            size: 14,
+            color: isActive
+                ? Theme.of(context).colorScheme.onPrimary
+                : Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(width: 4),
+          const Text('Favorites'),
+        ],
+      ),
+      selected: isActive,
+      onSelected: (selected) {
+        onFilterChanged(selected ? FilterOption.favorites : FilterOption.all);
+      },
+      backgroundColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+      selectedColor: Theme.of(context).colorScheme.primary,
+      checkmarkColor: Theme.of(context).colorScheme.onPrimary,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: BorderSide(
+          color: isActive
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      visualDensity: VisualDensity.compact,
+    );
+  }
+}
+
+/// Empty state shown when favorites filter is active but no favorites exist
+class _FavoritesEmptyState extends StatelessWidget {
+  final VoidCallback onClearFilter;
+
+  const _FavoritesEmptyState({required this.onClearFilter});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceVariant,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                LucideIcons.star,
+                size: 40,
+                color: Theme.of(context).colorScheme.outline,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'No favorites yet',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Star your important transcriptions to find them here quickly',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            OutlinedButton.icon(
+              onPressed: onClearFilter,
+              icon: const Icon(LucideIcons.x, size: 16),
+              label: const Text('Show All Transcriptions'),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

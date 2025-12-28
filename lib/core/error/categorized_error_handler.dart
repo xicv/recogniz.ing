@@ -3,8 +3,8 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'error_handler.dart';
 import 'error_components.dart';
 
-/// Detailed error handler with categorization and recovery options
-class DetailedErrorHandler {
+/// Categorized error handler with error categorization and recovery options
+class CategorizedErrorHandler {
   /// Convert ErrorResult to EnhancedErrorResult with proper category
   static EnhancedErrorResult categorizeErrorResult(
     ErrorResult result, {

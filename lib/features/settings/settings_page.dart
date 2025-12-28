@@ -384,11 +384,10 @@ class _SettingsPageState
                                     final trimmedKey = controller.text.trim();
 
                                     try {
-                                      // Use GeminiService to validate the API key
-                                      final geminiService = GeminiService();
+                                      // Use provider to get GeminiService for validation
+                                      final geminiService = ref.read(geminiServiceProvider);
                                       final (isValid, error) =
-                                          await geminiService
-                                              .validateApiKey(trimmedKey);
+                                          await geminiService.validateApiKey(trimmedKey);
 
                                       if (isValid) {
                                         await ref
