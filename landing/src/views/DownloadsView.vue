@@ -1,14 +1,19 @@
 <script setup lang="ts">
-// Downloads page - Updated for v1.0.4
 import { ref, onMounted } from 'vue'
+import { useScrollAnimations } from '@/composables/useScrollAnimations'
+
+// Initialize scroll animations
+useScrollAnimations()
 
 interface Platform {
   name: string
-  icon: string // SVG path string
+  icon: string
   version: string
   releaseDate: string
   downloadUrl: string
   changelog: string[]
+  requirements?: string
+  color?: string
 }
 
 const platforms = ref<Platform[]>([
@@ -22,7 +27,9 @@ const platforms = ref<Platform[]>([
       'Standalone APK - no Google Play required',
       'Works on Android 8.0+ (API 26)',
       'Optimized for both phones and tablets'
-    ]
+    ],
+    requirements: 'Android 8.0+ (API 26)',
+    color: 'emerald'
   },
   {
     name: 'macOS',
@@ -34,7 +41,9 @@ const platforms = ref<Platform[]>([
       'User preferences with persistent desktop settings',
       'Desktop-specific features: auto-start, minimize to tray',
       'VAD modal UI fixes and audio processing improvements'
-    ]
+    ],
+    requirements: 'macOS 10.15 or later',
+    color: 'slate'
   },
   {
     name: 'Windows',
@@ -45,7 +54,9 @@ const platforms = ref<Platform[]>([
     changelog: [
       'Updated to match macOS release',
       'Coming soon - check back later!'
-    ]
+    ],
+    requirements: 'Windows 10 or later',
+    color: 'sky'
   },
   {
     name: 'Linux',
@@ -56,25 +67,78 @@ const platforms = ref<Platform[]>([
     changelog: [
       'Updated to match macOS release',
       'Coming soon - check back later!'
-    ]
+    ],
+    requirements: 'Ubuntu 18.04 or later',
+    color: 'amber'
   }
 ])
 
 const selectedPlatform = ref<Platform | null>(null)
-const downloadCount = ref(0)
+const animatedDownloadCount = ref(0)
+const targetDownloadCount = 150000
 
 onMounted(() => {
-  // Simulate download count
-  downloadCount.value = Math.floor(Math.random() * 50000) + 100000
+  // Animate download count
+  const duration = 2000
+  const startTime = performance.now()
+  const startValue = 0
+
+  const animateCount = (currentTime: number) => {
+    const elapsed = currentTime - startTime
+    const progress = Math.min(elapsed / duration, 1)
+    const easeProgress = 1 - Math.pow(1 - progress, 4) // easeOutQuart
+
+    animatedDownloadCount.value = Math.floor(startValue + (targetDownloadCount - startValue) * easeProgress)
+
+    if (progress < 1) {
+      requestAnimationFrame(animateCount)
+    }
+  }
+
+  requestAnimationFrame(animateCount)
 })
+
+const formatDownloadCount = (count: number) => {
+  if (count >= 1000) {
+    return (count / 1000).toFixed(0) + 'K+'
+  }
+  return count.toLocaleString()
+}
 
 const downloadPlatform = (platform: Platform) => {
   selectedPlatform.value = platform
   // Only download if the platform is available (not "#")
   if (platform.downloadUrl !== '#') {
     window.open(platform.downloadUrl, '_blank')
-    downloadCount.value++
   }
+}
+
+// Color mapping for platforms
+const platformColors = {
+  emerald: {
+    bg: 'bg-emerald-100 dark:bg-emerald-900/50',
+    text: 'text-emerald-600 dark:text-emerald-400',
+    border: 'border-emerald-200 dark:border-emerald-800'
+  },
+  slate: {
+    bg: 'bg-slate-100 dark:bg-slate-800',
+    text: 'text-slate-600 dark:text-slate-400',
+    border: 'border-slate-200 dark:border-slate-700'
+  },
+  sky: {
+    bg: 'bg-sky-100 dark:bg-sky-900/50',
+    text: 'text-sky-600 dark:text-sky-400',
+    border: 'border-sky-200 dark:border-sky-800'
+  },
+  amber: {
+    bg: 'bg-amber-100 dark:bg-amber-900/50',
+    text: 'text-amber-600 dark:text-amber-400',
+    border: 'border-amber-200 dark:border-amber-800'
+  }
+}
+
+const getPlatformColor = (color?: string) => {
+  return platformColors[color || 'slate'] || platformColors.slate
 }
 </script>
 
@@ -82,93 +146,114 @@ const downloadPlatform = (platform: Platform) => {
   <div>
     <!-- Hero Section -->
     <section
-      class="pt-32 pb-24 section-padding bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-[#0a0a0a] transition-colors duration-300"
+      class="pt-24 sm:pt-32 pb-16 lg:pb-24 section-padding bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-[#0a0a0a] transition-colors duration-300"
     >
       <div class="container-custom text-center">
-        <div class="max-w-4xl mx-auto animate-fade-in">
+        <div class="max-w-4xl mx-auto">
+          <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-6 scroll-reveal-scale bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+            DOWNLOAD
+          </span>
           <h1
-            class="text-5xl sm:text-6xl lg:text-7xl font-light leading-tight mb-6 tracking-tight text-slate-950 dark:text-slate-50 transition-colors duration-300"
+            class="text-4xl sm:text-5xl lg:text-6xl font-semibold mb-6 tracking-tight text-slate-950 dark:text-slate-50 transition-colors duration-300 scroll-reveal"
+            style="font-size: clamp(2.5rem, 2rem + 2.5vw, 4.5rem); line-height: 1.1;"
           >
             Download
-            <span class="font-medium">Recogniz.ing</span>
+            <span class="gradient-text-accent">Recogniz.ing</span>
           </h1>
           <p
-            class="text-xl mb-12 text-slate-600 dark:text-slate-400 transition-colors duration-300"
+            class="text-lg sm:text-xl mb-8 text-slate-600 dark:text-slate-400 transition-colors duration-300 scroll-reveal"
           >
             Free AI-powered voice typing. Available for all platforms.
           </p>
           <div
-            class="text-center text-slate-500 transition-colors duration-300"
+            class="flex items-center justify-center gap-3 scroll-reveal"
           >
-            <span class="font-medium">{{ downloadCount.toLocaleString() }}</span> downloads and counting
+            <div class="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 transition-colors duration-300">
+              <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+              </svg>
+              <span class="font-medium tabular-nums">{{ formatDownloadCount(animatedDownloadCount) }}</span>
+            </div>
+            <span class="text-slate-500 dark:text-slate-400">downloads and counting</span>
           </div>
         </div>
       </div>
     </section>
 
     <!-- Platform Downloads -->
-    <section class="py-32 section-padding">
+    <section class="py-16 lg:py-24 section-padding">
       <div class="container-custom">
         <div class="max-w-6xl mx-auto">
-          <div class="grid sm:grid-cols-1 lg:grid-cols-3 gap-8">
+          <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div
               v-for="platform in platforms"
               :key="platform.name"
-              class="rounded-2xl border bg-white dark:bg-slate-800 dark:border-slate-700 border-slate-200 hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300 overflow-hidden"
+              class="group rounded-3xl border bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300 overflow-hidden scroll-reveal hover:shadow-xl hover:-translate-y-1"
+              :class="getPlatformColor(platform.color).border"
             >
               <!-- Platform Icon -->
               <div
-                class="p-8 text-center border-b border-slate-100 dark:border-slate-700 transition-colors duration-300"
+                class="p-6 sm:p-8 text-center border-b border-slate-100 dark:border-slate-700 transition-colors duration-300"
               >
-                <div class="w-16 h-16 mx-auto mb-4">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center transition-colors duration-300"
+                  :class="getPlatformColor(platform.color).bg"
+                >
                   <svg
                     viewBox="0 0 24 24"
                     fill="currentColor"
-                    class="w-16 h-16 text-slate-700 dark:text-slate-300 transition-colors duration-300"
+                    class="w-8 h-8 transition-colors duration-300"
+                    :class="getPlatformColor(platform.color).text"
                   >
                     <path :d="platform.icon"/>
                   </svg>
                 </div>
                 <h3
-                  class="text-2xl font-light mb-2 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                  class="text-xl sm:text-2xl font-semibold mb-1 text-slate-950 dark:text-slate-50 transition-colors duration-300"
                 >
                   {{ platform.name }}
                 </h3>
                 <p
-                  class="text-slate-500 transition-colors duration-300"
+                  class="text-sm text-slate-500 dark:text-slate-400 transition-colors duration-300"
                 >
-                  Version {{ platform.version }}
+                  v{{ platform.version }}
                 </p>
-                <p
-                  class="text-sm text-slate-400 dark:text-slate-600 transition-colors duration-300"
+                <span
+                  v-if="platform.downloadUrl === '#'"
+                  class="inline-block px-2 py-1 rounded-full text-xs font-medium mt-2 bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400"
                 >
-                  {{ platform.releaseDate }}
-                </p>
+                  Coming Soon
+                </span>
+                <span
+                  v-else
+                  class="inline-block px-2 py-1 rounded-full text-xs font-medium mt-2 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400"
+                >
+                  Available Now
+                </span>
               </div>
 
               <!-- Download Button -->
-              <div class="p-8">
+              <div class="p-6 sm:p-8">
                 <button
                   @click="downloadPlatform(platform)"
                   :disabled="platform.downloadUrl === '#'"
-                  class="w-full px-8 py-4 rounded-full font-medium transition-all duration-300 mb-6 text-white hover:scale-105"
+                  class="w-full px-6 py-4 rounded-xl font-medium transition-all duration-300 mb-4 text-white flex items-center justify-center gap-2 min-h-[52px] sm:min-h-[48px]"
                   :class="[
                     platform.downloadUrl === '#'
-                      ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
-                      : 'bg-slate-900 hover:bg-slate-800 dark:bg-sky-500 dark:hover:bg-sky-400'
+                      ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                      : 'bg-slate-900 hover:bg-slate-800 dark:bg-sky-500 dark:hover:bg-sky-400 hover:scale-105 hover:shadow-lg'
                   ]"
                 >
-                  {{ platform.downloadUrl === '#' ? 'Coming Soon' : `Download for ${platform.name}` }}
+                  <svg v-if="platform.downloadUrl !== '#'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                  </svg>
+                  {{ platform.downloadUrl === '#' ? 'Coming Soon' : 'Download' }}
                 </button>
 
                 <!-- Requirements -->
                 <div
-                  class="space-y-2 text-sm text-slate-600 dark:text-slate-400 transition-colors duration-300"
+                  class="text-sm text-slate-600 dark:text-slate-400 text-center transition-colors duration-300"
                 >
-                  <div v-if="platform.name === 'Android'">Android 8.0+ (API 26)</div>
-                  <div v-else-if="platform.name === 'macOS'">macOS 10.15 or later</div>
-                  <div v-else-if="platform.name === 'Windows'">Windows 10 or later</div>
-                  <div v-else>Ubuntu 18.04 or later</div>
+                  {{ platform.requirements }}
                 </div>
               </div>
             </div>
@@ -177,109 +262,187 @@ const downloadPlatform = (platform: Platform) => {
       </div>
     </section>
 
-    <!-- Installation Instructions -->
+    <!-- Installation Instructions - Accordion Style -->
     <section
-      class="py-32 section-padding bg-slate-50 dark:bg-slate-900/30 transition-colors duration-300"
+      class="py-16 lg:py-24 section-padding bg-slate-50 dark:bg-slate-900/30 transition-colors duration-300"
     >
       <div class="container-custom">
         <div class="max-w-4xl mx-auto">
-          <h2
-            class="text-4xl font-light mb-12 text-center text-slate-950 dark:text-slate-50 transition-colors duration-300"
-          >
-            Installation Instructions
-          </h2>
+          <div class="text-center mb-12 scroll-reveal">
+            <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+              INSTALLATION
+            </span>
+            <h2
+              class="text-3xl sm:text-4xl font-semibold mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+            >
+              Installation Instructions
+            </h2>
+            <p class="text-lg text-slate-600 dark:text-slate-400">
+              Get up and running in just a few minutes
+            </p>
+          </div>
 
-          <div class="space-y-12">
-            <div>
-              <h3
-                class="text-2xl font-medium mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
-              >
-                1. Get API Key
-              </h3>
-              <p
-                class="mb-4 text-slate-600 dark:text-slate-400 transition-colors duration-300"
-              >
-                Get your free Gemini API key from Google AI Studio. The app will not work without an API key.
-              </p>
-              <a
-                href="https://aistudio.google.com/app/apikey"
-                target="_blank"
-                rel="noopener"
-                class="inline-flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all bg-white border border-slate-300 hover:border-slate-400 text-slate-700 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:text-slate-50"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                </svg>
-                <span>Get API Key</span>
-              </a>
-            </div>
-
-            <div>
-              <h3
-                class="text-2xl font-medium mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
-              >
-                2. Download & Install
-              </h3>
-              <div
-                class="rounded-lg border p-6 bg-white dark:bg-slate-800 dark:border-slate-700 border-slate-200 transition-colors duration-300"
-              >
-                <h4 class="font-medium mb-2">Android:</h4>
-                <ol
-                  class="list-decimal list-inside space-y-1 mb-4 text-slate-600 dark:text-slate-400 transition-colors duration-300"
-                >
-                  <li>Download the APK file</li>
-                  <li>Enable "Install from unknown sources" in your device settings</li>
-                  <li>Open the APK file and tap "Install"</li>
-                  <li>Launch the app from your home screen</li>
-                </ol>
-
-                <h4 class="font-medium mb-2 mt-6">macOS:</h4>
-                <ol
-                  class="list-decimal list-inside space-y-1 mb-4 text-slate-600 dark:text-slate-400 transition-colors duration-300"
-                >
-                  <li>Download the .app file</li>
-                  <li>Drag the .app file to Applications folder</li>
-                  <li>If you see a warning "Apple could not verify 'recognizing.app' is free of malware", click "Done", then go to Settings → Privacy & Security, and click "Open Anyway"</li>
-                  <li>Alternatively, run <code class="px-2 py-1 rounded text-sm bg-slate-100 dark:bg-slate-900">sudo codesign -fs Recognizing /Applications/Recognizing.app</code> from Terminal.app</li>
-                  <li>Launch from Applications or Spotlight</li>
-                </ol>
-
-                <h4 class="font-medium mb-2 mt-6">Windows:</h4>
-                <ol
-                  class="list-decimal list-inside space-y-1 mb-4 text-slate-600 dark:text-slate-400 transition-colors duration-300"
-                >
-                  <li>Download the .exe installer</li>
-                  <li>Run the installer as Administrator</li>
-                  <li>Follow the installation wizard</li>
-                  <li>Launch from Start Menu</li>
-                </ol>
-
-                <h4 class="font-medium mb-2 mt-6">Linux:</h4>
-                <ol
-                  class="list-decimal list-inside space-y-1 text-slate-600 dark:text-slate-400 transition-colors duration-300"
-                >
-                  <li>Download the .AppImage file</li>
-                  <li>Make it executable: <code class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-900">chmod +x recognizing-linux.AppImage</code></li>
-                  <li>Run the AppImage</li>
-                </ol>
+          <!-- Step Cards -->
+          <div class="space-y-6">
+            <!-- Step 1: API Key -->
+            <div class="card scroll-reveal">
+              <div class="flex items-start gap-6">
+                <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center text-white font-bold text-lg">
+                  1
+                </div>
+                <div class="flex-1">
+                  <h3
+                    class="text-xl font-semibold mb-2 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                  >
+                    Get Your Free API Key
+                  </h3>
+                  <p
+                    class="mb-4 text-slate-600 dark:text-slate-400 transition-colors duration-300"
+                  >
+                    Get your free Gemini API key from Google AI Studio. The app will not work without an API key.
+                  </p>
+                  <a
+                    href="https://aistudio.google.com/app/apikey"
+                    target="_blank"
+                    rel="noopener"
+                    class="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all bg-slate-900 text-white hover:bg-slate-800 dark:bg-sky-500 dark:hover:bg-sky-400 min-h-[48px]"
+                  >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                    </svg>
+                    Get API Key
+                  </a>
+                </div>
               </div>
             </div>
 
-            <div>
-              <h3
-                class="text-2xl font-medium mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
-              >
-                3. Setup
-              </h3>
-              <ol
-                class="list-decimal list-inside space-y-2 text-slate-600 dark:text-slate-400 transition-colors duration-300"
-              >
-                <li>Launch the app</li>
-                <li>Go to Settings tab</li>
-                <li>Enter your Gemini API key</li>
-                <li>Customize prompts and vocabulary (optional)</li>
-                <li>Return to Dashboard and start recording!</li>
-              </ol>
+            <!-- Step 2: Download & Install -->
+            <div class="card scroll-reveal">
+              <div class="flex items-start gap-6">
+                <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
+                  2
+                </div>
+                <div class="flex-1">
+                  <h3
+                    class="text-xl font-semibold mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                  >
+                    Download & Install
+                  </h3>
+
+                  <!-- Installation details by platform -->
+                  <div class="grid sm:grid-cols-2 gap-4">
+                    <!-- Android -->
+                    <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                      <div class="flex items-center gap-3 mb-3">
+                        <svg viewBox="0 0 24 24" class="w-6 h-6 text-emerald-500" fill="currentColor">
+                          <path d="M6.382 3.968A8.962 8.962 0 0 1 12 2c2.125 0 4.078.736 5.618 1.968l1.453-1.453 1.414 1.414-1.453 1.453A8.962 8.962 0 0 1 21 11v1H3v-1c0-2.125.736-4.078 1.968-5.618L3.515 3.93l1.414-1.414 1.453 1.453zM3 14h18v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-7z"/>
+                        </svg>
+                        <span class="font-medium text-slate-950 dark:text-slate-50">Android</span>
+                      </div>
+                      <ol class="text-sm text-slate-600 dark:text-slate-400 space-y-1 list-decimal list-inside">
+                        <li>Download the APK file</li>
+                        <li>Enable "Install from unknown sources"</li>
+                        <li>Open the APK and tap "Install"</li>
+                      </ol>
+                    </div>
+
+                    <!-- macOS -->
+                    <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                      <div class="flex items-center gap-3 mb-3">
+                        <svg viewBox="0 0 24 24" class="w-6 h-6 text-slate-500" fill="currentColor">
+                          <path d="M18.7 19.5c-.8 1.2-1.7 2.5-3 2.5-1.3 0-1.8-.8-3.3-.8-1.5 0-2 .8-3.3.8-1.3 0-2.3-1.3-3.1-2.5C4.2 17 2.9 12.5 4.7 9.4c.9-1.5 2.4-2.5 4.1-2.5 1.3 0 2.5.9 3.3.9.8 0 2.3-1.1 3.8-.9.6.03 2.5.3 3.6 2-.1.06-2.2 1.3-2.1 3.8.03 3 2.6 4 2.7 4-.03.07-.4 1.4-1.4 2.8M13 3.5c.7-.8 1.9-1.5 2.9-1.5.1 1.2-.3 2.4-1 3.2-.7.8-1.8 1.5-2.9 1.4-.1-1.1.4-2.4 1.1-3.1z"/>
+                        </svg>
+                        <span class="font-medium text-slate-950 dark:text-slate-50">macOS</span>
+                      </div>
+                      <ol class="text-sm text-slate-600 dark:text-slate-400 space-y-1 list-decimal list-inside">
+                        <li>Download and unzip the file</li>
+                        <li>Drag to Applications folder</li>
+                        <li>Right-click → Open (if blocked)</li>
+                      </ol>
+                    </div>
+
+                    <!-- Windows -->
+                    <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                      <div class="flex items-center gap-3 mb-3">
+                        <svg viewBox="0 0 24 24" class="w-6 h-6 text-sky-500" fill="currentColor">
+                          <path d="M3 12V6.7L9 5.4v6.5L3 12M20 3v8.8L10 11.9V5.2L20 3M3 13l6 .1V19.9L3 18.7V13m17 .3V22L10 20.1v-7"/>
+                        </svg>
+                        <span class="font-medium text-slate-950 dark:text-slate-50">Windows</span>
+                      </div>
+                      <ol class="text-sm text-slate-600 dark:text-slate-400 space-y-1 list-decimal list-inside">
+                        <li>Download the .exe installer</li>
+                        <li>Run as Administrator</li>
+                        <li>Follow the wizard</li>
+                      </ol>
+                    </div>
+
+                    <!-- Linux -->
+                    <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                      <div class="flex items-center gap-3 mb-3">
+                        <svg viewBox="0 0 24 24" class="w-6 h-6 text-amber-500" fill="currentColor">
+                          <path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879V14.89h-2.896v-2.896h2.896V9.466c0-2.889 1.723-4.486 4.351-4.486 1.263 0 2.533.102 2.533.102v2.72h-1.425c-1.406 0-1.843.872-1.843 1.767v2.012h3.289l-.528 2.896h-2.761v6.989C18.343 21.128 22 16.991 22 12c0-5.523-4.477-10-10-10z"/>
+                        </svg>
+                        <span class="font-medium text-slate-950 dark:text-slate-50">Linux</span>
+                      </div>
+                      <ol class="text-sm text-slate-600 dark:text-slate-400 space-y-1 list-decimal list-inside">
+                        <li>Download the .AppImage</li>
+                        <li>Make executable: <code class="text-xs px-1 rounded bg-slate-100 dark:bg-slate-900">chmod +x</code></li>
+                        <li>Run the AppImage</li>
+                      </ol>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 3: Setup -->
+            <div class="card scroll-reveal">
+              <div class="flex items-start gap-6">
+                <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white font-bold text-lg">
+                  3
+                </div>
+                <div class="flex-1">
+                  <h3
+                    class="text-xl font-semibold mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                  >
+                    Setup & Start Recording
+                  </h3>
+                  <div class="grid sm:grid-cols-2 gap-4">
+                    <div class="flex items-start gap-3">
+                      <div class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                      </div>
+                      <span class="text-slate-600 dark:text-slate-400">Launch the app</span>
+                    </div>
+                    <div class="flex items-start gap-3">
+                      <div class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                      </div>
+                      <span class="text-slate-600 dark:text-slate-400">Go to Settings tab</span>
+                    </div>
+                    <div class="flex items-start gap-3">
+                      <div class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                      </div>
+                      <span class="text-slate-600 dark:text-slate-400">Enter your Gemini API key</span>
+                    </div>
+                    <div class="flex items-start gap-3">
+                      <div class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                      </div>
+                      <span class="text-slate-600 dark:text-slate-400">Start recording!</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -287,124 +450,124 @@ const downloadPlatform = (platform: Platform) => {
     </section>
 
     <!-- Changelog -->
-    <section class="py-32 section-padding">
+    <section class="py-16 lg:py-24 section-padding">
       <div class="container-custom">
         <div class="max-w-4xl mx-auto">
-          <h2
-            class="text-4xl font-light mb-12 text-center text-slate-950 dark:text-slate-50 transition-colors duration-300"
-          >
-            What's New
-          </h2>
-
-          <div class="space-y-8">
-            <div
-              class="rounded-lg border p-8 bg-white dark:bg-slate-800 dark:border-slate-700 border-slate-200 transition-colors duration-300"
+          <div class="text-center mb-12 scroll-reveal">
+            <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+              CHANGELOG
+            </span>
+            <h2
+              class="text-3xl sm:text-4xl font-semibold mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
             >
-              <div class="flex items-center justify-between mb-4">
-                <h3
-                  class="text-xl font-medium text-slate-950 dark:text-slate-50 transition-colors duration-300"
-                >
-                  Version 1.0.4
-                </h3>
-                <span
-                  class="text-sm text-slate-500 transition-colors duration-300"
-                >
-                  December 23, 2025
+              What's New
+            </h2>
+            <p class="text-lg text-slate-600 dark:text-slate-400">
+              Track the latest features and improvements
+            </p>
+          </div>
+
+          <!-- Version cards -->
+          <div class="space-y-6">
+            <!-- v1.0.4 -->
+            <div class="card scroll-reveal">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+                <div class="flex items-center gap-4">
+                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center">
+                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <h3
+                      class="text-2xl font-semibold text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                    >
+                      Version 1.0.4
+                    </h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">
+                      December 23, 2025
+                    </p>
+                  </div>
+                </div>
+                <span class="px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400">
+                  Latest
                 </span>
               </div>
-              <ul
-                class="space-y-2 text-slate-600 dark:text-slate-400 transition-colors duration-300"
-              >
-                <li class="flex items-start">
-                  <span class="text-green-500 mr-2">✓</span>
+              <ul class="space-y-3">
+                <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                  <svg class="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
                   User preferences with persistent desktop settings
                 </li>
-                <li class="flex items-start">
-                  <span class="text-green-500 mr-2">✓</span>
+                <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                  <svg class="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
                   Desktop-specific features: auto-start, minimize to tray
                 </li>
-                <li class="flex items-start">
-                  <span class="text-green-500 mr-2">✓</span>
+                <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                  <svg class="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
                   VAD modal UI fixes and audio processing improvements
                 </li>
-                <li class="flex items-start">
-                  <span class="text-green-500 mr-2">✓</span>
-                  Fixed Android build with AGP 8.10 and Gradle 8.11.1
-                </li>
               </ul>
             </div>
-            <div
-              class="rounded-lg border p-8 bg-white dark:bg-slate-800 dark:border-slate-700 border-slate-200 transition-colors duration-300"
-            >
-              <div class="flex items-center justify-between mb-4">
-                <h3
-                  class="text-xl font-medium text-slate-950 dark:text-slate-50 transition-colors duration-300"
-                >
-                  Version 1.0.3
-                </h3>
-                <span
-                  class="text-sm text-slate-500 transition-colors duration-300"
-                >
-                  December 21, 2025
-                </span>
+
+            <!-- v1.0.3 -->
+            <div class="card scroll-reveal">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+                <div class="flex items-center gap-4">
+                  <div class="w-14 h-14 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                    <span class="text-xl font-bold text-slate-500 dark:text-slate-400">1.0.3</span>
+                  </div>
+                  <div>
+                    <h3
+                      class="text-2xl font-semibold text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                    >
+                      Version 1.0.3
+                    </h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">
+                      December 21, 2025
+                    </p>
+                  </div>
+                </div>
               </div>
-              <ul
-                class="space-y-2 text-slate-600 dark:text-slate-400 transition-colors duration-300"
-              >
-                <li class="flex items-start">
-                  <span class="text-green-500 mr-2">✓</span>
+              <ul class="space-y-3">
+                <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                  <svg class="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
                   Fixed macOS Gatekeeper verification issues
                 </li>
-                <li class="flex items-start">
-                  <span class="text-green-500 mr-2">✓</span>
+                <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                  <svg class="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
                   Improved app signing and security
                 </li>
-                <li class="flex items-start">
-                  <span class="text-green-500 mr-2">✓</span>
+                <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                  <svg class="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
                   Initial Windows release with native installer
                 </li>
-                <li class="flex items-start">
-                  <span class="text-green-500 mr-2">✓</span>
-                  Enhanced stability and performance
-                </li>
               </ul>
             </div>
-            <div
-              class="rounded-lg border p-8 bg-white dark:bg-slate-800 dark:border-slate-700 border-slate-200 transition-colors duration-300"
+          </div>
+
+          <!-- View all changelogs link -->
+          <div class="text-center mt-12">
+            <RouterLink
+              to="/changelog"
+              class="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all border border-slate-200 hover:border-slate-300 text-slate-700 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-600 min-h-[48px]"
             >
-              <div class="flex items-center justify-between mb-4">
-                <h3
-                  class="text-xl font-medium text-slate-950 dark:text-slate-50 transition-colors duration-300"
-                >
-                  Version 1.0.2
-                </h3>
-                <span
-                  class="text-sm text-slate-500 transition-colors duration-300"
-                >
-                  December 15, 2024
-                </span>
-              </div>
-              <ul
-                class="space-y-2 text-slate-600 dark:text-slate-400 transition-colors duration-300"
-              >
-                <li class="flex items-start">
-                  <span class="text-green-500 mr-2">✓</span>
-                  Added comprehensive version management system
-                </li>
-                <li class="flex items-start">
-                  <span class="text-green-500 mr-2">✓</span>
-                  Fixed Settings navigation to open correct tab
-                </li>
-                <li class="flex items-start">
-                  <span class="text-green-500 mr-2">✓</span>
-                  Added keyboard shortcuts (Cmd/Ctrl+S for saving)
-                </li>
-                <li class="flex items-start">
-                  <span class="text-green-500 mr-2">✓</span>
-                  Enhanced UI components for better consistency
-                </li>
-              </ul>
-            </div>
+              View Full Changelog
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+              </svg>
+            </RouterLink>
           </div>
         </div>
       </div>
@@ -412,32 +575,44 @@ const downloadPlatform = (platform: Platform) => {
 
     <!-- Support Section -->
     <section
-      class="py-32 section-padding bg-slate-50 dark:bg-slate-900/30 transition-colors duration-300"
+      class="py-16 lg:py-24 section-padding bg-slate-50 dark:bg-slate-900/30 transition-colors duration-300"
     >
       <div class="container-custom text-center">
-        <h2
-          class="text-4xl font-light mb-6 text-slate-950 dark:text-slate-50 transition-colors duration-300"
-        >
-          Need Help?
-        </h2>
-        <p
-          class="text-xl mb-12 text-slate-600 dark:text-slate-400 transition-colors duration-300"
-        >
-          Check our documentation or report issues on GitHub
-        </p>
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a
-            href="#"
-            class="px-8 py-4 rounded-full font-medium transition-all bg-white border border-slate-300 hover:border-slate-400 text-slate-700 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-600"
+        <div class="max-w-3xl mx-auto">
+          <h2
+            class="text-3xl sm:text-4xl font-semibold mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
           >
-            Documentation
-          </a>
-          <a
-            href="#"
-            class="px-8 py-4 rounded-full font-medium transition-all bg-white border border-slate-300 hover:border-slate-400 text-slate-700 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-600"
+            Need Help?
+          </h2>
+          <p
+            class="text-lg mb-8 text-slate-600 dark:text-slate-400 transition-colors duration-300"
           >
-            Report Issue
-          </a>
+            Check our documentation or report issues on GitHub
+          </p>
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a
+              href="https://github.com/xicv/recogniz.ing"
+              target="_blank"
+              rel="noopener"
+              class="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all bg-slate-900 text-white hover:bg-slate-800 dark:bg-sky-500 dark:hover:bg-sky-400 min-h-[48px]"
+            >
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.911 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+              </svg>
+              View on GitHub
+            </a>
+            <a
+              href="https://github.com/xicv/recogniz.ing/issues"
+              target="_blank"
+              rel="noopener"
+              class="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all border border-slate-200 hover:border-slate-300 text-slate-700 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-600 min-h-[48px]"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              Report Issue
+            </a>
+          </div>
         </div>
       </div>
     </section>
@@ -445,18 +620,42 @@ const downloadPlatform = (platform: Platform) => {
 </template>
 
 <style scoped>
-.animate-fade-in {
-  animation: fadeIn 0.8s ease-out;
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s var(--ease-out-expo),
+              transform 0.8s var(--ease-out-expo);
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
+.scroll-reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scroll-reveal-scale {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.6s var(--ease-spring),
+              transform 0.6s var(--ease-spring);
+}
+
+.scroll-reveal-scale.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Tabular numbers */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal,
+  .scroll-reveal-scale {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
+    transition: none;
   }
 }
 </style>

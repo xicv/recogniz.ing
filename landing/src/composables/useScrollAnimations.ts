@@ -22,9 +22,12 @@ export function useScrollAnimations() {
         }
       )
 
-      // Observe all elements with scroll-reveal class
-      document.querySelectorAll('.scroll-reveal').forEach((el) => {
-        observer?.observe(el)
+      // Observe all elements with scroll-reveal classes
+      const scrollClasses = ['.scroll-reveal', '.scroll-reveal-left', '.scroll-reveal-scale']
+      scrollClasses.forEach((className) => {
+        document.querySelectorAll(className).forEach((el) => {
+          observer?.observe(el)
+        })
       })
     }, 100)
   })

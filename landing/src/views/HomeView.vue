@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useScrollAnimations } from '@/composables/useScrollAnimations'
+import GradientMesh from '@/components/ui/GradientMesh.vue'
+import ProductMockup from '@/components/ui/ProductMockup.vue'
+import TrustBadges from '@/components/ui/TrustBadges.vue'
 
 useScrollAnimations()
 
@@ -35,43 +38,55 @@ const faqs = [
   }
 ]
 
-// Feature data for bento grid
+// Feature data for bento grid with asymmetric layout
 const features = [
   {
     icon: 'lightning',
     title: 'Lightning Fast',
     description: 'Instant transcription with auto-copy to clipboard',
-    gradient: 'bg-gradient-to-br from-amber-500 to-orange-500'
+    gradient: 'bg-gradient-to-br from-amber-500 to-orange-500',
+    span: 'col-span-1',
+    category: 'recording'
   },
   {
     icon: 'sparkles',
     title: 'AI-Powered',
-    description: 'Powered by Google Gemini for accurate transcription',
-    gradient: 'bg-gradient-to-br from-sky-500 to-cyan-500'
+    description: 'Powered by Google Gemini 3.0 Flash for accurate transcription with intelligent context understanding',
+    gradient: 'bg-gradient-to-br from-sky-500 to-cyan-500',
+    span: 'col-span-1 sm:col-span-2 row-span-2',
+    category: 'recording'
   },
   {
     icon: 'document',
     title: 'Custom Prompts',
     description: 'Templates for any workflow or use case',
-    gradient: 'bg-gradient-to-br from-violet-500 to-purple-500'
+    gradient: 'bg-gradient-to-br from-violet-500 to-purple-500',
+    span: 'col-span-1',
+    category: 'prompts'
   },
   {
     icon: 'book',
     title: 'Smart Vocabulary',
     description: 'Industry-specific terms and custom dictionaries',
-    gradient: 'bg-gradient-to-br from-emerald-500 to-teal-500'
+    gradient: 'bg-gradient-to-br from-emerald-500 to-teal-500',
+    span: 'col-span-1',
+    category: 'vocabulary'
   },
   {
     icon: 'desktop',
     title: 'Cross-Platform',
     description: 'Works everywhere you do - desktop and mobile',
-    gradient: 'bg-gradient-to-br from-rose-500 to-pink-500'
+    gradient: 'bg-gradient-to-br from-rose-500 to-pink-500',
+    span: 'col-span-1',
+    category: 'settings'
   },
   {
     icon: 'lock',
     title: 'Private & Secure',
     description: 'All data stored locally on your device',
-    gradient: 'bg-gradient-to-br from-slate-600 to-slate-800'
+    gradient: 'bg-gradient-to-br from-slate-600 to-slate-800',
+    span: 'col-span-1',
+    category: 'settings'
   }
 ]
 
@@ -103,120 +118,151 @@ const demoFeatures = [
     icon: icons.lock
   }
 ]
+
+// Stats for counter animation
+const stats = [
+  { value: 50000, suffix: '+', label: 'Active Users', formatFn: (v: number) => Math.floor(v / 1000) + 'K' },
+  { value: 98, suffix: '%', label: 'Accuracy Rate' },
+  { value: 6, suffix: '', label: 'Platforms Supported' }
+]
+
+// Hero animation state
+const heroAnimated = ref(false)
+
+onMounted(() => {
+  setTimeout(() => {
+    heroAnimated.value = true
+  }, 100)
+})
 </script>
 
 <template>
   <div>
-    <!-- Hero Section - Enhanced with better value proposition -->
-    <section class="min-h-[90vh] flex items-center justify-center relative overflow-hidden bg-grid">
-      <!-- Subtle gradient glow -->
-      <div
-        class="absolute inset-0 bg-gradient-to-b from-slate-50/50 dark:from-slate-900/50 via-transparent to-transparent transition-colors duration-300"
-      ></div>
-      <div
-        class="absolute top-20 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full blur-3xl bg-sky-400/10 dark:bg-sky-500/10 transition-colors duration-300"
-      ></div>
+    <!-- Hero Section - Enhanced with gradient mesh and product mockup -->
+    <section class="hero-section relative min-h-screen flex items-center overflow-hidden">
+      <!-- Animated gradient mesh background -->
+      <GradientMesh :opacity="0.6" />
 
-      <div class="container-custom relative z-10 text-center pt-20 pb-16">
-        <div class="max-w-4xl mx-auto">
-          <!-- Badge -->
-          <div
-            class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm mb-8 transition-all duration-300 animate-fade-in bg-slate-100 border-slate-200 text-slate-600 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400"
-          >
-            <span class="relative flex h-2 w-2">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
-            </span>
-            v1.0.4 — Now Available
+      <!-- Grid overlay -->
+      <div class="absolute inset-0 bg-grid opacity-50" />
+
+      <div class="container-custom relative z-10 pt-24 pb-16 lg:pt-32 lg:pb-24">
+        <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <!-- Left: Hero Content -->
+          <div class="hero-content text-center lg:text-left">
+            <!-- Badge -->
+            <div
+              class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm mb-8 transition-all duration-300 scroll-reveal-scale bg-slate-100/80 backdrop-blur border border-slate-200 text-slate-600 dark:bg-slate-800/80 dark:border-slate-700 dark:text-slate-400"
+            >
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
+              </span>
+              v1.0.4 — Now Available
+            </div>
+
+            <!-- Headline with kinetic text effect -->
+            <h1
+              class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight mb-6 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+              style="font-size: clamp(2.75rem, 2rem + 4vw, 5.5rem); line-height: 1.1;"
+            >
+              <span class="block kinetic-word" :class="{ 'animate-in': heroAnimated }" style="animation-delay: 0ms;">
+                Free AI Voice
+              </span>
+              <span class="block gradient-text-accent kinetic-word" :class="{ 'animate-in': heroAnimated }" style="animation-delay: 150ms;">
+                Typing, Your Way
+              </span>
+            </h1>
+
+            <!-- Subheading -->
+            <p
+              class="text-lg sm:text-xl lg:text-2xl mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed text-slate-600 dark:text-slate-400 transition-colors duration-300 kinetic-word"
+              :class="{ 'animate-in': heroAnimated }"
+              style="animation-delay: 300ms;"
+            >
+              Your vocabulary, your style, your API key. Privacy-first voice typing that adapts to <strong>you</strong>.
+            </p>
+
+            <!-- CTA Buttons -->
+            <div
+              class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-12 kinetic-word"
+              :class="{ 'animate-in': heroAnimated }"
+              style="animation-delay: 450ms;"
+            >
+              <RouterLink
+                to="/downloads"
+                class="btn-primary inline-flex items-center gap-2 text-lg bg-slate-950 hover:bg-slate-900 dark:bg-sky-500 dark:hover:bg-sky-400 cta-pulse"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                Download Free
+              </RouterLink>
+
+              <a
+                href="https://aistudio.google.com/app/apikey"
+                target="_blank"
+                rel="noopener"
+                class="btn-secondary inline-flex items-center gap-2"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                </svg>
+                Get API Key
+              </a>
+            </div>
+
+            <!-- Trust Badges -->
+            <div class="kinetic-word" :class="{ 'animate-in': heroAnimated }" style="animation-delay: 600ms;">
+              <TrustBadges />
+            </div>
           </div>
 
-          <!-- Headline - Enhanced value proposition -->
-          <h1
-            class="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-6 text-slate-950 dark:text-slate-50 transition-colors duration-300 animate-fade-in"
-            style="animation-delay: 100ms"
-          >
-            Free AI Voice Typing
-            <br>
-            <span class="gradient-text-accent">Your Way, Zero Fees</span>
-          </h1>
-
-          <!-- Subheading -->
-          <p
-            class="text-xl sm:text-2xl mb-10 max-w-2xl mx-auto leading-relaxed font-normal text-slate-600 dark:text-slate-400 transition-colors duration-300 animate-fade-in"
-            style="animation-delay: 200ms"
-          >
-            Your vocabulary, your style, your API key. Privacy-first voice typing that adapts to <strong>you</strong>.
-          </p>
-
-          <!-- CTA Buttons -->
-          <div
-            class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 animate-fade-in"
-            style="animation-delay: 300ms"
-          >
-            <RouterLink
-              to="/downloads"
-              class="btn-primary inline-flex items-center gap-2 text-lg bg-slate-950 hover:bg-slate-900 dark:bg-sky-500 dark:hover:bg-sky-400"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-              </svg>
-              Download Free
-            </RouterLink>
-
-            <a
-              href="https://aistudio.google.com/app/apikey"
-              target="_blank"
-              rel="noopener"
-              class="btn-secondary inline-flex items-center gap-2"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
-              </svg>
-              Get API Key
-            </a>
+          <!-- Right: Product Mockup -->
+          <div class="hero-visual relative scroll-reveal-right">
+            <ProductMockup />
           </div>
+        </div>
+      </div>
 
-          <!-- Trust indicators -->
+      <!-- Scroll indicator -->
+      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-slate-400 dark:text-slate-500 animate-bounce">
+        <span class="text-xs uppercase tracking-wider">Scroll to explore</span>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+        </svg>
+      </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-16 lg:py-24 bg-slate-50/50 dark:bg-slate-900/30 border-y border-slate-100 dark:border-slate-800 transition-colors duration-300">
+      <div class="container-custom">
+        <div class="grid grid-cols-3 gap-8 max-w-4xl mx-auto">
           <div
-            class="flex flex-wrap items-center justify-center gap-8 text-sm text-slate-500 transition-colors duration-300 animate-fade-in"
-            style="animation-delay: 400ms"
+            v-for="(stat, index) in stats"
+            :key="stat.label"
+            class="stat-item text-center scroll-reveal-scale"
+            :style="{ animationDelay: `${index * 150}ms` }"
           >
-            <div class="flex items-center gap-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-              </svg>
-              <span>Forever Free</span>
+            <div class="text-4xl sm:text-5xl font-bold text-slate-950 dark:text-slate-50 tabular-nums mb-2">
+              {{ stat.value.toLocaleString() }}{{ stat.suffix }}
             </div>
-            <div class="flex items-center gap-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-              </svg>
-              <span>All Platforms</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-              </svg>
-              <span>Private & Secure</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-              </svg>
-              <span>No Subscription</span>
-            </div>
+            <p class="text-sm text-slate-600 dark:text-slate-400">{{ stat.label }}</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Features Bento Grid Section -->
+    <!-- Features Bento Grid Section - Asymmetric Layout -->
     <section
-      class="py-24 lg:py-32 bg-slate-50/50 dark:bg-slate-900/30 transition-colors duration-300"
+      class="py-24 lg:py-32 transition-colors duration-300"
       data-animate-id="features"
     >
       <div class="container-custom">
         <div class="max-w-3xl mx-auto text-center mb-16 scroll-reveal" data-animate-id="features-title">
+          <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+            FEATURES
+          </span>
           <h2
             class="text-4xl sm:text-5xl font-semibold mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
           >
@@ -227,14 +273,24 @@ const demoFeatures = [
           </p>
         </div>
 
-        <!-- Bento Grid -->
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+        <!-- Asymmetric Bento Grid -->
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 auto-rows-min">
           <div
             v-for="(feature, index) in features"
             :key="feature.title"
-            class="bento-card scroll-reveal"
+            :class="[feature.span, 'bento-card scroll-reveal']"
             :data-animate-id="'feature-' + index"
+            :style="{ 'animation-delay': `${index * 100}ms` }"
           >
+            <!-- Category badge -->
+            <div
+              v-if="feature.category"
+              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium mb-4"
+              :class="`badge-${feature.category}`"
+            >
+              {{ feature.category }}
+            </div>
+
             <!-- Icon with gradient background -->
             <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-5" :class="feature.gradient">
               <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -252,11 +308,14 @@ const demoFeatures = [
       </div>
     </section>
 
-    <!-- Product Demo Section - NEW -->
-    <section class="py-24 lg:py-32" data-animate-id="demo">
+    <!-- Product Demo Section -->
+    <section class="py-24 lg:py-32 bg-slate-50/50 dark:bg-slate-900/30 transition-colors duration-300" data-animate-id="demo">
       <div class="container-custom">
         <div class="max-w-6xl mx-auto">
           <div class="text-center mb-16 scroll-reveal" data-animate-id="demo-title">
+            <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+              HOW IT WORKS
+            </span>
             <h2
               class="text-4xl sm:text-5xl font-semibold mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
             >
@@ -271,7 +330,7 @@ const demoFeatures = [
             <div
               v-for="(demo, index) in demoFeatures"
               :key="demo.title"
-              class="card scroll-reveal"
+              class="card shimmer scroll-reveal"
               :data-animate-id="'demo-' + index"
             >
               <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center mb-5">
@@ -301,6 +360,9 @@ const demoFeatures = [
     >
       <div class="container-custom">
         <div class="max-w-5xl mx-auto text-center mb-16 scroll-reveal" data-animate-id="download-title">
+          <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+            DOWNLOAD
+          </span>
           <h2
             class="text-4xl sm:text-5xl font-semibold mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
           >
@@ -321,7 +383,6 @@ const demoFeatures = [
             <div
               class="w-14 h-14 mx-auto mb-4 rounded-xl flex items-center justify-center bg-slate-100 group-hover:bg-slate-200 dark:bg-slate-800 dark:group-hover:bg-slate-700 transition-colors duration-300"
             >
-              <!-- macOS Icon -->
               <svg class="w-8 h-8 text-slate-700 dark:text-slate-300" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
               </svg>
@@ -338,8 +399,7 @@ const demoFeatures = [
             <div
               class="w-14 h-14 mx-auto mb-4 rounded-xl flex items-center justify-center bg-slate-100 group-hover:bg-slate-200 dark:bg-slate-800 dark:group-hover:bg-slate-700 transition-colors duration-300"
             >
-              <!-- Windows Icon -->
-              <svg class="w-8 h-8 text-slate-700 dark:text-slate-300 transition-colors duration-300" viewBox="0 0 24 24" fill="currentColor">
+              <svg class="w-8 h-8 text-slate-700 dark:text-slate-300" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M3,12V6.75L9,5.43v6.48L3,12M20,3v8.75L10,11.9V5.21L20,3M3,13l6 .09V19.9L3,18.75V13m17 .25V22L10,20.09v-7Z"/>
               </svg>
             </div>
@@ -355,8 +415,7 @@ const demoFeatures = [
             <div
               class="w-14 h-14 mx-auto mb-4 rounded-xl flex items-center justify-center bg-slate-100 group-hover:bg-slate-200 dark:bg-slate-800 dark:group-hover:bg-slate-700 transition-colors duration-300"
             >
-              <!-- Linux Icon -->
-              <svg class="w-8 h-8 text-slate-700 dark:text-slate-300 transition-colors duration-300" viewBox="0 0 24 24" fill="currentColor">
+              <svg class="w-8 h-8 text-slate-700 dark:text-slate-300" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489a.424.424 0 0 0-.11.135c-.26.268-.45.6-.663.839-.199.199-.485.267-.797.4-.313.136-.658.269-.864.68-.09.189-.136.394-.132.602 0 .199.027.4.055.536.058.399.116.728.04.97-.249.68-.28 1.145-.106 1.484.174.334.535.47.94.601.81.2 1.91.135 2.774.6.926.466 1.866.67 2.616.47.526-.116.97-.464 1.208-.946.587-.003 1.23-.269 2.26-.334.699-.058 1.574.267 2.577.2.025.134.063.198.114.333l.003.003c.391.778 1.113 1.132 1.884 1.071.771-.06 1.592-.536 2.257-1.306.631-.765 1.683-1.084 2.378-1.503.348-.199.629-.469.649-.853.023-.4-.2-.811-.714-1.376v-.097l-.003-.003c-.17-.2-.25-.535-.338-.926-.085-.401-.182-.786-.492-1.046h-.003c-.059-.054-.123-.067-.188-.135a.357.357 0 0 0-.19-.064c.431-1.278.264-2.55-.173-3.694-.533-1.41-1.465-2.638-2.175-3.483-.796-1.005-1.576-1.957-1.56-3.368.026-2.152.236-6.133-3.544-6.139z"/>
               </svg>
             </div>
@@ -372,8 +431,7 @@ const demoFeatures = [
             <div
               class="w-14 h-14 mx-auto mb-4 rounded-xl flex items-center justify-center bg-slate-100 group-hover:bg-slate-200 dark:bg-slate-800 dark:group-hover:bg-slate-700 transition-colors duration-300"
             >
-              <!-- iOS Icon -->
-              <svg class="w-8 h-8 text-slate-700 dark:text-slate-300 transition-colors duration-300" viewBox="0 0 24 24" fill="currentColor">
+              <svg class="w-8 h-8 text-slate-700 dark:text-slate-300" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
               </svg>
             </div>
@@ -396,6 +454,9 @@ const demoFeatures = [
       <div class="container-custom">
         <div class="max-w-3xl mx-auto">
           <div class="text-center mb-12 scroll-reveal" data-animate-id="faq-title">
+            <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+              FAQ
+            </span>
             <h2
               class="text-4xl sm:text-5xl font-semibold mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
             >
@@ -444,20 +505,24 @@ const demoFeatures = [
     </section>
 
     <!-- Final CTA Section -->
-    <section class="py-24 lg:py-32" data-animate-id="cta">
-      <div class="container-custom">
+    <section class="py-24 lg:py-32 relative overflow-hidden" data-animate-id="cta">
+      <!-- Background gradient -->
+      <div class="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-800" />
+      <div class="absolute inset-0 bg-grid opacity-10" />
+
+      <div class="container-custom relative z-10">
         <div class="max-w-3xl mx-auto text-center scroll-reveal" data-animate-id="cta-title">
           <h2
-            class="text-4xl sm:text-5xl font-semibold mb-6 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+            class="text-4xl sm:text-5xl font-semibold mb-6 text-white transition-colors duration-300"
           >
             Ready to Get Started?
           </h2>
-          <p class="text-xl mb-10 text-slate-600 dark:text-slate-400">
+          <p class="text-xl mb-10 text-slate-300">
             Join thousands of users who are already typing smarter, not harder.
           </p>
           <RouterLink
             to="/downloads"
-            class="btn-primary inline-flex items-center gap-2 text-lg bg-slate-950 hover:bg-slate-900 dark:bg-sky-500 dark:hover:bg-sky-400"
+            class="inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold text-white rounded-full transition-all duration-300 hover:shadow-xl hover:scale-105 bg-slate-950 hover:bg-slate-900 dark:bg-sky-500 dark:hover:bg-sky-400"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
@@ -474,13 +539,56 @@ const demoFeatures = [
 .scroll-reveal {
   opacity: 0;
   transform: translateY(30px);
-  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
-              transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.8s var(--ease-out-expo),
+              transform 0.8s var(--ease-out-expo);
 }
 
 .scroll-reveal.visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+.scroll-reveal-right {
+  opacity: 0;
+  transform: translateX(50px);
+  transition: opacity 0.8s var(--ease-out-expo),
+              transform 0.8s var(--ease-out-expo);
+}
+
+.scroll-reveal-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.scroll-reveal-scale {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.6s var(--ease-spring),
+              transform 0.6s var(--ease-spring);
+}
+
+.scroll-reveal-scale.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Kinetic word animation */
+.kinetic-word {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s var(--ease-out-expo),
+              transform 0.6s var(--ease-out-expo);
+}
+
+.kinetic-word.animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Tabular numbers for stats */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
 
 /* Stagger animations for bento grid */
@@ -490,4 +598,32 @@ const demoFeatures = [
 .bento-card:nth-child(4) { transition-delay: 300ms; }
 .bento-card:nth-child(5) { transition-delay: 400ms; }
 .bento-card:nth-child(6) { transition-delay: 500ms; }
+
+/* Hero section specific */
+.hero-section {
+  min-height: 100vh;
+}
+
+@media (max-width: 1024px) {
+  .hero-content {
+    text-center: !important;
+  }
+
+  .hero-visual {
+    order: -1;
+    margin-bottom: 2rem;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduce-motion: reduce) {
+  .kinetic-word,
+  .scroll-reveal,
+  .scroll-reveal-right,
+  .scroll-reveal-scale {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
 </style>

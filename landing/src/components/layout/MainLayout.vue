@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
 import { RouterView } from 'vue-router'
 import AppHeader from './AppHeader.vue'
 import AppFooter from './AppFooter.vue'
-
-const route = useRoute()
 </script>
 
 <template>
