@@ -73,3 +73,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.5] - 2025-12-29
+
+### Added
+
+- **Favorites Filter** - New filter option to quickly access starred transcriptions. Toggle between All and Favorites with a single click in the transcriptions view.
+
+### Changed
+
+- **VAD Overlay UI** - Improved VAD recording overlay with static processing indicator (no flashing animations). Removed 'Speech Detection' and 'Audio Quality' status labels for cleaner interface.
+
+### Fixed
+
+- **Code Quality** - Fixed all static analysis warnings. Zero errors, zero warnings across entire codebase. Removed unused imports and variables.
+- **Hive Schema** - Fixed Hive schema compatibility by making isFavorite field nullable for backward compatibility with existing user data.
+
+### Removed
+
+- **Auto-Stop After Silence** - Removed auto-stop after silence feature for simplified manual recording control. Users now have full control over when to stop recording.
+
+---
+

@@ -30,6 +30,44 @@
   },
   "versions": [
     {
+      "version": "1.0.5",
+      "date": "2025-12-29",
+      "stable": true,
+      "highlights": [
+        "Favorites filter for quick access to starred transcriptions",
+        "Cleaner VAD overlay with static processing indicator",
+        "Removed auto-stop after silence for simplified workflow",
+        "Zero static analysis warnings and errors"
+      ],
+      "changes": [
+        {
+          "category": "added",
+          "title": "Favorites Filter",
+          "description": "New filter option to quickly access starred transcriptions. Toggle between All and Favorites with a single click in the transcriptions view."
+        },
+        {
+          "category": "changed",
+          "title": "VAD Overlay UI",
+          "description": "Improved VAD recording overlay with static processing indicator (no flashing animations). Removed 'Speech Detection' and 'Audio Quality' status labels for cleaner interface."
+        },
+        {
+          "category": "removed",
+          "title": "Auto-Stop After Silence",
+          "description": "Removed auto-stop after silence feature for simplified manual recording control. Users now have full control over when to stop recording."
+        },
+        {
+          "category": "fixed",
+          "title": "Code Quality",
+          "description": "Fixed all static analysis warnings. Zero errors, zero warnings across entire codebase. Removed unused imports and variables."
+        },
+        {
+          "category": "fixed",
+          "title": "Hive Schema",
+          "description": "Fixed Hive schema compatibility by making isFavorite field nullable for backward compatibility with existing user data."
+        }
+      ]
+    },
+    {
       "version": "1.0.4",
       "date": "2025-12-23",
       "stable": true,
