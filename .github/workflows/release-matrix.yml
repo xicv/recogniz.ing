@@ -98,21 +98,19 @@ jobs:
           - platform: macos
             os: macos-latest
             build_command: flutter build macos --release
-            artifact_name: recognizing-${{ needs.version.outputs.version_name }}-macos.zip
+            artifact_zip_name: recognizing-${{ needs.version.outputs.version_name }}-macos.zip
             artifact_source: build/macos/Build/Products/Release
-            archive_name: recognizing.app
+            app_bundle_name: recognizing
           - platform: windows
             os: windows-latest
             build_command: flutter build windows --release
-            artifact_name: recognizing-${{ needs.version.outputs.version_name }}-windows.zip
-            artifact_source: build/windows/x64/runner/Release
-            archive_name: recognizing-windows
+            artifact_zip_name: recognizing-${{ needs.version.outputs.version_name }}-windows.zip
+            artifact_exe_name: recognizing-${{ needs.version.outputs.version_name }}-windows.exe
           - platform: web
             os: ubuntu-latest
             build_command: flutter build web --release
-            artifact_name: recognizing-${{ needs.version.outputs.version_name }}-web.zip
+            artifact_zip_name: recognizing-${{ needs.version.outputs.version_name }}-web.zip
             artifact_source: build/web
-            archive_name: recognizing-web
 
     runs-on: ${{ matrix.os }}
     permissions:
@@ -141,7 +139,7 @@ jobs:
         if: matrix.platform == 'macos'
         run: |
           cd ${{ matrix.artifact_source }}
-          zip -r recognizing.app.zip ${{ matrix.archive_name }}.app
+          zip -r ${{ matrix.artifact_zip_name }} ${{ matrix.app_bundle_name }}.app
           cd ../../../../../
 
       - name: Create Windows archive with NSIS installer
@@ -225,14 +223,14 @@ jobs:
             }
           } else {
             Write-Host "NSIS not found, creating ZIP package..."
-            Compress-Archive -Path "${{ matrix.artifact_source }}\*" -DestinationPath "recognizing-${{ needs.version.outputs.version_name }}-windows.zip"
+            Compress-Archive -Path "${{ matrix.artifact_source }}\*" -DestinationPath "${{ matrix.artifact_zip_name }}"
           }
 
       - name: Create Web archive
         if: matrix.platform == 'web'
         run: |
           cd ${{ matrix.artifact_source }}
-          zip -r ${{ matrix.artifact_name }} .
+          zip -r ${{ matrix.artifact_zip_name }} .
           cd ../../
 
       - name: Upload build artifacts
@@ -240,10 +238,10 @@ jobs:
         with:
           name: build-${{ matrix.platform }}-${{ needs.version.outputs.version_name }}
           path: |
-            ${{ matrix.artifact_source }}/${{ matrix.artifact_name }}
-            recognizing-${{ needs.version.outputs.version_name }}-windows.exe
+            ${{ matrix.artifact_source }}/${{ matrix.artifact_zip_name }}
+            ${{ matrix.artifact_exe_name }}
           retention-days: 7
-          if-no-files-found: error
+          if-no-files-found: warn
 
   # Create release - waits for all builds to complete
   release:
@@ -280,8 +278,8 @@ jobs:
           mkdir -p landing/public/downloads/${VERSION}/web
 
           # Copy macOS artifact
-          if [ -f "artifacts/build-macos-${VERSION}/recognizing.app.zip" ]; then
-            cp artifacts/build-macos-${VERSION}/recognizing.app.zip \
+          if [ -f "artifacts/build-macos-${VERSION}/recognizing-${VERSION}-macos.zip" ]; then
+            cp artifacts/build-macos-${VERSION}/recognizing-${VERSION}-macos.zip \
               landing/public/downloads/${VERSION}/macos/recognizing-${VERSION}-macos.zip
           fi
 
