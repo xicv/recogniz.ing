@@ -1,1 +1,24 @@
-{"version": "1.0.4", "platforms": {"macos": "downloads/macos/1.0.4/recognizing-1.0.4-macos.zip", "windows": "downloads/windows/1.0.4/recognizing-1.0.4-windows.zip", "linux": "downloads/linux/1.0.4/recognizing-1.0.4-linux.tar.gz", "android_apk": "downloads/android/1.0.4/recognizing-1.0.4.apk", "android_aab": "downloads/android/1.0.4/recognizing-1.0.4.aab", "web": "downloads/web/1.0.4/recognizing-1.0.4-web.zip"}, "build_date": "2025-12-23T11:02:06Z"}
+{
+  "version": "1.0.4",
+  "platforms": {
+    "macos": "downloads/macos/1.0.4/recognizing-1.0.4-macos.zip",
+    "windows": "downloads/windows/1.0.4/recognizing-1.0.4-windows.zip",
+    "linux": "downloads/linux/1.0.4/recognizing-1.0.4-linux.tar.gz",
+    "android_apk": "downloads/android/1.0.4/recognizing-1.0.4.apk",
+    "android_aab": "downloads/android/1.0.4/recognizing-1.0.4.aab",
+    "web": "downloads/web/1.0.4/recognizing-1.0.4-web.zip"
+  },
+  "build_date": "2025-12-23T11:02:06Z",
+  "versions": [
+    {
+      "version": "1.0.8",
+      "released_at": "2025-12-29T03:41:21.406615+00:00",
+      "downloads": {
+        "macos": "downloads/1.0.8/macos/recognizing-1.0.8-macos.zip",
+        "windows": "downloads/1.0.8/windows/recognizing-1.0.8-windows.zip",
+        "web": "downloads/1.0.8/web/recognizing-1.0.8-web.zip"
+      }
+    }
+  ],
+  "current_version": "1.0.8"
+}
