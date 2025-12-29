@@ -2,8 +2,6 @@ import 'dart:typed_data';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:record/record.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as path;
 
 /// Audio compression service for optimizing audio files before API upload
 class AudioCompressionService {
@@ -18,11 +16,6 @@ class AudioCompressionService {
       if (kDebugMode) {
         debugPrint('[AudioCompression] Starting compression of: $inputPath');
       }
-
-      final tempDir = await getTemporaryDirectory();
-      final outputFileName =
-          'compressed_${DateTime.now().millisecondsSinceEpoch}.m4a';
-      final outputPath = path.join(tempDir.path, outputFileName);
 
       // For now, we'll use a simpler approach
       // The record package already compresses to AAC by default

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'error_handler.dart';
 import 'error_components.dart';

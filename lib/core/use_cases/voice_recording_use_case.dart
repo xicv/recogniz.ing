@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../constants/constants.dart';
 import '../models/transcription.dart';
-import '../models/transcription_result.dart';
 import '../providers/ui_providers.dart';
 import '../interfaces/audio_service_interface.dart';
 

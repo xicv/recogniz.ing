@@ -60,11 +60,6 @@ class AppTheme {
   static const Color _surfaceDark = Color(0xFF1C1B1F);
   static const Color _backgroundDark = Color(0xFF121212); // OLED-friendly
 
-  /// Semantic colors - consistent across themes
-  static const Color _success = Color(0xFF10B981); // Emerald
-  static const Color _warning = Color(0xFFF59E0B); // Amber
-  static const Color _error = Color(0xFFEF4444); // Red
-
   // ============================================================
   // LIGHT THEME
   // ============================================================

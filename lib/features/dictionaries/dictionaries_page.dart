@@ -7,9 +7,7 @@ import '../../core/providers/app_providers.dart';
 import '../../core/providers/vocabulary_providers.dart';
 import '../../core/models/vocabulary.dart';
 import '../../core/models/app_settings.dart';
-import '../../core/theme/app_theme.dart';
 import '../../widgets/shared/app_bars.dart';
-import '../../widgets/shared/content_skeletons.dart';
 import '../../widgets/shared/empty_states.dart';
 import '../settings/widgets/vocabulary_editor.dart';
 

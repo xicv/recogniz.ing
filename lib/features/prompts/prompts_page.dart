@@ -8,7 +8,6 @@ import '../../core/providers/prompt_providers.dart';
 import '../../core/models/custom_prompt.dart';
 import '../../core/models/app_settings.dart';
 import '../../widgets/shared/app_bars.dart';
-import '../../widgets/shared/content_skeletons.dart';
 import '../../widgets/shared/empty_states.dart';
 import '../settings/widgets/prompt_editor.dart';
 

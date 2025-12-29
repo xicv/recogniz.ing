@@ -5,9 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/providers/app_providers.dart';
-import '../../core/providers/transcription_providers.dart';
 import '../../core/theme/app_theme.dart';
-import '../../widgets/shared/content_skeletons.dart';
 import '../../widgets/shared/empty_states.dart';
 import 'widgets/compact_stats_card.dart';
 import 'widgets/dashboard_metrics.dart';

@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:record/record.dart';
 import '../utils/audio_utils.dart';
@@ -123,7 +122,6 @@ class VadService {
     }
 
     final segments = <SpeechSegment>[];
-    final frameDurationMs = _frameSize * 1000 ~/ sampleRate;
     bool inSpeech = false;
     int speechStart = -1;
 

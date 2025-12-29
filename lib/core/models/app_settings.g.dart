@@ -25,8 +25,6 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       autoCopyToClipboard: fields[5] as bool,
       showNotifications: fields[6] as bool,
       criticalInstructions: fields[7] as String?,
-      autoStopAfterSilence: fields[8] as bool,
-      silenceDuration: fields[9] as int,
       startAtLogin: fields[10] as bool,
     );
   }
@@ -34,7 +32,7 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
   @override
   void write(BinaryWriter writer, AppSettings obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.geminiApiKey)
       ..writeByte(1)
@@ -51,10 +49,6 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       ..write(obj.showNotifications)
       ..writeByte(7)
       ..write(obj.criticalInstructions)
-      ..writeByte(8)
-      ..write(obj.autoStopAfterSilence)
-      ..writeByte(9)
-      ..write(obj.silenceDuration)
       ..writeByte(10)
       ..write(obj.startAtLogin);
   }

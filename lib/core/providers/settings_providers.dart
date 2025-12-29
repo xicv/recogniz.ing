@@ -80,19 +80,6 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     state = newState;
   }
 
-  Future<void> toggleAutoStopAfterSilence() async {
-    final newState =
-        state.copyWith(autoStopAfterSilence: !state.autoStopAfterSilence);
-    await StorageService.saveSettings(newState);
-    state = newState;
-  }
-
-  Future<void> updateSilenceDuration(int duration) async {
-    final newState = state.copyWith(silenceDuration: duration);
-    await StorageService.saveSettings(newState);
-    state = newState;
-  }
-
   Future<void> toggleStartAtLogin() async {
     final newValue = !state.startAtLogin;
     final service = StartAtLoginService();

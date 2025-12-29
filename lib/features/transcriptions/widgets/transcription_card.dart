@@ -602,13 +602,12 @@ class _TranscriptionCardState extends State<TranscriptionCard>
           color: colorScheme.outline,
         ),
 
-        // Token usage (if available)
-        if (widget.transcription.tokenUsage != null)
-          _MetadataItem(
-            icon: LucideIcons.zap,
-            label: '${widget.transcription.tokenUsage} tokens',
-            color: colorScheme.outline,
-          ),
+        // Token usage
+        _MetadataItem(
+          icon: LucideIcons.zap,
+          label: '${widget.transcription.tokenUsage} tokens',
+          color: colorScheme.outline,
+        ),
 
         // Duration
         _MetadataItem(
@@ -774,9 +773,6 @@ class _MenuOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
     return TapRegion(
       onTapOutside: (_) => onClose(),
       child: CompositedTransformFollower(
@@ -1059,21 +1055,19 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
                               color: colorScheme.outline,
                             ),
                       ),
-                      if (widget.transcription.tokenUsage != null) ...[
-                        const SizedBox(width: 16),
-                        Icon(
-                          LucideIcons.zap,
-                          size: 16,
-                          color: colorScheme.outline,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          '${widget.transcription.tokenUsage} tokens',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                                color: colorScheme.outline,
-                              ),
-                        ),
-                      ],
+                      const SizedBox(width: 16),
+                      Icon(
+                        LucideIcons.zap,
+                        size: 16,
+                        color: colorScheme.outline,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${widget.transcription.tokenUsage} tokens',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                              color: colorScheme.outline,
+                            ),
+                      ),
                     ],
                   ),
                 ),

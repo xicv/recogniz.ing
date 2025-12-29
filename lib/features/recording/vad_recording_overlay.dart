@@ -1,14 +1,13 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/services/vad_service.dart';
 import '../../core/services/haptic_service.dart';
-import '../../core/constants/ui_constants.dart';
 import '../../core/providers/recording_providers.dart';
-import '../../core/providers/settings_providers.dart';
 import '../../core/providers/app_providers.dart';
 import '../../widgets/recording/audio_waveform_display.dart';
 import '../../core/theme/app_theme.dart';
@@ -227,13 +226,19 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // State indicator (multi-channel)
-        _buildStateIndicator(context, currentState, stateColor, stateIcon, stateText),
+        // State indicator (multi-channel) - hidden during processing
+        if (recordingState != RecordingState.processing)
+          _buildStateIndicator(context, currentState, stateColor, stateIcon, stateText),
+
+        // Static processing indicator (no animation, only during processing)
+        if (recordingState == RecordingState.processing)
+          _buildStaticProcessingIndicator(context, colorScheme),
 
         const SizedBox(height: 32),
 
-        // Main recording circle with waveform
-        _buildRecordingCircle(context, recordingState, currentState, stateColor),
+        // Main recording circle with waveform (hidden during processing)
+        if (recordingState != RecordingState.processing)
+          _buildRecordingCircle(context, recordingState, currentState, stateColor),
 
         const SizedBox(height: 32),
 
@@ -246,24 +251,14 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
 
         const SizedBox(height: 32),
 
-        // Processing progress bar (when processing)
-        if (recordingState == RecordingState.processing)
-          _buildProcessingProgress(context),
-
-        // Timer display
+        // Timer display (hidden during processing)
         if (recordingState == RecordingState.recording ||
             recordingState == RecordingState.idle)
           _buildTimerDisplay(context),
 
         const SizedBox(height: 24),
 
-        // Status indicators
-        if (_isInitialized && recordingState != RecordingState.processing)
-          _buildStatusIndicators(context),
-
-        const SizedBox(height: 24),
-
-        // Instructions
+        // Instructions (hidden during processing)
         if (_isInitialized && recordingState != RecordingState.processing)
           _buildInstructions(context),
 
@@ -281,8 +276,6 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
     RecordingState recordingState,
     RecordingStateValue currentState,
   ) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -298,27 +291,40 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
 
         const SizedBox(height: 64),
 
-        // Timer only
-        Text(
-          _formatDuration(_currentDuration),
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 56,
-            fontWeight: FontWeight.w300,
-            letterSpacing: 4,
+        // Timer only (hidden during processing)
+        if (recordingState != RecordingState.processing)
+          Text(
+            _formatDuration(_currentDuration),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 56,
+              fontWeight: FontWeight.w300,
+              letterSpacing: 4,
+            ),
           ),
-        ),
 
         const SizedBox(height: 16),
 
-        // Minimal state indicator
-        Text(
-          getStateText(currentState),
-          style: TextStyle(
-            color: Colors.white.withOpacity(0.6),
-            fontSize: 14,
+        // Minimal state indicator (hidden during processing)
+        if (recordingState != RecordingState.processing)
+          Text(
+            getStateText(currentState),
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.6),
+              fontSize: 14,
+            ),
           ),
-        ),
+
+        // Static processing text (only during processing, no animation)
+        if (recordingState == RecordingState.processing)
+          Text(
+            'Processing...',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.7),
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
 
         // Stop button (when recording)
         if (recordingState == RecordingState.recording) ...[
@@ -376,6 +382,46 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
     );
   }
 
+  /// Static processing indicator without any animation.
+  /// This provides feedback during processing without the flashing effect.
+  Widget _buildStaticProcessingIndicator(
+    BuildContext context,
+    ColorScheme colorScheme,
+  ) {
+    final processingColor = colorScheme.primary;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      decoration: BoxDecoration(
+        color: processingColor.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: processingColor.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            LucideIcons.clock,
+            color: processingColor,
+            size: 18,
+          ),
+          const SizedBox(width: 10),
+          Text(
+            'Processing',
+            style: TextStyle(
+              color: processingColor,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildRecordingCircle(
     BuildContext context,
     RecordingState recordingState,
@@ -424,75 +470,6 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
     );
   }
 
-  Widget _buildProcessingProgress(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final settings = ref.watch(settingsProvider);
-    final estimatedTime = _estimateProcessingTime();
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 32),
-      child: Column(
-        children: [
-          // Progress bar
-          Container(
-            width: 280,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(2),
-            ),
-            child: FractionallySizedBox(
-              widthFactor: _processingProgress,
-              alignment: Alignment.centerLeft,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: colorScheme.primary,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          // Progress text
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                '${(_processingProgress * 100).toInt()}%',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                '• ${_processingStage.isNotEmpty ? _processingStage : 'Processing'}...',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 4),
-
-          // ETA
-          if (estimatedTime > 0)
-            Text(
-              'About ${estimatedTime}s remaining',
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.5),
-                fontSize: 12,
-              ),
-            ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildTimerDisplay(BuildContext context) {
     return Text(
@@ -506,36 +483,7 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
     );
   }
 
-  Widget _buildStatusIndicators(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _StatusIndicator(
-            icon: LucideIcons.activity,
-            label: 'Speech Detection',
-            isActive: _hasDetectedSpeech,
-          ),
-          const SizedBox(height: 8),
-          _StatusIndicator(
-            icon: LucideIcons.checkCircle,
-            label: 'Audio Quality',
-            isActive: true,
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildInstructions(BuildContext context) {
-    final settings = ref.watch(settingsProvider);
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
@@ -554,9 +502,7 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
           ),
           const SizedBox(width: 8),
           Text(
-            settings.autoStopAfterSilence
-                ? 'Auto-stops after ${settings.silenceDuration}s of silence'
-                : 'Press stop button when finished',
+            'Press stop button when finished',
             style: TextStyle(
               color: Colors.white.withOpacity(0.7),
               fontSize: 12,
@@ -807,47 +753,5 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
       debugPrint('[VadRecordingOverlay] Error stopping recording: $e');
       rethrow;
     }
-  }
-}
-
-// ============================================================
-// STATUS INDICATOR WIDGET
-// ============================================================
-
-class _StatusIndicator extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool isActive;
-
-  const _StatusIndicator({
-    required this.icon,
-    required this.label,
-    required this.isActive,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final color = isActive
-        ? RecordingStateColors.voiceDetected
-        : Colors.white.withOpacity(0.4);
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          icon,
-          size: 14,
-          color: color,
-        ),
-        const SizedBox(width: 8),
-        Text(
-          label,
-          style: TextStyle(
-            color: color,
-            fontSize: 13,
-          ),
-        ),
-      ],
-    );
   }
 }

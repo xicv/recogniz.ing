@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:flutter/foundation.dart';
 import '../models/transcription.dart';
 
 /// Enhanced analytics service for deeper insights

@@ -3,7 +3,6 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
-import '../interfaces/audio_service_interface.dart';
 
 /// Audio processor that runs analysis in a separate isolate
 class AudioProcessor {

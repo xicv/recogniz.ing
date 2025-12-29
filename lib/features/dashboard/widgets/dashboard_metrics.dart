@@ -163,12 +163,6 @@ class DashboardMetrics extends StatelessWidget {
     );
   }
 
-  String _formatDuration(double seconds) {
-    final mins = (seconds / 60).floor();
-    final secs = (seconds % 60).floor();
-    return '${mins}:${secs.toString().padLeft(2, '0')}';
-  }
-
   String _formatDurationMinutes(double minutes) {
     final mins = minutes.floor();
     final secs = ((minutes - mins) * 60).floor();

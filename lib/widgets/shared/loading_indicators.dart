@@ -99,7 +99,7 @@ class LoadingIndicators {
                 large(message: message),
                 if (child != null) ...[
                   const SizedBox(height: 24),
-                  child!,
+                  child,
                 ],
               ],
             ),

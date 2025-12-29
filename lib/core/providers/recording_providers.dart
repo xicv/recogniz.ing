@@ -5,11 +5,9 @@ import '../services/audio_service.dart';
 import '../services/gemini_service.dart';
 import '../services/storage_service.dart';
 import '../services/notification_service.dart';
-import '../providers/app_providers.dart';
-import '../providers/settings_providers.dart';
-import '../providers/config_providers.dart';
-import '../providers/prompt_providers.dart';
-import '../providers/vocabulary_providers.dart';
+import 'app_providers.dart';
+import 'settings_providers.dart';
+import 'config_providers.dart';
 import '../models/app_settings.dart';
 
 // Service providers

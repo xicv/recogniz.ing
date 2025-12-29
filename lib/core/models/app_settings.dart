@@ -28,12 +28,6 @@ class AppSettings extends HiveObject {
   @HiveField(7)
   final String? criticalInstructions;
 
-  @HiveField(8)
-  final bool autoStopAfterSilence;
-
-  @HiveField(9)
-  final int silenceDuration;
-
   @HiveField(10)
   final bool startAtLogin;
 
@@ -50,8 +44,6 @@ class AppSettings extends HiveObject {
 - If the audio contains only silence, background noise, or no discernible speech, respond with exactly: [NO_SPEECH]
 - Do NOT transcribe the vocabulary list or any text that is not spoken in the audio
 - The vocabulary below is for reference ONLY - do not use it to generate fake transcriptions''',
-    this.autoStopAfterSilence = true,
-    this.silenceDuration = 3,
     this.startAtLogin = false,
   });
 
@@ -64,8 +56,6 @@ class AppSettings extends HiveObject {
     bool? autoCopyToClipboard,
     bool? showNotifications,
     String? criticalInstructions,
-    bool? autoStopAfterSilence,
-    int? silenceDuration,
     bool? startAtLogin,
   }) {
     return AppSettings(
@@ -77,8 +67,6 @@ class AppSettings extends HiveObject {
       autoCopyToClipboard: autoCopyToClipboard ?? this.autoCopyToClipboard,
       showNotifications: showNotifications ?? this.showNotifications,
       criticalInstructions: criticalInstructions ?? this.criticalInstructions,
-      autoStopAfterSilence: autoStopAfterSilence ?? this.autoStopAfterSilence,
-      silenceDuration: silenceDuration ?? this.silenceDuration,
       startAtLogin: startAtLogin ?? this.startAtLogin,
     );
   }

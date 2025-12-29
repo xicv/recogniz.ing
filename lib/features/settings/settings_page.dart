@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/providers/app_providers.dart';
-import '../../core/services/gemini_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/constants/app_constants.dart';
 import 'widgets/critical_instructions_editor.dart';
@@ -195,71 +194,6 @@ class _SettingsPageState
                     });
                   },
                 ),
-                // Auto-stop After Silence
-                SwitchListTile(
-                  title: const Text('Auto-stop After Silence'),
-                  subtitle: Text(settings.autoStopAfterSilence
-                      ? 'Stop automatically when silent'
-                      : 'Manual stop only'),
-                  value: settings.autoStopAfterSilence,
-                  onChanged: (value) {
-                    SchedulerBinding.instance.addPostFrameCallback((_) {
-                      ref
-                          .read(settingsProvider.notifier)
-                          .toggleAutoStopAfterSilence();
-                    });
-                  },
-                ),
-                if (settings.autoStopAfterSilence)
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Silence Duration',
-                              style: Theme.of(context).textTheme.titleSmall,
-                            ),
-                            Text(
-                              '${settings.silenceDuration}s',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleSmall
-                                  ?.copyWith(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                            ),
-                          ],
-                        ),
-                        Slider(
-                          value: settings.silenceDuration.toDouble(),
-                          min: 1,
-                          max: 10,
-                          divisions: 9,
-                          label: '${settings.silenceDuration}s',
-                          onChanged: (value) {
-                            SchedulerBinding.instance.addPostFrameCallback((_) {
-                              ref
-                                  .read(settingsProvider.notifier)
-                                  .updateSilenceDuration(value.toInt());
-                            });
-                          },
-                        ),
-                        Text(
-                          'Recording will stop after this many seconds of silence',
-                          style:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: Colors.grey,
-                                  ),
-                        ),
-                      ],
-                    ),
-                  ),
                 // Start at Login - Desktop only
                 if (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
                   SwitchListTile(
