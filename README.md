@@ -17,6 +17,8 @@ AI-powered voice typing application built with Flutter, featuring modern Materia
 - **🎨 Cleaner VAD UI**: Removed status labels, static processing indicator (no flashing)
 - **🔧 Simplified Recording**: Removed auto-stop feature for manual control
 - **✅ Code Quality**: Zero static analysis warnings or errors
+- **🎨 UI/UX Polish**: Improved typography hierarchy, smoother animations, refined card designs
+- **🔀 Navigation Fix**: Fixed drawer toggle animation overflow with proper state synchronization
 
 ### **Previous Version: 1.0.4** (December 23, 2025)
 - **📋 Changelog System**: New structured changelog with JSON format and auto-generated Markdown
@@ -170,9 +172,15 @@ make release          # Bump patch + deploy all platforms
 ### 🎨 Modern UI/UX
 - Material Design 3 with expressive shapes and colors
 - Collapsible left drawer navigation (replaces bottom tabs)
+- Smooth 250ms animations with easeOutCubic easing
 - Responsive design adapting to all screen sizes
 - Clean, minimal interface with thoughtful micro-interactions
 - Dark/Light theme support with system preference detection
+- Consistent border radius system (8, 12, 16, 20px)
+- Typography hierarchy with refined font weights (w500 for labels, w600 for headlines)
+- Hover effects on cards with subtle shadows
+- Empty states with gradient icon backgrounds
+- WCAG AAA compliant with 7:1 minimum contrast ratio
 
 ---
 
@@ -224,9 +232,9 @@ The repository includes a Vue 3 + Vite + TailwindCSS landing page that deploys t
 ```
 xicv/recogniz.ing (Single Repository)
 ├── .github/workflows/
-│   ├── release-all-platforms.yml  # Builds app, creates releases
-│   ├── release.yml                 # Alternative release workflow
-│   └── landing-deploy.yml         # Deploys landing to GitHub Pages
+│   ├── release-matrix.yml          # Unified release workflow (matrix strategy)
+│   ├── build-windows.yml           # Manual Windows-only builds
+│   └── landing-deploy.yml          # Deploys landing to GitHub Pages
 └── landing/                        # Vue 3 + Vite + TailwindCSS landing page
     ├── src/
     ├── public/downloads/           # App download artifacts (Git LFS)
@@ -237,12 +245,16 @@ xicv/recogniz.ing (Single Repository)
 
 **Tech Stack**: Vue 3.5, Vite 6.0, TailwindCSS 3.4, TypeScript 5.5, PWA (vite-plugin-pwa 0.21)
 
-### Automated Deployment Flow
+### Automated Release Flow (Matrix Strategy)
 
-1. **Tag Push**: Push a version tag (`v1.0.4`) → triggers release workflow
-2. **Build & Release**: GitHub Actions builds all platforms, creates GitHub Release
-3. **Update Downloads**: Workflow commits artifacts to `landing/public/downloads/[version]/`
-4. **Deploy Landing**: Commit triggers `landing-deploy.yml` → deploys to https://recogniz.ing/
+1. **Tag Push**: Push a version tag (`v1.0.5`) → triggers `release-matrix.yml`
+2. **Parallel Builds**: GitHub Actions builds macOS, Windows, and Web **simultaneously** on appropriate runners
+   - macOS on `macos-latest` (with Xcode)
+   - Windows on `windows-latest` (with NSIS installer creation)
+   - Web on `ubuntu-latest` (cost-effective)
+3. **Release Creation**: After all builds complete, creates GitHub release with all artifacts
+4. **Update Downloads**: Commits artifacts to `landing/public/downloads/[version]/`
+5. **Deploy Landing**: Commit triggers `landing-deploy.yml` → deploys to https://recogniz.ing/
 
 ### Landing Page Development
 
