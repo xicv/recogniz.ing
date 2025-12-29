@@ -12,7 +12,13 @@ AI-powered voice typing application built with Flutter, featuring modern Materia
 
 ## ✨ What's New
 
-### **Latest Version: 1.0.4** (December 23, 2025)
+### **Latest Version: 1.0.5** (December 29, 2025)
+- **⭐ Favorites Filter**: New filter to quickly access starred transcriptions
+- **🎨 Cleaner VAD UI**: Removed status labels, static processing indicator (no flashing)
+- **🔧 Simplified Recording**: Removed auto-stop feature for manual control
+- **✅ Code Quality**: Zero static analysis warnings or errors
+
+### **Previous Version: 1.0.4** (December 23, 2025)
 - **📋 Changelog System**: New structured changelog with JSON format and auto-generated Markdown
 - **🔄 Single Source of Truth**: CHANGELOG.json is now the authoritative source, CHANGELOG.md is auto-generated
 - **📦 Automated Version Management**: Updated version_manager.dart with changelog entry templates
@@ -114,8 +120,9 @@ make release          # Bump patch + deploy all platforms
 ## Features
 
 ### 🎤 Voice Recording
-- Smart voice activity detection (VAD) with configurable sensitivity
-- Visual recording feedback with timer and waveform indicators
+- Smart voice activity detection (VAD) with real-time feedback
+- Visual recording feedback with timer, waveform, and state indicators
+- Clean, static processing indicator (no flashing animations)
 - Desktop global hotkey support (Cmd+Shift+Space on macOS, Ctrl+Shift+Space on Windows/Linux)
 - System tray integration for desktop platforms
 - RMS-based amplitude detection with optimized thresholds
@@ -133,6 +140,7 @@ make release          # Bump patch + deploy all platforms
 
 ### 📊 Dashboard & Analytics
 - Real-time transcription history with search functionality
+- Favorites filter to quickly access starred transcriptions
 - Usage statistics tracking (transcriptions, tokens, duration)
 - Editable transcriptions with auto-save
 - Copy to clipboard with one-click
@@ -141,10 +149,11 @@ make release          # Bump patch + deploy all platforms
 ### ⚙️ Customization
 - 6 pre-configured prompts for different use cases
 - Custom vocabulary sets for technical terms
-- Configurable recording settings (sensitivity, minimum duration)
 - Theme switching (Light/Dark mode)
 - Global hotkey customization
 - Auto-copy to clipboard option
+- Show notifications toggle
+- Start at login (desktop platforms)
 
 ### 📝 Smart Prompts System
 - Clean Transcription, Formal Writing, Bullet Points, Email Draft, Meeting Notes, Social Media Post
@@ -160,6 +169,7 @@ make release          # Bump patch + deploy all platforms
 
 ### 🎨 Modern UI/UX
 - Material Design 3 with expressive shapes and colors
+- Collapsible left drawer navigation (replaces bottom tabs)
 - Responsive design adapting to all screen sizes
 - Clean, minimal interface with thoughtful micro-interactions
 - Dark/Light theme support with system preference detection
@@ -355,7 +365,15 @@ MIT License
 
 ## Changelog
 
-### v1.0.4 (Latest) - December 23, 2025
+### v1.0.5 (Latest) - December 29, 2025
+- **NEW**: Favorites filter for quickly accessing starred transcriptions
+- **REFACTORED**: Removed auto-stop after silence feature for simplified recording workflow
+- **ENHANCED**: Improved VAD overlay with static processing indicator (no flashing)
+- **REMOVED**: "Speech Detection" and "Audio Quality" status labels for cleaner UI
+- **FIXED**: All static analysis warnings (0 errors, 0 warnings)
+- **FIXED**: Hive schema compatibility with nullable isFavorite field
+
+### v1.0.4 - December 23, 2025
 - **NEW**: Changelog synchronization system with JSON as single source of truth
 - **NEW**: Version manager with `--changelog`, `--add-entry`, and `--verify-changelog` flags
 - **NEW**: Added Android platform downloads to landing page

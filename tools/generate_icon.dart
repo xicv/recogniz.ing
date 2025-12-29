@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -28,7 +27,6 @@ Future<ui.Image> createAppIcon() async {
   final canvas = Canvas(recorder);
 
   const size = 1024.0;
-  const center = Offset(512, 512);
 
   // Background
   final bgPaint = Paint()

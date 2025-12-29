@@ -7,9 +7,15 @@ A modern, minimalist landing page for the Recogniz.ing AI voice typing applicati
 
 ---
 
-## Latest Version: 1.0.4 (December 23, 2025)
+## Latest Version: 1.0.5 (December 29, 2025)
 
 ### Recent Updates
+- **⭐ Favorites Filter**: New filter to quickly access starred transcriptions
+- **🎨 Cleaner VAD UI**: Removed status labels, static processing indicator (no flashing)
+- **🔧 Simplified Recording**: Removed auto-stop feature for manual control
+- **✅ Code Quality**: Zero static analysis warnings or errors
+
+### Previous Updates (v1.0.4)
 - **📋 Changelog System**: JSON-first changelog with auto-generated Markdown
 - **🌐 Android Downloads**: Added Android platform downloads with installation instructions
 - **🐛 Fixed Download URLs**: Now correctly point to GitHub Pages instead of GitHub Releases
@@ -17,8 +23,6 @@ A modern, minimalist landing page for the Recogniz.ing AI voice typing applicati
 - **🏗️ Deployment**: Fixed detached HEAD issue in GitHub Actions release workflow
 - **📱 Android Support**: Fixed Android build with AGP 8.10 compatibility
 - **✨ PWA Support**: Progressive Web App capabilities with offline support
-
-### Previous Updates (v1.0.3)
 - **🎨 Updated Platform Icons**: Better visual representation with iMac for macOS and Apple logo for iOS
 - **🔐 macOS Security**: Fixed Gatekeeper verification issues
 - **🪟 Windows Support**: Initial Windows release with native installer
