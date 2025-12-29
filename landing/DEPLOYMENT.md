@@ -8,39 +8,34 @@ This guide covers how to deploy and maintain the Recogniz.ing landing page.
 xicv/recogniz.ing (Single Repository)
 ├── [Flutter App Source Code]
 ├── .github/workflows/
-│   ├── release-all-platforms.yml  # Builds app, creates releases
-│   ├── release.yml                 # Alternative release workflow
+│   ├── release-all-platforms.yml  # Builds app, creates GitHub Releases
+│   ├── build-windows.yml          # Windows-specific build
 │   └── landing-deploy.yml         # Deploys landing to GitHub Pages
 └── landing/                        # Landing page source
     ├── src/
     ├── public/
-    │   └── downloads/              # App download artifacts (LFS)
+    │   └── downloads/
+    │       └── manifest.json       # Version manifest (only tracked file)
     └── package.json
 ```
 
 ## Automated Deployment Flow
 
-1. **Release Triggered**: Push a version tag (e.g., `v1.0.4`) to main branch
+1. **Release Triggered**: Push a version tag (e.g., `v1.0.8`) to main branch
 2. **Build & Release**: GitHub Actions builds all platforms and creates a GitHub Release
-3. **Update Downloads**: Workflow commits download artifacts to `landing/public/downloads/`
+3. **Update Manifest**: Workflow updates `landing/public/downloads/manifest.json` with version info
 4. **Deploy Landing**: The commit triggers `landing-deploy.yml` to build and deploy to GitHub Pages
+
+> **Note**: Build artifacts (.zip, .apk, .aab) are stored in **GitHub Releases**, not in the repository. The `downloads/` folder is gitignored except for `manifest.json`.
 
 ## GitHub Pages Deployment
 
 The landing page is automatically deployed to GitHub Pages using GitHub Actions. Deployment is triggered when:
-- A release workflow commits updates to `landing/` folder
+- A release workflow commits updates to `manifest.json`
 - Any push to `main` branch with changes to `landing/**` files
 - Manual trigger via workflow_dispatch
 
-## Managing Releases with Git LFS
-
-The landing page stores downloadable files using Git LFS (Large File Storage).
-
-### Current Setup
-
-- ✅ Git LFS initialized
-- ✅ `*.zip`, `*.tar.gz`, `*.apk`, `*.aab` files tracked by LFS
-- ✅ LFS bandwidth: 10GB/month (free tier)
+## Managing Releases
 
 ### Automated Release Process
 
@@ -48,38 +43,41 @@ When you push a version tag:
 
 ```bash
 # Tag and push (triggers automated release)
-git tag v1.0.4
-git push origin v1.0.4
+git tag v1.0.8
+git push origin v1.0.8
 ```
 
 The GitHub Actions workflow will:
 1. Build all platform binaries
-2. Create GitHub Release with artifacts
-3. Copy artifacts to `landing/public/downloads/[version]/`
-4. Update `landing/public/downloads/manifest.json`
-5. Commit and push changes (triggers landing deployment)
+2. Create GitHub Release with artifacts attached
+3. Update `landing/public/downloads/manifest.json` with version info
+4. Commit and push manifest changes (triggers landing deployment)
+
+### Download URLs
+
+Users download from GitHub Releases:
+```
+https://github.com/xicv/recogniz.ing/releases/download/v{VERSION}/recognizing-{VERSION}-{platform}.zip
+```
+
+The landing page `DownloadsView.vue` reads these URLs from the manifest and constructs download links.
 
 ### Manual Release Process
 
-If you need to add builds manually:
+If you need to create a release manually:
 
-1. Copy build files to landing downloads:
+1. Build the app using `make build-macos` (or other platform)
+2. Create a GitHub Release via web UI or `gh` CLI:
    ```bash
-   mkdir -p landing/public/downloads/1.0.4/macos
-   cp path/to/recognizing-1.0.4-macos.zip landing/public/downloads/1.0.4/macos/
+   gh release create v1.0.8 \
+     --title "Recogniz.ing v1.0.8" \
+     --notes "Release notes here..."
    ```
-
-2. Update manifest.json:
+3. Upload build artifacts:
    ```bash
-   # Edit landing/public/downloads/manifest.json to include new version
+   gh release upload v1.0.8 build/macos/recognizing-1.0.8-macos.zip
    ```
-
-3. Commit and push:
-   ```bash
-   git add landing/public/downloads/
-   git commit -m "Add macOS v1.0.4 build"
-   git push
-   ```
+4. Update `landing/public/downloads/manifest.json` manually
 
 ## Custom Domain Configuration
 
@@ -117,22 +115,6 @@ TTL: 3600
 3. Custom domain: `recogniz.ing`
 4. Enable HTTPS when available
 
-## Git LFS Management
-
-### Check LFS Status
-```bash
-# Check which files are tracked by LFS
-git lfs ls-files
-
-# Check LFS storage usage
-git lfs ls-files | wc -l
-```
-
-### File Size Limits
-- Free tier: 10GB storage + 10GB bandwidth/month
-- Maximum file size: 2GB
-- Bandwidth counts ALL downloads/clones
-
 ## Development
 
 ### Landing Page Development
@@ -157,17 +139,7 @@ See the main project README for Flutter app development.
 ### GitHub Actions Issues
 - Check the Actions tab for deployment status
 - Ensure repository has GitHub Pages enabled
-- Verify workflow permissions are correct (contents: read, pages: write, id-token: write)
-
-### LFS Issues
-```bash
-# Reinstall Git LFS if needed
-git lfs install
-git lfs pull
-
-# Check if file is tracked by LFS
-git lfs track "*.zip"
-```
+- Verify workflow permissions are correct (contents: write, pages: write)
 
 ### DNS Issues
 - Use `dig recogniz.ing` to verify A records
@@ -177,5 +149,5 @@ git lfs track "*.zip"
 ## Resources
 
 - [GitHub Pages Documentation](https://docs.github.com/en/pages)
-- [Git LFS Documentation](https://git-lfs.com/)
+- [GitHub Releases Documentation](https://docs.github.com/en/repositories/releasing-projects-on-github)
 - [Vite Deployment Guide](https://vitejs.dev/guide/static-deploy.html)
