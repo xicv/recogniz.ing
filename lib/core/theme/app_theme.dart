@@ -49,6 +49,7 @@ class AppTheme {
   // ============================================================
 
   /// Seed color for dynamic theme generation
+  /// Using a refined indigo with better color harmony
   static const Color _seedColor = Color(0xFF6366F1);
 
   /// Foundation colors - Light mode
@@ -59,6 +60,17 @@ class AppTheme {
   /// Using MD3 recommended dark surfaces for eye comfort
   static const Color _surfaceDark = Color(0xFF1C1B1F);
   static const Color _backgroundDark = Color(0xFF121212); // OLED-friendly
+
+  // ============================================================
+  // BORDER RADIUS - Consistent rounded corners
+  // ============================================================
+
+  /// Consistent border radius values following Material 3 guidelines
+  static const double radiusSmall = 8.0;
+  static const double radiusMedium = 12.0;
+  static const double radiusLarge = 16.0;
+  static const double radiusXLarge = 20.0;
+  static const double radiusFull = 9999.0; // Pill shape
 
   // ============================================================
   // LIGHT THEME
@@ -177,40 +189,44 @@ class AppTheme {
       // Display styles - reserved for shortest, highest-emphasis text
       displayLarge: interTextTheme.displayLarge?.copyWith(
         fontSize: 57,
-        fontWeight: FontWeight.w400,
+        fontWeight: FontWeight.w600,
         letterSpacing: -0.25,
         color: onSurface,
         height: 1.12,
       ),
       displayMedium: interTextTheme.displayMedium?.copyWith(
         fontSize: 45,
-        fontWeight: FontWeight.w400,
+        fontWeight: FontWeight.w600,
         color: onSurface,
         height: 1.16,
+        letterSpacing: -0.2,
       ),
       displaySmall: interTextTheme.displaySmall?.copyWith(
         fontSize: 36,
-        fontWeight: FontWeight.w400,
+        fontWeight: FontWeight.w600,
         color: onSurface,
         height: 1.22,
+        letterSpacing: -0.15,
       ),
 
       // Headline styles - high-emphasis, shorter than body
       headlineLarge: interTextTheme.headlineLarge?.copyWith(
         fontSize: 32,
-        fontWeight: FontWeight.w400,
+        fontWeight: FontWeight.w600,
         color: onSurface,
         height: 1.25,
+        letterSpacing: -0.1,
       ),
       headlineMedium: interTextTheme.headlineMedium?.copyWith(
         fontSize: 28,
-        fontWeight: FontWeight.w400,
+        fontWeight: FontWeight.w600,
         color: onSurface,
         height: 1.29,
+        letterSpacing: -0.05,
       ),
       headlineSmall: interTextTheme.headlineSmall?.copyWith(
         fontSize: 24,
-        fontWeight: FontWeight.w400,
+        fontWeight: FontWeight.w600,
         color: onSurface,
         height: 1.33,
       ),
@@ -218,20 +234,21 @@ class AppTheme {
       // Title styles - medium-emphasis, shorter than body
       titleLarge: interTextTheme.titleLarge?.copyWith(
         fontSize: 22,
-        fontWeight: FontWeight.w400,
+        fontWeight: FontWeight.w500,
         color: onSurface,
         height: 1.27,
+        letterSpacing: 0,
       ),
       titleMedium: interTextTheme.titleMedium?.copyWith(
         fontSize: 16,
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.w600,
         letterSpacing: 0.15,
         color: onSurface,
         height: 1.5,
       ),
       titleSmall: interTextTheme.titleSmall?.copyWith(
         fontSize: 14,
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.w600,
         letterSpacing: 0.1,
         color: onSurface,
         height: 1.43,
@@ -241,21 +258,21 @@ class AppTheme {
       bodyLarge: interTextTheme.bodyLarge?.copyWith(
         fontSize: 16,
         fontWeight: FontWeight.w400,
-        letterSpacing: 0.5,
-        height: 1.5,
+        letterSpacing: 0.1,
+        height: 1.6,
         color: onSurface,
       ),
       bodyMedium: interTextTheme.bodyMedium?.copyWith(
         fontSize: 14,
         fontWeight: FontWeight.w400,
-        letterSpacing: 0.25,
-        height: 1.5,
+        letterSpacing: 0,
+        height: 1.6,
         color: onSurface,
       ),
       bodySmall: interTextTheme.bodySmall?.copyWith(
         fontSize: 12,
         fontWeight: FontWeight.w400,
-        letterSpacing: 0.4,
+        letterSpacing: 0.2,
         height: 1.5,
         color: onSurfaceVariant,
       ),
@@ -263,21 +280,21 @@ class AppTheme {
       // Label styles - smaller, utilitarian text
       labelLarge: interTextTheme.labelLarge?.copyWith(
         fontSize: 14,
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.w600,
         letterSpacing: 0.1,
         height: 1.29,
         color: onSurface,
       ),
       labelMedium: interTextTheme.labelMedium?.copyWith(
         fontSize: 12,
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.w600,
         letterSpacing: 0.5,
         height: 1.33,
         color: onSurfaceVariant,
       ),
       labelSmall: interTextTheme.labelSmall?.copyWith(
         fontSize: 11,
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.w600,
         letterSpacing: 0.5,
         height: 1.45,
         color: onSurfaceVariant,
@@ -293,10 +310,11 @@ class AppTheme {
     return CardThemeData(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(radiusLarge),
       ),
       color: colorScheme.surfaceContainerLow,
       margin: const EdgeInsets.only(bottom: 12),
+      clipBehavior: Clip.antiAlias,
     );
   }
 
@@ -310,28 +328,31 @@ class AppTheme {
 
     return InputDecorationTheme(
       filled: true,
-      fillColor: colorScheme.surfaceContainerHighest,
+      fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(radiusMedium),
         borderSide: BorderSide(color: outlineColor),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: outlineColor),
+        borderRadius: BorderRadius.circular(radiusMedium),
+        borderSide: BorderSide(color: outlineColor, width: 1),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(radiusMedium),
         borderSide: BorderSide(color: colorScheme.primary, width: 2),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: colorScheme.error),
+        borderRadius: BorderRadius.circular(radiusMedium),
+        borderSide: BorderSide(color: colorScheme.error, width: 1.5),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(radiusMedium),
         borderSide: BorderSide(color: colorScheme.error, width: 2),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      hintStyle: TextStyle(
+        color: colorScheme.onSurfaceVariant.withOpacity(0.6),
+      ),
     );
   }
 
@@ -341,10 +362,24 @@ class AppTheme {
         backgroundColor: colorScheme.primary,
         foregroundColor: colorScheme.onPrimary,
         elevation: 0,
+        shadowColor: Colors.transparent,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(radiusMedium),
         ),
+      ).copyWith(
+        overlayColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.pressed)) {
+            return colorScheme.onPrimary.withOpacity(0.1);
+          }
+          if (states.contains(WidgetState.hovered)) {
+            return colorScheme.onPrimary.withOpacity(0.08);
+          }
+          if (states.contains(WidgetState.focused)) {
+            return colorScheme.onPrimary.withOpacity(0.12);
+          }
+          return null;
+        }),
       ),
     );
   }
@@ -356,8 +391,18 @@ class AppTheme {
         foregroundColor: colorScheme.onPrimary,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(radiusMedium),
         ),
+      ).copyWith(
+        overlayColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.pressed)) {
+            return colorScheme.onPrimary.withOpacity(0.1);
+          }
+          if (states.contains(WidgetState.hovered)) {
+            return colorScheme.onPrimary.withOpacity(0.08);
+          }
+          return null;
+        }),
       ),
     );
   }
@@ -368,7 +413,7 @@ class AppTheme {
         foregroundColor: colorScheme.primary,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(radiusSmall),
         ),
       ),
     );
@@ -380,7 +425,7 @@ class AppTheme {
         foregroundColor: colorScheme.onSurfaceVariant,
         padding: const EdgeInsets.all(8),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(radiusSmall),
         ),
       ),
     );
@@ -436,7 +481,7 @@ class AppTheme {
         fontWeight: FontWeight.w500,
       ),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(radiusSmall),
       ),
       side: BorderSide.none,
     );
@@ -456,7 +501,7 @@ class AppTheme {
         fontWeight: FontWeight.w400,
       ),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(radiusMedium),
       ),
       behavior: SnackBarBehavior.floating,
       elevation: 8,
@@ -470,7 +515,7 @@ class AppTheme {
     return DialogThemeData(
       backgroundColor: colorScheme.surface,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(radiusLarge),
       ),
       titleTextStyle: TextStyle(
         color: colorScheme.onSurface,

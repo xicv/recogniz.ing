@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
+import '../../core/theme/app_theme.dart';
+
 /// Enhanced empty state widgets with engaging visuals and clear CTAs.
 ///
 /// Empty states are opportunities for user engagement and education.
@@ -58,13 +60,13 @@ class EmptyState extends StatelessWidget {
             children: [
               // Illustration icon
               _buildIcon(context),
-              const SizedBox(height: 24),
+              const SizedBox(height: 28),
 
               // Title
               Text(
                 title,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                     ),
                 textAlign: TextAlign.center,
               ).animate().fadeIn(delay: 200.ms),
@@ -76,6 +78,7 @@ class EmptyState extends StatelessWidget {
                 message,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: colorScheme.onSurfaceVariant,
+                      height: 1.5,
                     ),
                 textAlign: TextAlign.center,
               ).animate().fadeIn(delay: 300.ms),
@@ -96,14 +99,21 @@ class EmptyState extends StatelessWidget {
     final effectiveIconColor = iconColor ?? colorScheme.primary;
 
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        color: effectiveIconColor.withOpacity(0.1),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            effectiveIconColor.withOpacity(0.15),
+            effectiveIconColor.withOpacity(0.05),
+          ],
+        ),
         shape: BoxShape.circle,
       ),
       child: Icon(
         icon,
-        size: 48,
+        size: 52,
         color: effectiveIconColor,
       ),
     ).animate().scale(
@@ -119,8 +129,14 @@ class EmptyState extends StatelessWidget {
       children.add(
         FilledButton.icon(
           onPressed: onAction,
-          icon: const Icon(LucideIcons.mic),
+          icon: const Icon(LucideIcons.mic, size: 18),
           label: Text(actionLabel!),
+          style: FilledButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+            ),
+          ),
         ),
       );
     }
@@ -132,8 +148,14 @@ class EmptyState extends StatelessWidget {
       children.add(
         OutlinedButton.icon(
           onPressed: onSecondaryAction,
-          icon: const Icon(LucideIcons.settings),
+          icon: const Icon(LucideIcons.settings, size: 18),
           label: Text(secondaryActionLabel!),
+          style: OutlinedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+            ),
+          ),
         ),
       );
     }
@@ -460,15 +482,15 @@ class _FeatureCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: colorScheme.primaryContainer,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
             ),
             child: Icon(
               icon,
@@ -492,6 +514,7 @@ class _FeatureCard extends StatelessWidget {
                   description,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: colorScheme.onSurfaceVariant,
+                        height: 1.4,
                       ),
                 ),
               ],
@@ -521,7 +544,7 @@ class _ExamplePromptCard extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
         border: Border.all(
           color: colorScheme.outlineVariant.withOpacity(0.3),
         ),
@@ -532,7 +555,7 @@ class _ExamplePromptCard extends StatelessWidget {
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
               color: colorScheme.secondaryContainer,
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
             ),
             child: Icon(
               LucideIcons.quote,

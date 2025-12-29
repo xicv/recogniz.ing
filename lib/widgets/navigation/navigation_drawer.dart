@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/providers/app_providers.dart';
+import '../../core/services/version_service.dart';
+import '../../core/theme/app_theme.dart';
 
 /// Enhanced navigation drawer
 ///
@@ -26,15 +28,29 @@ class AppNavigationDrawer extends ConsumerStatefulWidget {
 class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
+  late Animation<double> _widthAnimation;
   bool _isExpanded = false;
+  String _appVersion = 'v1.0.0';
 
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 250),
       vsync: this,
     );
+    _widthAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOutCubic,
+    );
+    _loadVersion();
+  }
+
+  Future<void> _loadVersion() async {
+    final version = await VersionService.getVersionDisplayName();
+    setState(() {
+      _appVersion = 'v$version';
+    });
   }
 
   @override
@@ -59,43 +75,54 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
     final currentPage = ref.watch(currentPageProvider);
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Container(
-      width: _isExpanded ? 280 : 80,
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        border: Border(
-          right: BorderSide(
-            color: colorScheme.outlineVariant.withOpacity(0.2),
-            width: 1,
+    return AnimatedBuilder(
+      animation: _widthAnimation,
+      builder: (context, child) {
+        final collapsedWidth = 80.0;
+        final expandedWidth = 280.0;
+        final currentWidth = collapsedWidth + (expandedWidth - collapsedWidth) * _widthAnimation.value;
+        // Use animation value to determine layout state, not just _isExpanded
+        final isVisuallyExpanded = _widthAnimation.value > 0.5;
+
+        return Container(
+          width: currentWidth,
+          decoration: BoxDecoration(
+            color: colorScheme.surface,
+            border: Border(
+              right: BorderSide(
+                color: colorScheme.outlineVariant.withOpacity(0.3),
+                width: 1,
+              ),
+            ),
           ),
-        ),
-      ),
-      child: Column(
-        children: [
-          // Header with app logo and expand/collapse button
-          _buildHeader(context),
+          child: Column(
+            children: [
+              // Header with app logo and expand/collapse button
+              _buildHeader(context, isVisuallyExpanded),
 
-          const SizedBox(height: 8),
+              const SizedBox(height: 8),
 
-          // Navigation items
-          Expanded(
-            child: _buildNavigationItems(context, currentPage),
+              // Navigation items
+              Expanded(
+                child: _buildNavigationItems(context, currentPage, isVisuallyExpanded),
+              ),
+
+              // Footer with version
+              _buildFooter(context),
+            ],
           ),
-
-          // Footer with shortcuts hint
-          _buildFooter(context),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, bool isVisuallyExpanded) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(12),
-        child: _isExpanded
+        child: isVisuallyExpanded
             ? Row(
                 children: [
                   // App logo/icon
@@ -152,7 +179,7 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
       height: 48,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.primary,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
         image: const DecorationImage(
           image: AssetImage('assets/icons/app_icon.png'),
           fit: BoxFit.cover,
@@ -184,7 +211,7 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
     );
   }
 
-  Widget _buildNavigationItems(BuildContext context, int currentPage) {
+  Widget _buildNavigationItems(BuildContext context, int currentPage, bool isVisuallyExpanded) {
     final navigationItems = _getNavigationItems();
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -194,7 +221,7 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
         final isSelected = currentPage == item.index;
 
         // Collapsed mode: icon only
-        if (!_isExpanded) {
+        if (!isVisuallyExpanded) {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
             child: Tooltip(
@@ -202,68 +229,51 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
               waitDuration: const Duration(milliseconds: 500),
               child: Material(
                 color: isSelected
-                    ? colorScheme.primaryContainer.withOpacity(0.5)
+                    ? colorScheme.primaryContainer.withOpacity(0.6)
                     : Colors.transparent,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
                 child: InkWell(
                   onTap: () {
                     ref.read(currentPageProvider.notifier).state = item.index;
                   },
-                  borderRadius: BorderRadius.circular(12),
-                  hoverColor: colorScheme.onSurface.withOpacity(0.06),
-                  splashColor: colorScheme.onSurface.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                  hoverColor: colorScheme.onSurface.withOpacity(0.08),
+                  splashColor: colorScheme.onSurface.withOpacity(0.12),
                   child: Container(
-                    height: 48, // Optimized for smaller screens
+                    height: 48,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
                     ),
                     child: Stack(
                       children: [
-                        // Active indicator bar (left side) - Increased from 4px to 6px
+                        // Active indicator bar (left side)
                         Positioned(
                           left: 4,
                           top: 0,
                           bottom: 0,
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
-                            width: 6,
+                            width: 4,
                             margin: const EdgeInsets.symmetric(vertical: 12),
                             decoration: BoxDecoration(
                               color: isSelected
                                   ? colorScheme.primary
                                   : Colors.transparent,
                               borderRadius: const BorderRadius.only(
-                                topRight: Radius.circular(3),
-                                bottomRight: Radius.circular(3),
+                                topRight: Radius.circular(2),
+                                bottomRight: Radius.circular(2),
                               ),
                             ),
                           ),
                         ),
-
-                        // Center content
+                        // Center icon
                         Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                item.icon,
-                                color: isSelected
-                                    ? colorScheme.primary
-                                    : colorScheme.onSurfaceVariant,
-                                size: 24,
-                              ),
-                              if (!isSelected) ...[
-                                const SizedBox(height: 4),
-                                Text(
-                                  item.index.toString(),
-                                  style: TextStyle(
-                                    color: colorScheme.onSurfaceVariant.withOpacity(0.6),
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ],
+                          child: Icon(
+                            item.icon,
+                            color: isSelected
+                                ? colorScheme.onPrimaryContainer
+                                : colorScheme.onSurfaceVariant,
+                            size: 22,
                           ),
                         ),
                       ],
@@ -280,16 +290,16 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           child: Material(
             color: isSelected
-                ? colorScheme.primaryContainer
+                ? colorScheme.primaryContainer.withOpacity(0.7)
                 : Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
             child: InkWell(
               onTap: () {
                 ref.read(currentPageProvider.notifier).state = item.index;
               },
-              borderRadius: BorderRadius.circular(12),
-              hoverColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
-              splashColor: colorScheme.onSurface.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+              hoverColor: colorScheme.surfaceContainerHighest.withOpacity(0.6),
+              splashColor: colorScheme.onSurface.withOpacity(0.1),
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   vertical: 12,
@@ -302,7 +312,7 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
                       color: isSelected
                           ? colorScheme.onPrimaryContainer
                           : colorScheme.onSurfaceVariant,
-                      size: 24,
+                      size: 22,
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -317,7 +327,8 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
                                   : colorScheme.onSurface,
                               fontWeight: isSelected
                                   ? FontWeight.w600
-                                  : FontWeight.normal,
+                                  : FontWeight.w500,
+                              fontSize: 15,
                             ),
                       ),
                     ),
@@ -343,32 +354,12 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
     final colorScheme = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.all(8),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: 4),
-          // Version info
-          Text(
-            'v1.1.0',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant.withOpacity(0.6),
-                ),
-          ),
-          const SizedBox(height: 2),
-          // Settings link (collapsed) or full button (expanded)
-          if (!_isExpanded)
-            IconButton(
-              onPressed: () => ref.read(currentPageProvider.notifier).state = 4,
-              icon: Icon(
-                LucideIcons.settings,
-                color: colorScheme.onSurfaceVariant.withOpacity(0.6),
-                size: 18,
-              ),
-              tooltip: 'Settings',
-              padding: EdgeInsets.zero,
+      padding: const EdgeInsets.all(12),
+      child: Text(
+        _appVersion,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant.withOpacity(0.6),
             ),
-        ],
       ),
     );
   }

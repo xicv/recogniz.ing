@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../core/constants/ui_constants.dart';
 import '../../../core/models/transcription.dart';
+import '../../../core/theme/app_theme.dart';
 
 /// Enhanced transcription card with improved visual hierarchy
 ///
@@ -202,17 +203,33 @@ class _TranscriptionCardState extends State<TranscriptionCard>
           }
         },
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          transform: Matrix4.identity()..scale(_isHovered ? 1.01 : 1.0),
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOutCubic,
+          transform: Matrix4.identity()..scale(_isHovered ? 1.005 : 1.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+            boxShadow: _isHovered
+                ? [
+                    BoxShadow(
+                      color: colorScheme.shadow.withOpacity(0.08),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : null,
+          ),
           child: Card(
             margin: const EdgeInsets.only(bottom: UIConstants.spacingSmall),
             elevation: 0,
             surfaceTintColor: colorScheme.surfaceTint,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
               side: accentColor != Colors.transparent
-                  ? BorderSide(color: accentColor, width: 3)
-                  : BorderSide.none,
+                  ? BorderSide(color: accentColor, width: 2)
+                  : BorderSide(
+                      color: colorScheme.outlineVariant.withOpacity(0.3),
+                      width: 1,
+                    ),
             ),
             child: InkWell(
               onTap: () {
@@ -220,7 +237,9 @@ class _TranscriptionCardState extends State<TranscriptionCard>
                   setState(() => _isEditing = true);
                 }
               },
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+              hoverColor: colorScheme.onSurface.withOpacity(0.04),
+              splashColor: colorScheme.onSurface.withOpacity(0.08),
               child: Padding(
                 padding: const EdgeInsets.all(UIConstants.spacingMedium),
                 child: widget.isCompact
