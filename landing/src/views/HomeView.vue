@@ -3,7 +3,6 @@ import { ref, onMounted } from 'vue'
 import { useScrollAnimations } from '@/composables/useScrollAnimations'
 import GradientMesh from '@/components/ui/GradientMesh.vue'
 import ProductMockup from '@/components/ui/ProductMockup.vue'
-import TrustBadges from '@/components/ui/TrustBadges.vue'
 
 useScrollAnimations()
 
@@ -119,13 +118,6 @@ const demoFeatures = [
   }
 ]
 
-// Stats for counter animation
-const stats = [
-  { value: 50000, suffix: '+', label: 'Active Users', formatFn: (v: number) => Math.floor(v / 1000) + 'K' },
-  { value: 98, suffix: '%', label: 'Accuracy Rate' },
-  { value: 6, suffix: '', label: 'Platforms Supported' }
-]
-
 // Hero animation state
 const heroAnimated = ref(false)
 
@@ -212,10 +204,6 @@ onMounted(() => {
               </a>
             </div>
 
-            <!-- Trust Badges -->
-            <div class="kinetic-word" :class="{ 'animate-in': heroAnimated }" style="animation-delay: 600ms;">
-              <TrustBadges />
-            </div>
           </div>
 
           <!-- Right: Product Mockup -->
@@ -231,25 +219,6 @@ onMounted(() => {
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
         </svg>
-      </div>
-    </section>
-
-    <!-- Stats Section -->
-    <section class="py-16 lg:py-24 bg-slate-50/50 dark:bg-slate-900/30 border-y border-slate-100 dark:border-slate-800 transition-colors duration-300">
-      <div class="container-custom">
-        <div class="grid grid-cols-3 gap-8 max-w-4xl mx-auto">
-          <div
-            v-for="(stat, index) in stats"
-            :key="stat.label"
-            class="stat-item text-center scroll-reveal-scale"
-            :style="{ animationDelay: `${index * 150}ms` }"
-          >
-            <div class="text-4xl sm:text-5xl font-bold text-slate-950 dark:text-slate-50 tabular-nums mb-2">
-              {{ stat.value.toLocaleString() }}{{ stat.suffix }}
-            </div>
-            <p class="text-sm text-slate-600 dark:text-slate-400">{{ stat.label }}</p>
-          </div>
-        </div>
       </div>
     </section>
 

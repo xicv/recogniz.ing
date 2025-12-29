@@ -303,7 +303,7 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
                 <div
                   v-for="item in activeItems"
                   :key="item.title"
-                  class="p-6 rounded-2xl border bg-white dark:bg-slate-800 dark:border-slate-700 border-slate-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 shimmer scroll-reveal"
+                  class="p-6 rounded-2xl border bg-white dark:bg-slate-800 dark:border-slate-700 border-slate-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 shimmer"
                 >
                   <!-- Badge if present -->
                   <span
