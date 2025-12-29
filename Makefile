@@ -7,7 +7,7 @@
 .PHONY: generate debug-release install-release logs deploy deploy-all
 .PHONY: package-macos package-windows package-linux package-android package-web
 .PHONY: sign-macos notarize-macos codesign-setup
-.PHONY: version changelog verify-changelog
+.PHONY: version sync-version changelog verify-changelog
 .PHONY: bump-patch bump-minor bump-major bump-prerelease
 .PHONY: bump-patch-entry bump-minor-entry bump-major-entry
 
@@ -348,6 +348,10 @@ distribute-macos: ## Build, sign, and notarize macOS distribution
 version: ## Show current version
 	@echo "📋 Current version:"
 	@dart scripts/version_manager.dart --current
+
+sync-version: ## Sync pubspec.yaml version from CHANGELOG.json (SSOT)
+	@echo "🔄 Syncing version from CHANGELOG.json..."
+	@dart scripts/version_manager.dart --sync-from-changelog
 
 changelog: ## Generate CHANGELOG.md from CHANGELOG.json
 	@echo "📝 Generating changelog..."

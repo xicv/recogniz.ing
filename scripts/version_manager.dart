@@ -383,6 +383,62 @@ class ChangelogManager {
   }
 }
 
+/// Sync pubspec.yaml version from CHANGELOG.json (Single Source of Truth)
+Future<void> _syncFromChangelog(String projectRoot) async {
+  final changelogPath = path.join(projectRoot, 'CHANGELOG.json');
+  final pubspecPath = path.join(projectRoot, 'pubspec.yaml');
+
+  // Read changelog
+  if (!await File(changelogPath).exists()) {
+    print('❌ Error: CHANGELOG.json not found!');
+    exit(1);
+  }
+
+  final changelogContent = await File(changelogPath).readAsString();
+  final changelogJson = json.decode(changelogContent) as Map<String, dynamic>;
+
+  // Get latest version from changelog
+  final versions = changelogJson['versions'] as List<dynamic>;
+  if (versions.isEmpty) {
+    print('❌ Error: No versions found in CHANGELOG.json!');
+    exit(1);
+  }
+
+  final latestVersion = versions.first['version'] as String;
+  print('📋 Latest version in CHANGELOG.json: $latestVersion');
+
+  // Read pubspec.yaml
+  if (!await File(pubspecPath).exists()) {
+    print('❌ Error: pubspec.yaml not found!');
+    exit(1);
+  }
+
+  final pubspecContent = await File(pubspecPath).readAsString();
+  final lines = pubspecContent.split('\n');
+
+  // Find and update version line
+  for (int i = 0; i < lines.length; i++) {
+    if (lines[i].startsWith('version:')) {
+      final currentVersion = lines[i].replaceFirst('version: ', '').trim();
+
+      if (currentVersion == latestVersion) {
+        print('✅ pubspec.yaml already at version $latestVersion');
+        return;
+      }
+
+      print('🔄 Updating pubspec.yaml: $currentVersion → $latestVersion');
+      lines[i] = 'version: $latestVersion';
+
+      await File(pubspecPath).writeAsString(lines.join('\n'));
+      print('✅ pubspec.yaml updated to version $latestVersion');
+      return;
+    }
+  }
+
+  print('❌ Error: No version line found in pubspec.yaml!');
+  exit(1);
+}
+
 Future<void> main(List<String> args) async {
   if (args.isEmpty || args.contains('--help')) {
     _printUsage();
@@ -400,6 +456,12 @@ Future<void> main(List<String> args) async {
 
   if (args.contains('--verify-changelog')) {
     await changelogManager.verifySync();
+    return;
+  }
+
+  // Sync version from CHANGELOG.json (Single Source of Truth)
+  if (args.contains('--sync-from-changelog')) {
+    await _syncFromChangelog(projectRoot);
     return;
   }
 
@@ -528,6 +590,7 @@ USAGE:
 VERSION OPTIONS:
   --help                    Show this help message
   --current                 Show current version
+  --sync-from-changelog     Sync pubspec.yaml from CHANGELOG.json (SSOT)
   --bump <type>            Bump version (patch, minor, major, prerelease)
   --add-entry              Add changelog entry template when bumping
   --pub-get                Run 'flutter pub get' after updating version
@@ -539,6 +602,9 @@ CHANGELOG OPTIONS:
 EXAMPLES:
   # Show current version
   dart scripts/version_manager.dart --current
+
+  # Sync version from CHANGELOG.json (SSOT)
+  dart scripts/version_manager.dart --sync-from-changelog
 
   # Bump patch version (1.0.0 → 1.0.1)
   dart scripts/version_manager.dart --bump patch
@@ -556,14 +622,15 @@ EXAMPLES:
   dart scripts/version_manager.dart --verify-changelog
 
 WORKFLOW:
-  1. Bump version with entry: make bump-patch-entry (or manually)
+  1. Bump version: make bump-patch (automatically updates both files)
   2. Edit CHANGELOG.json with actual changes
-  3. Generate Markdown: dart scripts/version_manager.dart --changelog
-  4. Commit both changelogs together
+  3. Generate Markdown: make changelog
+  4. Commit both files together
 
 CHANGELOG FORMAT:
   JSON is the Single Source of Truth (SSOT).
   - Edit CHANGELOG.json to add changes
+  - Run --sync-from-changelog to update pubspec.yaml from JSON
   - Run --changelog to generate CHANGELOG.md
   - Categories: added, changed, fixed, removed, security
 ''');
