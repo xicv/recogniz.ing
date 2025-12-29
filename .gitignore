@@ -127,3 +127,8 @@ coverage/
 # Temporary files
 *.tmp
 *.temp
+
+# Landing page downloads - build artifacts (not manifest.json)
+landing/public/downloads/*/
+landing/public/downloads/!manifest.json
+landing/public/downloads/!*.gitkeep

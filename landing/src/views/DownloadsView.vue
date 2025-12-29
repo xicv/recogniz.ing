@@ -145,34 +145,42 @@ const getPlatformColor = (color?: string) => {
     </section>
 
     <!-- Platform Downloads -->
-    <section class="py-16 lg:py-24 section-padding">
-      <div class="container-custom">
+    <section class="py-16 lg:py-24 section-padding relative overflow-hidden">
+      <!-- Decorative background -->
+      <div class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-50/50 to-transparent dark:via-slate-900/30 pointer-events-none" />
+
+      <div class="container-custom relative z-10">
         <div class="max-w-6xl mx-auto">
           <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div
               v-for="platform in platforms"
               :key="platform.name"
-              class="group rounded-3xl border bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300 overflow-hidden scroll-reveal hover:shadow-xl hover:-translate-y-1"
+              class="group rounded-3xl border bg-white dark:bg-slate-800 transition-all duration-300 overflow-hidden scroll-reveal hover:shadow-2xl hover:-translate-y-2 platform-card-enhanced"
               :class="getPlatformColor(platform.color).border"
             >
-              <!-- Platform Icon -->
+              <!-- Platform Icon - Enhanced with glow -->
               <div
-                class="p-6 sm:p-8 text-center border-b border-slate-100 dark:border-slate-700 transition-colors duration-300"
+                class="p-6 sm:p-8 text-center border-b border-slate-100 dark:border-slate-700 transition-colors duration-300 relative"
               >
-                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center transition-colors duration-300"
+                <!-- Glow effect on hover -->
+                <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                  <div class="absolute inset-0 bg-gradient-to-br from-sky-500/5 to-violet-500/5" />
+                </div>
+
+                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg relative"
                   :class="platform.bg || getPlatformColor(platform.color).bg"
                 >
                   <svg
                     :viewBox="platform.viewBox || '0 0 24 24'"
                     fill="currentColor"
-                    class="w-8 h-8 transition-colors duration-300"
+                    class="w-8 h-8 transition-colors duration-300 relative z-10"
                     :class="getPlatformColor(platform.color).text"
                   >
                     <path :d="platform.icon"/>
                   </svg>
                 </div>
                 <h3
-                  class="text-xl sm:text-2xl font-semibold mb-1 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                  class="text-xl sm:text-2xl font-semibold mb-1 text-slate-950 dark:text-slate-50 transition-colors duration-300 group-hover:text-sky-600 dark:group-hover:text-sky-400"
                 >
                   {{ platform.name }}
                 </h3>
@@ -183,31 +191,34 @@ const getPlatformColor = (color?: string) => {
                 </p>
                 <span
                   v-if="platform.downloadUrl === '#'"
-                  class="inline-block px-2 py-1 rounded-full text-xs font-medium mt-2 bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400"
+                  class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium mt-3 bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400"
                 >
                   Coming Soon
                 </span>
                 <span
                   v-else
-                  class="inline-block px-2 py-1 rounded-full text-xs font-medium mt-2 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400"
+                  class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium mt-3 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400 shadow-sm"
                 >
+                  <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
                   Available Now
                 </span>
               </div>
 
-              <!-- Download Button -->
+              <!-- Download Button - Enhanced -->
               <div class="p-6 sm:p-8">
                 <button
                   @click="downloadPlatform(platform)"
                   :disabled="platform.downloadUrl === '#'"
-                  class="w-full px-6 py-4 rounded-xl font-medium transition-all duration-300 mb-4 text-white flex items-center justify-center gap-2 min-h-[52px] sm:min-h-[48px]"
+                  class="w-full px-6 py-4 rounded-xl font-medium transition-all duration-300 mb-4 text-white flex items-center justify-center gap-2.5 min-h-[52px] sm:min-h-[48px] group/btn relative overflow-hidden"
                   :class="[
                     platform.downloadUrl === '#'
                       ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                      : 'bg-slate-900 hover:bg-slate-800 dark:bg-sky-500 dark:hover:bg-sky-400 hover:scale-105 hover:shadow-lg'
+                      : 'bg-slate-900 hover:bg-slate-800 dark:bg-gradient-to-r dark:from-sky-500 dark:to-cyan-500 dark:hover:from-sky-400 dark:hover:to-cyan-400 hover:scale-105 hover:shadow-xl'
                   ]"
                 >
-                  <svg v-if="platform.downloadUrl !== '#'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg v-if="platform.downloadUrl !== '#'" class="w-5 h-5 transition-transform group-hover/btn:translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                   </svg>
                   {{ platform.downloadUrl === '#' ? 'Coming Soon' : 'Download' }}
@@ -226,14 +237,17 @@ const getPlatformColor = (color?: string) => {
       </div>
     </section>
 
-    <!-- Installation Instructions - Accordion Style -->
+    <!-- Installation Instructions - Enhanced -->
     <section
-      class="py-16 lg:py-24 section-padding bg-slate-50 dark:bg-slate-900/30 transition-colors duration-300"
+      class="py-16 lg:py-24 section-padding bg-slate-50 dark:bg-slate-900/30 transition-colors duration-300 relative overflow-hidden"
     >
-      <div class="container-custom">
+      <!-- Decorative background -->
+      <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-sky-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
+
+      <div class="container-custom relative z-10">
         <div class="max-w-4xl mx-auto">
           <div class="text-center mb-12 scroll-reveal">
-            <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+            <span class="inline-block px-4 py-1.5 rounded-full text-xs font-semibold mb-4 bg-slate-100/80 backdrop-blur text-slate-600 border border-slate-200 dark:bg-slate-800/80 dark:border-slate-700 dark:text-slate-400">
               INSTALLATION
             </span>
             <h2
@@ -246,17 +260,17 @@ const getPlatformColor = (color?: string) => {
             </p>
           </div>
 
-          <!-- Step Cards -->
+          <!-- Step Cards - Enhanced -->
           <div class="space-y-6">
             <!-- Step 1: API Key -->
-            <div class="card scroll-reveal">
+            <div class="card shimmer scroll-reveal group">
               <div class="flex items-start gap-6">
-                <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center text-white font-bold text-lg">
+                <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center text-white font-bold text-lg shadow-lg group-hover:scale-110 transition-transform">
                   1
                 </div>
                 <div class="flex-1">
                   <h3
-                    class="text-xl font-semibold mb-2 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                    class="text-xl font-semibold mb-2 text-slate-950 dark:text-slate-50 transition-colors duration-300 group-hover:text-sky-600 dark:group-hover:text-sky-400"
                   >
                     Get Your Free API Key
                   </h3>
@@ -269,9 +283,9 @@ const getPlatformColor = (color?: string) => {
                     href="https://aistudio.google.com/app/apikey"
                     target="_blank"
                     rel="noopener"
-                    class="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all bg-slate-900 text-white hover:bg-slate-800 dark:bg-sky-500 dark:hover:bg-sky-400 min-h-[48px]"
+                    class="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all bg-slate-900 text-white hover:bg-slate-800 dark:bg-gradient-to-r dark:from-sky-500 dark:to-cyan-500 dark:hover:from-sky-400 dark:hover:to-cyan-400 hover:shadow-lg min-h-[48px] group/btn"
                   >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 transition-transform group-hover/btn:translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                     </svg>
                     Get API Key
@@ -280,30 +294,30 @@ const getPlatformColor = (color?: string) => {
               </div>
             </div>
 
-            <!-- Step 2: Download & Install -->
-            <div class="card scroll-reveal">
+            <!-- Step 2: Download & Install - Enhanced -->
+            <div class="card shimmer scroll-reveal group">
               <div class="flex items-start gap-6">
-                <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
+                <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-lg group-hover:scale-110 transition-transform">
                   2
                 </div>
                 <div class="flex-1">
                   <h3
-                    class="text-xl font-semibold mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                    class="text-xl font-semibold mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300 group-hover:text-violet-600 dark:group-hover:text-violet-400"
                   >
                     Download & Install
                   </h3>
 
-                  <!-- Installation details by platform -->
+                  <!-- Installation details by platform - Enhanced cards -->
                   <div class="grid sm:grid-cols-2 gap-4">
                     <!-- Android -->
-                    <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                    <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 group-hover:border-emerald-300 dark:group-hover:border-emerald-700 transition-colors">
                       <div class="flex items-center gap-3 mb-3">
                         <svg viewBox="0 0 24 24" class="w-6 h-6 text-emerald-500" fill="currentColor">
                           <path d="M6.382 3.968A8.962 8.962 0 0 1 12 2c2.125 0 4.078.736 5.618 1.968l1.453-1.453 1.414 1.414-1.453 1.453A8.962 8.962 0 0 1 21 11v1H3v-1c0-2.125.736-4.078 1.968-5.618L3.515 3.93l1.414-1.414 1.453 1.453zM3 14h18v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-7z"/>
                         </svg>
                         <span class="font-medium text-slate-950 dark:text-slate-50">Android</span>
                       </div>
-                      <ol class="text-sm text-slate-600 dark:text-slate-400 space-y-1 list-decimal list-inside">
+                      <ol class="text-sm text-slate-600 dark:text-slate-400 space-y-1.5 list-decimal list-inside">
                         <li>Download the APK file</li>
                         <li>Enable "Install from unknown sources"</li>
                         <li>Open the APK and tap "Install"</li>
@@ -311,14 +325,14 @@ const getPlatformColor = (color?: string) => {
                     </div>
 
                     <!-- macOS -->
-                    <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                    <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 group-hover:border-slate-400 dark:group-hover:border-slate-600 transition-colors">
                       <div class="flex items-center gap-3 mb-3">
                         <svg viewBox="0 0 24 24" class="w-6 h-6 text-slate-500" fill="currentColor">
                           <path d="M18.7 19.5c-.8 1.2-1.7 2.5-3 2.5-1.3 0-1.8-.8-3.3-.8-1.5 0-2 .8-3.3.8-1.3 0-2.3-1.3-3.1-2.5C4.2 17 2.9 12.5 4.7 9.4c.9-1.5 2.4-2.5 4.1-2.5 1.3 0 2.5.9 3.3.9.8 0 2.3-1.1 3.8-.9.6.03 2.5.3 3.6 2-.1.06-2.2 1.3-2.1 3.8.03 3 2.6 4 2.7 4-.03.07-.4 1.4-1.4 2.8M13 3.5c.7-.8 1.9-1.5 2.9-1.5.1 1.2-.3 2.4-1 3.2-.7.8-1.8 1.5-2.9 1.4-.1-1.1.4-2.4 1.1-3.1z"/>
                         </svg>
                         <span class="font-medium text-slate-950 dark:text-slate-50">macOS</span>
                       </div>
-                      <ol class="text-sm text-slate-600 dark:text-slate-400 space-y-1 list-decimal list-inside">
+                      <ol class="text-sm text-slate-600 dark:text-slate-400 space-y-1.5 list-decimal list-inside">
                         <li>Download and unzip the file</li>
                         <li>Drag to Applications folder</li>
                         <li>Right-click → Open (if blocked)</li>
@@ -326,14 +340,14 @@ const getPlatformColor = (color?: string) => {
                     </div>
 
                     <!-- Windows -->
-                    <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                    <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 group-hover:border-sky-300 dark:group-hover:border-sky-700 transition-colors">
                       <div class="flex items-center gap-3 mb-3">
                         <svg viewBox="0 0 24 24" class="w-6 h-6 text-sky-500" fill="currentColor">
                           <path d="M3 12V6.7L9 5.4v6.5L3 12M20 3v8.8L10 11.9V5.2L20 3M3 13l6 .1V19.9L3 18.7V13m17 .3V22L10 20.1v-7"/>
                         </svg>
                         <span class="font-medium text-slate-950 dark:text-slate-50">Windows</span>
                       </div>
-                      <ol class="text-sm text-slate-600 dark:text-slate-400 space-y-1 list-decimal list-inside">
+                      <ol class="text-sm text-slate-600 dark:text-slate-400 space-y-1.5 list-decimal list-inside">
                         <li>Download the .exe installer</li>
                         <li>Run as Administrator</li>
                         <li>Follow the wizard</li>
@@ -341,16 +355,16 @@ const getPlatformColor = (color?: string) => {
                     </div>
 
                     <!-- Linux -->
-                    <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                    <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 group-hover:border-amber-300 dark:group-hover:border-amber-700 transition-colors">
                       <div class="flex items-center gap-3 mb-3">
                         <svg viewBox="0 0 24 24" class="w-6 h-6 text-amber-500" fill="currentColor">
                           <path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879V14.89h-2.896v-2.896h2.896V9.466c0-2.889 1.723-4.486 4.351-4.486 1.263 0 2.533.102 2.533.102v2.72h-1.425c-1.406 0-1.843.872-1.843 1.767v2.012h3.289l-.528 2.896h-2.761v6.989C18.343 21.128 22 16.991 22 12c0-5.523-4.477-10-10-10z"/>
                         </svg>
                         <span class="font-medium text-slate-950 dark:text-slate-50">Linux</span>
                       </div>
-                      <ol class="text-sm text-slate-600 dark:text-slate-400 space-y-1 list-decimal list-inside">
+                      <ol class="text-sm text-slate-600 dark:text-slate-400 space-y-1.5 list-decimal list-inside">
                         <li>Download the .AppImage</li>
-                        <li>Make executable: <code class="text-xs px-1 rounded bg-slate-100 dark:bg-slate-900">chmod +x</code></li>
+                        <li>Make executable: <code class="text-xs px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-900 font-mono">chmod +x</code></li>
                         <li>Run the AppImage</li>
                       </ol>
                     </div>
@@ -359,45 +373,45 @@ const getPlatformColor = (color?: string) => {
               </div>
             </div>
 
-            <!-- Step 3: Setup -->
-            <div class="card scroll-reveal">
+            <!-- Step 3: Setup - Enhanced -->
+            <div class="card shimmer scroll-reveal group">
               <div class="flex items-start gap-6">
-                <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white font-bold text-lg">
+                <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white font-bold text-lg shadow-lg group-hover:scale-110 transition-transform">
                   3
                 </div>
                 <div class="flex-1">
                   <h3
-                    class="text-xl font-semibold mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                    class="text-xl font-semibold mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400"
                   >
                     Setup & Start Recording
                   </h3>
                   <div class="grid sm:grid-cols-2 gap-4">
-                    <div class="flex items-start gap-3">
-                      <div class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <div class="flex items-start gap-3 group">
+                      <div class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform">
                         <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                           <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                         </svg>
                       </div>
                       <span class="text-slate-600 dark:text-slate-400">Launch the app</span>
                     </div>
-                    <div class="flex items-start gap-3">
-                      <div class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <div class="flex items-start gap-3 group">
+                      <div class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform">
                         <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                           <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                         </svg>
                       </div>
                       <span class="text-slate-600 dark:text-slate-400">Go to Settings tab</span>
                     </div>
-                    <div class="flex items-start gap-3">
-                      <div class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <div class="flex items-start gap-3 group">
+                      <div class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform">
                         <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                           <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                         </svg>
                       </div>
                       <span class="text-slate-600 dark:text-slate-400">Enter your Gemini API key</span>
                     </div>
-                    <div class="flex items-start gap-3">
-                      <div class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <div class="flex items-start gap-3 group">
+                      <div class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform">
                         <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                           <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                         </svg>

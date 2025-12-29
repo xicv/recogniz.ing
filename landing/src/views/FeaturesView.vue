@@ -210,16 +210,22 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
     </section>
 
     <!-- Core Features Grid - Asymmetric -->
-    <section class="py-16 lg:py-24 section-padding">
-      <div class="container-custom">
+    <section class="py-16 lg:py-24 section-padding relative overflow-hidden">
+      <!-- Decorative background -->
+      <div class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-50/50 to-transparent dark:via-slate-900/30 pointer-events-none" />
+
+      <div class="container-custom relative z-10">
         <div class="text-center mb-12 scroll-reveal">
+          <span class="inline-block px-4 py-1.5 rounded-full text-xs font-semibold mb-4 bg-slate-100/80 backdrop-blur text-slate-600 border border-slate-200 dark:bg-slate-800/80 dark:border-slate-700 dark:text-slate-400">
+            CORE FEATURES
+          </span>
           <h2
             class="text-3xl sm:text-4xl font-semibold mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
           >
-            Core Features
+            Designed for Productivity
           </h2>
           <p class="text-lg text-slate-600 dark:text-slate-400">
-            Designed for productivity and ease of use
+            Powerful features that make voice typing effortless
           </p>
         </div>
 
@@ -228,17 +234,17 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
           <div
             v-for="(feature, index) in coreFeatures"
             :key="feature.title"
-            :class="[feature.span, 'bento-card scroll-reveal']"
+            :class="[feature.span, 'bento-card scroll-reveal group']"
             :style="{ animationDelay: `${index * 100}ms` }"
           >
-            <!-- Icon with gradient background -->
-            <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-5 bg-gradient-to-br" :class="feature.gradient">
+            <!-- Icon with gradient background and hover effect -->
+            <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-5 bg-gradient-to-br transition-transform group-hover:scale-110 group-hover:shadow-lg" :class="feature.gradient">
               <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" :d="feature.icon"/>
               </svg>
             </div>
             <h3
-              class="text-xl font-semibold mb-2 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+              class="text-xl font-semibold mb-2 text-slate-950 dark:text-slate-50 transition-colors duration-300 group-hover:text-sky-600 dark:group-hover:text-sky-400"
             >
               {{ feature.title }}
             </h3>
@@ -250,11 +256,14 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
 
     <!-- Customization Section -->
     <section
-      class="py-16 lg:py-24 section-padding bg-slate-50 dark:bg-slate-900/30 transition-colors duration-300"
+      class="py-16 lg:py-24 section-padding bg-slate-50 dark:bg-slate-900/30 transition-colors duration-300 relative overflow-hidden"
     >
-      <div class="container-custom">
+      <!-- Decorative background -->
+      <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-violet-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
+
+      <div class="container-custom relative z-10">
         <div class="text-center mb-12 scroll-reveal">
-          <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+          <span class="inline-block px-4 py-1.5 rounded-full text-xs font-semibold mb-4 bg-slate-100/80 backdrop-blur text-slate-600 border border-slate-200 dark:bg-slate-800/80 dark:border-slate-700 dark:text-slate-400">
             CUSTOMIZATION
           </span>
           <h2
@@ -269,16 +278,16 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
 
         <!-- Interactive Tabs - Swipeable on mobile -->
         <div class="max-w-6xl mx-auto">
-          <!-- Tab Navigation -->
+          <!-- Tab Navigation - Enhanced with glassmorphism -->
           <div class="flex justify-center mb-12">
             <div
-              class="inline-flex rounded-2xl p-1.5 bg-slate-100 dark:bg-slate-800 transition-colors duration-300"
+              class="inline-flex rounded-2xl p-1.5 glass-card border-slate-200 dark:border-slate-700 transition-all duration-300"
             >
               <button
                 v-for="(config, tab) in tabConfig"
                 :key="tab"
                 @click="setActiveTab(tab as TabType)"
-                class="relative px-4 sm:px-6 py-3 rounded-xl font-medium transition-all min-h-[44px] min-w-[100px] tab-snap"
+                class="relative px-4 sm:px-6 py-3 rounded-xl font-medium transition-all min-h-[44px] min-w-[100px] tab-snap group"
                 :class="[
                   activeTab === tab
                     ? `${config.bgColor} ${config.textColor} shadow-md`
@@ -290,7 +299,7 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
             </div>
           </div>
 
-          <!-- Tab Content Grid -->
+          <!-- Tab Content Grid - Enhanced -->
           <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <transition
               name="tab-content"
@@ -303,20 +312,20 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
                 <div
                   v-for="item in activeItems"
                   :key="item.title"
-                  class="p-6 rounded-2xl border bg-white dark:bg-slate-800 dark:border-slate-700 border-slate-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 shimmer"
+                  class="p-6 rounded-2xl border bg-white dark:bg-slate-800 dark:border-slate-700 border-slate-200 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 shimmer group"
                 >
                   <!-- Badge if present -->
                   <span
                     v-if="item.badge"
-                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold mb-4"
+                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold mb-4 transition-transform group-hover:scale-105"
                     :class="`${activeConfig.bgColor} ${activeConfig.textColor}`"
                   >
                     {{ item.badge }}
                   </span>
 
-                  <!-- Icon -->
+                  <!-- Icon with hover effect -->
                   <div
-                    class="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-colors duration-300"
+                    class="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all duration-300 group-hover:scale-110"
                     :class="activeConfig.bgColor"
                   >
                     <svg
@@ -332,7 +341,7 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
                   </div>
 
                   <h3
-                    class="text-lg font-semibold mb-2 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                    class="text-lg font-semibold mb-2 text-slate-950 dark:text-slate-50 transition-colors duration-300 group-hover:text-sky-600 dark:group-hover:text-sky-400"
                   >
                     {{ item.title }}
                   </h3>
@@ -350,12 +359,15 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
     </section>
 
     <!-- Performance Section -->
-    <section class="py-16 lg:py-24 section-padding">
-      <div class="container-custom">
+    <section class="py-16 lg:py-24 section-padding relative overflow-hidden">
+      <!-- Decorative background -->
+      <div class="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-sky-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
+
+      <div class="container-custom relative z-10">
         <div class="max-w-6xl mx-auto">
           <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div class="scroll-reveal-left">
-              <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+              <span class="inline-block px-4 py-1.5 rounded-full text-xs font-semibold mb-4 bg-slate-100/80 backdrop-blur text-slate-600 border border-slate-200 dark:bg-slate-800/80 dark:border-slate-700 dark:text-slate-400">
                 PERFORMANCE
               </span>
               <h2
@@ -370,9 +382,9 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
               </p>
 
               <div class="space-y-6">
-                <div class="flex items-start space-x-4">
+                <div class="flex items-start space-x-4 group">
                   <div
-                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1 bg-emerald-100 dark:bg-emerald-900/50 transition-colors duration-300"
+                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1 bg-emerald-100 dark:bg-emerald-900/50 transition-colors duration-300 group-hover:scale-110"
                   >
                     <svg
                       class="w-4 h-4 text-emerald-600 dark:text-emerald-400 transition-colors duration-300"
@@ -384,7 +396,7 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
                   </div>
                   <div>
                     <h3
-                      class="text-lg font-medium mb-1 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                      class="text-lg font-medium mb-1 text-slate-950 dark:text-slate-50 transition-colors duration-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400"
                     >
                       Single API Call Mode
                     </h3>
@@ -396,9 +408,9 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
                   </div>
                 </div>
 
-                <div class="flex items-start space-x-4">
+                <div class="flex items-start space-x-4 group">
                   <div
-                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1 bg-emerald-100 dark:bg-emerald-900/50 transition-colors duration-300"
+                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1 bg-emerald-100 dark:bg-emerald-900/50 transition-colors duration-300 group-hover:scale-110"
                   >
                     <svg
                       class="w-4 h-4 text-emerald-600 dark:text-emerald-400 transition-colors duration-300"
@@ -410,7 +422,7 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
                   </div>
                   <div>
                     <h3
-                      class="text-lg font-medium mb-1 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                      class="text-lg font-medium mb-1 text-slate-950 dark:text-slate-50 transition-colors duration-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400"
                     >
                       Background Processing
                     </h3>
@@ -422,9 +434,9 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
                   </div>
                 </div>
 
-                <div class="flex items-start space-x-4">
+                <div class="flex items-start space-x-4 group">
                   <div
-                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1 bg-emerald-100 dark:bg-emerald-900/50 transition-colors duration-300"
+                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1 bg-emerald-100 dark:bg-emerald-900/50 transition-colors duration-300 group-hover:scale-110"
                   >
                     <svg
                       class="w-4 h-4 text-emerald-600 dark:text-emerald-400 transition-colors duration-300"
@@ -436,7 +448,7 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
                   </div>
                   <div>
                     <h3
-                      class="text-lg font-medium mb-1 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                      class="text-lg font-medium mb-1 text-slate-950 dark:text-slate-50 transition-colors duration-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400"
                     >
                       Pre-validation
                     </h3>
@@ -448,9 +460,9 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
                   </div>
                 </div>
 
-                <div class="flex items-start space-x-4">
+                <div class="flex items-start space-x-4 group">
                   <div
-                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1 bg-emerald-100 dark:bg-emerald-900/50 transition-colors duration-300"
+                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1 bg-emerald-100 dark:bg-emerald-900/50 transition-colors duration-300 group-hover:scale-110"
                   >
                     <svg
                       class="w-4 h-4 text-emerald-600 dark:text-emerald-400 transition-colors duration-300"
@@ -462,7 +474,7 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
                   </div>
                   <div>
                     <h3
-                      class="text-lg font-medium mb-1 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                      class="text-lg font-medium mb-1 text-slate-950 dark:text-slate-50 transition-colors duration-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400"
                     >
                       Smart Retry Logic
                     </h3>
@@ -476,13 +488,13 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
               </div>
             </div>
 
-            <!-- Performance Metrics Visualization -->
+            <!-- Performance Metrics Visualization - Enhanced with glassmorphism -->
             <div
-              class="rounded-2xl p-8 bg-slate-100 dark:bg-slate-800 transition-all duration-300 scroll-reveal-scale shadow-lg"
+              class="rounded-3xl p-8 glass-card scroll-reveal-scale shadow-xl border-slate-200 dark:border-slate-700"
             >
               <div class="text-center mb-8">
                 <div
-                  class="text-5xl sm:text-6xl font-bold mb-2 text-slate-900 dark:text-slate-50 tabular-nums transition-colors duration-300"
+                  class="text-5xl sm:text-6xl font-bold mb-2 gradient-text-accent tabular-nums transition-colors duration-300"
                 >
                   2x
                 </div>
@@ -511,7 +523,7 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
                     class="w-full rounded-full h-3 bg-slate-200 dark:bg-slate-700 transition-colors duration-300 overflow-hidden"
                   >
                     <div
-                      class="h-full rounded-full bg-gradient-to-r from-sky-500 to-cyan-500 transition-all duration-1000 ease-out"
+                      class="h-full rounded-full bg-gradient-to-r from-sky-500 to-cyan-500 transition-all duration-1000 ease-out shadow-lg shadow-sky-500/30"
                       style="width: 95%"
                     ></div>
                   </div>
@@ -534,7 +546,7 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
                     class="w-full rounded-full h-3 bg-slate-200 dark:bg-slate-700 transition-colors duration-300 overflow-hidden"
                   >
                     <div
-                      class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-1000 ease-out"
+                      class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-1000 ease-out shadow-lg shadow-emerald-500/30"
                       style="width: 98%; animation-delay: 200ms;"
                     ></div>
                   </div>
@@ -557,7 +569,7 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
                     class="w-full rounded-full h-3 bg-slate-200 dark:bg-slate-700 transition-colors duration-300 overflow-hidden"
                   >
                     <div
-                      class="h-full rounded-full bg-gradient-to-r from-violet-500 to-purple-500 transition-all duration-1000 ease-out"
+                      class="h-full rounded-full bg-gradient-to-r from-violet-500 to-purple-500 transition-all duration-1000 ease-out shadow-lg shadow-violet-500/30"
                       style="width: 50%; animation-delay: 400ms;"
                     ></div>
                   </div>
@@ -569,11 +581,14 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
       </div>
     </section>
 
-    <!-- CTA Section -->
+    <!-- CTA Section - Enhanced -->
     <section
-      class="py-16 lg:py-24 section-padding bg-gradient-to-br from-slate-900 to-slate-800 transition-colors duration-300 relative overflow-hidden"
+      class="py-16 lg:py-24 section-padding bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 transition-colors duration-300 relative overflow-hidden"
     >
       <div class="absolute inset-0 bg-grid opacity-10" />
+      <!-- Animated glow spots -->
+      <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-sky-500/20 rounded-full blur-3xl animate-pulse" style="animation-duration: 6s;" />
+      <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-500/20 rounded-full blur-3xl animate-pulse" style="animation-duration: 8s; animation-delay: 2s;" />
 
       <div class="container-custom relative z-10 text-center">
         <h2 class="text-3xl sm:text-4xl sm:text-5xl font-semibold text-white mb-6 transition-colors duration-300">
@@ -586,7 +601,7 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
           <RouterLink
             to="/downloads"
-            class="inline-flex items-center gap-2 px-8 py-4 text-base font-semibold text-slate-900 rounded-full transition-all duration-300 hover:shadow-xl hover:scale-105 bg-white hover:bg-slate-100 min-h-[48px]"
+            class="btn-accent inline-flex items-center gap-2.5 px-8 py-4 text-base font-semibold text-white rounded-full transition-all duration-300 hover:shadow-2xl hover:scale-105 min-h-[48px]"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
@@ -598,9 +613,9 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
             href="https://aistudio.google.com/app/apikey"
             target="_blank"
             rel="noopener"
-            class="inline-flex items-center gap-2 px-8 py-4 text-base font-semibold text-white border border-slate-600 rounded-full transition-all duration-300 hover:bg-slate-800 min-h-[48px]"
+            class="btn-secondary inline-flex items-center gap-2.5 px-8 py-4 text-base font-semibold text-white border border-slate-600 rounded-full transition-all duration-300 hover:bg-slate-800 hover:shadow-xl min-h-[48px] group"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 transition-transform group-hover:rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
             </svg>
             Get API Key

@@ -133,18 +133,22 @@ onMounted(() => {
     <!-- Hero Section - Enhanced with gradient mesh and product mockup -->
     <section class="hero-section relative min-h-screen flex items-center overflow-hidden">
       <!-- Animated gradient mesh background -->
-      <GradientMesh :opacity="0.6" />
+      <GradientMesh :opacity="0.7" />
 
       <!-- Grid overlay -->
-      <div class="absolute inset-0 bg-grid opacity-50" />
+      <div class="absolute inset-0 bg-grid opacity-40" />
+
+      <!-- Ambient glow spots -->
+      <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl animate-pulse" style="animation-duration: 4s;" />
+      <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl animate-pulse" style="animation-duration: 5s; animation-delay: 1s;" />
 
       <div class="container-custom relative z-10 pt-24 pb-16 lg:pt-32 lg:pb-24">
         <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <!-- Left: Hero Content -->
           <div class="hero-content text-center lg:text-left">
-            <!-- Badge -->
+            <!-- Badge - Enhanced with glassmorphism and glow -->
             <div
-              class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm mb-8 transition-all duration-300 scroll-reveal-scale bg-slate-100/80 backdrop-blur border border-slate-200 text-slate-600 dark:bg-slate-800/80 dark:border-slate-700 dark:text-slate-400"
+              class="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full text-sm mb-8 transition-all duration-300 scroll-reveal-scale glass-card badge-glow cursor-default hover:scale-105"
             >
               <span class="relative flex h-2 w-2">
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
@@ -153,10 +157,10 @@ onMounted(() => {
               v1.0.8 — Now Available
             </div>
 
-            <!-- Headline with kinetic text effect -->
+            <!-- Headline with kinetic text effect and better visual hierarchy -->
             <h1
               class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight mb-6 text-slate-950 dark:text-slate-50 transition-colors duration-300"
-              style="font-size: clamp(2.75rem, 2rem + 4vw, 5.5rem); line-height: 1.1;"
+              style="font-size: clamp(2.5rem, 2rem + 3vw, 4.5rem); line-height: 1.15; text-shadow: 0 2px 20px rgba(0,0,0,0.02);"
             >
               <span class="block kinetic-word" :class="{ 'animate-in': heroAnimated }" style="animation-delay: 0ms;">
                 Free AI Voice
@@ -166,16 +170,16 @@ onMounted(() => {
               </span>
             </h1>
 
-            <!-- Subheading -->
+            <!-- Subheading with better emphasis -->
             <p
               class="text-lg sm:text-xl lg:text-2xl mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed text-slate-600 dark:text-slate-400 transition-colors duration-300 kinetic-word"
               :class="{ 'animate-in': heroAnimated }"
               style="animation-delay: 300ms;"
             >
-              Your vocabulary, your style, your API key. Privacy-first voice typing that adapts to <strong>you</strong>.
+              Your vocabulary, your style, your API key. Privacy-first voice typing that adapts to <span class="font-semibold text-slate-900 dark:text-slate-300">you</span>.
             </p>
 
-            <!-- CTA Buttons -->
+            <!-- CTA Buttons - Enhanced with better hover effects -->
             <div
               class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-12 kinetic-word"
               :class="{ 'animate-in': heroAnimated }"
@@ -183,7 +187,7 @@ onMounted(() => {
             >
               <RouterLink
                 to="/downloads"
-                class="btn-primary inline-flex items-center gap-2 text-lg bg-slate-950 hover:bg-slate-900 dark:bg-sky-500 dark:hover:bg-sky-400 cta-pulse"
+                class="btn-primary inline-flex items-center gap-2.5 text-lg bg-slate-950 hover:bg-slate-900 dark:bg-sky-500 dark:hover:bg-sky-400 cta-pulse"
               >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
@@ -195,15 +199,40 @@ onMounted(() => {
                 href="https://aistudio.google.com/app/apikey"
                 target="_blank"
                 rel="noopener"
-                class="btn-secondary inline-flex items-center gap-2"
+                class="btn-secondary inline-flex items-center gap-2.5 group"
               >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 transition-transform group-hover:rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
                 </svg>
                 Get API Key
               </a>
             </div>
 
+            <!-- Trust indicators -->
+            <div
+              class="flex flex-wrap items-center justify-center lg:justify-start gap-6 text-sm text-slate-500 dark:text-slate-400 kinetic-word"
+              :class="{ 'animate-in': heroAnimated }"
+              style="animation-delay: 600ms;"
+            >
+              <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span>100% Free</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span>No Account Required</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span>Privacy First</span>
+              </div>
+            </div>
           </div>
 
           <!-- Right: Product Mockup -->
@@ -213,9 +242,9 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- Scroll indicator -->
+      <!-- Scroll indicator - Enhanced -->
       <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-slate-400 dark:text-slate-500 animate-bounce">
-        <span class="text-xs uppercase tracking-wider">Scroll to explore</span>
+        <span class="text-xs uppercase tracking-wider font-medium">Scroll to explore</span>
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
         </svg>
@@ -224,12 +253,15 @@ onMounted(() => {
 
     <!-- Features Bento Grid Section - Asymmetric Layout -->
     <section
-      class="py-24 lg:py-32 transition-colors duration-300"
+      class="py-24 lg:py-32 transition-colors duration-300 relative overflow-hidden"
       data-animate-id="features"
     >
-      <div class="container-custom">
+      <!-- Subtle background gradient -->
+      <div class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-50/50 to-transparent dark:via-slate-900/30 pointer-events-none" />
+
+      <div class="container-custom relative z-10">
         <div class="max-w-3xl mx-auto text-center mb-16 scroll-reveal" data-animate-id="features-title">
-          <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+          <span class="inline-block px-4 py-1.5 rounded-full text-xs font-semibold mb-4 bg-slate-100/80 backdrop-blur text-slate-600 border border-slate-200 dark:bg-slate-800/80 dark:border-slate-700 dark:text-slate-400">
             FEATURES
           </span>
           <h2
@@ -247,27 +279,27 @@ onMounted(() => {
           <div
             v-for="(feature, index) in features"
             :key="feature.title"
-            :class="[feature.span, 'bento-card scroll-reveal']"
+            :class="[feature.span, 'bento-card scroll-reveal group']"
             :data-animate-id="'feature-' + index"
             :style="{ 'animation-delay': `${index * 100}ms` }"
           >
             <!-- Category badge -->
             <div
               v-if="feature.category"
-              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium mb-4"
+              class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium mb-4 transition-transform group-hover:scale-105"
               :class="`badge-${feature.category}`"
             >
               {{ feature.category }}
             </div>
 
-            <!-- Icon with gradient background -->
-            <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-5" :class="feature.gradient">
+            <!-- Icon with gradient background and subtle glow -->
+            <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-5 transition-transform group-hover:scale-110 group-hover:shadow-lg" :class="feature.gradient">
               <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" :d="icons[feature.icon]"/>
               </svg>
             </div>
             <h3
-              class="text-xl font-semibold mb-2 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+              class="text-xl font-semibold mb-2 text-slate-950 dark:text-slate-50 transition-colors duration-300 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors"
             >
               {{ feature.title }}
             </h3>
@@ -278,11 +310,14 @@ onMounted(() => {
     </section>
 
     <!-- Product Demo Section -->
-    <section class="py-24 lg:py-32 bg-slate-50/50 dark:bg-slate-900/30 transition-colors duration-300" data-animate-id="demo">
-      <div class="container-custom">
+    <section class="py-24 lg:py-32 bg-slate-50/50 dark:bg-slate-900/30 transition-colors duration-300 relative overflow-hidden" data-animate-id="demo">
+      <!-- Decorative background elements -->
+      <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-sky-500/5 to-violet-500/5 rounded-full blur-3xl pointer-events-none" />
+
+      <div class="container-custom relative z-10">
         <div class="max-w-6xl mx-auto">
           <div class="text-center mb-16 scroll-reveal" data-animate-id="demo-title">
-            <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+            <span class="inline-block px-4 py-1.5 rounded-full text-xs font-semibold mb-4 bg-slate-100/80 backdrop-blur text-slate-600 border border-slate-200 dark:bg-slate-800/80 dark:border-slate-700 dark:text-slate-400">
               HOW IT WORKS
             </span>
             <h2
@@ -299,16 +334,16 @@ onMounted(() => {
             <div
               v-for="(demo, index) in demoFeatures"
               :key="demo.title"
-              class="card shimmer scroll-reveal"
+              class="card shimmer scroll-reveal group"
               :data-animate-id="'demo-' + index"
             >
-              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center mb-5">
+              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center mb-5 transition-transform group-hover:scale-110 group-hover:shadow-lg">
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" :d="demo.icon"/>
                 </svg>
               </div>
               <h3
-                class="text-lg font-semibold mb-2 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                class="text-lg font-semibold mb-2 text-slate-950 dark:text-slate-50 transition-colors duration-300 group-hover:text-sky-600 dark:group-hover:text-sky-400"
               >
                 {{ demo.title }}
               </h3>
@@ -473,11 +508,15 @@ onMounted(() => {
       </div>
     </section>
 
-    <!-- Final CTA Section -->
+    <!-- Final CTA Section - Enhanced with better gradient and effects -->
     <section class="py-24 lg:py-32 relative overflow-hidden" data-animate-id="cta">
-      <!-- Background gradient -->
-      <div class="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-800" />
+      <!-- Enhanced background gradient with multiple layers -->
+      <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
       <div class="absolute inset-0 bg-grid opacity-10" />
+
+      <!-- Animated glow spots -->
+      <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-sky-500/20 rounded-full blur-3xl animate-pulse" style="animation-duration: 6s;" />
+      <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-500/20 rounded-full blur-3xl animate-pulse" style="animation-duration: 8s; animation-delay: 2s;" />
 
       <div class="container-custom relative z-10">
         <div class="max-w-3xl mx-auto text-center scroll-reveal" data-animate-id="cta-title">
@@ -491,7 +530,7 @@ onMounted(() => {
           </p>
           <RouterLink
             to="/downloads"
-            class="inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold text-white rounded-full transition-all duration-300 hover:shadow-xl hover:scale-105 bg-slate-950 hover:bg-slate-900 dark:bg-sky-500 dark:hover:bg-sky-400"
+            class="btn-accent inline-flex items-center gap-2.5 px-8 py-4 text-lg font-semibold text-white rounded-full transition-all duration-300 hover:shadow-2xl hover:scale-105 cta-pulse"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
