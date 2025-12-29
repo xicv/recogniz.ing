@@ -20,9 +20,9 @@ const platforms = ref<Platform[]>([
   {
     name: 'Android',
     icon: 'M6.382 3.968A8.962 8.962 0 0 1 12 2c2.125 0 4.078.736 5.618 1.968l1.453-1.453 1.414 1.414-1.453 1.453A8.962 8.962 0 0 1 21 11v1H3v-1c0-2.125.736-4.078 1.968-5.618L3.515 3.93l1.414-1.414 1.453 1.453zM3 14h18v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-7zm6-5a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm6 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z',
-    version: '1.0.4',
-    releaseDate: '2025-12-23',
-    downloadUrl: 'https://xicv.github.io/recogniz.ing/downloads/android/1.0.4/recognizing-1.0.4.apk',
+    version: '1.0.8',
+    releaseDate: '2025-12-29',
+    downloadUrl: 'https://github.com/xicv/recogniz.ing/releases/download/v1.0.8/recognizing-1.0.8.apk',
     changelog: [
       'Standalone APK - no Google Play required',
       'Works on Android 8.0+ (API 26)',
@@ -34,9 +34,9 @@ const platforms = ref<Platform[]>([
   {
     name: 'macOS',
     icon: 'M18.7 19.5c-.8 1.2-1.7 2.5-3 2.5-1.3 0-1.8-.8-3.3-.8-1.5 0-2 .8-3.3.8-1.3 0-2.3-1.3-3.1-2.5C4.2 17 2.9 12.5 4.7 9.4c.9-1.5 2.4-2.5 4.1-2.5 1.3 0 2.5.9 3.3.9.8 0 2.3-1.1 3.8-.9.6.03 2.5.3 3.6 2-.1.06-2.2 1.3-2.1 3.8.03 3 2.6 4 2.7 4-.03.07-.4 1.4-1.4 2.8M13 3.5c.7-.8 1.9-1.5 2.9-1.5.1 1.2-.3 2.4-1 3.2-.7.8-1.8 1.5-2.9 1.4-.1-1.1.4-2.4 1.1-3.1z',
-    version: '1.0.4',
-    releaseDate: '2025-12-23',
-    downloadUrl: 'https://xicv.github.io/recogniz.ing/downloads/macos/1.0.4/recognizing-1.0.4-macos.zip',
+    version: '1.0.8',
+    releaseDate: '2025-12-29',
+    downloadUrl: 'https://github.com/xicv/recogniz.ing/releases/download/v1.0.8/recognizing-1.0.8-macos.zip',
     changelog: [
       'User preferences with persistent desktop settings',
       'Desktop-specific features: auto-start, minimize to tray',
@@ -48,12 +48,13 @@ const platforms = ref<Platform[]>([
   {
     name: 'Windows',
     icon: 'M3 12V6.7L9 5.4v6.5L3 12M20 3v8.8L10 11.9V5.2L20 3M3 13l6 .1V19.9L3 18.7V13m17 .3V22L10 20.1v-7',
-    version: '1.0.4',
-    releaseDate: '2025-12-23',
-    downloadUrl: '#',
+    version: '1.0.8',
+    releaseDate: '2025-12-29',
+    downloadUrl: 'https://github.com/xicv/recogniz.ing/releases/download/v1.0.8/recognizing-1.0.8-windows.exe',
     changelog: [
-      'Updated to match macOS release',
-      'Coming soon - check back later!'
+      'Native installer with automatic updates',
+      'System tray and global hotkeys support',
+      'Same features as macOS version'
     ],
     requirements: 'Windows 10 or later',
     color: 'sky'
@@ -61,12 +62,13 @@ const platforms = ref<Platform[]>([
   {
     name: 'Linux',
     icon: 'M4.53918 2.40715C4.82145 1.0075 6.06066 0 7.49996 0C8.93926 0 10.1785 1.0075 10.4607 2.40715L10.798 4.07944C10.9743 4.9539 11.3217 5.78562 11.8205 6.52763L12.4009 7.39103C12.7631 7.92978 12.9999 8.5385 13.0979 9.17323C13.6747 9.22167 14.1803 9.58851 14.398 10.1283L14.8897 11.3474C15.1376 11.962 14.9583 12.665 14.4455 13.0887L12.5614 14.6458C12.0128 15.0992 11.2219 15.1193 10.6506 14.6944L9.89192 14.1301C9.88189 14.1227 9.87197 14.1151 9.86216 14.1074C9.48973 14.2075 9.09793 14.261 8.69355 14.261H6.30637C5.90201 14.261 5.51023 14.2076 5.13782 14.1074C5.12802 14.1151 5.11811 14.1227 5.10808 14.1301L4.34942 14.6944C3.77811 15.1193 2.98725 15.0992 2.43863 14.6458L0.55446 13.0887C0.0417175 12.665 -0.1376 11.962 0.110281 11.3474L0.602025 10.1283C0.819715 9.58854 1.32527 9.2217 1.90198 9.17324C2 8.5385 2.2368 7.92978 2.59897 7.39103L3.17938 6.52763C3.67818 5.78562 4.02557 4.9539 4.20193 4.07944L4.53918 2.40715ZM10.8445 9.47585C10.6345 9.63293 10.4642 9.84382 10.3561 10.0938L9.58799 11.8713C9.20026 12.0979 8.75209 12.2237 8.28465 12.2237H6.7153C6.24789 12.2237 5.79975 12.0979 5.41203 11.8714L4.64386 10.0938C4.53581 9.8438 4.36552 9.6329 4.15546 9.47582C4.18121 9.15355 4.2689 8.83503 4.41853 8.53826L5.67678 6.04259L5.68433 6.05007C6.68715 7.04458 8.31304 7.04458 9.31585 6.05007L9.32324 6.04274L10.5814 8.53825C10.7311 8.83504 10.8187 9.15357 10.8445 9.47585ZM9.04068 4.26906V3.05592H8.01353V3.85713C8.23151 3.90123 8.44506 3.97371 8.64848 4.07458L9.04068 4.26906ZM6.98638 3.85718V3.05592H5.95923V4.26919L6.3517 4.07458C6.55504 3.97375 6.7685 3.90129 6.98638 3.85718ZM2.03255 10.1864C1.82255 10.1864 1.6337 10.3132 1.55571 10.5066L1.06397 11.7257C0.981339 11.9306 1.04111 12.1649 1.21203 12.3062L3.0962 13.8633C3.27907 14.0144 3.54269 14.0211 3.73313 13.8795L4.49179 13.3152C4.6813 13.1743 4.74901 12.923 4.6557 12.7071L3.69976 10.4951C3.61884 10.3078 3.43316 10.1864 3.22771 10.1864H2.03255ZM13.4443 10.5066C13.3663 10.3132 13.1775 10.1864 12.9674 10.1864H11.7723C11.5668 10.1864 11.3812 10.3078 11.3002 10.4951L10.3443 12.7071C10.251 12.923 10.3187 13.1743 10.5082 13.3152L11.2669 13.8795C11.4573 14.0211 11.7209 14.0144 11.9038 13.8633L13.788 12.3062C13.9589 12.1649 14.0187 11.9306 13.936 11.7257L13.4443 10.5066ZM6.81106 4.98568C7.24481 4.7706 7.75537 4.7706 8.18912 4.98568L8.68739 5.23275L8.58955 5.32978C7.98786 5.92649 7.01232 5.92649 6.41063 5.32978L6.31279 5.23275L6.81106 4.98568Z',
-    version: '1.0.4',
-    releaseDate: '2025-12-23',
-    downloadUrl: '#',
+    version: '1.0.8',
+    releaseDate: '2025-12-29',
+    downloadUrl: 'https://github.com/xicv/recogniz.ing/releases/download/v1.0.8/recognizing-1.0.8-linux.tar.gz',
     changelog: [
-      'Updated to match macOS release',
-      'Coming soon - check back later!'
+      'Portable AppImage format',
+      'Same features as macOS and Windows',
+      'Tested on Ubuntu 18.04+'
     ],
     requirements: 'Ubuntu 18.04 or later',
     color: 'amber'
@@ -469,7 +471,7 @@ const getPlatformColor = (color?: string) => {
 
           <!-- Version cards -->
           <div class="space-y-6">
-            <!-- v1.0.4 -->
+            <!-- v1.0.8 -->
             <div class="card scroll-reveal">
               <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
                 <div class="flex items-center gap-4">
@@ -482,10 +484,10 @@ const getPlatformColor = (color?: string) => {
                     <h3
                       class="text-2xl font-semibold text-slate-950 dark:text-slate-50 transition-colors duration-300"
                     >
-                      Version 1.0.4
+                      Version 1.0.8
                     </h3>
                     <p class="text-sm text-slate-500 dark:text-slate-400">
-                      December 23, 2025
+                      December 29, 2025
                     </p>
                   </div>
                 </div>
@@ -498,16 +500,51 @@ const getPlatformColor = (color?: string) => {
                   <svg class="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                   </svg>
-                  User preferences with persistent desktop settings
+                  Fixed detached HEAD error when pushing landing downloads
                 </li>
                 <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
                   <svg class="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                   </svg>
+                  macOS and Windows downloads now available
+                </li>
+              </ul>
+            </div>
+
+            <!-- v1.0.4 -->
+            <div class="card scroll-reveal">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+                <div class="flex items-center gap-4">
+                  <div class="w-14 h-14 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                    <span class="text-xl font-bold text-slate-500 dark:text-slate-400">1.0.4</span>
+                  </div>
+                  <div>
+                    <h3
+                      class="text-2xl font-semibold text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                    >
+                      Version 1.0.4
+                    </h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">
+                      December 23, 2025
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <ul class="space-y-3">
+                <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                  <svg class="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  User preferences with persistent desktop settings
+                </li>
+                <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                  <svg class="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
                   Desktop-specific features: auto-start, minimize to tray
                 </li>
                 <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
-                  <svg class="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                   </svg>
                   VAD modal UI fixes and audio processing improvements

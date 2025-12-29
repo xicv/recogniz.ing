@@ -30,6 +30,27 @@
   },
   "versions": [
     {
+      "version": "1.0.8",
+      "date": "2025-12-29",
+      "stable": true,
+      "highlights": [
+        "Fixed detached HEAD error when pushing landing downloads",
+        "macOS and Windows downloads now available"
+      ],
+      "changes": [
+        {
+          "category": "fixed",
+          "title": "CI/CD Fix",
+          "description": "Fixed detached HEAD error when pushing landing downloads to repository."
+        },
+        {
+          "category": "added",
+          "title": "Platform Releases",
+          "description": "macOS and Windows installers now available for download."
+        }
+      ]
+    },
+    {
       "version": "1.0.5",
       "date": "2025-12-29",
       "stable": true,
