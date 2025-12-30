@@ -7,26 +7,24 @@ A modern, minimalist landing page for the Recogniz.ing AI voice typing applicati
 
 ---
 
-## Latest Version: 1.0.5 (December 29, 2025)
+## Latest Version: 1.0.8 (December 29, 2025)
 
-### Recent Updates
-- **⭐ Favorites Filter**: New filter to quickly access starred transcriptions
-- **🎨 Cleaner VAD UI**: Removed status labels, static processing indicator (no flashing)
-- **🔧 Simplified Recording**: Removed auto-stop feature for manual control
-- **✅ Code Quality**: Zero static analysis warnings or errors
+### Recent Updates (v1.0.8)
+- **🔧 CI/CD Fix**: Fixed detached HEAD error when pushing landing downloads
+- **🍎🪟 Platform Releases**: macOS and Windows installers available
 
-### Previous Updates (v1.0.4)
-- **📋 Changelog System**: JSON-first changelog with auto-generated Markdown
-- **🌐 Android Downloads**: Added Android platform downloads with installation instructions
-- **🐛 Fixed Download URLs**: Now correctly point to GitHub Pages instead of GitHub Releases
-- **🔧 Build System**: Upgraded Android Gradle Plugin to 8.10, Gradle to 8.11.1, Kotlin to 2.1.0
-- **🏗️ Deployment**: Fixed detached HEAD issue in GitHub Actions release workflow
-- **📱 Android Support**: Fixed Android build with AGP 8.10 compatibility
-- **✨ PWA Support**: Progressive Web App capabilities with offline support
-- **🎨 Updated Platform Icons**: Better visual representation with iMac for macOS and Apple logo for iOS
+### Previous Updates (v1.0.5)
+- **⭐ Favorites Filter**: Quick access to starred transcriptions
+- **🎨 Cleaner VAD UI**: Static processing indicator (no flashing)
+- **🔧 Simplified Recording**: Removed auto-stop for manual control
+- **✅ Code Quality**: Zero static analysis warnings
+
+### Earlier Updates (v1.0.4)
+- **📋 Changelog System**: JSON-first with auto-generated Markdown
+- **🌐 Cross-platform Downloads**: All platforms with install instructions
+- **✨ PWA Support**: Progressive Web App with offline capabilities
 - **🔐 macOS Security**: Fixed Gatekeeper verification issues
 - **🪟 Windows Support**: Initial Windows release with native installer
-- **🏗️ Deployment**: Simplified single-repository deployment architecture
 
 ---
 
@@ -50,7 +48,6 @@ Recogniz.ing is an AI-powered voice typing application built with Flutter that:
 - **Vue Router 4.6** for SPA navigation
 - **vite-plugin-pwa 0.21** for Progressive Web App capabilities
 - **Lucide Vue Next 0.460** for modern icons
-- **Git LFS** for large download file storage
 
 ---
 
@@ -80,21 +77,16 @@ This landing page is part of a single-repository architecture that houses both t
 ```
 xicv/recogniz.ing (Single Repository)
 ├── .github/workflows/
-│   ├── release-all-platforms.yml  # Builds app, creates releases
-│   ├── release.yml                 # Alternative release workflow
+│   ├── release-all-platforms.yml  # Builds app, creates GitHub Releases
+│   ├── build-windows.yml          # Windows-specific build
 │   └── landing-deploy.yml         # Deploys landing to GitHub Pages
 ├── lib/                           # Flutter app source code
 ├── android/, ios/, macos/, ...    # Flutter platform folders
 ├── pubspec.yaml                   # Flutter dependencies
 └── landing/                        # This folder
     ├── src/
-    ├── public/downloads/           # App download artifacts (Git LFS)
-    │   ├── 1.0.4/                 # Latest version downloads
-    │   │   ├── macos/
-    │   │   ├── windows/
-    │   │   ├── linux/
-    │   │   └── android/
-    │   └── manifest.json           # Version manifest
+    ├── public/downloads/
+    │   └── manifest.json           # Version manifest (only tracked file)
     ├── public/.nojekyll            # Required for GitHub Pages + Vite
     └── package.json
 ```
@@ -103,10 +95,12 @@ xicv/recogniz.ing (Single Repository)
 
 ### Automated Deployment Flow
 
-1. **Tag Push**: Push a version tag (e.g., `v1.0.4`) to main branch
+1. **Tag Push**: Push a version tag (e.g., `v1.0.8`) to main branch
 2. **Build & Release**: GitHub Actions builds all platforms and creates a GitHub Release
-3. **Update Downloads**: Workflow commits artifacts to `landing/public/downloads/[version]/`
+3. **Update Manifest**: Workflow updates `landing/public/downloads/manifest.json` with version info
 4. **Deploy Landing**: Commit triggers `landing-deploy.yml` → deploys to GitHub Pages
+
+> **Note**: Build artifacts are stored in **GitHub Releases**, not in the repository. The `downloads/` folder contains only `manifest.json` for version tracking.
 
 ### GitHub Pages Settings
 
@@ -149,13 +143,8 @@ npm run preview
 ```
 landing/
 ├── public/                  # Static assets
-│   ├── downloads/           # Platform-specific app downloads (Git LFS)
-│   │   ├── 1.0.4/          # Version-specific downloads
-│   │   │   ├── macos/
-│   │   │   ├── windows/
-│   │   │   ├── linux/
-│   │   │   └── android/
-│   │   └── manifest.json   # Version manifest for downloads
+│   ├── downloads/
+│   │   └── manifest.json   # Version manifest (only tracked file)
 │   ├── .nojekyll           # Required for GitHub Pages + Vite
 │   └── assets/             # Images, icons, etc.
 ├── src/
@@ -191,14 +180,13 @@ The landing page includes an automated download management system:
 ### How Downloads Work
 
 1. **Release Builds**: When a version tag is pushed, GitHub Actions builds all platforms
-2. **Artifact Storage**: Build artifacts are committed to `landing/public/downloads/[version]/`
-3. **Manifest Update**: `manifest.json` is updated with new version info
-4. **GitHub Release**: Official release created with all artifacts attached
-5. **Download Links**: Landing page displays links to both GitHub Releases and local LFS files
+2. **GitHub Release**: Official release created with artifacts attached
+3. **Manifest Update**: `manifest.json` is updated with version info
+4. **Download Links**: Landing page displays links to GitHub Releases
 
 ### Download URLs
 
-Download URLs in `src/views/DownloadsView.vue` point to GitHub releases:
+Download URLs in `src/views/DownloadsView.vue` point to GitHub Releases:
 ```
 https://github.com/xicv/recogniz.ing/releases/download/v{VERSION}/recognizing-{VERSION}-{platform}.zip
 ```
