@@ -94,7 +94,7 @@ const getCategoryIcon = (category: string) => {
 
 <template>
   <div
-    class="min-h-screen py-16 section-padding bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-[#0a0a0a] transition-colors duration-300"
+    class="min-h-screen pt-24 sm:pt-32 pb-16 lg:pb-24 bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-[#0a0a0a] transition-colors duration-300"
   >
     <div class="container-custom max-w-5xl">
       <!-- Header -->
@@ -305,15 +305,5 @@ const getCategoryIcon = (category: string) => {
 </template>
 
 <style scoped>
-.section-padding {
-  padding-top: 4rem;
-  padding-bottom: 4rem;
-}
-
-@media (min-width: 640px) {
-  .section-padding {
-    padding-top: 6rem;
-    padding-bottom: 6rem;
-  }
-}
+/* No custom styles needed - using Tailwind utility classes */
 </style>
