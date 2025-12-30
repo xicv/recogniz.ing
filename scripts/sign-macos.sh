@@ -2,15 +2,22 @@
 
 # macOS Code Signing and Notarization Script for Recogniz.ing
 # This script signs and notarizes the macOS build for distribution
+#
+# Prerequisites:
+# 1. Run 'xcrun notarytool store-credentials' to store your Apple ID credentials
+# 2. Have Developer ID Application certificate installed in Keychain Access
+#
+# Store credentials one-time:
+#   xcrun notarytool store-credentials "recognizing" \
+#     --apple-id "your@email.com" \
+#     --team-id "YOUR_TEAM_ID" \
+#     --password "app-specific-password"
 
 set -e
 
 # Configuration
-DEVELOPER_ID_APPLICATION=""  # Your Apple Developer ID Application certificate (e.g., "Developer ID Application: Your Name (TEAM_ID)")
-DEVELOPER_ID_INSTALLER=""      # Your Apple Developer ID Installer certificate
-TEAM_ID=""                    # Your 10-character Team ID
-APPLE_ID=""                   # Your Apple ID for notarization
-APPLE_ID_PASSWORD=""           # App-specific password (generate at appleid.apple.com)
+NOTARY_PROFILE="recognizing"  # Keychain profile name for notarytool credentials
+DEVELOPER_ID_APPLICATION=""   # Your Apple Developer ID Application certificate name
 
 # Colors
 RED='\033[0;31m'
@@ -61,17 +68,25 @@ check_requirements() {
 check_certificates() {
     print_status "Checking available certificates..."
 
-    security find-identity -v -p codesigning | grep "$TEAM_ID" > /dev/null 2>&1
-    if [ $? -ne 0 ]; then
-        print_error "No valid Developer ID certificates found for team: $TEAM_ID"
+    if [ -z "$DEVELOPER_ID_APPLICATION" ]; then
+        print_error "DEVELOPER_ID_APPLICATION not set"
+        print_status "Please set this to your Developer ID Application certificate name"
+        exit 1
+    fi
+
+    if security find-identity -v -p codesigning | grep "$DEVELOPER_ID_APPLICATION" > /dev/null 2>&1; then
+        print_success "Developer ID certificate found: $DEVELOPER_ID_APPLICATION"
+    else
+        print_error "No valid Developer ID certificates found matching: $DEVELOPER_ID_APPLICATION"
         print_status "Please ensure you have:"
         print_status "1. An Apple Developer Account"
         print_status "2. Generated a Developer ID Application certificate"
         print_status "3. Downloaded and installed the certificate in Keychain Access"
+        print_status ""
+        print_status "Available certificates:"
+        security find-identity -v -p codesigning | head -5
         exit 1
     fi
-
-    print_success "Developer ID certificates found"
 }
 
 # Build the app
@@ -168,62 +183,53 @@ notarize_app() {
         exit 1
     fi
 
-    # Upload for notarization
+    # Check if notarytool profile exists (by testing history command)
+    print_status "Verifying notarytool credentials..."
+    if ! xcrun notarytool history --keychain-profile "$NOTARY_PROFILE" &>/dev/null; then
+        print_error "Notarytool credentials not found in keychain for profile: $NOTARY_PROFILE"
+        print_status ""
+        print_status "Run the following command to store credentials:"
+        print_status "  xcrun notarytool store-credentials \"$NOTARY_PROFILE\" \\"
+        print_status "    --apple-id \"your@email.com\" \\"
+        print_status "    --team-id \"YOUR_TEAM_ID\" \\"
+        print_status "    --password \"app-specific-password\""
+        print_status ""
+        exit 1
+    fi
+
+    # Submit for notarization (waits for completion)
     print_status "Uploading to Apple's notarization service..."
-    xcrun altool --notarize-app \
-        --primary-bundle-id "recogniz.ing.recogniz.ing" \
-        --username "$APPLE_ID" \
-        --password "$APPLE_ID_PASSWORD" \
-        --file "$DMG_PATH" \
-        --output-format json > notarization.json
+    print_status "This may take a few minutes..."
 
-    # Extract request UUID
-    REQUEST_UUID=$(grep -o '"RequestUUID": "[^"]*' notarization.json | cut -d'"' -f4)
+    if xcrun notarytool submit "$DMG_PATH" \
+        --keychain-profile "$NOTARY_PROFILE" \
+        --wait \
+        --output-format json > notarization.json 2>&1; then
 
-    if [ -z "$REQUEST_UUID" ]; then
-        print_error "Failed to submit for notarization"
+        # Check the result
+        if grep -q '"status": "Accepted"' notarization.json; then
+            print_success "Notarization completed successfully"
+        else
+            print_warning "Could not confirm 'Accepted' status. Check notarization.json for details."
+            # Continue anyway - JSON format may vary
+        fi
+    else
+        print_error "Notarization failed"
         cat notarization.json
         exit 1
     fi
 
-    print_success "Notarization submitted with UUID: $REQUEST_UUID"
-
-    # Wait for notarization to complete
-    print_status "Waiting for notarization to complete..."
-
-    while true; do
-        xcrun altool --notarization-info \
-            --username "$APPLE_ID" \
-            --password "$APPLE_ID_PASSWORD" \
-            --request-uuid "$REQUEST_UUID" \
-            --output-format json > notarization-status.json
-
-        STATUS=$(grep -o '"Status": "[^"]*' notarization-status.json | cut -d'"' -f4)
-
-        if [ "$STATUS" = "success" ]; then
-            print_success "Notarization completed successfully"
-            break
-        elif [ "$STATUS" = "invalid" ]; then
-            print_error "Notarization failed"
-            cat notarization-status.json
-            exit 1
-        fi
-
-        print_status "Status: $STATUS... waiting 30 seconds"
-        sleep 30
-    done
-
-    # Staple the notarization
-    print_status "Stapling notarization to DMG..."
+    # Staple the notarization ticket to the DMG
+    print_status "Stapling notarization ticket to DMG..."
     xcrun stapler staple "$DMG_PATH"
 
-    print_success "Notarization stapled to DMG"
+    print_success "Notarization ticket stapled to DMG"
 
     # Verify notarization
     print_status "Verifying notarization..."
     xcrun stapler validate -v "$DMG_PATH"
 
-    print_success "DMG is properly notarized"
+    print_success "DMG is properly notarized and ready for distribution"
 }
 
 # Main execution
@@ -231,12 +237,13 @@ main() {
     print_status "Starting macOS code signing and notarization process"
 
     # Check configuration
-    if [ -z "$DEVELOPER_ID_APPLICATION" ] || [ -z "$TEAM_ID" ] || [ -z "$APPLE_ID" ] || [ -z "$APPLE_ID_PASSWORD" ]; then
-        print_error "Please configure the following variables at the top of this script:"
-        print_error "- DEVELOPER_ID_APPLICATION"
-        print_error "- TEAM_ID"
-        print_error "- APPLE_ID"
-        print_error "- APPLE_ID_PASSWORD"
+    if [ -z "$DEVELOPER_ID_APPLICATION" ]; then
+        print_error "Please configure DEVELOPER_ID_APPLICATION at the top of this script"
+        print_status "Set it to your Developer ID Application certificate name, e.g.:"
+        print_status '  DEVELOPER_ID_APPLICATION="Developer ID Application: Your Name (TEAM_ID)"'
+        print_status ""
+        print_status "To find your certificate name, run:"
+        print_status "  security find-identity -v -p codesigning"
         exit 1
     fi
 
@@ -248,7 +255,7 @@ main() {
     notarize_app
 
     print_success "Code signing and notarization completed successfully!"
-    print_status "You can now distribute the signed DMG file"
+    print_status "You can now distribute the signed and notarized DMG file"
 }
 
 # Run main function

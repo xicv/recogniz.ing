@@ -303,12 +303,17 @@ codesign-setup: ## Set up code signing configuration
 	@echo "  - APPLE_DEVELOPER_ID: Your Apple ID email"
 	@echo "  - APPLE_APP_PASSWORD: App-specific password from Apple ID"
 	@echo ""
-	@echo "After configuration, run: make verify-codesign"
+	@echo "Then run the following to store notarytool credentials in keychain:"
+	@echo "  source scripts/codesign-config.sh"
+	@echo "  setup_notarytool_credentials"
+	@echo ""
+	@echo "After setup, verify with: make verify-codesign"
 
 verify-codesign: ## Verify code signing setup and certificates
 	@echo "🔍 Verifying code signing configuration..."
 	@source scripts/codesign-config.sh && verify_codesign_config
 	@source scripts/codesign-config.sh && check_codesign_certificates
+	@source scripts/codesign-config.sh && check_notarytool_credentials
 
 sign-macos: ## Sign macOS build (requires codesign-setup)
 	@echo "🔐 Signing macOS build..."
