@@ -75,13 +75,13 @@ const prompts = [
 
 const vocabulary = [
   {
-    title: 'General Tech',
-    description: 'Common technology terms: AI, API, UI/UX, GitHub',
+    title: 'General',
+    description: 'Common words: AI, API, UI/UX, GitHub, Flutter, JavaScript',
     icon: 'M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9V3m0 9a9 9 0 000 18z',
-    badge: 'New'
+    badge: 'Default'
   },
   {
-    title: 'DevOps & Cloud',
+    title: 'Technology',
     description: 'Industry terms: Kubernetes, Docker, AWS, CI/CD',
     icon: 'M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z'
   },
@@ -109,20 +109,15 @@ const vocabulary = [
 
 const settings = [
   {
-    title: 'Recording Settings',
-    description: 'Configure audio input, sensitivity, and VAD parameters',
-    icon: 'M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z'
+    title: 'API Configuration',
+    description: 'Manage your Gemini API key for transcription',
+    icon: 'M13 10V3L4 14h7v7l9-11h-7z',
+    badge: 'Required'
   },
   {
-    title: 'Hotkey Configuration',
+    title: 'Global Hotkey',
     description: 'Set up global hotkeys for quick recording access',
     icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4'
-  },
-  {
-    title: 'API Integration',
-    description: 'Manage API keys and service provider settings',
-    icon: 'M13 10V3L4 14h7v7l9-11h-7z',
-    badge: 'Important'
   },
   {
     title: 'Theme Preferences',
@@ -130,14 +125,19 @@ const settings = [
     icon: 'M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z'
   },
   {
-    title: 'Data Management',
-    description: 'Export, backup, and manage your transcription history',
-    icon: 'M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4'
+    title: 'Auto-copy to Clipboard',
+    description: 'Automatically copy transcription results',
+    icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4'
   },
   {
-    title: 'Privacy Settings',
-    description: 'Configure data encryption and local storage options',
-    icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z'
+    title: 'Show Notifications',
+    description: 'Get notified when transcription completes',
+    icon: 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4h.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9'
+  },
+  {
+    title: 'Start at Login',
+    description: 'Automatically launch app on system startup (desktop)',
+    icon: 'M13 10V3L4 14h7v7l9-11h-7z'
   }
 ]
 
@@ -353,229 +353,6 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
                 </div>
               </div>
             </transition>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Performance Section -->
-    <section class="py-16 lg:py-24 section-padding relative overflow-hidden">
-      <!-- Decorative background -->
-      <div class="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-sky-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
-
-      <div class="container-custom relative z-10">
-        <div class="max-w-6xl mx-auto">
-          <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            <div class="scroll-reveal-left">
-              <span class="inline-block px-4 py-1.5 rounded-full text-xs font-semibold mb-4 bg-slate-100/80 backdrop-blur text-slate-600 border border-slate-200 dark:bg-slate-800/80 dark:border-slate-700 dark:text-slate-400">
-                PERFORMANCE
-              </span>
-              <h2
-                class="text-3xl sm:text-4xl font-semibold mb-6 text-slate-950 dark:text-slate-50 transition-colors duration-300"
-              >
-                Built for Performance
-              </h2>
-              <p
-                class="text-lg mb-8 text-slate-600 dark:text-slate-400 transition-colors duration-300"
-              >
-                Optimized for speed and efficiency with intelligent caching and background processing.
-              </p>
-
-              <div class="space-y-6">
-                <div class="flex items-start space-x-4 group">
-                  <div
-                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1 bg-emerald-100 dark:bg-emerald-900/50 transition-colors duration-300 group-hover:scale-110"
-                  >
-                    <svg
-                      class="w-4 h-4 text-emerald-600 dark:text-emerald-400 transition-colors duration-300"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <h3
-                      class="text-lg font-medium mb-1 text-slate-950 dark:text-slate-50 transition-colors duration-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400"
-                    >
-                      Single API Call Mode
-                    </h3>
-                    <p
-                      class="text-slate-600 dark:text-slate-400 transition-colors duration-300"
-                    >
-                      Reduces transcription time by up to 50%
-                    </p>
-                  </div>
-                </div>
-
-                <div class="flex items-start space-x-4 group">
-                  <div
-                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1 bg-emerald-100 dark:bg-emerald-900/50 transition-colors duration-300 group-hover:scale-110"
-                  >
-                    <svg
-                      class="w-4 h-4 text-emerald-600 dark:text-emerald-400 transition-colors duration-300"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <h3
-                      class="text-lg font-medium mb-1 text-slate-950 dark:text-slate-50 transition-colors duration-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400"
-                    >
-                      Background Processing
-                    </h3>
-                    <p
-                      class="text-slate-600 dark:text-slate-400 transition-colors duration-300"
-                    >
-                      Audio analysis in isolates for smooth UI
-                    </p>
-                  </div>
-                </div>
-
-                <div class="flex items-start space-x-4 group">
-                  <div
-                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1 bg-emerald-100 dark:bg-emerald-900/50 transition-colors duration-300 group-hover:scale-110"
-                  >
-                    <svg
-                      class="w-4 h-4 text-emerald-600 dark:text-emerald-400 transition-colors duration-300"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <h3
-                      class="text-lg font-medium mb-1 text-slate-950 dark:text-slate-50 transition-colors duration-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400"
-                    >
-                      Pre-validation
-                    </h3>
-                    <p
-                      class="text-slate-600 dark:text-slate-400 transition-colors duration-300"
-                    >
-                      Filters non-speech audio to reduce costs
-                    </p>
-                  </div>
-                </div>
-
-                <div class="flex items-start space-x-4 group">
-                  <div
-                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1 bg-emerald-100 dark:bg-emerald-900/50 transition-colors duration-300 group-hover:scale-110"
-                  >
-                    <svg
-                      class="w-4 h-4 text-emerald-600 dark:text-emerald-400 transition-colors duration-300"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <h3
-                      class="text-lg font-medium mb-1 text-slate-950 dark:text-slate-50 transition-colors duration-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400"
-                    >
-                      Smart Retry Logic
-                    </h3>
-                    <p
-                      class="text-slate-600 dark:text-slate-400 transition-colors duration-300"
-                    >
-                      Intelligent policies with circuit breaker
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Performance Metrics Visualization - Enhanced with glassmorphism -->
-            <div
-              class="rounded-3xl p-8 glass-card scroll-reveal-scale shadow-xl border-slate-200 dark:border-slate-700"
-            >
-              <div class="text-center mb-8">
-                <div
-                  class="text-5xl sm:text-6xl font-bold mb-2 gradient-text-accent tabular-nums transition-colors duration-300"
-                >
-                  2x
-                </div>
-                <div
-                  class="text-slate-600 dark:text-slate-400 transition-colors duration-300"
-                >
-                  Faster than traditional transcription
-                </div>
-              </div>
-
-              <div class="space-y-5">
-                <div>
-                  <div class="flex justify-between text-sm mb-2">
-                    <span
-                      class="text-slate-600 dark:text-slate-400 transition-colors duration-300 font-medium"
-                    >
-                      API Efficiency
-                    </span>
-                    <span
-                      class="font-semibold text-slate-900 dark:text-slate-50 tabular-nums transition-colors duration-300"
-                    >
-                      95%
-                    </span>
-                  </div>
-                  <div
-                    class="w-full rounded-full h-3 bg-slate-200 dark:bg-slate-700 transition-colors duration-300 overflow-hidden"
-                  >
-                    <div
-                      class="h-full rounded-full bg-gradient-to-r from-sky-500 to-cyan-500 transition-all duration-1000 ease-out shadow-lg shadow-sky-500/30"
-                      style="width: 95%"
-                    ></div>
-                  </div>
-                </div>
-
-                <div>
-                  <div class="flex justify-between text-sm mb-2">
-                    <span
-                      class="text-slate-600 dark:text-slate-400 transition-colors duration-300 font-medium"
-                    >
-                      Accuracy Rate
-                    </span>
-                    <span
-                      class="font-semibold text-slate-900 dark:text-slate-50 tabular-nums transition-colors duration-300"
-                    >
-                      98%
-                    </span>
-                  </div>
-                  <div
-                    class="w-full rounded-full h-3 bg-slate-200 dark:bg-slate-700 transition-colors duration-300 overflow-hidden"
-                  >
-                    <div
-                      class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-1000 ease-out shadow-lg shadow-emerald-500/30"
-                      style="width: 98%; animation-delay: 200ms;"
-                    ></div>
-                  </div>
-                </div>
-
-                <div>
-                  <div class="flex justify-between text-sm mb-2">
-                    <span
-                      class="text-slate-600 dark:text-slate-400 transition-colors duration-300 font-medium"
-                    >
-                      Cost Reduction
-                    </span>
-                    <span
-                      class="font-semibold text-slate-900 dark:text-slate-50 tabular-nums transition-colors duration-300"
-                    >
-                      50%
-                    </span>
-                  </div>
-                  <div
-                    class="w-full rounded-full h-3 bg-slate-200 dark:bg-slate-700 transition-colors duration-300 overflow-hidden"
-                  >
-                    <div
-                      class="h-full rounded-full bg-gradient-to-r from-violet-500 to-purple-500 transition-all duration-1000 ease-out shadow-lg shadow-violet-500/30"
-                      style="width: 50%; animation-delay: 400ms;"
-                    ></div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
