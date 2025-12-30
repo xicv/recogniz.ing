@@ -94,3 +94,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.8] - 2025-12-29
+
+### Added
+
+- **Platform Releases** - macOS and Windows installers now available for download.
+
+### Fixed
+
+- **CI/CD Fix** - Fixed detached HEAD error when pushing landing downloads to repository.
+
+---
+
