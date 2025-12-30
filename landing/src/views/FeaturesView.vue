@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
 import { useScrollAnimations } from '@/composables/useScrollAnimations'
+import { computed, ref } from 'vue'
 
 // Initialize scroll animations
 useScrollAnimations()
@@ -198,7 +198,7 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
             style="font-size: clamp(2.5rem, 2rem + 2.5vw, 4.5rem); line-height: 1.1;"
           >
             Powerful Features for
-            <span class="gradient-text-accent">Voice Typing</span>
+            <p class="gradient-text-accent">Voice Typing</p>
           </h1>
           <p
             class="text-lg sm:text-xl leading-relaxed text-slate-600 dark:text-slate-400 transition-colors duration-300 scroll-reveal"

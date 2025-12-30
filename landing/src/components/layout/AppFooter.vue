@@ -21,8 +21,8 @@
 
         <!-- Tagline -->
         <p class="text-sm flex items-center gap-2 text-slate-500">
-          <span>Powered by</span>
-          <span class="font-medium text-slate-700 dark:text-slate-400">Google Gemini API</span>
+          <span>&copy;</span>
+          <span class="font-medium text-slate-700 dark:text-slate-400">{{ new Date().getFullYear() }}</span>
         </p>
       </div>
     </div>
