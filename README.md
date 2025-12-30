@@ -12,15 +12,18 @@ AI-powered voice typing application built with Flutter, featuring modern Materia
 
 ## ✨ What's New
 
-### **Latest Version: 1.0.5** (December 29, 2025)
-- **⭐ Favorites Filter**: New filter to quickly access starred transcriptions
-- **🎨 Cleaner VAD UI**: Removed status labels, static processing indicator (no flashing)
-- **🔧 Simplified Recording**: Removed auto-stop feature for manual control
-- **✅ Code Quality**: Zero static analysis warnings or errors
-- **🎨 UI/UX Polish**: Improved typography hierarchy, smoother animations, refined card designs
-- **🔀 Navigation Fix**: Fixed drawer toggle animation overflow with proper state synchronization
+### **Latest Version: 1.0.8** (December 29, 2025)
+- **🔧 CI/CD Fix**: Fixed detached HEAD error when pushing landing downloads
+- **🍎🪟 Platform Releases**: macOS and Windows installers available
+- **📋 Version Sync**: New `make sync-version` command to sync from CHANGELOG.json
 
-### **Previous Version: 1.0.4** (December 23, 2025)
+### **Previous Version: 1.0.5** (December 29, 2025)
+- **⭐ Favorites Filter**: Quick access to starred transcriptions
+- **🎨 Cleaner VAD UI**: Static processing indicator (no flashing)
+- **🔧 Simplified Recording**: Removed auto-stop for manual control
+- **✅ Code Quality**: Zero static analysis warnings
+
+### **Version 1.0.4** (December 23, 2025)
 - **📋 Changelog System**: New structured changelog with JSON format and auto-generated Markdown
 - **🔄 Single Source of Truth**: CHANGELOG.json is now the authoritative source, CHANGELOG.md is auto-generated
 - **📦 Automated Version Management**: Updated version_manager.dart with changelog entry templates
@@ -98,6 +101,7 @@ make quick-run        # get + run-macos (quick start)
 
 # Version Management
 make version          # Show current version
+make sync-version     # Sync pubspec.yaml from CHANGELOG.json (SSOT)
 make changelog        # Generate CHANGELOG.md from CHANGELOG.json
 make verify-changelog # Verify changelogs are in sync
 make bump-patch       # Bump patch version
@@ -232,29 +236,28 @@ The repository includes a Vue 3 + Vite + TailwindCSS landing page that deploys t
 ```
 xicv/recogniz.ing (Single Repository)
 ├── .github/workflows/
-│   ├── release-matrix.yml          # Unified release workflow (matrix strategy)
-│   ├── build-windows.yml           # Manual Windows-only builds
-│   └── landing-deploy.yml          # Deploys landing to GitHub Pages
+│   ├── release-all-platforms.yml  # Builds app, creates GitHub Releases
+│   ├── build-windows.yml          # Windows-specific builds
+│   └── landing-deploy.yml         # Deploys landing to GitHub Pages
 └── landing/                        # Vue 3 + Vite + TailwindCSS landing page
     ├── src/
-    ├── public/downloads/           # App download artifacts (Git LFS)
-    │   └── manifest.json           # Version manifest for downloads
+    ├── public/downloads/
+    │   └── manifest.json           # Version manifest (only tracked file)
     ├── public/.nojekyll            # Required for GitHub Pages + Vite
     └── package.json
 ```
 
 **Tech Stack**: Vue 3.5, Vite 6.0, TailwindCSS 3.4, TypeScript 5.5, PWA (vite-plugin-pwa 0.21)
 
-### Automated Release Flow (Matrix Strategy)
+### Automated Release Flow
 
-1. **Tag Push**: Push a version tag (`v1.0.5`) → triggers `release-matrix.yml`
-2. **Parallel Builds**: GitHub Actions builds macOS, Windows, and Web **simultaneously** on appropriate runners
-   - macOS on `macos-latest` (with Xcode)
-   - Windows on `windows-latest` (with NSIS installer creation)
-   - Web on `ubuntu-latest` (cost-effective)
-3. **Release Creation**: After all builds complete, creates GitHub release with all artifacts
-4. **Update Downloads**: Commits artifacts to `landing/public/downloads/[version]/`
+1. **Tag Push**: Push a version tag (`v1.0.8`) → triggers `release-all-platforms.yml`
+2. **Parallel Builds**: GitHub Actions builds all platforms simultaneously
+3. **GitHub Release**: Creates release with artifacts attached
+4. **Update Manifest**: Updates `landing/public/downloads/manifest.json`
 5. **Deploy Landing**: Commit triggers `landing-deploy.yml` → deploys to https://recogniz.ing/
+
+> **Note**: Build artifacts are stored in **GitHub Releases**, not in the repository.
 
 ### Landing Page Development
 
@@ -292,10 +295,11 @@ git commit -m "chore: bump version to X.Y.Z and update changelog"
 ### Version Manager Commands
 
 ```bash
-dart scripts/version_manager.dart --help              # Show all options
-dart scripts/version_manager.dart --current           # Show current version
-dart scripts/version_manager.dart --changelog         # Generate CHANGELOG.md
-dart scripts/version_manager.dart --verify-changelog  # Check if files are in sync
+dart scripts/version_manager.dart --help               # Show all options
+dart scripts/version_manager.dart --current            # Show current version
+dart scripts/version_manager.dart --sync-from-changelog # Sync pubspec.yaml from CHANGELOG.json
+dart scripts/version_manager.dart --changelog          # Generate CHANGELOG.md
+dart scripts/version_manager.dart --verify-changelog   # Check if files are in sync
 dart scripts/version_manager.dart --bump patch --add-entry  # Bump + add template
 ```
 
@@ -377,7 +381,12 @@ MIT License
 
 ## Changelog
 
-### v1.0.5 (Latest) - December 29, 2025
+### v1.0.8 (Latest) - December 29, 2025
+- **FIXED**: Detached HEAD error when pushing landing downloads to repository
+- **NEW**: macOS and Windows installers available for download
+- **NEW**: `make sync-version` command to sync pubspec.yaml from CHANGELOG.json
+
+### v1.0.5 - December 29, 2025
 - **NEW**: Favorites filter for quickly accessing starred transcriptions
 - **REFACTORED**: Removed auto-stop after silence feature for simplified recording workflow
 - **ENHANCED**: Improved VAD overlay with static processing indicator (no flashing)
