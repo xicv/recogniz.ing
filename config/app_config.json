@@ -1,9 +1,9 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.8",
   "app": {
     "name": "Recogniz.ing",
-    "version": "1.0.0",
-    "buildNumber": "1"
+    "version": "1.0.8",
+    "buildNumber": "8"
   },
   "api": {
     "gemini": {
