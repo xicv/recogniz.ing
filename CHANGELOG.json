@@ -30,6 +30,38 @@
   },
   "versions": [
     {
+      "version": "1.10.0",
+      "date": "2025-12-31",
+      "stable": true,
+      "highlights": [
+        "Transcription status tracking with pending, processing, completed, failed states",
+        "Audio backup functionality for retrying failed transcriptions",
+        "Enhanced error tracking with retry count and completion timestamps"
+      ],
+      "changes": [
+        {
+          "category": "added",
+          "title": "Transcription Status Tracking",
+          "description": "Added TranscriptionStatus enum with states: pending, processing, completed, failed. Each transcription now tracks its lifecycle from initial recording through API processing to final result."
+        },
+        {
+          "category": "added",
+          "title": "Audio Backup for Retry",
+          "description": "Original audio files are now backed up to local storage, enabling retry functionality for failed transcriptions without requiring users to re-record."
+        },
+        {
+          "category": "added",
+          "title": "Error Tracking",
+          "description": "Added errorMessage field and retryCount to track transcription failures and retry attempts."
+        },
+        {
+          "category": "added",
+          "title": "Completion Timestamp",
+          "description": "Added completedAt field to track when transcription processing finished, enabling better analytics and user insights."
+        }
+      ]
+    },
+    {
       "version": "1.0.9",
       "date": "2025-12-31",
       "stable": true,
