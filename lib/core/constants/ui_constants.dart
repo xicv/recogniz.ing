@@ -37,6 +37,10 @@ class UIConstants {
   // Text field dimensions
   static const double textFieldHeight = 56.0;
   static const double textLineHeight = 1.5;
+
+  // Touch targets - WCAG 2.1 AAA compliant (44x44 minimum)
+  static const double touchTargetMinimum = 44.0;
+  static const double touchTargetCompact = 40.0;
 }
 
 class AppDimensions {

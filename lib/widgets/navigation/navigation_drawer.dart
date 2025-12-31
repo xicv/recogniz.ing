@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -215,137 +217,145 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
     final navigationItems = _getNavigationItems();
     final colorScheme = Theme.of(context).colorScheme;
 
-    return SingleChildScrollView(
-      child: Column(
-        children: navigationItems.map((item) {
-        final isSelected = currentPage == item.index;
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          color: colorScheme.surface.withOpacity(0.8),
+          child: SingleChildScrollView(
+            child: Column(
+              children: navigationItems.map((item) {
+              final isSelected = currentPage == item.index;
 
-        // Collapsed mode: icon only
-        if (!isVisuallyExpanded) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-            child: Tooltip(
-              message: item.label,
-              waitDuration: const Duration(milliseconds: 500),
-              child: Material(
-                color: isSelected
-                    ? colorScheme.primaryContainer.withOpacity(0.6)
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                child: InkWell(
-                  onTap: () {
-                    ref.read(currentPageProvider.notifier).state = item.index;
-                  },
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                  hoverColor: colorScheme.onSurface.withOpacity(0.08),
-                  splashColor: colorScheme.onSurface.withOpacity(0.12),
-                  child: Container(
-                    height: 48,
-                    decoration: BoxDecoration(
+              // Collapsed mode: icon only
+              if (!isVisuallyExpanded) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                  child: Tooltip(
+                    message: item.label,
+                    waitDuration: const Duration(milliseconds: 500),
+                    child: Material(
+                      color: isSelected
+                          ? colorScheme.primaryContainer.withOpacity(0.6)
+                          : Colors.transparent,
                       borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                    ),
-                    child: Stack(
-                      children: [
-                        // Active indicator bar (left side)
-                        Positioned(
-                          left: 4,
-                          top: 0,
-                          bottom: 0,
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            width: 4,
-                            margin: const EdgeInsets.symmetric(vertical: 12),
-                            decoration: BoxDecoration(
-                              color: isSelected
-                                  ? colorScheme.primary
-                                  : Colors.transparent,
-                              borderRadius: const BorderRadius.only(
-                                topRight: Radius.circular(2),
-                                bottomRight: Radius.circular(2),
+                      child: InkWell(
+                        onTap: () {
+                          ref.read(currentPageProvider.notifier).state = item.index;
+                        },
+                        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                        hoverColor: colorScheme.onSurface.withOpacity(0.08),
+                        splashColor: colorScheme.onSurface.withOpacity(0.12),
+                        child: Container(
+                          height: 48,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                          ),
+                          child: Stack(
+                            children: [
+                              // Active indicator bar (left side)
+                              Positioned(
+                                left: 4,
+                                top: 0,
+                                bottom: 0,
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  width: 4,
+                                  margin: const EdgeInsets.symmetric(vertical: 12),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? colorScheme.primary
+                                        : Colors.transparent,
+                                    borderRadius: const BorderRadius.only(
+                                      topRight: Radius.circular(2),
+                                      bottomRight: Radius.circular(2),
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
+                              // Center icon
+                              Center(
+                                child: Icon(
+                                  item.icon,
+                                  color: isSelected
+                                      ? colorScheme.onPrimaryContainer
+                                      : colorScheme.onSurfaceVariant,
+                                  size: 22,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        // Center icon
-                        Center(
-                          child: Icon(
+                      ),
+                    ),
+                  ),
+                );
+              }
+
+              // Expanded mode: full layout
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Material(
+                  color: isSelected
+                      ? colorScheme.primaryContainer.withOpacity(0.7)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                  child: InkWell(
+                    onTap: () {
+                      ref.read(currentPageProvider.notifier).state = item.index;
+                    },
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                    hoverColor: colorScheme.surfaceContainerHighest.withOpacity(0.6),
+                    splashColor: colorScheme.onSurface.withOpacity(0.1),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 16,
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
                             item.icon,
                             color: isSelected
                                 ? colorScheme.onPrimaryContainer
                                 : colorScheme.onSurfaceVariant,
                             size: 22,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Text(
+                              item.label,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge
+                                  ?.copyWith(
+                                    color: isSelected
+                                        ? colorScheme.onPrimaryContainer
+                                        : colorScheme.onSurface,
+                                    fontWeight: isSelected
+                                        ? FontWeight.w600
+                                        : FontWeight.w500,
+                                    fontSize: 15,
+                                  ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          if (isSelected)
+                            Icon(
+                              LucideIcons.chevronRight,
+                              color: colorScheme.onPrimaryContainer,
+                              size: 16,
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
-          );
-        }
-
-        // Expanded mode: full layout
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          child: Material(
-            color: isSelected
-                ? colorScheme.primaryContainer.withOpacity(0.7)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-            child: InkWell(
-              onTap: () {
-                ref.read(currentPageProvider.notifier).state = item.index;
-              },
-              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-              hoverColor: colorScheme.surfaceContainerHighest.withOpacity(0.6),
-              splashColor: colorScheme.onSurface.withOpacity(0.1),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 12,
-                  horizontal: 16,
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      item.icon,
-                      color: isSelected
-                          ? colorScheme.onPrimaryContainer
-                          : colorScheme.onSurfaceVariant,
-                      size: 22,
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Text(
-                        item.label,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyLarge
-                            ?.copyWith(
-                              color: isSelected
-                                  ? colorScheme.onPrimaryContainer
-                                  : colorScheme.onSurface,
-                              fontWeight: isSelected
-                                  ? FontWeight.w600
-                                  : FontWeight.w500,
-                              fontSize: 15,
-                            ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    if (isSelected)
-                      Icon(
-                        LucideIcons.chevronRight,
-                        color: colorScheme.onPrimaryContainer,
-                        size: 16,
-                      ),
-                  ],
-                ),
-              ),
+              );
+            }).toList(),
             ),
           ),
-        );
-      }).toList(),
+        ),
       ),
     );
   }

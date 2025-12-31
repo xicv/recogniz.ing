@@ -70,11 +70,11 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
     super.initState();
 
     _pulseController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
-    _pulseAnimation = Tween<double>(begin: 0.7, end: 1.0).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    _pulseAnimation = Tween<double>(begin: 0.85, end: 1.0).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeOut),
     );
 
     _fadeController = AnimationController(
@@ -169,6 +169,8 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
   Widget build(BuildContext context) {
     final recordingState = ref.watch(recordingStateProvider);
     final currentState = _getCurrentState(recordingState);
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
 
     // Trigger fade animation on state change
     _fadeController.forward(from: 0);
@@ -179,7 +181,9 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
     _manageProgressTimer(recordingState);
 
     return Container(
-      color: Colors.black.withOpacity(0.85),
+      color: isDark
+          ? Colors.black.withOpacity(0.90)
+          : colorScheme.surface.withOpacity(0.95),
       child: Material(
         color: Colors.transparent,
         child: Stack(
@@ -276,6 +280,9 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
     RecordingState recordingState,
     RecordingStateValue currentState,
   ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final onSurfaceColor = colorScheme.onSurface;
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -295,8 +302,8 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
         if (recordingState != RecordingState.processing)
           Text(
             _formatDuration(_currentDuration),
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: onSurfaceColor,
               fontSize: 56,
               fontWeight: FontWeight.w300,
               letterSpacing: 4,
@@ -310,7 +317,7 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
           Text(
             getStateText(currentState),
             style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
+              color: onSurfaceColor.withOpacity(0.6),
               fontSize: 14,
             ),
           ),
@@ -320,7 +327,7 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
           Text(
             'Processing...',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.7),
+              color: onSurfaceColor.withOpacity(0.7),
               fontSize: 16,
               fontWeight: FontWeight.w400,
             ),
@@ -329,7 +336,7 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
         // Stop button (when recording)
         if (recordingState == RecordingState.recording) ...[
           const SizedBox(height: 48),
-          _buildMinimalStopButton(),
+          _buildMinimalStopButton(context),
         ],
       ],
     );
@@ -428,6 +435,8 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
     RecordingStateValue currentState,
     Color stateColor,
   ) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return AnimatedBuilder(
       animation: _pulseAnimation,
       builder: (context, child) {
@@ -460,7 +469,7 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
                 recordingState == RecordingState.recording
                     ? LucideIcons.square
                     : LucideIcons.mic,
-                color: Colors.white,
+                color: colorScheme.onPrimary,
                 size: 32,
               ),
             ),
@@ -472,10 +481,12 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
 
 
   Widget _buildTimerDisplay(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Text(
       _formatDuration(_currentDuration),
-      style: const TextStyle(
-        color: Colors.white,
+      style: TextStyle(
+        color: colorScheme.onSurface,
         fontSize: 48,
         fontWeight: FontWeight.bold,
         letterSpacing: -2,
@@ -489,7 +500,7 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       decoration: BoxDecoration(
-        color: colorScheme.surface.withOpacity(0.8),
+        color: colorScheme.surfaceContainerHighest.withOpacity(0.8),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -497,14 +508,14 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
         children: [
           Icon(
             LucideIcons.info,
-            color: Colors.white.withOpacity(0.7),
+            color: colorScheme.onSurface.withOpacity(0.7),
             size: 16,
           ),
           const SizedBox(width: 8),
           Text(
             'Press stop button when finished',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.7),
+              color: colorScheme.onSurface.withOpacity(0.7),
               fontSize: 12,
             ),
           ),
@@ -514,6 +525,8 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
   }
 
   Widget _buildStopButton(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return GestureDetector(
       onTap: () async {
         await HapticService.mediumImpact();
@@ -522,18 +535,18 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.red.withOpacity(0.8),
+          color: colorScheme.error.withOpacity(0.9),
           borderRadius: BorderRadius.circular(24),
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(LucideIcons.square, color: Colors.white, size: 16),
-            SizedBox(width: 8),
+            Icon(LucideIcons.square, color: colorScheme.onError, size: 16),
+            const SizedBox(width: 8),
             Text(
               'Stop Recording',
               style: TextStyle(
-                color: Colors.white,
+                color: colorScheme.onError,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
@@ -544,7 +557,9 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
     );
   }
 
-  Widget _buildMinimalStopButton() {
+  Widget _buildMinimalStopButton(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return GestureDetector(
       onTap: () async {
         await HapticService.mediumImpact();
@@ -555,15 +570,15 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
         height: 64,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Colors.white.withOpacity(0.15),
+          color: colorScheme.onSurface.withOpacity(0.15),
           border: Border.all(
-            color: Colors.white.withOpacity(0.3),
+            color: colorScheme.onSurface.withOpacity(0.3),
             width: 2,
           ),
         ),
-        child: const Icon(
+        child: Icon(
           LucideIcons.square,
-          color: Colors.white,
+          color: colorScheme.onSurface,
           size: 24,
         ),
       ),
@@ -571,16 +586,18 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
   }
 
   Widget _buildZenModeToggle() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: colorScheme.onSurface.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: IconButton(
         onPressed: _toggleZenMode,
         icon: Icon(
           _isZenMode ? LucideIcons.expand : LucideIcons.minimize,
-          color: Colors.white.withOpacity(0.7),
+          color: colorScheme.onSurface.withOpacity(0.7),
           size: 18,
         ),
         tooltip: _isZenMode ? 'Exit Zen mode' : 'Zen mode',
@@ -589,16 +606,18 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
   }
 
   Widget _buildCloseHint() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: colorScheme.onSurface.withOpacity(0.1),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
         'Press Esc to close',
         style: TextStyle(
-          color: Colors.white.withOpacity(0.6),
+          color: colorScheme.onSurface.withOpacity(0.6),
           fontSize: 11,
         ),
       ),

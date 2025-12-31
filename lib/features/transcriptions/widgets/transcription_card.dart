@@ -203,16 +203,18 @@ class _TranscriptionCardState extends State<TranscriptionCard>
           }
         },
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
+          duration: const Duration(milliseconds: 200),
           curve: Curves.easeOutCubic,
-          transform: Matrix4.identity()..scale(_isHovered ? 1.005 : 1.0),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+            color: _isHovered
+                ? colorScheme.surfaceContainerHigh
+                : null,
             boxShadow: _isHovered
                 ? [
                     BoxShadow(
-                      color: colorScheme.shadow.withOpacity(0.08),
-                      blurRadius: 12,
+                      color: colorScheme.shadow.withOpacity(0.1),
+                      blurRadius: 16,
                       offset: const Offset(0, 4),
                     ),
                   ]
@@ -227,7 +229,7 @@ class _TranscriptionCardState extends State<TranscriptionCard>
               side: accentColor != Colors.transparent
                   ? BorderSide(color: accentColor, width: 2)
                   : BorderSide(
-                      color: colorScheme.outlineVariant.withOpacity(0.3),
+                      color: colorScheme.outlineVariant.withOpacity(_isHovered ? 0.5 : 0.3),
                       width: 1,
                     ),
             ),
@@ -416,8 +418,8 @@ class _TranscriptionCardState extends State<TranscriptionCard>
               : colorScheme.onSurfaceVariant,
           tooltip: _isStarred ? 'Unfavorite' : 'Favorite',
           style: IconButton.styleFrom(
-            padding: const EdgeInsets.all(6),
-            minimumSize: const Size(32, 32),
+            padding: const EdgeInsets.all(8),
+            minimumSize: const Size(UIConstants.touchTargetMinimum, UIConstants.touchTargetMinimum),
             side: BorderSide.none,
           ),
         ),
@@ -428,8 +430,8 @@ class _TranscriptionCardState extends State<TranscriptionCard>
           icon: const Icon(LucideIcons.copy, size: 16),
           tooltip: 'Copy to clipboard',
           style: IconButton.styleFrom(
-            padding: const EdgeInsets.all(6),
-            minimumSize: const Size(32, 32),
+            padding: const EdgeInsets.all(8),
+            minimumSize: const Size(UIConstants.touchTargetMinimum, UIConstants.touchTargetMinimum),
             side: BorderSide.none,
           ),
         ),
@@ -441,8 +443,8 @@ class _TranscriptionCardState extends State<TranscriptionCard>
             icon: const Icon(LucideIcons.edit, size: 16),
             tooltip: 'Edit',
             style: IconButton.styleFrom(
-              padding: const EdgeInsets.all(6),
-              minimumSize: const Size(32, 32),
+              padding: const EdgeInsets.all(8),
+              minimumSize: const Size(UIConstants.touchTargetMinimum, UIConstants.touchTargetMinimum),
               side: BorderSide.none,
             ),
           ),
@@ -475,8 +477,8 @@ class _TranscriptionCardState extends State<TranscriptionCard>
           icon: const Icon(LucideIcons.x, size: 16),
           tooltip: 'Cancel (Esc)',
           style: IconButton.styleFrom(
-            padding: const EdgeInsets.all(6),
-            minimumSize: const Size(32, 32),
+            padding: const EdgeInsets.all(8),
+            minimumSize: const Size(UIConstants.touchTargetMinimum, UIConstants.touchTargetMinimum),
           ),
         ),
         const SizedBox(width: 4),
@@ -506,8 +508,8 @@ class _TranscriptionCardState extends State<TranscriptionCard>
             icon: const Icon(LucideIcons.copy, size: 14),
             tooltip: 'Copy',
             style: IconButton.styleFrom(
-              padding: const EdgeInsets.all(4),
-              minimumSize: const Size(28, 28),
+              padding: const EdgeInsets.all(8),
+              minimumSize: const Size(UIConstants.touchTargetCompact, UIConstants.touchTargetCompact),
             ),
           )
         else
@@ -517,7 +519,7 @@ class _TranscriptionCardState extends State<TranscriptionCard>
             tooltip: 'Copy to clipboard',
             style: IconButton.styleFrom(
               padding: const EdgeInsets.all(8),
-              minimumSize: const Size(36, 36),
+              minimumSize: const Size(UIConstants.touchTargetMinimum, UIConstants.touchTargetMinimum),
             ),
           ),
         const SizedBox(width: 4),
@@ -767,8 +769,8 @@ class _TranscriptionMenuButtonState
         icon: const Icon(LucideIcons.moreVertical, size: 16),
         tooltip: 'More options',
         style: IconButton.styleFrom(
-          padding: const EdgeInsets.all(6),
-          minimumSize: const Size(32, 32),
+          padding: const EdgeInsets.all(8),
+          minimumSize: const Size(UIConstants.touchTargetMinimum, UIConstants.touchTargetMinimum),
         ),
       ),
     );
