@@ -1,91 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <!-- Background gradient: Deep indigo to lighter indigo -->
+    <!-- Background gradient: Deep blue to teal/emerald for trust and reliability -->
     <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#4F46E5"/>
-      <stop offset="100%" stop-color="#6366F1"/>
-    </linearGradient>
-
-    <!-- Sound wave gradient: Cyan to indigo -->
-    <linearGradient id="waveGradient" x1="0%" y1="50%" x2="100%" y2="50%">
-      <stop offset="0%" stop-color="#22D3EE"/>
-      <stop offset="100%" stop-color="#6366F1"/>
-    </linearGradient>
-
-    <!-- Text line gradient: Indigo to emerald -->
-    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="0%" stop-color="#1E40AF"/>
+      <stop offset="50%" stop-color="#0891B2"/>
       <stop offset="100%" stop-color="#10B981"/>
     </linearGradient>
 
-    <!-- Accent gradient for transition elements -->
-    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#22D3EE"/>
-      <stop offset="50%" stop-color="#6366F1"/>
-      <stop offset="100%" stop-color="#10B981"/>
-    </linearGradient>
-
-    <!-- Subtle inner shadow for depth -->
-    <filter id="innerShadow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="8" result="blur"/>
-      <feOffset dx="0" dy="4" result="offsetBlur"/>
-      <feComposite in="offsetBlur" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="inverse"/>
-      <feFlood flood-color="#000000" flood-opacity="0.15"/>
-      <feComposite in2="inverse" operator="in"/>
-      <feComposite in2="SourceAlpha" operator="in"/>
-      <feMerge>
-        <feMergeNode in="SourceGraphic"/>
-        <feMergeNode/>
-      </feMerge>
-    </filter>
-
-    <!-- Subtle drop shadow -->
-    <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000000" flood-opacity="0.1"/>
+    <!-- Subtle drop shadow for the R -->
+    <filter id="rShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="6" stdDeviation="12" flood-color="#000000" flood-opacity="0.2"/>
     </filter>
   </defs>
 
   <!-- Background: Rounded square with Material Design 3 corner radius -->
-  <rect x="32" y="32" width="960" height="960" rx="220" fill="url(#bgGradient)" filter="url(#innerShadow)"/>
+  <rect x="32" y="32" width="960" height="960" rx="220" fill="url(#bgGradient)"/>
 
-  <!-- Main content group: centered with padding -->
-  <g transform="translate(160, 240)">
-    <!-- Sound Wave Section (Left) - 5 vertical bars with varying heights -->
-    <!-- Wave 1: Pure cyan, tallest -->
-    <rect x="40" y="120" width="56" height="360" rx="28" fill="#22D3EE"/>
-
-    <!-- Wave 2: Cyan-indigo transition -->
-    <rect x="132" y="180" width="56" height="240" rx="28" fill="#30C4E6"/>
-
-    <!-- Wave 3: Mid transition - the transformation point -->
-    <rect x="224" y="140" width="56" height="320" rx="28" fill="url(#accentGradient)"/>
-
-    <!-- Wave 4: Indigo-emerald transition, shorter -->
-    <rect x="316" y="220" width="56" height="160" rx="28" fill="url(#textGradient)"/>
-
-    <!-- Wave 5: Text line begins - very short, emerald tint -->
-    <rect x="408" y="260" width="56" height="80" rx="28" fill="#10B981"/>
-
-    <!-- Text Lines Section (Right) - 4 horizontal lines -->
-    <!-- Line 1: Longest, transitioning from wave to text -->
-    <rect x="500" y="120" width="200" height="56" rx="28" fill="url(#textGradient)"/>
-
-    <!-- Line 2: Medium length -->
-    <rect x="540" y="220" width="160" height="56" rx="28" fill="#10B981"/>
-
-    <!-- Line 3: Medium-short length -->
-    <rect x="500" y="320" width="120" height="56" rx="28" fill="#10B981" opacity="0.9"/>
-
-    <!-- Line 4: Shortest (ellipsis effect) -->
-    <rect x="540" y="420" width="80" height="56" rx="28" fill="#10B981" opacity="0.8"/>
-
-    <!-- Connection dots: Visual bridge between waves and text -->
-    <circle cx="480" cy="280" r="24" fill="url(#accentGradient)" opacity="0.9"/>
-    <circle cx="480" cy="148" r="20" fill="url(#accentGradient)" opacity="0.7"/>
-    <circle cx="480" cy="408" r="16" fill="url(#accentGradient)" opacity="0.5"/>
+  <!-- Geometric "R" - Clean, modern design -->
+  <g filter="url(#rShadow)" transform="translate(512, 512)">
+    <!-- Main R shape - geometric sans-serif style -->
+    <path d="
+      M -180 -260
+      L -180 260
+      L -90 260
+      L -90 30
+      L 40 30
+      L 180 260
+      L 280 260
+      L 130 10
+      C 180 -10, 220 -50, 220 -115
+      C 220 -190, 170 -230, 90 -230
+      L -90 -230
+      L -90 -260
+      L -180 -260
+      Z
+      M -90 -160
+      L 80 -160
+      C 130 -160, 150 -140, 150 -105
+      C 150 -70, 130 -50, 80 -50
+      L -90 -50
+      L -90 -160
+      Z
+    " fill="#FFFFFF"/>
   </g>
 
-  <!-- Optional: Subtle corner accent for brand recognition -->
-  <circle cx="920" cy="104" r="64" fill="#22D3EE" opacity="0.15"/>
+  <!-- Red recording dot at the end of R's right leg -->
+  <circle cx="785" cy="765" r="40" fill="#EF4444" stroke="#FFFFFF" stroke-width="6"/>
 </svg>

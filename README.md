@@ -338,6 +338,7 @@ MIT License
 For detailed version history and release notes, see [CHANGELOG.md](CHANGELOG.md).
 
 **Quick links:**
+- [v1.11.0](CHANGELOG.md#1110---2025-12-31) - Complete app logo redesign with bold 'R' and red recording dot
 - [v1.10.0](CHANGELOG.md#1100---2025-12-31) - Transcription status tracking with retry functionality
 - [v1.0.9](CHANGELOG.md#109---2025-12-31) - App logo redesign with modern voice-to-text metaphor
 - [v1.0.8](CHANGELOG.md#108---2025-12-29) - Platform releases and CI/CD fixes

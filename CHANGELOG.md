@@ -106,3 +106,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.9] - 2025-12-31
+
+### Changed
+
+- **App Logo Redesign** - Complete logo redesign featuring vertical sound-wave bars that transform into horizontal text lines. Uses brand color progression (cyan → indigo → emerald) to visually represent the transcription flow.
+- **Platform Icons** - Updated all platform icons (Android, iOS, macOS, Windows, Web) and landing page favicons with the new modern design.
+
+---
+
+## [1.10.0] - 2025-12-31
+
+### Added
+
+- **Transcription Status Tracking** - Added TranscriptionStatus enum with states: pending, processing, completed, failed. Each transcription now tracks its lifecycle from initial recording through API processing to final result.
+- **Audio Backup for Retry** - Original audio files are now backed up to local storage, enabling retry functionality for failed transcriptions without requiring users to re-record.
+- **Error Tracking** - Added errorMessage field and retryCount to track transcription failures and retry attempts.
+- **Completion Timestamp** - Added completedAt field to track when transcription processing finished, enabling better analytics and user insights.
+
+---
+
+## [1.11.0] - 2025-12-31
+
+### Changed
+
+- **App Logo Redesign** - Complete logo redesign featuring a bold geometric 'R' letter in white on a blue-to-teal-to-emerald gradient background. The red recording dot is positioned at the end of the R's right leg, creating a clear visual metaphor for the app's voice recording functionality.
+- **Color Scheme Update** - Updated from cyan-indigo-emerald to a more professional deep blue (#1E40AF) → cyan/teal (#0891B2) → emerald (#10B981) gradient that conveys trust, reliability, and accuracy.
+- **Platform Icons** - Regenerated all platform icons (Android, iOS, macOS, Windows, Web) and landing page assets with the new modern design following 2025 minimalist trends.
+
+### Removed
+
+- **Unused Logo Files** - Removed redundant assets/logo/ folder. Consolidated all icon assets to assets/icons/ as single source of truth.
+
+---
+

@@ -30,6 +30,38 @@
   },
   "versions": [
     {
+      "version": "1.11.0",
+      "date": "2025-12-31",
+      "stable": true,
+      "highlights": [
+        "Complete app logo redesign with bold 'R' for Recogniz.ing",
+        "Red recording dot positioned at end of R's right leg",
+        "New blue-teal-emerald gradient conveying trust and reliability"
+      ],
+      "changes": [
+        {
+          "category": "changed",
+          "title": "App Logo Redesign",
+          "description": "Complete logo redesign featuring a bold geometric 'R' letter in white on a blue-to-teal-to-emerald gradient background. The red recording dot is positioned at the end of the R's right leg, creating a clear visual metaphor for the app's voice recording functionality."
+        },
+        {
+          "category": "changed",
+          "title": "Color Scheme Update",
+          "description": "Updated from cyan-indigo-emerald to a more professional deep blue (#1E40AF) → cyan/teal (#0891B2) → emerald (#10B981) gradient that conveys trust, reliability, and accuracy."
+        },
+        {
+          "category": "changed",
+          "title": "Platform Icons",
+          "description": "Regenerated all platform icons (Android, iOS, macOS, Windows, Web) and landing page assets with the new modern design following 2025 minimalist trends."
+        },
+        {
+          "category": "removed",
+          "title": "Unused Logo Files",
+          "description": "Removed redundant assets/logo/ folder. Consolidated all icon assets to assets/icons/ as single source of truth."
+        }
+      ]
+    },
+    {
       "version": "1.10.0",
       "date": "2025-12-31",
       "stable": true,

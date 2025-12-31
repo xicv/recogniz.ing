@@ -1,34 +1,33 @@
 # Generate App Icons
 
-The app icon SVG has been created at `app_icon.svg`. To generate the required PNG files:
+The app icon SVGs are the single source of truth. To generate PNG files:
 
-## Using online tool (easiest):
-1. Open `app_icon.svg` in a browser
-2. Right-click and "Save as PNG" as `app_icon.png` (1024x1024)
-3. Use an online tool like https://convertio.co/svg-png/ for conversion
-
-## Using ImageMagick (if installed):
+## Using ImageMagick (recommended):
 ```bash
-# Install ImageMagick first
-# macOS: brew install imagemagick
-# Ubuntu: sudo apt-get install imagemagick
+# From project root, run:
+convert -background none -resize 1024x1024 assets/icons/app_icon.svg assets/icons/app_icon.png
+convert -background none -resize 1024x1024 assets/icons/app_icon_adaptive.svg assets/icons/app_icon_adaptive.png
+convert -background none -resize 1024x1024 assets/icons/app_icon.svg assets/icons/app_icon_mac.png
 
-# Convert to PNG
-convert app_icon.svg -resize 1024x1024 app_icon.png
-convert app_icon.svg -resize 1024x1024 -background transparent -alpha remove app_icon_adaptive.png
-convert app_icon.svg -resize 512x512 app_icon_mac.png
+# Generate all size variants:
+mkdir -p assets/icons/generated
+convert -background none -resize 1024x1024 assets/icons/app_icon.svg assets/icons/generated/app_icon_1024.png
+convert -background none -resize 512x512 assets/icons/app_icon.svg assets/icons/generated/app_icon_512.png
+convert -background none -resize 256x256 assets/icons/app_icon.svg assets/icons/generated/app_icon_256.png
+convert -background none -resize 128x128 assets/icons/app_icon.svg assets/icons/generated/app_icon_128.png
+convert -background none -resize 64x64 assets/icons/app_icon.svg assets/icons/generated/app_icon_64.png
+convert -background none -resize 32x32 assets/icons/app_icon.svg assets/icons/generated/app_icon_32.png
+convert -background none -resize 16x16 assets/icons/app_icon.svg assets/icons/generated/app_icon_16.png
 ```
 
 ## After generating icons:
-1. Run `flutter pub get` to ensure flutter_launcher_icons is installed
-2. Run `dart run flutter_launcher_icons` to generate all platform icons
-3. The generated icons will be placed in:
-   - android/app/src/main/res/
-   - ios/Runner/Assets.xcassets/AppIcon.appiconset/
-   - windows/runner/resources/
-   - macos/Runner/Assets.xcassets/AppIcon.iconset/
+```bash
+# Run flutter_launcher_icons to update all platform icons
+dart run flutter_launcher_icons
+```
 
 ## Icon Design:
-- Represents voice (sound waves) transforming into text (lines)
-- Uses blue to cyan gradient
-- Clean, modern design suitable for all platforms
+- Bold "R" letter for "Recogniz.ing"
+- Red recording dot at end of R's right leg
+- Blue to teal to emerald gradient (trust, reliability, accuracy)
+- Material Design 3 compliant (220px corner radius)
