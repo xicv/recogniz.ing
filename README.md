@@ -335,51 +335,11 @@ MIT License
 
 ## Changelog
 
-### v1.0.8 (Latest) - December 29, 2025
-- **FIXED**: Detached HEAD error when pushing landing downloads to repository
-- **NEW**: macOS and Windows installers available for download
-- **NEW**: `make sync-version` command to sync pubspec.yaml from CHANGELOG.json
+For detailed version history and release notes, see [CHANGELOG.md](CHANGELOG.md).
 
-### v1.0.5 - December 29, 2025
-- **NEW**: Favorites filter for quickly accessing starred transcriptions
-- **REFACTORED**: Removed auto-stop after silence feature for simplified recording workflow
-- **ENHANCED**: Improved VAD overlay with static processing indicator (no flashing)
-- **REMOVED**: "Speech Detection" and "Audio Quality" status labels for cleaner UI
-- **FIXED**: All static analysis warnings (0 errors, 0 warnings)
-- **FIXED**: Hive schema compatibility with nullable isFavorite field
-
-### v1.0.4 - December 23, 2025
-- **NEW**: Changelog synchronization system with JSON as single source of truth
-- **NEW**: Version manager with `--changelog`, `--add-entry`, and `--verify-changelog` flags
-- **NEW**: Added Android platform downloads to landing page
-- **FIXED**: Download URLs now point to GitHub Pages instead of GitHub Releases
-- **FIXED**: Detached HEAD issue in GitHub Actions release workflow
-- **FIXED**: Android build compatibility with AGP 8.10 and Gradle 8.11.1
-- **FIXED**: PWA build error by excluding downloads folder from precaching
-- **ENHANCED**: User preferences with persistent desktop settings
-- **ENHANCED**: VAD modal UI fixes and audio processing improvements
-
-### v1.0.3 - December 21, 2025
-- **FIXED**: macOS Gatekeeper verification issues with improved app signing
-- **NEW**: Initial Windows release with native installer
-- **FIXED**: `make quick-run` command now properly cleans build directory
-- **NEW**: Updated platform icons on landing page
-- **ENHANCED**: Overall stability and performance improvements
-- **UPDATED**: Simplified single-repository deployment architecture
-
-### v1.0.2
-- **NEW**: Comprehensive version management system with semantic versioning
-- **NEW**: Keyboard shortcut (Cmd/Ctrl+S) for saving edited transcriptions
-- **FIXED**: Settings menu navigation now opens correct Settings tab
-- **NEW**: Automated deployment system with landing page integration
-- **NEW**: macOS code signing and notarization support
-- **NEW**: Landing page with download management
-- **REFACTOR**: Simplified version format (removed unnecessary build numbers)
-
-### v1.0.0
-- Initial release with core voice typing functionality
-- Material Design 3 UI implementation
-- Configuration system for themes, prompts, and vocabulary
-- Desktop hotkey and system tray integration
-- Advanced audio processing with VAD
-- Comprehensive error handling and logging
+**Quick links:**
+- [v1.10.0](CHANGELOG.md#1100---2025-12-31) - Transcription status tracking with retry functionality
+- [v1.0.9](CHANGELOG.md#109---2025-12-31) - App logo redesign with modern voice-to-text metaphor
+- [v1.0.8](CHANGELOG.md#108---2025-12-29) - Platform releases and CI/CD fixes
+- [v1.0.5](CHANGELOG.md#105---2025-12-29) - Favorites filter and UI improvements
+- [v1.0.4](CHANGELOG.md#104---2025-12-23) - Changelog system and deployment architecture

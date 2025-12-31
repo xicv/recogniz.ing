@@ -7,19 +7,29 @@ A modern, minimalist landing page for the Recogniz.ing AI voice typing applicati
 
 ---
 
-## Latest Version: 1.0.8 (December 29, 2025)
+## Latest Version: 1.10.0 (December 31, 2025)
 
-### Recent Updates (v1.0.8)
+### Recent Updates (v1.10.0)
+- **📊 Transcription Status Tracking**: New status system with pending, processing, completed, and failed states
+- **💾 Audio Backup for Retry**: Original audio files backed up locally for retrying failed transcriptions
+- **🔍 Error Tracking**: Enhanced error tracking with retry count and completion timestamps
+- **✅ Completion Timestamp**: Track when transcription processing finished for better analytics
+
+### Previous Updates (v1.0.9)
+- **🎨 App Logo Redesign**: Modern voice-to-text metaphor with sound-wave-to-text transformation
+- **🌈 Brand Color Progression**: Cyan → Indigo → Emerald representing transcription flow
+
+### Earlier Updates (v1.0.8)
 - **🔧 CI/CD Fix**: Fixed detached HEAD error when pushing landing downloads
 - **🍎🪟 Platform Releases**: macOS and Windows installers available
 
-### Previous Updates (v1.0.5)
+### Older Updates (v1.0.5)
 - **⭐ Favorites Filter**: Quick access to starred transcriptions
 - **🎨 Cleaner VAD UI**: Static processing indicator (no flashing)
 - **🔧 Simplified Recording**: Removed auto-stop for manual control
 - **✅ Code Quality**: Zero static analysis warnings
 
-### Earlier Updates (v1.0.4)
+### Legacy Updates (v1.0.4)
 - **📋 Changelog System**: JSON-first with auto-generated Markdown
 - **🌐 Cross-platform Downloads**: All platforms with install instructions
 - **✨ PWA Support**: Progressive Web App with offline capabilities
@@ -42,12 +52,12 @@ Recogniz.ing is an AI-powered voice typing application built with Flutter that:
 ## Tech Stack
 
 - **Vue 3.5** with Composition API and `<script setup>` syntax
-- **Vite 6.0** for ultra-fast development and optimized builds
+- **Vite 6.4** for ultra-fast development and optimized builds
 - **Tailwind CSS 3.4** for utility-first styling
-- **TypeScript 5.5** for type safety
-- **Vue Router 4.6** for SPA navigation
+- **TypeScript 5.6** for type safety
+- **Vue Router 4.5** for SPA navigation
 - **vite-plugin-pwa 0.21** for Progressive Web App capabilities
-- **Lucide Vue Next 0.460** for modern icons
+- **Lucide Vue Next** for modern icons
 
 ---
 
