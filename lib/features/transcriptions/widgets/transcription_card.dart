@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../core/constants/ui_constants.dart';
 import '../../../core/models/transcription.dart';
+import '../../../core/models/transcription_status.dart';
 import '../../../core/theme/app_theme.dart';
 
 /// Enhanced transcription card with improved visual hierarchy
@@ -25,6 +26,7 @@ class TranscriptionCard extends StatefulWidget {
   final VoidCallback onDelete;
   final Function(String)? onUpdate;
   final VoidCallback? onToggleFavorite;
+  final Function(Transcription)? onRetry;
   final bool isSelected;
   final bool isCompact;
 
@@ -35,6 +37,7 @@ class TranscriptionCard extends StatefulWidget {
     required this.onDelete,
     this.onUpdate,
     this.onToggleFavorite,
+    this.onRetry,
     this.isSelected = false,
     this.isCompact = false,
   });
@@ -91,8 +94,8 @@ class _TranscriptionCardState extends State<TranscriptionCard>
       context: context,
       builder: (context) => AlertDialog.adaptive(
         title: const Text('Delete Transcription'),
-        content: const Text(
-            'Are you sure you want to delete this transcription?'),
+        content:
+            const Text('Are you sure you want to delete this transcription?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -158,6 +161,16 @@ class _TranscriptionCardState extends State<TranscriptionCard>
   }
 
   Color _getAccentColor(ColorScheme colorScheme) {
+    // Status-based colors take priority
+    final status = widget.transcription.status;
+    if (status == TranscriptionStatus.failed) {
+      return colorScheme.error;
+    } else if (status == TranscriptionStatus.pending ||
+        status == TranscriptionStatus.processing) {
+      return colorScheme.tertiary;
+    }
+
+    // Time-based accent for completed transcriptions
     final now = DateTime.now();
     final difference = now.difference(widget.transcription.createdAt);
 
@@ -183,7 +196,8 @@ class _TranscriptionCardState extends State<TranscriptionCard>
           const SingleActivator(LogicalKeyboardKey.keyS, control: true):
               _saveChanges,
         if (_isEditing && _hasChanges)
-          const SingleActivator(LogicalKeyboardKey.keyS, meta: true): _saveChanges,
+          const SingleActivator(LogicalKeyboardKey.keyS, meta: true):
+              _saveChanges,
         const SingleActivator(LogicalKeyboardKey.escape): () {
           if (_isEditing) {
             setState(() {
@@ -207,13 +221,11 @@ class _TranscriptionCardState extends State<TranscriptionCard>
           curve: Curves.easeOutCubic,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-            color: _isHovered
-                ? colorScheme.surfaceContainerHigh
-                : null,
+            color: _isHovered ? colorScheme.surfaceContainerHigh : null,
             boxShadow: _isHovered
                 ? [
                     BoxShadow(
-                      color: colorScheme.shadow.withOpacity(0.1),
+                      color: colorScheme.shadow.withValues(alpha: 0.1),
                       blurRadius: 16,
                       offset: const Offset(0, 4),
                     ),
@@ -229,19 +241,25 @@ class _TranscriptionCardState extends State<TranscriptionCard>
               side: accentColor != Colors.transparent
                   ? BorderSide(color: accentColor, width: 2)
                   : BorderSide(
-                      color: colorScheme.outlineVariant.withOpacity(_isHovered ? 0.5 : 0.3),
+                      color: colorScheme.outlineVariant.withValues(
+                        alpha: _isHovered ? 0.5 : 0.3,
+                      ),
                       width: 1,
                     ),
             ),
             child: InkWell(
               onTap: () {
-                if (!_isEditing && !widget.isCompact) {
+                // Only allow editing completed transcriptions with content
+                final canEdit = widget.transcription.status ==
+                        TranscriptionStatus.completed &&
+                    widget.transcription.processedText.isNotEmpty;
+                if (!_isEditing && !widget.isCompact && canEdit) {
                   setState(() => _isEditing = true);
                 }
               },
               borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-              hoverColor: colorScheme.onSurface.withOpacity(0.04),
-              splashColor: colorScheme.onSurface.withOpacity(0.08),
+              hoverColor: colorScheme.onSurface.withValues(alpha: 0.04),
+              splashColor: colorScheme.onSurface.withValues(alpha: 0.08),
               child: Padding(
                 padding: const EdgeInsets.all(UIConstants.spacingMedium),
                 child: widget.isCompact
@@ -263,6 +281,9 @@ class _TranscriptionCardState extends State<TranscriptionCard>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Status badge (for non-completed transcriptions)
+        _buildStatusBadge(context, colorScheme),
+
         // Header with date, duration and actions
         _buildHeader(context, colorScheme, dateFormat),
 
@@ -302,7 +323,7 @@ class _TranscriptionCardState extends State<TranscriptionCard>
             size: 16,
             color: _isStarred
                 ? colorScheme.primary
-                : colorScheme.outline.withOpacity(0.4),
+                : colorScheme.outline.withValues(alpha: 0.4),
           ),
         ),
 
@@ -326,7 +347,7 @@ class _TranscriptionCardState extends State<TranscriptionCard>
               Text(
                 dateFormat.format(widget.transcription.createdAt),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+                      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                     ),
               ),
             ],
@@ -338,7 +359,7 @@ class _TranscriptionCardState extends State<TranscriptionCard>
           Icon(
             LucideIcons.chevronRight,
             size: 16,
-            color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           ),
 
         const SizedBox(width: 4),
@@ -364,9 +385,9 @@ class _TranscriptionCardState extends State<TranscriptionCard>
               Text(
                 dateFormat.format(widget.transcription.createdAt),
                 style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant.withOpacity(0.8),
-                      fontWeight: FontWeight.w500,
-                    ),
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               const SizedBox(height: 2),
               Row(
@@ -374,13 +395,13 @@ class _TranscriptionCardState extends State<TranscriptionCard>
                   Icon(
                     LucideIcons.clock,
                     size: 13,
-                    color: colorScheme.outline.withOpacity(0.7),
+                    color: colorScheme.outline.withValues(alpha: 0.7),
                   ),
                   const SizedBox(width: 4),
                   Text(
                     _formatDuration(widget.transcription.audioDurationSeconds),
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.outline.withOpacity(0.7),
+                      color: colorScheme.outline.withValues(alpha: 0.7),
                       fontSize: 12,
                     ),
                   ),
@@ -402,61 +423,114 @@ class _TranscriptionCardState extends State<TranscriptionCard>
   Widget _buildViewActions(BuildContext context, ColorScheme colorScheme) {
     // Show fewer actions by default, reveal all on hover or when menu is open
     final showAll = _isHovered || _isMenuOpen;
+    final status = widget.transcription.status;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Star toggle (always visible)
-        IconButton.outlined(
-          onPressed: _toggleStar,
-          icon: Icon(
-            _isStarred ? LucideIcons.star : LucideIcons.star,
-            size: 16,
-          ),
-          color: _isStarred
-              ? colorScheme.primary
-              : colorScheme.onSurfaceVariant,
-          tooltip: _isStarred ? 'Unfavorite' : 'Favorite',
-          style: IconButton.styleFrom(
-            padding: const EdgeInsets.all(8),
-            minimumSize: const Size(UIConstants.touchTargetMinimum, UIConstants.touchTargetMinimum),
-            side: BorderSide.none,
-          ),
-        ),
-
-        // Copy (always visible)
-        IconButton.outlined(
-          onPressed: widget.onCopy,
-          icon: const Icon(LucideIcons.copy, size: 16),
-          tooltip: 'Copy to clipboard',
-          style: IconButton.styleFrom(
-            padding: const EdgeInsets.all(8),
-            minimumSize: const Size(UIConstants.touchTargetMinimum, UIConstants.touchTargetMinimum),
-            side: BorderSide.none,
-          ),
-        ),
-
-        // Edit and more (show on hover or when menu is open)
-        if (showAll) ...[
-          IconButton.outlined(
-            onPressed: _openFullScreenEdit,
-            icon: const Icon(LucideIcons.edit, size: 16),
-            tooltip: 'Edit',
-            style: IconButton.styleFrom(
-              padding: const EdgeInsets.all(8),
-              minimumSize: const Size(UIConstants.touchTargetMinimum, UIConstants.touchTargetMinimum),
-              side: BorderSide.none,
+        // Retry button for failed transcriptions (always visible)
+        if (status == TranscriptionStatus.failed && widget.onRetry != null)
+          FilledButton.icon(
+            onPressed: () => widget.onRetry!(widget.transcription),
+            icon: const Icon(LucideIcons.refreshCw, size: 14),
+            label: const Text('Retry'),
+            style: FilledButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              backgroundColor: colorScheme.errorContainer,
+              foregroundColor: colorScheme.onErrorContainer,
             ),
           ),
-          _TranscriptionMenuButton(
-            iconColor: colorScheme.onSurfaceVariant,
-            errorColor: colorScheme.error,
-            onEdit: _openFullScreenEdit,
-            onCopy: widget.onCopy,
-            onDelete: () => _confirmDelete(context),
-            onMenuOpen: () => setState(() => _isMenuOpen = true),
-            onMenuClose: () => setState(() => _isMenuOpen = false),
+
+        // Processing indicator (instead of actions)
+        if (status == TranscriptionStatus.processing)
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation(colorScheme.tertiary),
+              ),
+            ),
           ),
+
+        // Normal actions for completed/pending transcriptions
+        if (status != TranscriptionStatus.processing) ...[
+          // Star toggle (always visible, hide for failed)
+          if (status != TranscriptionStatus.failed)
+            IconButton.outlined(
+              onPressed: _toggleStar,
+              icon: Icon(
+                _isStarred ? LucideIcons.star : LucideIcons.star,
+                size: 16,
+              ),
+              color: _isStarred
+                  ? colorScheme.primary
+                  : colorScheme.onSurfaceVariant,
+              tooltip: _isStarred ? 'Unfavorite' : 'Favorite',
+              style: IconButton.styleFrom(
+                padding: const EdgeInsets.all(8),
+                minimumSize: const Size(UIConstants.touchTargetMinimum,
+                    UIConstants.touchTargetMinimum),
+                side: BorderSide.none,
+              ),
+            ),
+
+          // Copy (always visible, hide for failed)
+          if (status != TranscriptionStatus.failed)
+            IconButton.outlined(
+              onPressed: widget.onCopy,
+              icon: const Icon(LucideIcons.copy, size: 16),
+              tooltip: 'Copy to clipboard',
+              style: IconButton.styleFrom(
+                padding: const EdgeInsets.all(8),
+                minimumSize: const Size(UIConstants.touchTargetMinimum,
+                    UIConstants.touchTargetMinimum),
+                side: BorderSide.none,
+              ),
+            ),
+
+          // Edit and more (show on hover or when menu is open, hide for failed/pending)
+          if (showAll && status == TranscriptionStatus.completed) ...[
+            IconButton.outlined(
+              onPressed: _openFullScreenEdit,
+              icon: const Icon(LucideIcons.edit, size: 16),
+              tooltip: 'Edit',
+              style: IconButton.styleFrom(
+                padding: const EdgeInsets.all(8),
+                minimumSize: const Size(UIConstants.touchTargetMinimum,
+                    UIConstants.touchTargetMinimum),
+                side: BorderSide.none,
+              ),
+            ),
+            _TranscriptionMenuButton(
+              iconColor: colorScheme.onSurfaceVariant,
+              errorColor: colorScheme.error,
+              onEdit: _openFullScreenEdit,
+              onCopy: widget.onCopy,
+              onDelete: () => _confirmDelete(context),
+              onMenuOpen: () => setState(() => _isMenuOpen = true),
+              onMenuClose: () => setState(() => _isMenuOpen = false),
+            ),
+          ],
+
+          // Delete only for failed/pending
+          if (showAll &&
+              status != TranscriptionStatus.completed &&
+              status != TranscriptionStatus.processing)
+            IconButton.outlined(
+              onPressed: () => _confirmDelete(context),
+              icon: const Icon(LucideIcons.trash2, size: 16),
+              tooltip: 'Delete',
+              style: IconButton.styleFrom(
+                padding: const EdgeInsets.all(8),
+                minimumSize: const Size(UIConstants.touchTargetMinimum,
+                    UIConstants.touchTargetMinimum),
+                side: BorderSide.none,
+                foregroundColor: colorScheme.error,
+              ),
+            ),
         ],
       ],
     );
@@ -478,7 +552,8 @@ class _TranscriptionCardState extends State<TranscriptionCard>
           tooltip: 'Cancel (Esc)',
           style: IconButton.styleFrom(
             padding: const EdgeInsets.all(8),
-            minimumSize: const Size(UIConstants.touchTargetMinimum, UIConstants.touchTargetMinimum),
+            minimumSize: const Size(
+                UIConstants.touchTargetMinimum, UIConstants.touchTargetMinimum),
           ),
         ),
         const SizedBox(width: 4),
@@ -509,7 +584,8 @@ class _TranscriptionCardState extends State<TranscriptionCard>
             tooltip: 'Copy',
             style: IconButton.styleFrom(
               padding: const EdgeInsets.all(8),
-              minimumSize: const Size(UIConstants.touchTargetCompact, UIConstants.touchTargetCompact),
+              minimumSize: const Size(UIConstants.touchTargetCompact,
+                  UIConstants.touchTargetCompact),
             ),
           )
         else
@@ -519,7 +595,8 @@ class _TranscriptionCardState extends State<TranscriptionCard>
             tooltip: 'Copy to clipboard',
             style: IconButton.styleFrom(
               padding: const EdgeInsets.all(8),
-              minimumSize: const Size(UIConstants.touchTargetMinimum, UIConstants.touchTargetMinimum),
+              minimumSize: const Size(UIConstants.touchTargetMinimum,
+                  UIConstants.touchTargetMinimum),
             ),
           ),
         const SizedBox(width: 4),
@@ -535,14 +612,32 @@ class _TranscriptionCardState extends State<TranscriptionCard>
   }
 
   Widget _buildPreviewContent(BuildContext context, ColorScheme colorScheme) {
-    final preview = _getPreviewText(_controller.text);
+    final status = widget.transcription.status;
+    final text = _controller.text;
+
+    // Show placeholder for pending/failed transcriptions
+    if (text.isEmpty &&
+        (status == TranscriptionStatus.pending ||
+            status == TranscriptionStatus.failed)) {
+      return Text(
+        status == TranscriptionStatus.pending
+            ? 'Waiting to process...'
+            : 'Transcription failed. Tap Retry to try again.',
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+          fontStyle: FontStyle.italic,
+        ),
+      );
+    }
+
+    final preview = _getPreviewText(text);
 
     return Text(
       preview,
       style: theme.textTheme.bodyLarge?.copyWith(
-            color: colorScheme.onSurface,
-            height: 1.5,
-          ),
+        color: colorScheme.onSurface,
+        height: 1.5,
+      ),
       maxLines: 3,
       overflow: TextOverflow.ellipsis,
     );
@@ -557,14 +652,14 @@ class _TranscriptionCardState extends State<TranscriptionCard>
           maxLines: 5,
           minLines: 2,
           style: theme.textTheme.bodyLarge?.copyWith(
-                color: colorScheme.onSurface,
-              ),
+            color: colorScheme.onSurface,
+          ),
           decoration: InputDecoration(
             hintText: 'Type your transcription...',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: colorScheme.outline.withOpacity(0.3),
+                color: colorScheme.outline.withValues(alpha: 0.3),
               ),
             ),
             focusedBorder: OutlineInputBorder(
@@ -573,7 +668,7 @@ class _TranscriptionCardState extends State<TranscriptionCard>
             ),
             contentPadding: const EdgeInsets.all(12),
             filled: true,
-            fillColor: colorScheme.surfaceVariant.withOpacity(0.3),
+            fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
           ),
           onChanged: (value) {
             setState(() {
@@ -595,10 +690,10 @@ class _TranscriptionCardState extends State<TranscriptionCard>
               Text(
                 'Press Ctrl+S (Cmd+S) to save',
                 style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.primary,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 12,
-                    ),
+                  color: colorScheme.primary,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 12,
+                ),
               ),
             ],
           ),
@@ -643,12 +738,86 @@ class _TranscriptionCardState extends State<TranscriptionCard>
   String _formatDuration(double seconds) {
     final mins = (seconds / 60).floor();
     final secs = (seconds % 60).floor();
-    return '${mins}:${secs.toString().padLeft(2, '0')}';
+    return '$mins:${secs.toString().padLeft(2, '0')}';
+  }
+
+  Widget _buildStatusBadge(BuildContext context, ColorScheme colorScheme) {
+    final status = widget.transcription.status;
+    if (status == TranscriptionStatus.completed) {
+      return const SizedBox.shrink();
+    }
+
+    IconData icon;
+    String label;
+    Color backgroundColor;
+    Color iconColor;
+    Color textColor;
+
+    switch (status) {
+      case TranscriptionStatus.pending:
+        icon = LucideIcons.clock;
+        label = 'Pending';
+        backgroundColor = colorScheme.tertiaryContainer;
+        iconColor = colorScheme.onTertiaryContainer;
+        textColor = colorScheme.onTertiaryContainer;
+        break;
+      case TranscriptionStatus.processing:
+        icon = LucideIcons.loader;
+        label = 'Processing';
+        backgroundColor = colorScheme.tertiaryContainer;
+        iconColor = colorScheme.onTertiaryContainer;
+        textColor = colorScheme.onTertiaryContainer;
+        break;
+      case TranscriptionStatus.failed:
+        icon = LucideIcons.alertCircle;
+        label = widget.transcription.errorMessage ?? 'Failed';
+        backgroundColor = colorScheme.errorContainer;
+        iconColor = colorScheme.onErrorContainer;
+        textColor = colorScheme.onErrorContainer;
+        break;
+      case TranscriptionStatus.completed:
+        return const SizedBox.shrink();
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: UIConstants.spacingSmall),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (status == TranscriptionStatus.processing)
+            SizedBox(
+              width: 14,
+              height: 14,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation(iconColor),
+              ),
+            )
+          else
+            Icon(icon, size: 14, color: iconColor),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: textColor,
+              fontWeight: FontWeight.w500,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   String _getPreviewText(String text) {
     final lines = text.split('\n');
-    final preview = lines.firstWhere((l) => l.trim().isNotEmpty, orElse: () => '');
+    final preview =
+        lines.firstWhere((l) => l.trim().isNotEmpty, orElse: () => '');
     return preview.length > 120 ? '${preview.substring(0, 120)}...' : preview;
   }
 
@@ -680,15 +849,15 @@ class _MetadataItem extends StatelessWidget {
         Icon(
           icon,
           size: 13,
-          color: color.withOpacity(0.7),
+          color: color.withValues(alpha: 0.7),
         ),
         const SizedBox(width: 4),
         Text(
           label,
           style: theme.textTheme.bodySmall?.copyWith(
-                color: color.withOpacity(0.7),
-                fontSize: 12,
-              ),
+            color: color.withValues(alpha: 0.7),
+            fontSize: 12,
+          ),
         ),
       ],
     );
@@ -723,8 +892,7 @@ class _TranscriptionMenuButton extends StatefulWidget {
       _TranscriptionMenuButtonState();
 }
 
-class _TranscriptionMenuButtonState
-    extends State<_TranscriptionMenuButton> {
+class _TranscriptionMenuButtonState extends State<_TranscriptionMenuButton> {
   OverlayEntry? _overlayEntry;
   final LayerLink _layerLink = LayerLink();
 
@@ -770,7 +938,8 @@ class _TranscriptionMenuButtonState
         tooltip: 'More options',
         style: IconButton.styleFrom(
           padding: const EdgeInsets.all(8),
-          minimumSize: const Size(UIConstants.touchTargetMinimum, UIConstants.touchTargetMinimum),
+          minimumSize: const Size(
+              UIConstants.touchTargetMinimum, UIConstants.touchTargetMinimum),
         ),
       ),
     );
@@ -855,7 +1024,7 @@ class _MenuContent extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: colorScheme.outlineVariant.withOpacity(0.5),
+            color: colorScheme.outlineVariant.withValues(alpha: 0.5),
           ),
         ),
         child: Column(
@@ -880,7 +1049,7 @@ class _MenuContent extends StatelessWidget {
             Divider(
               height: 1,
               thickness: 1,
-              color: colorScheme.outlineVariant.withOpacity(0.3),
+              color: colorScheme.outlineVariant.withValues(alpha: 0.3),
             ),
             _MenuItem(
               icon: LucideIcons.trash2,
@@ -932,8 +1101,8 @@ class _MenuItem extends StatelessWidget {
             Text(
               label,
               style: theme.textTheme.bodyMedium?.copyWith(
-                    color: textColor ?? colorScheme.onSurface,
-                  ),
+                color: textColor ?? colorScheme.onSurface,
+              ),
             ),
           ],
         ),
@@ -999,7 +1168,8 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
       bindings: {
         const SingleActivator(LogicalKeyboardKey.keyS, control: true):
             _saveChanges,
-        const SingleActivator(LogicalKeyboardKey.keyS, meta: true): _saveChanges,
+        const SingleActivator(LogicalKeyboardKey.keyS, meta: true):
+            _saveChanges,
         const SingleActivator(LogicalKeyboardKey.escape): () =>
             Navigator.pop(context),
       },
@@ -1021,8 +1191,8 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
               Text(
                 dateFormat.format(widget.transcription.createdAt),
                 style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ),
             ],
           ),
@@ -1033,7 +1203,8 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
                 icon: const Icon(LucideIcons.check, size: 18),
                 label: const Text('Save'),
                 style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
               ),
           ],
@@ -1045,9 +1216,10 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
               children: [
                 // Info bar
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                    color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -1061,8 +1233,8 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
                       Text(
                         '${_formatDuration(widget.transcription.audioDurationSeconds)} • ',
                         style: theme.textTheme.bodySmall?.copyWith(
-                              color: colorScheme.outline,
-                            ),
+                          color: colorScheme.outline,
+                        ),
                       ),
                       Icon(
                         LucideIcons.fileText,
@@ -1073,8 +1245,8 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
                       Text(
                         '${_controller.text.split(' ').where((w) => w.isNotEmpty).length} words',
                         style: theme.textTheme.bodySmall?.copyWith(
-                              color: colorScheme.outline,
-                            ),
+                          color: colorScheme.outline,
+                        ),
                       ),
                       const SizedBox(width: 16),
                       Icon(
@@ -1086,8 +1258,8 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
                       Text(
                         '${widget.transcription.tokenUsage} tokens',
                         style: theme.textTheme.bodySmall?.copyWith(
-                              color: colorScheme.outline,
-                            ),
+                          color: colorScheme.outline,
+                        ),
                       ),
                     ],
                   ),
@@ -1103,15 +1275,15 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
                     expands: true,
                     textAlignVertical: TextAlignVertical.top,
                     style: theme.textTheme.bodyLarge?.copyWith(
-                          color: colorScheme.onSurface,
-                          height: 1.6,
-                        ),
+                      color: colorScheme.onSurface,
+                      height: 1.6,
+                    ),
                     decoration: InputDecoration(
                       hintText: 'Type your transcription...',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide(
-                          color: colorScheme.outline.withOpacity(0.3),
+                          color: colorScheme.outline.withValues(alpha: 0.3),
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
@@ -1120,7 +1292,8 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
                       ),
                       contentPadding: const EdgeInsets.all(20),
                       filled: true,
-                      fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                      fillColor:
+                          colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                     ),
                   ),
                 ),
@@ -1129,9 +1302,10 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
                 // Save hint
                 if (_hasChanges)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
-                      color: colorScheme.primaryContainer.withOpacity(0.5),
+                      color: colorScheme.primaryContainer.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -1146,9 +1320,9 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
                         Text(
                           'Press Ctrl+S (Cmd+S) to save • Esc to cancel',
                           style: theme.textTheme.bodySmall?.copyWith(
-                                color: colorScheme.primary,
-                                fontWeight: FontWeight.w500,
-                              ),
+                            color: colorScheme.primary,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ],
                     ),
@@ -1164,6 +1338,6 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
   String _formatDuration(double seconds) {
     final mins = (seconds / 60).floor();
     final secs = (seconds % 60).floor();
-    return '${mins}:${secs.toString().padLeft(2, '0')}';
+    return '$mins:${secs.toString().padLeft(2, '0')}';
   }
 }

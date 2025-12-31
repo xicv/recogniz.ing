@@ -89,10 +89,11 @@ class TranscriptionCardSkeleton extends StatelessWidget {
       ),
     )
         .animate(onPlay: (controller) => controller.repeat())
-        .shimmer(duration: 1200.ms, color: Colors.white.withOpacity(0.3));
+        .shimmer(duration: 1200.ms, color: Colors.white.withValues(alpha: 0.3));
   }
 
-  Widget _buildSkeleton(Color color, {required double width, required double height}) {
+  Widget _buildSkeleton(Color color,
+      {required double width, required double height}) {
     return Container(
       width: width,
       height: height,
@@ -132,7 +133,7 @@ class VocabularyTileSkeleton extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.3)),
+        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -167,10 +168,11 @@ class VocabularyTileSkeleton extends StatelessWidget {
       ),
     )
         .animate(onPlay: (controller) => controller.repeat())
-        .shimmer(duration: 1200.ms, color: Colors.white.withOpacity(0.3));
+        .shimmer(duration: 1200.ms, color: Colors.white.withValues(alpha: 0.3));
   }
 
-  Widget _buildSkeleton(Color color, {required double width, required double height}) {
+  Widget _buildSkeleton(Color color,
+      {required double width, required double height}) {
     return Container(
       width: width,
       height: height,
@@ -210,7 +212,7 @@ class PromptCardSkeleton extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.3)),
+        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -248,10 +250,11 @@ class PromptCardSkeleton extends StatelessWidget {
       ),
     )
         .animate(onPlay: (controller) => controller.repeat())
-        .shimmer(duration: 1200.ms, color: Colors.white.withOpacity(0.3));
+        .shimmer(duration: 1200.ms, color: Colors.white.withValues(alpha: 0.3));
   }
 
-  Widget _buildSkeleton(Color color, {required double width, required double height}) {
+  Widget _buildSkeleton(Color color,
+      {required double width, required double height}) {
     return Container(
       width: width,
       height: height,
@@ -310,10 +313,11 @@ class StatsCardSkeleton extends StatelessWidget {
       ),
     )
         .animate(onPlay: (controller) => controller.repeat())
-        .shimmer(duration: 1200.ms, color: Colors.white.withOpacity(0.3));
+        .shimmer(duration: 1200.ms, color: Colors.white.withValues(alpha: 0.3));
   }
 
-  Widget _buildSkeleton(Color color, {required double width, required double height}) {
+  Widget _buildSkeleton(Color color,
+      {required double width, required double height}) {
     return Container(
       width: width,
       height: height,

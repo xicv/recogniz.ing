@@ -83,7 +83,8 @@ class AudioUtils {
     double silenceThreshold = 0.35,
   }) {
     // Combine RMS and speech ratio for a robust probability estimate
-    final rmsFactor = (rms - silenceThreshold) / (speechThreshold - silenceThreshold);
+    final rmsFactor =
+        (rms - silenceThreshold) / (speechThreshold - silenceThreshold);
     final combinedScore = rmsFactor * 0.6 + speechRatio * 0.4;
 
     return combinedScore.clamp(0.0, 1.0);

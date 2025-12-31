@@ -68,7 +68,7 @@ class _CompactStatsCardState extends State<CompactStatsCard>
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(UIConstants.borderRadiusMedium),
         side: BorderSide(
-          color: Theme.of(context).dividerColor.withOpacity(0.1),
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
@@ -172,7 +172,7 @@ class _CompactStatsCardState extends State<CompactStatsCard>
         Container(
           padding: const EdgeInsets.all(UIConstants.spacingSmall),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(UIConstants.borderRadiusSmall),
           ),
           child: Icon(

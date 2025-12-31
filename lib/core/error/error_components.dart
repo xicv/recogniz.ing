@@ -120,10 +120,10 @@ class ErrorBanner extends StatelessWidget {
     return Container(
       margin: margin ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: error.category.color.withOpacity(0.1),
+        color: error.category.color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: error.category.color.withOpacity(0.3),
+          color: error.category.color.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -198,7 +198,7 @@ class ErrorBanner extends StatelessWidget {
                     label: Text(action.label),
                     style: OutlinedButton.styleFrom(
                       backgroundColor: action.isPrimary
-                          ? error.category.color.withOpacity(0.1)
+                          ? error.category.color.withValues(alpha: 0.1)
                           : null,
                       foregroundColor:
                           action.isPrimary ? error.category.color : null,
@@ -238,7 +238,7 @@ class ErrorBanner extends StatelessWidget {
                   margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceVariant,
+                    color: theme.colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -375,7 +375,7 @@ class TechnicalDetailsDialog extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceVariant,
+            color: theme.colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(8),
           ),
           child: SelectableText(

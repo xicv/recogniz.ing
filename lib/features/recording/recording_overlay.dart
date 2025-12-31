@@ -33,7 +33,7 @@ class RecordingOverlay extends ConsumerWidget {
                     height: 80,
                     decoration: BoxDecoration(
                       color:
-                          Theme.of(context).colorScheme.error.withOpacity(0.1),
+                          Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -68,7 +68,7 @@ class RecordingOverlay extends ConsumerWidget {
                           color: Theme.of(context)
                               .colorScheme
                               .onSurface
-                              .withOpacity(0.7),
+                              .withValues(alpha: 0.7),
                         ),
                   ),
                   const SizedBox(height: 24),
@@ -90,7 +90,7 @@ class RecordingOverlay extends ConsumerWidget {
                           color: Theme.of(context)
                               .colorScheme
                               .onSurface
-                              .withOpacity(0.7),
+                              .withValues(alpha: 0.7),
                         ),
                   ),
                   // Only show debug text in debug mode
@@ -102,7 +102,7 @@ class RecordingOverlay extends ConsumerWidget {
                             color: Theme.of(context)
                                 .colorScheme
                                 .onSurface
-                                .withOpacity(0.54),
+                                .withValues(alpha: 0.54),
                           ),
                     ),
                   ],

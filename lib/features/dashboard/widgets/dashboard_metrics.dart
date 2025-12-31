@@ -65,7 +65,7 @@ class DashboardMetrics extends StatelessWidget {
                 _buildMetricTile(
                   context,
                   'Avg Words/Min',
-                  '${stats.avgWordsPerMinute.toStringAsFixed(0)}',
+                  stats.avgWordsPerMinute.toStringAsFixed(0),
                   LucideIcons.trendingUp,
                   theme.colorScheme.secondaryContainer,
                 ),
@@ -81,7 +81,7 @@ class DashboardMetrics extends StatelessWidget {
                   'Total Cost',
                   '\$${stats.totalCost.toStringAsFixed(2)}',
                   LucideIcons.dollarSign,
-                  theme.colorScheme.surfaceVariant,
+                  theme.colorScheme.surfaceContainerHighest,
                 ),
               ],
             ),
@@ -127,7 +127,7 @@ class DashboardMetrics extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(UIConstants.spacingSmall),
       decoration: BoxDecoration(
-        color: backgroundColor.withOpacity(0.3),
+        color: backgroundColor.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(UIConstants.borderRadiusSmall),
       ),
       child: Row(
@@ -166,6 +166,6 @@ class DashboardMetrics extends StatelessWidget {
   String _formatDurationMinutes(double minutes) {
     final mins = minutes.floor();
     final secs = ((minutes - mins) * 60).floor();
-    return '${mins}:${secs.toString().padLeft(2, '0')}';
+    return '$mins:${secs.toString().padLeft(2, '0')}';
   }
 }

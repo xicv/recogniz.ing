@@ -56,7 +56,7 @@ class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(UIConstants.borderRadiusMedium),
         side: BorderSide(
-          color: Theme.of(context).dividerColor.withOpacity(0.1),
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
@@ -71,7 +71,7 @@ class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
                 Container(
                   padding: const EdgeInsets.all(UIConstants.spacingSmall),
                   decoration: BoxDecoration(
-                    color: AppColors.success.withOpacity(0.1),
+                    color: AppColors.success.withValues(alpha: 0.1),
                     borderRadius:
                         BorderRadius.circular(UIConstants.borderRadiusSmall),
                   ),
@@ -96,7 +96,7 @@ class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
                       vertical: UIConstants.spacingXXSmall,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.1),
+                      color: Colors.orange.withValues(alpha: 0.1),
                       borderRadius:
                           BorderRadius.circular(UIConstants.borderRadiusSmall),
                     ),
@@ -159,7 +159,7 @@ class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
                     context,
                     icon: LucideIcons.messageSquare,
                     value:
-                        '${widget.stats.avgWordsPerMinute.toStringAsFixed(0)}',
+                        widget.stats.avgWordsPerMinute.toStringAsFixed(0),
                     label: 'Words/min',
                     color: AppColors.warning,
                   ),
@@ -211,10 +211,10 @@ class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
     Widget child = Container(
       padding: const EdgeInsets.all(UIConstants.spacingMedium),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.05),
+        color: color.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(UIConstants.borderRadiusSmall),
         border: Border.all(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
         ),
       ),
       child: Column(
@@ -297,7 +297,7 @@ class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
         Container(
           height: 8,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceVariant,
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(4),
           ),
           child: FractionallySizedBox(

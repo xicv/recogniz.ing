@@ -2,8 +2,10 @@
 // dart run scripts/generate_icons.dart
 // Or use an online SVG to PNG converter
 
+import 'dart:io';
+
 void main() {
-  print('''
+  stdout.writeln('''
 To generate PNG icons for the menu bar:
 
 Option 1: Use an online converter

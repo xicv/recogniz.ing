@@ -152,7 +152,7 @@ class AppInputs {
     bool isExpanded = true,
   }) {
     return DropdownButtonFormField<T>(
-      value: value,
+      initialValue: value,
       onChanged: onChanged,
       items: items,
       style: _inputStyle(context),
@@ -224,7 +224,7 @@ class AppInputs {
       title: label,
       subtitle: subtitle != null ? Text(subtitle) : null,
       contentPadding: EdgeInsets.zero,
-      activeColor: Theme.of(context).colorScheme.primary,
+      activeThumbColor: Theme.of(context).colorScheme.primary,
     );
   }
 
@@ -248,9 +248,12 @@ class AppInputs {
         ],
         ...options.entries.map(
           (entry) => RadioListTile<T>(
+            // ignore: deprecated_member_use
             value: entry.key,
+            // ignore: deprecated_member_use
             groupValue: value,
-            onChanged: (val) => onChanged?.call(val!),
+            // ignore: deprecated_member_use
+            onChanged: (val) => onChanged?.call(val as T),
             title: entry.value,
             contentPadding: EdgeInsets.zero,
             activeColor: Theme.of(context).colorScheme.primary,
@@ -340,7 +343,7 @@ class AppInputs {
       enabledBorder: OutlineInputBorder(
         borderRadius: const BorderRadius.all(Radius.circular(12)),
         borderSide: BorderSide(
-          color: theme.colorScheme.outline.withOpacity(0.3),
+          color: theme.colorScheme.outline.withValues(alpha: 0.3),
         ),
       ),
       focusedBorder: OutlineInputBorder(
@@ -418,7 +421,7 @@ class _PasswordFieldState extends State<PasswordField> {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
           ),
         ),
         focusedBorder: OutlineInputBorder(

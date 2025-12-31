@@ -28,7 +28,7 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(UIConstants.borderRadiusMedium),
         side: BorderSide(
-          color: Theme.of(context).dividerColor.withOpacity(0.1),
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
@@ -43,7 +43,7 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                 Container(
                   padding: const EdgeInsets.all(UIConstants.spacingSmall),
                   decoration: BoxDecoration(
-                    color: AppColors.accent.withOpacity(0.1),
+                    color: AppColors.accent.withValues(alpha: 0.1),
                     borderRadius:
                         BorderRadius.circular(UIConstants.borderRadiusSmall),
                   ),
@@ -115,7 +115,7 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
             Container(
               padding: const EdgeInsets.all(UIConstants.spacingMedium),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceVariant,
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 borderRadius:
                     BorderRadius.circular(UIConstants.borderRadiusSmall),
               ),
@@ -165,7 +165,7 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '${(widget.stats.totalTokens * 0.5).toStringAsFixed(0)}',
+                              (widget.stats.totalTokens * 0.5).toStringAsFixed(0),
                               style: Theme.of(context)
                                   .textTheme
                                   .titleMedium
@@ -200,7 +200,7 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '${(widget.stats.totalTokens * 0.5).toStringAsFixed(0)}',
+                              (widget.stats.totalTokens * 0.5).toStringAsFixed(0),
                               style: Theme.of(context)
                                   .textTheme
                                   .titleMedium
@@ -239,10 +239,10 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
     return Container(
       padding: const EdgeInsets.all(UIConstants.spacingMedium),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.05),
+        color: color.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(UIConstants.borderRadiusSmall),
         border: Border.all(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
         ),
       ),
       child: Column(
@@ -327,7 +327,7 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: AppColors.success.withOpacity(0.1),
+                color: AppColors.success.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -364,7 +364,7 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
             width: double.infinity,
             padding: const EdgeInsets.all(UIConstants.spacingSmall),
             decoration: BoxDecoration(
-              color: AppColors.success.withOpacity(0.1),
+              color: AppColors.success.withValues(alpha: 0.1),
               borderRadius:
                   BorderRadius.circular(UIConstants.borderRadiusSmall),
             ),

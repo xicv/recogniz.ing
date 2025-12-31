@@ -105,8 +105,8 @@ class EmptyState extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            effectiveIconColor.withOpacity(0.15),
-            effectiveIconColor.withOpacity(0.05),
+            effectiveIconColor.withValues(alpha: 0.15),
+            effectiveIconColor.withValues(alpha: 0.05),
           ],
         ),
         shape: BoxShape.circle,
@@ -117,9 +117,9 @@ class EmptyState extends StatelessWidget {
         color: effectiveIconColor,
       ),
     ).animate().scale(
-      duration: 600.ms,
-      curve: Curves.elasticOut,
-    );
+          duration: 600.ms,
+          curve: Curves.elasticOut,
+        );
   }
 
   Widget _buildActions(BuildContext context) {
@@ -195,7 +195,8 @@ class TranscriptionEmptyState extends StatelessWidget {
         icon: LucideIcons.mic,
         iconColor: colorScheme.primary,
         title: 'No transcriptions yet',
-        message: 'Tap the record button to capture your voice and transcribe it to text.',
+        message:
+            'Tap the record button to capture your voice and transcribe it to text.',
         actionLabel: 'Start Recording',
         onAction: onStartRecording,
       );
@@ -205,7 +206,8 @@ class TranscriptionEmptyState extends StatelessWidget {
       icon: LucideIcons.key,
       iconColor: colorScheme.error,
       title: 'API Key Required',
-      message: 'Add your Gemini API key to start transcribing your voice recordings.',
+      message:
+          'Add your Gemini API key to start transcribing your voice recordings.',
       actionLabel: 'Add API Key',
       onAction: onOpenSettings,
     );
@@ -230,7 +232,8 @@ class SearchEmptyState extends StatelessWidget {
     return EmptyState(
       icon: LucideIcons.search,
       title: 'No results found',
-      message: 'Could not find any transcriptions matching "$searchQuery". Try different keywords.',
+      message:
+          'Could not find any transcriptions matching "$searchQuery". Try different keywords.',
       actionLabel: 'Clear Search',
       onAction: onClearSearch,
     );
@@ -272,7 +275,8 @@ class DictionariesEmptyState extends StatelessWidget {
           icon: LucideIcons.bookOpen,
           iconColor: colorScheme.primary,
           title: 'No dictionaries yet',
-          message: 'Create custom vocabulary sets to improve transcription accuracy for specific terms.',
+          message:
+              'Create custom vocabulary sets to improve transcription accuracy for specific terms.',
           actionLabel: 'Create Dictionary',
           onAction: onCreateDictionary,
         ),
@@ -343,7 +347,8 @@ class PromptsEmptyState extends StatelessWidget {
           icon: LucideIcons.messageSquare,
           iconColor: colorScheme.primary,
           title: 'No prompts yet',
-          message: 'Create custom AI prompt templates to customize transcription output format.',
+          message:
+              'Create custom AI prompt templates to customize transcription output format.',
           actionLabel: 'Create Prompt',
           onAction: onCreatePrompt,
         ),
@@ -400,7 +405,7 @@ class DashboardEmptyState extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
-                color: colorScheme.primaryContainer.withOpacity(0.3),
+                color: colorScheme.primaryContainer.withValues(alpha: 0.3),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -409,9 +414,9 @@ class DashboardEmptyState extends StatelessWidget {
                 color: colorScheme.primary,
               ),
             ).animate().scale(
-              duration: 600.ms,
-              curve: Curves.elasticOut,
-            ),
+                  duration: 600.ms,
+                  curve: Curves.elasticOut,
+                ),
 
             const SizedBox(height: 32),
 
@@ -546,7 +551,7 @@ class _ExamplePromptCard extends StatelessWidget {
         color: colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
         border: Border.all(
-          color: colorScheme.outlineVariant.withOpacity(0.3),
+          color: colorScheme.outlineVariant.withValues(alpha: 0.3),
         ),
       ),
       child: Row(

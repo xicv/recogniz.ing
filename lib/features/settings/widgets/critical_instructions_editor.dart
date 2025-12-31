@@ -57,9 +57,9 @@ class _CriticalInstructionsEditorState
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: AppColors.warning.withOpacity(0.1),
+            color: AppColors.warning.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColors.warning.withOpacity(0.3)),
+            border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,7 +92,7 @@ class _CriticalInstructionsEditorState
                       color: Theme.of(context)
                           .colorScheme
                           .onSurface
-                          .withOpacity(0.8),
+                          .withValues(alpha: 0.8),
                     ),
               ),
             ],
@@ -106,7 +106,7 @@ class _CriticalInstructionsEditorState
             color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: Theme.of(context).dividerColor.withOpacity(0.2),
+              color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
             ),
           ),
           child: TextField(

@@ -5,10 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/providers/app_providers.dart';
-import '../../core/providers/transcription_providers.dart';
 import '../../core/services/haptic_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/models/app_settings.dart';
+import '../../core/models/transcription.dart';
 import '../../widgets/shared/empty_states.dart';
 import 'widgets/transcription_card.dart';
 
@@ -122,7 +122,7 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
                           ),
                         ]
                       : null,
-                  padding: const MaterialStatePropertyAll<EdgeInsets>(
+                  padding: const WidgetStatePropertyAll<EdgeInsets>(
                     EdgeInsets.symmetric(horizontal: 16),
                   ),
                   onChanged: (value) {
@@ -140,9 +140,9 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
                 margin: const EdgeInsets.all(16),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.warning.withOpacity(0.1),
+                  color: AppColors.warning.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.warning.withOpacity(0.3)),
+                  border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
@@ -171,7 +171,8 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
           ],
 
           // Transcription Count & Sort (always show if filter is active or has items)
-          if (transcriptions.isNotEmpty || ref.watch(filterOptionProvider) != FilterOption.all) ...[
+          if (transcriptions.isNotEmpty ||
+              ref.watch(filterOptionProvider) != FilterOption.all) ...[
             SliverToBoxAdapter(
               child: Padding(
                 padding:
@@ -310,6 +311,9 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
                               .read(transcriptionsProvider.notifier)
                               .toggleFavorite(transcription.id);
                         },
+                        onRetry: transcription.canRetry
+                            ? (t) => _retryTranscription(context, ref, t)
+                            : null,
                       ),
                     )
                         .animate()
@@ -370,7 +374,7 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
   void _showClearAllDialog(BuildContext context, int count) {
     final isFiltered = _searchQuery.isNotEmpty;
     final message = isFiltered
-        ? 'Delete $count transcription${count != 1 ? 's' : ''} matching "${_searchQuery}"?'
+        ? 'Delete $count transcription${count != 1 ? 's' : ''} matching "$_searchQuery"?'
         : 'Delete all $count transcription${count != 1 ? 's' : ''}?';
 
     showDialog(
@@ -400,9 +404,11 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
           ),
           TextButton(
             onPressed: () async {
+              final messenger = ScaffoldMessenger.of(context);
               Navigator.pop(context);
               await _clearAllTranscriptions(ref);
-              ScaffoldMessenger.of(context).showSnackBar(
+              if (!context.mounted) return;
+              messenger.showSnackBar(
                 SnackBar(
                   content: Text(isFiltered
                       ? '$count transcription${count != 1 ? 's' : ''} deleted'
@@ -412,7 +418,9 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
                   action: SnackBarAction(
                     label: 'Dismiss',
                     onPressed: () {
-                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                      if (context.mounted) {
+                        messenger.hideCurrentSnackBar();
+                      }
                     },
                   ),
                 ),
@@ -420,7 +428,7 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
             },
             style: TextButton.styleFrom(
               foregroundColor: AppColors.error,
-              backgroundColor: AppColors.error.withOpacity(0.1),
+              backgroundColor: AppColors.error.withValues(alpha: 0.1),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -578,10 +586,10 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
         ),
       ),
       child: Column(
@@ -671,7 +679,7 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
             },
             style: TextButton.styleFrom(
               foregroundColor: AppColors.error,
-              backgroundColor: AppColors.error.withOpacity(0.1),
+              backgroundColor: AppColors.error.withValues(alpha: 0.1),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -681,6 +689,33 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
         ],
       ),
     );
+  }
+
+  Future<void> _retryTranscription(
+      BuildContext context, WidgetRef ref, Transcription transcription) async {
+    HapticService.lightImpact();
+    final useCase = ref.read(voiceRecordingUseCaseProvider);
+
+    try {
+      await useCase.retryTranscription(transcription);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Retrying transcription...'),
+          behavior: SnackBarBehavior.floating,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Retry failed: $e'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
   }
 
   Future<void> _clearAllTranscriptions(WidgetRef ref) async {
@@ -734,7 +769,8 @@ class _FavoritesFilterChip extends StatelessWidget {
       onSelected: (selected) {
         onFilterChanged(selected ? FilterOption.favorites : FilterOption.all);
       },
-      backgroundColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+      backgroundColor:
+          Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
       selectedColor: Theme.of(context).colorScheme.primary,
       checkmarkColor: Theme.of(context).colorScheme.onPrimary,
       shape: RoundedRectangleBorder(
@@ -742,7 +778,7 @@ class _FavoritesFilterChip extends StatelessWidget {
         side: BorderSide(
           color: isActive
               ? Theme.of(context).colorScheme.primary
-              : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+              : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
         ),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -770,7 +806,7 @@ class _FavoritesEmptyState extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceVariant,
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 shape: BoxShape.circle,
               ),
               child: Icon(

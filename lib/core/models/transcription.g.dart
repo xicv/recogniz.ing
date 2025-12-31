@@ -25,13 +25,17 @@ class TranscriptionAdapter extends TypeAdapter<Transcription> {
       promptId: fields[5] as String,
       audioDurationSeconds: fields[6] as double,
       isFavorite: fields[7] as bool?,
+      audioBackupPath: fields[8] as String?,
+      errorMessage: fields[10] as String?,
+      retryCount: fields[11] == null ? 0 : fields[11] as int,
+      completedAt: fields[12] as DateTime?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Transcription obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(13)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -47,7 +51,17 @@ class TranscriptionAdapter extends TypeAdapter<Transcription> {
       ..writeByte(6)
       ..write(obj.audioDurationSeconds)
       ..writeByte(7)
-      ..write(obj.isFavorite);
+      ..write(obj.isFavorite)
+      ..writeByte(8)
+      ..write(obj.audioBackupPath)
+      ..writeByte(9)
+      ..write(obj.statusIndex)
+      ..writeByte(10)
+      ..write(obj.errorMessage)
+      ..writeByte(11)
+      ..write(obj.retryCount)
+      ..writeByte(12)
+      ..write(obj.completedAt);
   }
 
   @override

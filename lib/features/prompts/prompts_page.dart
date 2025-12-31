@@ -4,7 +4,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../core/providers/app_providers.dart';
-import '../../core/providers/prompt_providers.dart';
 import '../../core/models/custom_prompt.dart';
 import '../../core/models/app_settings.dart';
 import '../../widgets/shared/app_bars.dart';
@@ -137,7 +136,7 @@ class _PromptsPageState extends ConsumerState<PromptsPage> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -173,8 +172,8 @@ class _PromptsPageState extends ConsumerState<PromptsPage> {
                               ? Theme.of(context)
                                   .colorScheme
                                   .primary
-                                  .withOpacity(0.1)
-                              : Theme.of(context).colorScheme.surfaceVariant,
+                                  .withValues(alpha: 0.1)
+                              : Theme.of(context).colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
@@ -324,8 +323,8 @@ class _PromptsPageState extends ConsumerState<PromptsPage> {
                 decoration: BoxDecoration(
                   color: Theme.of(context)
                       .colorScheme
-                      .surfaceVariant
-                      .withOpacity(0.5),
+                      .surfaceContainerHighest
+                      .withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(

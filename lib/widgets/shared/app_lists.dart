@@ -94,7 +94,7 @@ class AppLists {
       title: Text(title),
       subtitle: subtitle != null ? Text(subtitle) : null,
       contentPadding: contentPadding,
-      activeColor: Theme.of(context).colorScheme.primary,
+      activeThumbColor: Theme.of(context).colorScheme.primary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),
@@ -113,8 +113,11 @@ class AppLists {
     EdgeInsetsGeometry? contentPadding,
   }) {
     return RadioListTile<T>(
+      // ignore: deprecated_member_use
       value: value,
+      // ignore: deprecated_member_use
       groupValue: groupValue,
+      // ignore: deprecated_member_use
       onChanged: enabled ? onChanged : null,
       title: Text(title),
       subtitle: subtitle != null ? Text(subtitle) : null,
@@ -140,11 +143,11 @@ class AppLists {
       title: title,
       trailing: trailing,
       tilePadding: contentPadding,
-      children: children,
       initiallyExpanded: initiallyExpanded,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),
+      children: children,
     );
   }
 

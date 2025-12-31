@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/services/vad_service.dart';
 import '../../core/services/haptic_service.dart';
-import '../../core/providers/recording_providers.dart';
 import '../../core/providers/app_providers.dart';
 import '../../widgets/recording/audio_waveform_display.dart';
 import '../../core/theme/app_theme.dart';
@@ -56,8 +54,10 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
   DateTime? _recordingStartTime;
   Timer? _durationTimer;
 
-  // Processing progress
+  // Processing progress (reserved for future UI feedback)
+  // ignore: unused_field
   double _processingProgress = 0.0;
+  // ignore: unused_field
   String _processingStage = '';
   bool _isZenMode = false;
 
@@ -182,8 +182,8 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
 
     return Container(
       color: isDark
-          ? Colors.black.withOpacity(0.90)
-          : colorScheme.surface.withOpacity(0.95),
+          ? Colors.black.withValues(alpha: 0.90)
+          : colorScheme.surface.withValues(alpha: 0.95),
       child: Material(
         color: Colors.transparent,
         child: Stack(
@@ -193,8 +193,10 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(vertical: 40),
                 child: _isZenMode
-                    ? _buildZenModeContent(context, recordingState, currentState)
-                    : _buildNormalModeContent(context, recordingState, currentState),
+                    ? _buildZenModeContent(
+                        context, recordingState, currentState)
+                    : _buildNormalModeContent(
+                        context, recordingState, currentState),
               ),
             ),
 
@@ -232,7 +234,8 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
       children: [
         // State indicator (multi-channel) - hidden during processing
         if (recordingState != RecordingState.processing)
-          _buildStateIndicator(context, currentState, stateColor, stateIcon, stateText),
+          _buildStateIndicator(
+              context, currentState, stateColor, stateIcon, stateText),
 
         // Static processing indicator (no animation, only during processing)
         if (recordingState == RecordingState.processing)
@@ -242,7 +245,8 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
 
         // Main recording circle with waveform (hidden during processing)
         if (recordingState != RecordingState.processing)
-          _buildRecordingCircle(context, recordingState, currentState, stateColor),
+          _buildRecordingCircle(
+              context, recordingState, currentState, stateColor),
 
         const SizedBox(height: 32),
 
@@ -317,7 +321,7 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
           Text(
             getStateText(currentState),
             style: TextStyle(
-              color: onSurfaceColor.withOpacity(0.6),
+              color: onSurfaceColor.withValues(alpha: 0.6),
               fontSize: 14,
             ),
           ),
@@ -327,7 +331,7 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
           Text(
             'Processing...',
             style: TextStyle(
-              color: onSurfaceColor.withOpacity(0.7),
+              color: onSurfaceColor.withValues(alpha: 0.7),
               fontSize: 16,
               fontWeight: FontWeight.w400,
             ),
@@ -357,10 +361,10 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
-              color: stateColor.withOpacity(0.15),
+              color: stateColor.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: stateColor.withOpacity(0.3),
+                color: stateColor.withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
@@ -400,10 +404,10 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
-        color: processingColor.withOpacity(0.15),
+        color: processingColor.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: processingColor.withOpacity(0.3),
+          color: processingColor.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -459,7 +463,7 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
                 color: stateColor,
                 boxShadow: [
                   BoxShadow(
-                    color: stateColor.withOpacity(0.4),
+                    color: stateColor.withValues(alpha: 0.4),
                     blurRadius: 30 * scale,
                     spreadRadius: 5 * scale,
                   ),
@@ -478,7 +482,6 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
       },
     );
   }
-
 
   Widget _buildTimerDisplay(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -500,7 +503,7 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest.withOpacity(0.8),
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -508,14 +511,14 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
         children: [
           Icon(
             LucideIcons.info,
-            color: colorScheme.onSurface.withOpacity(0.7),
+            color: colorScheme.onSurface.withValues(alpha: 0.7),
             size: 16,
           ),
           const SizedBox(width: 8),
           Text(
             'Press stop button when finished',
             style: TextStyle(
-              color: colorScheme.onSurface.withOpacity(0.7),
+              color: colorScheme.onSurface.withValues(alpha: 0.7),
               fontSize: 12,
             ),
           ),
@@ -535,7 +538,7 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         decoration: BoxDecoration(
-          color: colorScheme.error.withOpacity(0.9),
+          color: colorScheme.error.withValues(alpha: 0.9),
           borderRadius: BorderRadius.circular(24),
         ),
         child: Row(
@@ -570,9 +573,9 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
         height: 64,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: colorScheme.onSurface.withOpacity(0.15),
+          color: colorScheme.onSurface.withValues(alpha: 0.15),
           border: Border.all(
-            color: colorScheme.onSurface.withOpacity(0.3),
+            color: colorScheme.onSurface.withValues(alpha: 0.3),
             width: 2,
           ),
         ),
@@ -590,14 +593,14 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
 
     return Container(
       decoration: BoxDecoration(
-        color: colorScheme.onSurface.withOpacity(0.1),
+        color: colorScheme.onSurface.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: IconButton(
         onPressed: _toggleZenMode,
         icon: Icon(
           _isZenMode ? LucideIcons.expand : LucideIcons.minimize,
-          color: colorScheme.onSurface.withOpacity(0.7),
+          color: colorScheme.onSurface.withValues(alpha: 0.7),
           size: 18,
         ),
         tooltip: _isZenMode ? 'Exit Zen mode' : 'Zen mode',
@@ -611,13 +614,13 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: colorScheme.onSurface.withOpacity(0.1),
+        color: colorScheme.onSurface.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
         'Press Esc to close',
         style: TextStyle(
-          color: colorScheme.onSurface.withOpacity(0.6),
+          color: colorScheme.onSurface.withValues(alpha: 0.6),
           fontSize: 11,
         ),
       ),
@@ -627,7 +630,7 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
   Color _getStateColor(RecordingStateValue state, ColorScheme colorScheme) {
     switch (state) {
       case RecordingStateValue.idle:
-        return colorScheme.primary.withOpacity(0.6);
+        return colorScheme.primary.withValues(alpha: 0.6);
       case RecordingStateValue.listening:
         return colorScheme.primary;
       case RecordingStateValue.voiceDetected:
@@ -653,11 +656,13 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
     if (minutes > 0) {
       return '$minutes:${seconds.toString().padLeft(2, '0')}';
     } else {
-      return '${seconds.toString().padLeft(2, '0')}';
+      return seconds.toString().padLeft(2, '0');
     }
   }
 
+  // ignore: unused_element
   int _estimateProcessingTime() {
+    // Reserved for future processing time estimation UI
     final durationSeconds = _currentDuration.inSeconds;
     if (durationSeconds == 0) return 0;
     // Estimate: 15% of audio duration + 5s overhead
@@ -667,9 +672,7 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
   void _manageDurationTimer(RecordingState state) {
     if (state == RecordingState.recording) {
       if (_durationTimer == null || !_durationTimer!.isActive) {
-        if (_recordingStartTime == null) {
-          _recordingStartTime = DateTime.now();
-        }
+        _recordingStartTime ??= DateTime.now();
         _durationTimer = Timer.periodic(const Duration(seconds: 1), (_) {
           if (mounted) {
             setState(() {});
@@ -688,7 +691,8 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
   void _manageAmplitudeUpdates(RecordingState state) {
     if (state == RecordingState.recording) {
       if (_amplitudeUpdateTimer == null || !_amplitudeUpdateTimer!.isActive) {
-        _amplitudeUpdateTimer = Timer.periodic(const Duration(milliseconds: 50), (_) {
+        _amplitudeUpdateTimer =
+            Timer.periodic(const Duration(milliseconds: 50), (_) {
           if (mounted) {
             setState(() {
               _updateAmplitudes();
@@ -712,11 +716,13 @@ class _VadRecordingOverlayState extends ConsumerState<VadRecordingOverlay>
         }
         _progressTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
           if (mounted && _processingStartTime != null) {
-            final elapsed = DateTime.now().difference(_processingStartTime!).inMilliseconds;
+            final elapsed =
+                DateTime.now().difference(_processingStartTime!).inMilliseconds;
             // Estimate processing time: typical transcription takes 3-8 seconds
             // We'll use 5 seconds as baseline, with 0-90% progress
             final estimatedDuration = 5000;
-            final newProgress = (elapsed / estimatedDuration * 0.9).clamp(0.0, 0.9);
+            final newProgress =
+                (elapsed / estimatedDuration * 0.9).clamp(0.0, 0.9);
 
             // Update stage based on progress
             String stage = '';

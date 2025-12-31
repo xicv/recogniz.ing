@@ -1,8 +1,6 @@
 import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 
 /// Tool to generate app icon programmatically
 Future<void> main() async {
@@ -18,7 +16,7 @@ Future<void> main() async {
   final byteData = await icon.toByteData(format: ui.ImageByteFormat.png);
   await file.writeAsBytes(byteData!.buffer.asUint8List());
 
-  print('Icon generated at ${file.path}');
+  stdout.writeln('Icon generated at ${file.path}');
 }
 
 Future<ui.Image> createAppIcon() async {

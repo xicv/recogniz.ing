@@ -28,7 +28,7 @@ class _InsightsWidgetState extends State<InsightsWidget> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(UIConstants.borderRadiusMedium),
         side: BorderSide(
-          color: Theme.of(context).dividerColor.withOpacity(0.1),
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
@@ -43,7 +43,7 @@ class _InsightsWidgetState extends State<InsightsWidget> {
                 Container(
                   padding: const EdgeInsets.all(UIConstants.spacingSmall),
                   decoration: BoxDecoration(
-                    color: AppColors.warning.withOpacity(0.1),
+                    color: AppColors.warning.withValues(alpha: 0.1),
                     borderRadius:
                         BorderRadius.circular(UIConstants.borderRadiusSmall),
                   ),
@@ -170,7 +170,7 @@ class _InsightsWidgetState extends State<InsightsWidget> {
                   color: Theme.of(context)
                       .colorScheme
                       .onPrimaryContainer
-                      .withOpacity(0.8),
+                      .withValues(alpha: 0.8),
                 ),
           ),
           if (trendPercentage.abs() > 5) ...[
@@ -181,7 +181,7 @@ class _InsightsWidgetState extends State<InsightsWidget> {
                     color: Theme.of(context)
                         .colorScheme
                         .onPrimaryContainer
-                        .withOpacity(0.8),
+                        .withValues(alpha: 0.8),
                   ),
             ),
           ],
@@ -215,10 +215,10 @@ class _InsightsWidgetState extends State<InsightsWidget> {
       margin: const EdgeInsets.only(bottom: UIConstants.spacingSmall),
       padding: const EdgeInsets.all(UIConstants.spacingMedium),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.05),
+        color: color.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(UIConstants.borderRadiusSmall),
         border: Border.all(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
         ),
       ),
       child: Row(
@@ -248,7 +248,7 @@ class _InsightsWidgetState extends State<InsightsWidget> {
       width: double.infinity,
       padding: const EdgeInsets.all(UIConstants.spacingLarge),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(UIConstants.borderRadiusSmall),
       ),
       child: Column(

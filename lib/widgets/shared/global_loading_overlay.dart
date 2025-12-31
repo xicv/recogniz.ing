@@ -17,7 +17,7 @@ class GlobalLoadingOverlay extends ConsumerWidget {
     }
 
     return Material(
-      color: Colors.black.withOpacity(0.7),
+      color: Colors.black.withValues(alpha: 0.7),
       child: Stack(
         children: [
           // Tap to dismiss if allowed

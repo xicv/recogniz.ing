@@ -4,7 +4,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../core/providers/app_providers.dart';
-import '../../core/providers/vocabulary_providers.dart';
 import '../../core/models/vocabulary.dart';
 import '../../core/models/app_settings.dart';
 import '../../widgets/shared/app_bars.dart';
@@ -138,7 +137,7 @@ class _DictionariesPageState extends ConsumerState<DictionariesPage> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -153,8 +152,8 @@ class _DictionariesPageState extends ConsumerState<DictionariesPage> {
               height: 48,
               decoration: BoxDecoration(
                 color: isSelected
-                    ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
-                    : Theme.of(context).colorScheme.surfaceVariant,
+                    ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
+                    : Theme.of(context).colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
@@ -280,13 +279,17 @@ class _DictionariesPageState extends ConsumerState<DictionariesPage> {
                   return Chip(
                     label: Text(word),
                     backgroundColor:
-                        Theme.of(context).colorScheme.surfaceVariant,
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                     deleteIcon: const Icon(LucideIcons.x, size: 16),
                     onDeleted: !vocab.isDefault
                         ? () {
-                            final updatedWords = List<String>.from(vocab.words)..remove(word);
-                            final updatedVocab = vocab.copyWith(words: updatedWords);
-                            ref.read(vocabularyProvider.notifier).updateVocabulary(updatedVocab);
+                            final updatedWords = List<String>.from(vocab.words)
+                              ..remove(word);
+                            final updatedVocab =
+                                vocab.copyWith(words: updatedWords);
+                            ref
+                                .read(vocabularyProvider.notifier)
+                                .updateVocabulary(updatedVocab);
                           }
                         : null,
                   );
@@ -329,7 +332,9 @@ class _DictionariesPageState extends ConsumerState<DictionariesPage> {
           FilledButton(
             onPressed: () async {
               Navigator.of(context).pop();
-              await ref.read(vocabularyProvider.notifier).deleteVocabulary(vocab.id);
+              await ref
+                  .read(vocabularyProvider.notifier)
+                  .deleteVocabulary(vocab.id);
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Dictionary "${vocab.name}" deleted')),

@@ -133,24 +133,65 @@ class StorageService implements StorageServiceInterface {
 
   @override
   Future<CustomPrompt?> getPrompt(String id) async {
+    if (!_isBoxOpen(promptsBox)) {
+      debugPrint(
+          '[StorageService] Prompts box not open, attempting to open it');
+      try {
+        await Hive.openBox<CustomPrompt>(promptsBox);
+      } catch (e) {
+        debugPrint('[StorageService] Failed to open prompts box: $e');
+        return null;
+      }
+    }
     final box = Hive.box<CustomPrompt>(promptsBox);
     return box.get(id);
   }
 
   @override
   Future<VocabularySet?> getVocabulary(String id) async {
+    if (!_isBoxOpen(vocabularyBox)) {
+      debugPrint(
+          '[StorageService] Vocabulary box not open, attempting to open it');
+      try {
+        await Hive.openBox<VocabularySet>(vocabularyBox);
+      } catch (e) {
+        debugPrint('[StorageService] Failed to open vocabulary box: $e');
+        return null;
+      }
+    }
     final box = Hive.box<VocabularySet>(vocabularyBox);
     return box.get(id);
   }
 
   @override
   Future<void> saveTranscription(Transcription transcription) async {
+    if (!_isBoxOpen(transcriptionsBox)) {
+      debugPrint(
+          '[StorageService] Transcriptions box not open, attempting to open it');
+      try {
+        await Hive.openBox<Transcription>(transcriptionsBox);
+      } catch (e) {
+        debugPrint('[StorageService] Failed to open transcriptions box: $e');
+        rethrow;
+      }
+    }
     final box = Hive.box<Transcription>(transcriptionsBox);
     await box.put(transcription.id, transcription);
   }
 
   @override
-  Future<List<Transcription>> getTranscriptions({int? limit, int? offset}) async {
+  Future<List<Transcription>> getTranscriptions(
+      {int? limit, int? offset}) async {
+    if (!_isBoxOpen(transcriptionsBox)) {
+      debugPrint(
+          '[StorageService] Transcriptions box not open, attempting to open it');
+      try {
+        await Hive.openBox<Transcription>(transcriptionsBox);
+      } catch (e) {
+        debugPrint('[StorageService] Failed to open transcriptions box: $e');
+        return [];
+      }
+    }
     final box = Hive.box<Transcription>(transcriptionsBox);
     final values = box.values.toList();
     values.sort((a, b) => b.createdAt.compareTo(a.createdAt));
@@ -172,18 +213,48 @@ class StorageService implements StorageServiceInterface {
 
   @override
   Future<void> deleteTranscription(String id) async {
+    if (!_isBoxOpen(transcriptionsBox)) {
+      debugPrint(
+          '[StorageService] Transcriptions box not open, attempting to open it');
+      try {
+        await Hive.openBox<Transcription>(transcriptionsBox);
+      } catch (e) {
+        debugPrint('[StorageService] Failed to open transcriptions box: $e');
+        return;
+      }
+    }
     final box = Hive.box<Transcription>(transcriptionsBox);
     await box.delete(id);
   }
 
   /// Delete multiple transcriptions at once
   static Future<void> deleteMultipleTranscriptions(List<String> ids) async {
+    if (!_isBoxOpen(transcriptionsBox)) {
+      debugPrint(
+          '[StorageService] Transcriptions box not open, attempting to open it');
+      try {
+        await Hive.openBox<Transcription>(transcriptionsBox);
+      } catch (e) {
+        debugPrint('[StorageService] Failed to open transcriptions box: $e');
+        return;
+      }
+    }
     final box = Hive.box<Transcription>(transcriptionsBox);
     await box.deleteAll(ids);
   }
 
   @override
   Future<void> updateTranscription(String id, String newText) async {
+    if (!_isBoxOpen(transcriptionsBox)) {
+      debugPrint(
+          '[StorageService] Transcriptions box not open, attempting to open it');
+      try {
+        await Hive.openBox<Transcription>(transcriptionsBox);
+      } catch (e) {
+        debugPrint('[StorageService] Failed to open transcriptions box: $e');
+        return;
+      }
+    }
     final box = Hive.box<Transcription>(transcriptionsBox);
     final transcription = box.get(id);
     if (transcription != null) {

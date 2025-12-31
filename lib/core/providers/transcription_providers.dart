@@ -29,10 +29,12 @@ final transcriptionsProvider =
 final searchQueryProvider = StateProvider<String>((ref) => '');
 
 /// Sort option for transcriptions
-final sortOptionProvider = StateProvider<SortOption>((ref) => SortOption.newest);
+final sortOptionProvider =
+    StateProvider<SortOption>((ref) => SortOption.newest);
 
 /// Filter option for transcriptions
-final filterOptionProvider = StateProvider<FilterOption>((ref) => FilterOption.all);
+final filterOptionProvider =
+    StateProvider<FilterOption>((ref) => FilterOption.all);
 
 /// Filtered transcriptions based on search query, filter option, and sort option
 final filteredTranscriptionsProvider = Provider<List<Transcription>>((ref) {
@@ -67,7 +69,8 @@ final filteredTranscriptionsProvider = Provider<List<Transcription>>((ref) {
       filtered.sort((a, b) => a.createdAt.compareTo(b.createdAt));
       break;
     case SortOption.duration:
-      filtered.sort((a, b) => b.audioDurationSeconds.compareTo(a.audioDurationSeconds));
+      filtered.sort(
+          (a, b) => b.audioDurationSeconds.compareTo(a.audioDurationSeconds));
       break;
     case SortOption.favorites:
       filtered.sort((a, b) {

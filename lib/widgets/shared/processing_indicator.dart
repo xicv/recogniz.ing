@@ -280,7 +280,9 @@ class _ProcessingIndicatorState extends State<ProcessingIndicator>
       stageIcon = LucideIcons.mic;
       stageTitle = 'Transcribing';
       stageDescription = 'Converting speech to text...';
-    } else if (actualStage.contains('vocab') || actualStage.contains('apply') || progress < 0.85) {
+    } else if (actualStage.contains('vocab') ||
+        actualStage.contains('apply') ||
+        progress < 0.85) {
       stageIcon = LucideIcons.bookOpen;
       stageTitle = 'Applying Vocabulary';
       stageDescription = 'Refining with custom words...';
@@ -374,7 +376,7 @@ class CompactProcessingIndicator extends StatelessWidget {
           Text(
             '${(progress * 100).toInt()}% • ~${estimatedSeconds}s left',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                   fontSize: 11,
                 ),
           ),
@@ -470,7 +472,8 @@ class ProcessingStages {
     if (progress <= 0 || audioDurationSeconds <= 0) return null;
 
     // Estimate: 15% of audio duration + overhead
-    final totalEstimated = (audioDurationSeconds * 0.15 + overheadSeconds).ceil();
+    final totalEstimated =
+        (audioDurationSeconds * 0.15 + overheadSeconds).ceil();
     final remaining = totalEstimated - (totalEstimated * progress).round();
 
     return remaining > 0 ? remaining : 1;

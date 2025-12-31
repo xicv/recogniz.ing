@@ -44,7 +44,7 @@ class AppChips {
       onSelected: onSelected,
       avatar: avatar,
       selectedColor: selectedColor ??
-          Theme.of(context).colorScheme.primary.withOpacity(0.2),
+          Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
       labelStyle: TextStyle(
         color: selected ? Theme.of(context).colorScheme.primary : null,
       ),
@@ -54,7 +54,7 @@ class AppChips {
         side: BorderSide(
           color: selected
               ? Theme.of(context).colorScheme.primary
-              : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+              : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
         ),
       ),
     );
@@ -76,7 +76,7 @@ class AppChips {
       onSelected: onSelected,
       avatar: avatar,
       selectedColor: selectedColor ??
-          Theme.of(context).colorScheme.primary.withOpacity(0.2),
+          Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
       labelStyle: TextStyle(
         color: selected ? Theme.of(context).colorScheme.primary : null,
       ),
@@ -86,7 +86,7 @@ class AppChips {
         side: BorderSide(
           color: selected
               ? Theme.of(context).colorScheme.primary
-              : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+              : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
         ),
       ),
     );
@@ -133,10 +133,10 @@ class AppChips {
       padding:
           padding ?? const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: config.color.withOpacity(0.1),
+        color: config.color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: config.color.withOpacity(0.3),
+          color: config.color.withValues(alpha: 0.3),
         ),
       ),
       child: Row(

@@ -327,7 +327,7 @@ class ChangelogManager {
     final changelog = await loadJson();
     final markdown = changelog.toMarkdown();
     await File(mdPath).writeAsString(markdown);
-    print('✅ Generated $mdPath from $jsonPath');
+    stdout.writeln('✅ Generated $mdPath from $jsonPath');
   }
 
   /// Add a new version entry to the changelog
@@ -335,8 +335,8 @@ class ChangelogManager {
     final changelog = await loadJson();
 
     if (changelog.hasVersion(version)) {
-      print('⚠️  Version $version already exists in changelog');
-      print('   Edit $jsonPath to update the entry');
+      stdout.writeln('⚠️  Version $version already exists in changelog');
+      stdout.writeln('   Edit $jsonPath to update the entry');
       return;
     }
 
@@ -344,13 +344,13 @@ class ChangelogManager {
     final updated = changelog.addVersion(newEntry);
     await saveJson(updated);
 
-    print('✅ Added version entry for $version to $jsonPath');
-    print('   Please edit the file to add actual changes:');
-    print('   - Add highlights');
-    print('   - Add/modify change entries');
-    print('');
-    print('   Run: dart scripts/version_manager.dart --changelog');
-    print('   to generate the Markdown file.');
+    stdout.writeln('✅ Added version entry for $version to $jsonPath');
+    stdout.writeln('   Please edit the file to add actual changes:');
+    stdout.writeln('   - Add highlights');
+    stdout.writeln('   - Add/modify change entries');
+    stdout.writeln('');
+    stdout.writeln('   Run: dart scripts/version_manager.dart --changelog');
+    stdout.writeln('   to generate the Markdown file.');
   }
 
   /// Verify JSON and Markdown are in sync
@@ -359,12 +359,12 @@ class ChangelogManager {
     final mdFile = File(mdPath);
 
     if (!await jsonFile.exists()) {
-      print('❌ $jsonPath does not exist');
+      stdout.writeln('❌ $jsonPath does not exist');
       return false;
     }
 
     if (!await mdFile.exists()) {
-      print('❌ $mdPath does not exist');
+      stdout.writeln('❌ $mdPath does not exist');
       return false;
     }
 
@@ -373,12 +373,12 @@ class ChangelogManager {
     final mdStats = await mdFile.stat();
 
     if (jsonStats.modified.isAfter(mdStats.modified)) {
-      print('⚠️  $jsonPath is newer than $mdPath');
-      print('   Run: dart scripts/version_manager.dart --changelog');
+      stdout.writeln('⚠️  $jsonPath is newer than $mdPath');
+      stdout.writeln('   Run: dart scripts/version_manager.dart --changelog');
       return false;
     }
 
-    print('✅ Changelogs appear to be in sync');
+    stdout.writeln('✅ Changelogs appear to be in sync');
     return true;
   }
 }
@@ -390,7 +390,7 @@ Future<void> _syncFromChangelog(String projectRoot) async {
 
   // Read changelog
   if (!await File(changelogPath).exists()) {
-    print('❌ Error: CHANGELOG.json not found!');
+    stdout.writeln('❌ Error: CHANGELOG.json not found!');
     exit(1);
   }
 
@@ -400,16 +400,16 @@ Future<void> _syncFromChangelog(String projectRoot) async {
   // Get latest version from changelog
   final versions = changelogJson['versions'] as List<dynamic>;
   if (versions.isEmpty) {
-    print('❌ Error: No versions found in CHANGELOG.json!');
+    stdout.writeln('❌ Error: No versions found in CHANGELOG.json!');
     exit(1);
   }
 
   final latestVersion = versions.first['version'] as String;
-  print('📋 Latest version in CHANGELOG.json: $latestVersion');
+  stdout.writeln('📋 Latest version in CHANGELOG.json: $latestVersion');
 
   // Read pubspec.yaml
   if (!await File(pubspecPath).exists()) {
-    print('❌ Error: pubspec.yaml not found!');
+    stdout.writeln('❌ Error: pubspec.yaml not found!');
     exit(1);
   }
 
@@ -422,20 +422,20 @@ Future<void> _syncFromChangelog(String projectRoot) async {
       final currentVersion = lines[i].replaceFirst('version: ', '').trim();
 
       if (currentVersion == latestVersion) {
-        print('✅ pubspec.yaml already at version $latestVersion');
+        stdout.writeln('✅ pubspec.yaml already at version $latestVersion');
         return;
       }
 
-      print('🔄 Updating pubspec.yaml: $currentVersion → $latestVersion');
+      stdout.writeln('🔄 Updating pubspec.yaml: $currentVersion → $latestVersion');
       lines[i] = 'version: $latestVersion';
 
       await File(pubspecPath).writeAsString(lines.join('\n'));
-      print('✅ pubspec.yaml updated to version $latestVersion');
+      stdout.writeln('✅ pubspec.yaml updated to version $latestVersion');
       return;
     }
   }
 
-  print('❌ Error: No version line found in pubspec.yaml!');
+  stdout.writeln('❌ Error: No version line found in pubspec.yaml!');
   exit(1);
 }
 
@@ -468,7 +468,7 @@ Future<void> main(List<String> args) async {
   // Version management
   final pubspecPath = path.join(projectRoot, 'pubspec.yaml');
   if (!await File(pubspecPath).exists()) {
-    print('Error: pubspec.yaml not found!');
+    stdout.writeln('Error: pubspec.yaml not found!');
     exit(1);
   }
 
@@ -479,7 +479,7 @@ Future<void> main(List<String> args) async {
   );
 
   if (versionLine.isEmpty) {
-    print('Error: Version line not found in pubspec.yaml!');
+    stdout.writeln('Error: Version line not found in pubspec.yaml!');
     exit(1);
   }
 
@@ -488,7 +488,7 @@ Future<void> main(List<String> args) async {
   final currentVersion = VersionInfo.parse(currentVersionString);
 
   if (args.contains('--current')) {
-    print('Current version: $currentVersionString');
+    stdout.writeln('Current version: $currentVersionString');
     return;
   }
 
@@ -498,7 +498,7 @@ Future<void> main(List<String> args) async {
   if (args.contains('--bump')) {
     final bumpIndex = args.indexOf('--bump');
     if (bumpIndex + 1 >= args.length) {
-      print('Error: Please specify bump type (patch, minor, major, prerelease)');
+      stdout.writeln('Error: Please specify bump type (patch, minor, major, prerelease)');
       exit(1);
     }
 
@@ -506,7 +506,7 @@ Future<void> main(List<String> args) async {
     final versionParts = currentVersion.version.split('.');
 
     if (versionParts.length < 3) {
-      print('Error: Invalid version format!');
+      stdout.writeln('Error: Invalid version format!');
       exit(1);
     }
 
@@ -532,20 +532,20 @@ Future<void> main(List<String> args) async {
         break;
       case 'prerelease':
         if (bumpIndex + 2 >= args.length) {
-          print('Error: Please specify pre-release identifier');
+          stdout.writeln('Error: Please specify pre-release identifier');
           exit(1);
         }
         final preReleaseId = args[bumpIndex + 2];
         newVersion = VersionInfo(version: '$major.$minor.$patch-$preReleaseId');
         break;
       default:
-        print('Error: Invalid bump type! Use patch, minor, major, or prerelease');
+        stdout.writeln('Error: Invalid bump type! Use patch, minor, major, or prerelease');
         exit(1);
     }
   }
 
   if (newVersion.toString() != currentVersionString) {
-    print('Updating version: $currentVersionString → ${newVersion.toString()}');
+    stdout.writeln('Updating version: $currentVersionString → ${newVersion.toString()}');
 
     // Update pubspec.yaml
     final updatedContent = content.replaceFirst(
@@ -554,7 +554,7 @@ Future<void> main(List<String> args) async {
     );
 
     await File(pubspecPath).writeAsString(updatedContent);
-    print('✅ Version updated successfully!');
+    stdout.writeln('✅ Version updated successfully!');
 
     // Add changelog entry if requested
     if (shouldAddChangelogEntry) {
@@ -566,22 +566,22 @@ Future<void> main(List<String> args) async {
 
     // Optionally run flutter pub get
     if (args.contains('--pub-get')) {
-      print('Running flutter pub get...');
+      stdout.writeln('Running flutter pub get...');
       final result = await Process.run('flutter', ['pub', 'get']);
       if (result.exitCode == 0) {
-        print('✅ Dependencies updated!');
+        stdout.writeln('✅ Dependencies updated!');
       } else {
-        print('❌ Failed to update dependencies');
-        print(result.stderr);
+        stdout.writeln('❌ Failed to update dependencies');
+        stdout.writeln(result.stderr);
       }
     }
   } else {
-    print('No version changes needed');
+    stdout.writeln('No version changes needed');
   }
 }
 
 void _printUsage() {
-  print('''
+  stdout.writeln('''
 Version Manager & Changelog Tool for Recogniz.ing
 
 USAGE:

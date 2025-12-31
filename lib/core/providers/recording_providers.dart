@@ -6,7 +6,6 @@ import '../services/gemini_service.dart';
 import '../services/storage_service.dart';
 import '../services/notification_service.dart';
 import 'app_providers.dart';
-import 'settings_providers.dart';
 import 'config_providers.dart';
 import '../models/app_settings.dart';
 

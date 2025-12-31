@@ -181,10 +181,10 @@ class AppButtons {
 
   /// Default primary button style
   static const ButtonStyle _primaryStyle = ButtonStyle(
-    padding: MaterialStatePropertyAll(
+    padding: WidgetStatePropertyAll(
       EdgeInsets.symmetric(horizontal: 24, vertical: 12),
     ),
-    shape: MaterialStatePropertyAll(
+    shape: WidgetStatePropertyAll(
       RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(12)),
       ),

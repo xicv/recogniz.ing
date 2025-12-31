@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 import 'audio_processor.dart';
 import 'audio_compression_service.dart';
 import 'audio_processing_service.dart';
+import 'audio_storage_service.dart';
 import '../config/app_config.dart';
 import '../constants/constants.dart';
 import '../interfaces/audio_service_interface.dart';
@@ -263,8 +264,41 @@ class AudioService implements AudioServiceInterface {
       }
     }
 
+    // Save audio to persistent storage for retry capability
+    String? persistentAudioPath;
+    try {
+      await AudioStorageService.initialize();
+      persistentAudioPath = await AudioStorageService.saveAudioBytes(
+        finalBytes,
+      );
+      if (kDebugMode) {
+        debugPrint(
+            '[AudioService] Audio saved to persistent storage: $persistentAudioPath');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint(
+            '[AudioService] Failed to save audio to persistent storage: $e');
+      }
+      // Continue anyway - recording will work but retry won't be available
+    }
+
+    // Delete the temporary file since we have the bytes and persistent copy
+    try {
+      if (await file.exists()) {
+        await file.delete();
+        if (kDebugMode) {
+          debugPrint('[AudioService] Temporary file deleted');
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[AudioService] Failed to delete temp file: $e');
+      }
+    }
+
     return RecordingResult(
-      path: path,
+      path: persistentAudioPath ?? path, // Use persistent path if available
       bytes: finalBytes,
       durationSeconds: duration,
       analysis: analysis,

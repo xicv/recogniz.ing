@@ -85,7 +85,7 @@ class AppBars {
             color: Theme.of(AppBarGet.context!)
                 .colorScheme
                 .onSurface
-                .withOpacity(0.6),
+                .withValues(alpha: 0.6),
           ),
         ),
         style: TextStyle(

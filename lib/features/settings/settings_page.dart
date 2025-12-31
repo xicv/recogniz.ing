@@ -17,12 +17,10 @@ class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
 
   @override
-  ConsumerState<SettingsPage> createState() =>
-      _SettingsPageState();
+  ConsumerState<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsPageState
-    extends ConsumerState<SettingsPage> {
+class _SettingsPageState extends ConsumerState<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsProvider);
@@ -67,7 +65,7 @@ class _SettingsPageState
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
+                            color: AppColors.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -108,7 +106,7 @@ class _SettingsPageState
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -133,7 +131,7 @@ class _SettingsPageState
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -319,9 +317,11 @@ class _SettingsPageState
 
                                     try {
                                       // Use provider to get GeminiService for validation
-                                      final geminiService = ref.read(geminiServiceProvider);
+                                      final geminiService =
+                                          ref.read(geminiServiceProvider);
                                       final (isValid, error) =
-                                          await geminiService.validateApiKey(trimmedKey);
+                                          await geminiService
+                                              .validateApiKey(trimmedKey);
 
                                       if (isValid) {
                                         await ref

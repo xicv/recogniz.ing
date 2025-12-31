@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -25,7 +24,8 @@ class DashboardPage extends ConsumerWidget {
       return Scaffold(
         body: DashboardEmptyState(
           hasApiKey: false,
-          onOpenSettings: () => ref.read(currentPageProvider.notifier).state = 4,
+          onOpenSettings: () =>
+              ref.read(currentPageProvider.notifier).state = 4,
         ),
       );
     }
@@ -72,10 +72,10 @@ class DashboardPage extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.warning.withOpacity(0.1),
+                        color: AppColors.warning.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                            color: AppColors.warning.withOpacity(0.3)),
+                            color: AppColors.warning.withValues(alpha: 0.3)),
                       ),
                       child: Row(
                         children: [

@@ -43,7 +43,7 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(UIConstants.borderRadiusMedium),
         side: BorderSide(
-          color: Theme.of(context).dividerColor.withOpacity(0.1),
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
@@ -56,7 +56,7 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
                 Container(
                   padding: const EdgeInsets.all(UIConstants.spacingSmall),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius:
                         BorderRadius.circular(UIConstants.borderRadiusSmall),
                   ),
@@ -138,7 +138,7 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
                                       child: Container(
                                         decoration: BoxDecoration(
                                           color: AppColors.primary
-                                              .withOpacity(0.8),
+                                              .withValues(alpha: 0.8),
                                           borderRadius:
                                               const BorderRadius.vertical(
                                             top: Radius.circular(2),
@@ -213,7 +213,7 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
                       width: 32,
                       height: 80,
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceVariant,
+                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Align(
@@ -282,11 +282,11 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
                                     color: isActive
                                         ? (index >= 9 &&
                                                 index <= 17) // Business hours
-                                            ? AppColors.success.withOpacity(0.8)
-                                            : AppColors.primary.withOpacity(0.8)
+                                            ? AppColors.success.withValues(alpha: 0.8)
+                                            : AppColors.primary.withValues(alpha: 0.8)
                                         : Theme.of(context)
                                             .colorScheme
-                                            .surfaceVariant,
+                                            .surfaceContainerHighest,
                                     borderRadius: const BorderRadius.vertical(
                                       top: Radius.circular(2),
                                     ),
@@ -324,7 +324,7 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
                 width: 12,
                 height: 12,
                 decoration: BoxDecoration(
-                  color: AppColors.success.withOpacity(0.8),
+                  color: AppColors.success.withValues(alpha: 0.8),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -338,7 +338,7 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
                 width: 12,
                 height: 12,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.8),
+                  color: AppColors.primary.withValues(alpha: 0.8),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),

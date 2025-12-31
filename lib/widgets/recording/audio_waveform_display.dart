@@ -59,9 +59,7 @@ class _AudioWaveformDisplayState extends State<AudioWaveformDisplay>
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final primaryColor = widget.color ??
-        (widget.isSpeechDetected
-            ? colorScheme.secondary
-            : colorScheme.primary);
+        (widget.isSpeechDetected ? colorScheme.secondary : colorScheme.primary);
 
     return AnimatedBuilder(
       animation: _animationController,
@@ -125,9 +123,9 @@ class _AudioWaveformPainter extends CustomPainter {
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
-          color.withOpacity(0.9),
-          color.withOpacity(0.5),
-          color.withOpacity(0.3),
+          color.withValues(alpha: 0.9),
+          color.withValues(alpha: 0.5),
+          color.withValues(alpha: 0.3),
         ],
       );
 
@@ -156,7 +154,7 @@ class _AudioWaveformPainter extends CustomPainter {
       // Add glow effect for speech detected
       if (isSpeechDetected && amplitude > 0.3) {
         final glowPaint = Paint()
-          ..color = color.withOpacity(0.2)
+          ..color = color.withValues(alpha: 0.2)
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
         canvas.drawRRect(rRect, glowPaint);
       }
@@ -230,7 +228,7 @@ class _CircularWavePainter extends CustomPainter {
 
       if (waveAmplitude > 0.01) {
         final paint = Paint()
-          ..color = color.withOpacity(0.3 * waveAmplitude)
+          ..color = color.withValues(alpha: 0.3 * waveAmplitude)
           ..style = PaintingStyle.stroke
           ..strokeWidth = 2.0
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);

@@ -69,7 +69,7 @@ class _TranscriptionTileState extends State<TranscriptionTile> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -108,7 +108,7 @@ class _TranscriptionTileState extends State<TranscriptionTile> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(
-                              color: AppColors.primary.withOpacity(0.5)),
+                              color: AppColors.primary.withValues(alpha: 0.5)),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -135,14 +135,14 @@ class _TranscriptionTileState extends State<TranscriptionTile> {
                       decoration: BoxDecoration(
                         color: Theme.of(context)
                             .colorScheme
-                            .surfaceVariant
-                            .withOpacity(0.3),
+                            .surfaceContainerHighest
+                            .withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: Theme.of(context)
                               .colorScheme
                               .outline
-                              .withOpacity(0.2),
+                              .withValues(alpha: 0.2),
                         ),
                       ),
                       child: Text(
@@ -254,7 +254,7 @@ class _TranscriptionTileState extends State<TranscriptionTile> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -367,7 +367,7 @@ class _TranscriptionTileState extends State<TranscriptionTile> {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color:
-                Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+                Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(12),
           ),
           child: SelectableText(

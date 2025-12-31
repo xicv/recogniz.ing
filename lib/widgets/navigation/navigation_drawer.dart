@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
@@ -24,7 +23,8 @@ class AppNavigationDrawer extends ConsumerStatefulWidget {
   const AppNavigationDrawer({super.key});
 
   @override
-  ConsumerState<AppNavigationDrawer> createState() => _AppNavigationDrawerState();
+  ConsumerState<AppNavigationDrawer> createState() =>
+      _AppNavigationDrawerState();
 }
 
 class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
@@ -82,7 +82,8 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
       builder: (context, child) {
         final collapsedWidth = 80.0;
         final expandedWidth = 280.0;
-        final currentWidth = collapsedWidth + (expandedWidth - collapsedWidth) * _widthAnimation.value;
+        final currentWidth = collapsedWidth +
+            (expandedWidth - collapsedWidth) * _widthAnimation.value;
         // Use animation value to determine layout state, not just _isExpanded
         final isVisuallyExpanded = _widthAnimation.value > 0.5;
 
@@ -92,7 +93,7 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
             color: colorScheme.surface,
             border: Border(
               right: BorderSide(
-                color: colorScheme.outlineVariant.withOpacity(0.3),
+                color: colorScheme.outlineVariant.withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
@@ -106,7 +107,8 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
 
               // Navigation items
               Expanded(
-                child: _buildNavigationItems(context, currentPage, isVisuallyExpanded),
+                child: _buildNavigationItems(
+                    context, currentPage, isVisuallyExpanded),
               ),
 
               // Footer with version
@@ -140,15 +142,17 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
                       children: [
                         Text(
                           'Recogniz.ing',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                         Text(
                           'Voice Typing',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
                         ),
                       ],
                     ),
@@ -213,7 +217,8 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
     );
   }
 
-  Widget _buildNavigationItems(BuildContext context, int currentPage, bool isVisuallyExpanded) {
+  Widget _buildNavigationItems(
+      BuildContext context, int currentPage, bool isVisuallyExpanded) {
     final navigationItems = _getNavigationItems();
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -221,138 +226,148 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
-          color: colorScheme.surface.withOpacity(0.8),
+          color: colorScheme.surface.withValues(alpha: 0.8),
           child: SingleChildScrollView(
             child: Column(
               children: navigationItems.map((item) {
-              final isSelected = currentPage == item.index;
+                final isSelected = currentPage == item.index;
 
-              // Collapsed mode: icon only
-              if (!isVisuallyExpanded) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-                  child: Tooltip(
-                    message: item.label,
-                    waitDuration: const Duration(milliseconds: 500),
-                    child: Material(
-                      color: isSelected
-                          ? colorScheme.primaryContainer.withOpacity(0.6)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                      child: InkWell(
-                        onTap: () {
-                          ref.read(currentPageProvider.notifier).state = item.index;
-                        },
-                        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                        hoverColor: colorScheme.onSurface.withOpacity(0.08),
-                        splashColor: colorScheme.onSurface.withOpacity(0.12),
-                        child: Container(
-                          height: 48,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                          ),
-                          child: Stack(
-                            children: [
-                              // Active indicator bar (left side)
-                              Positioned(
-                                left: 4,
-                                top: 0,
-                                bottom: 0,
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  width: 4,
-                                  margin: const EdgeInsets.symmetric(vertical: 12),
-                                  decoration: BoxDecoration(
-                                    color: isSelected
-                                        ? colorScheme.primary
-                                        : Colors.transparent,
-                                    borderRadius: const BorderRadius.only(
-                                      topRight: Radius.circular(2),
-                                      bottomRight: Radius.circular(2),
+                // Collapsed mode: icon only
+                if (!isVisuallyExpanded) {
+                  return Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                    child: Tooltip(
+                      message: item.label,
+                      waitDuration: const Duration(milliseconds: 500),
+                      child: Material(
+                        color: isSelected
+                            ? colorScheme.primaryContainer.withValues(alpha: 0.6)
+                            : Colors.transparent,
+                        borderRadius:
+                            BorderRadius.circular(AppTheme.radiusMedium),
+                        child: InkWell(
+                          onTap: () {
+                            ref.read(currentPageProvider.notifier).state =
+                                item.index;
+                          },
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.radiusMedium),
+                          hoverColor: colorScheme.onSurface.withValues(alpha: 0.08),
+                          splashColor: colorScheme.onSurface.withValues(alpha: 0.12),
+                          child: Container(
+                            height: 48,
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.circular(AppTheme.radiusMedium),
+                            ),
+                            child: Stack(
+                              children: [
+                                // Active indicator bar (left side)
+                                Positioned(
+                                  left: 4,
+                                  top: 0,
+                                  bottom: 0,
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    width: 4,
+                                    margin: const EdgeInsets.symmetric(
+                                        vertical: 12),
+                                    decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? colorScheme.primary
+                                          : Colors.transparent,
+                                      borderRadius: const BorderRadius.only(
+                                        topRight: Radius.circular(2),
+                                        bottomRight: Radius.circular(2),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              // Center icon
-                              Center(
-                                child: Icon(
-                                  item.icon,
-                                  color: isSelected
-                                      ? colorScheme.onPrimaryContainer
-                                      : colorScheme.onSurfaceVariant,
-                                  size: 22,
+                                // Center icon
+                                Center(
+                                  child: Icon(
+                                    item.icon,
+                                    color: isSelected
+                                        ? colorScheme.onPrimaryContainer
+                                        : colorScheme.onSurfaceVariant,
+                                    size: 22,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
+                // Expanded mode: full layout
+                return Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  child: Material(
+                    color: isSelected
+                        ? colorScheme.primaryContainer.withValues(alpha: 0.7)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                    child: InkWell(
+                      onTap: () {
+                        ref.read(currentPageProvider.notifier).state =
+                            item.index;
+                      },
+                      borderRadius:
+                          BorderRadius.circular(AppTheme.radiusMedium),
+                      hoverColor:
+                          colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                      splashColor: colorScheme.onSurface.withValues(alpha: 0.1),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 16,
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              item.icon,
+                              color: isSelected
+                                  ? colorScheme.onPrimaryContainer
+                                  : colorScheme.onSurfaceVariant,
+                              size: 22,
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Text(
+                                item.label,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.copyWith(
+                                      color: isSelected
+                                          ? colorScheme.onPrimaryContainer
+                                          : colorScheme.onSurface,
+                                      fontWeight: isSelected
+                                          ? FontWeight.w600
+                                          : FontWeight.w500,
+                                      fontSize: 15,
+                                    ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            if (isSelected)
+                              Icon(
+                                LucideIcons.chevronRight,
+                                color: colorScheme.onPrimaryContainer,
+                                size: 16,
+                              ),
+                          ],
                         ),
                       ),
                     ),
                   ),
                 );
-              }
-
-              // Expanded mode: full layout
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                child: Material(
-                  color: isSelected
-                      ? colorScheme.primaryContainer.withOpacity(0.7)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                  child: InkWell(
-                    onTap: () {
-                      ref.read(currentPageProvider.notifier).state = item.index;
-                    },
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                    hoverColor: colorScheme.surfaceContainerHighest.withOpacity(0.6),
-                    splashColor: colorScheme.onSurface.withOpacity(0.1),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 16,
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            item.icon,
-                            color: isSelected
-                                ? colorScheme.onPrimaryContainer
-                                : colorScheme.onSurfaceVariant,
-                            size: 22,
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Text(
-                              item.label,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(
-                                    color: isSelected
-                                        ? colorScheme.onPrimaryContainer
-                                        : colorScheme.onSurface,
-                                    fontWeight: isSelected
-                                        ? FontWeight.w600
-                                        : FontWeight.w500,
-                                    fontSize: 15,
-                                  ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          if (isSelected)
-                            Icon(
-                              LucideIcons.chevronRight,
-                              color: colorScheme.onPrimaryContainer,
-                              size: 16,
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
+              }).toList(),
             ),
           ),
         ),
@@ -368,7 +383,7 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
       child: Text(
         _appVersion,
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant.withOpacity(0.6),
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
             ),
       ),
     );
@@ -428,4 +443,3 @@ class NavigationItemData {
     required this.shortcut,
   });
 }
-

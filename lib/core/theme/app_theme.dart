@@ -105,8 +105,10 @@ class AppTheme {
       iconButtonTheme: _buildIconButtonTheme(colorScheme),
 
       // Navigation themes
-      navigationBarTheme: _buildNavigationBarTheme(colorScheme, Brightness.light),
-      navigationDrawerTheme: _buildNavigationDrawerTheme(colorScheme, Brightness.light),
+      navigationBarTheme:
+          _buildNavigationBarTheme(colorScheme, Brightness.light),
+      navigationDrawerTheme:
+          _buildNavigationDrawerTheme(colorScheme, Brightness.light),
 
       // Other components
       dividerTheme: _buildDividerTheme(colorScheme),
@@ -152,8 +154,10 @@ class AppTheme {
       iconButtonTheme: _buildIconButtonTheme(colorScheme),
 
       // Navigation themes
-      navigationBarTheme: _buildNavigationBarTheme(colorScheme, Brightness.dark),
-      navigationDrawerTheme: _buildNavigationDrawerTheme(colorScheme, Brightness.dark),
+      navigationBarTheme:
+          _buildNavigationBarTheme(colorScheme, Brightness.dark),
+      navigationDrawerTheme:
+          _buildNavigationDrawerTheme(colorScheme, Brightness.dark),
 
       // Other components
       dividerTheme: _buildDividerTheme(colorScheme),
@@ -306,7 +310,8 @@ class AppTheme {
   // COMPONENT THEMES
   // ============================================================
 
-  static CardThemeData _buildCardTheme(ColorScheme colorScheme, Brightness brightness) {
+  static CardThemeData _buildCardTheme(
+      ColorScheme colorScheme, Brightness brightness) {
     return CardThemeData(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -328,7 +333,7 @@ class AppTheme {
 
     return InputDecorationTheme(
       filled: true,
-      fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+      fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(radiusMedium),
         borderSide: BorderSide(color: outlineColor),
@@ -351,12 +356,13 @@ class AppTheme {
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       hintStyle: TextStyle(
-        color: colorScheme.onSurfaceVariant.withOpacity(0.6),
+        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
       ),
     );
   }
 
-  static ElevatedButtonThemeData _buildElevatedButtonTheme(ColorScheme colorScheme) {
+  static ElevatedButtonThemeData _buildElevatedButtonTheme(
+      ColorScheme colorScheme) {
     return ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: colorScheme.primary,
@@ -370,13 +376,13 @@ class AppTheme {
       ).copyWith(
         overlayColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.pressed)) {
-            return colorScheme.onPrimary.withOpacity(0.1);
+            return colorScheme.onPrimary.withValues(alpha: 0.1);
           }
           if (states.contains(WidgetState.hovered)) {
-            return colorScheme.onPrimary.withOpacity(0.08);
+            return colorScheme.onPrimary.withValues(alpha: 0.08);
           }
           if (states.contains(WidgetState.focused)) {
-            return colorScheme.onPrimary.withOpacity(0.12);
+            return colorScheme.onPrimary.withValues(alpha: 0.12);
           }
           return null;
         }),
@@ -384,7 +390,8 @@ class AppTheme {
     );
   }
 
-  static FilledButtonThemeData _buildFilledButtonTheme(ColorScheme colorScheme) {
+  static FilledButtonThemeData _buildFilledButtonTheme(
+      ColorScheme colorScheme) {
     return FilledButtonThemeData(
       style: FilledButton.styleFrom(
         backgroundColor: colorScheme.primary,
@@ -396,10 +403,10 @@ class AppTheme {
       ).copyWith(
         overlayColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.pressed)) {
-            return colorScheme.onPrimary.withOpacity(0.1);
+            return colorScheme.onPrimary.withValues(alpha: 0.1);
           }
           if (states.contains(WidgetState.hovered)) {
-            return colorScheme.onPrimary.withOpacity(0.08);
+            return colorScheme.onPrimary.withValues(alpha: 0.08);
           }
           return null;
         }),
@@ -442,7 +449,8 @@ class AppTheme {
         final color = states.contains(WidgetState.selected)
             ? colorScheme.onSurface
             : colorScheme.onSurfaceVariant;
-        return TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w500);
+        return TextStyle(
+            color: color, fontSize: 12, fontWeight: FontWeight.w500);
       }),
       iconTheme: WidgetStateProperty.resolveWith((states) {
         final color = states.contains(WidgetState.selected)
@@ -458,20 +466,22 @@ class AppTheme {
     Brightness brightness,
   ) {
     return NavigationDrawerThemeData(
-      backgroundColor: brightness == Brightness.dark ? _surfaceDark : _surfaceLight,
+      backgroundColor:
+          brightness == Brightness.dark ? _surfaceDark : _surfaceLight,
       surfaceTintColor: colorScheme.surfaceTint,
     );
   }
 
   static DividerThemeData _buildDividerTheme(ColorScheme colorScheme) {
     return DividerThemeData(
-      color: colorScheme.outlineVariant.withOpacity(0.3),
+      color: colorScheme.outlineVariant.withValues(alpha: 0.3),
       thickness: 1,
       space: 1,
     );
   }
 
-  static ChipThemeData _buildChipTheme(ColorScheme colorScheme, Brightness brightness) {
+  static ChipThemeData _buildChipTheme(
+      ColorScheme colorScheme, Brightness brightness) {
     return ChipThemeData(
       backgroundColor: colorScheme.surfaceContainerHighest,
       selectedColor: colorScheme.secondaryContainer,
@@ -496,7 +506,9 @@ class AppTheme {
           ? const Color(0xFF2B2930)
           : const Color(0xFF323232),
       contentTextStyle: TextStyle(
-        color: brightness == Brightness.dark ? Colors.white : const Color(0xFFE4E1E5),
+        color: brightness == Brightness.dark
+            ? Colors.white
+            : const Color(0xFFE4E1E5),
         fontSize: 14,
         fontWeight: FontWeight.w400,
       ),
@@ -602,7 +614,7 @@ String getStateText(RecordingStateValue state) {
 }
 
 /// Get icon for state
- IconData getStateIcon(RecordingStateValue state) {
+IconData getStateIcon(RecordingStateValue state) {
   switch (state) {
     case RecordingStateValue.idle:
       return Icons.mic;

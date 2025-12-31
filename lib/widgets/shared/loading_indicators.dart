@@ -77,7 +77,7 @@ class LoadingIndicators {
       ),
     ).animate(onPlay: (controller) => controller.repeat()).shimmer(
           duration: const Duration(seconds: 2),
-          color: Colors.white.withOpacity(0.3),
+          color: Colors.white.withValues(alpha: 0.3),
         );
   }
 
@@ -88,7 +88,7 @@ class LoadingIndicators {
     Widget? child,
   }) {
     return Material(
-      color: barrierColor ?? Colors.black.withOpacity(0.5),
+      color: barrierColor ?? Colors.black.withValues(alpha: 0.5),
       child: Center(
         child: Card(
           child: Padding(
@@ -136,7 +136,7 @@ class LoadingIndicators {
       style: ElevatedButton.styleFrom(
         backgroundColor: backgroundColor,
         foregroundColor: foregroundColor,
-        disabledBackgroundColor: backgroundColor?.withOpacity(0.5),
+        disabledBackgroundColor: backgroundColor?.withValues(alpha: 0.5),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       ),
       child: isLoading
@@ -174,7 +174,7 @@ class LoadingOverlay extends StatelessWidget {
         if (isLoading)
           Positioned.fill(
             child: Container(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               child: Center(
                 child: Card(
                   child: Padding(
@@ -222,7 +222,7 @@ class ShimmerLoading extends StatelessWidget {
     return isLoading
         ? child.animate(onPlay: (controller) => controller.repeat()).shimmer(
               duration: const Duration(seconds: 2),
-              color: (highlightColor ?? Colors.white).withOpacity(0.3),
+              color: (highlightColor ?? Colors.white).withValues(alpha: 0.3),
             )
         : child;
   }
