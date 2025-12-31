@@ -30,6 +30,27 @@
   },
   "versions": [
     {
+      "version": "1.0.9",
+      "date": "2025-12-31",
+      "stable": true,
+      "highlights": [
+        "Redesigned app logo with modern voice-to-text metaphor",
+        "New distinctive icon with sound-wave-to-text transformation"
+      ],
+      "changes": [
+        {
+          "category": "changed",
+          "title": "App Logo Redesign",
+          "description": "Complete logo redesign featuring vertical sound-wave bars that transform into horizontal text lines. Uses brand color progression (cyan → indigo → emerald) to visually represent the transcription flow."
+        },
+        {
+          "category": "changed",
+          "title": "Platform Icons",
+          "description": "Updated all platform icons (Android, iOS, macOS, Windows, Web) and landing page favicons with the new modern design."
+        }
+      ]
+    },
+    {
       "version": "1.0.8",
       "date": "2025-12-29",
       "stable": true,
