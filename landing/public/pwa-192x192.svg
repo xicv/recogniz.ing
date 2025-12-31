@@ -1,25 +1,37 @@
-<svg width="192" height="192" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="192" height="192" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0EA5E9"/>
-      <stop offset="50%" stop-color="#0284C7"/>
-      <stop offset="100%" stop-color="#0369A1"/>
+      <stop offset="0%" stop-color="#4F46E5"/>
+      <stop offset="100%" stop-color="#6366F1"/>
+    </linearGradient>
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#10B981"/>
+    </linearGradient>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22D3EE"/>
+      <stop offset="50%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#10B981"/>
     </linearGradient>
   </defs>
-  <rect width="1024" height="1024" rx="192" fill="url(#bgGradient)"/>
-  <g transform="translate(102, 102)">
-    <rect x="40" y="40" width="740" height="740" rx="80" fill="white" fill-opacity="0.1"/>
-    <g transform="translate(150, 250)">
-      <rect x="0" y="0" width="520" height="60" rx="30" fill="white" fill-opacity="0.9"/>
-      <rect x="0" y="100" width="420" height="60" rx="30" fill="white" fill-opacity="0.9"/>
-      <rect x="0" y="200" width="460" height="60" rx="30" fill="white" fill-opacity="0.9"/>
-      <circle cx="460" cy="30" r="20" fill="#10B981"/>
-      <circle cx="360" cy="130" r="20" fill="#10B981"/>
-      <circle cx="420" cy="230" r="20" fill="#10B981"/>
-    </g>
-    <g transform="translate(380, 420)">
-      <circle cx="130" cy="130" r="60" fill="white" fill-opacity="0.9"/>
-      <path d="M 110 120 L 130 140 L 150 110" stroke="#0369A1" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-    </g>
+
+  <rect x="32" y="32" width="960" height="960" rx="220" fill="url(#bgGradient)"/>
+
+  <g transform="translate(160, 240)">
+    <rect x="40" y="120" width="56" height="360" rx="28" fill="#22D3EE"/>
+    <rect x="132" y="180" width="56" height="240" rx="28" fill="#30C4E6"/>
+    <rect x="224" y="140" width="56" height="320" rx="28" fill="url(#accentGradient)"/>
+    <rect x="316" y="220" width="56" height="160" rx="28" fill="url(#textGradient)"/>
+    <rect x="408" y="260" width="56" height="80" rx="28" fill="#10B981"/>
+
+    <rect x="500" y="120" width="200" height="56" rx="28" fill="url(#textGradient)"/>
+    <rect x="540" y="220" width="160" height="56" rx="28" fill="#10B981"/>
+    <rect x="500" y="320" width="120" height="56" rx="28" fill="#10B981" opacity="0.9"/>
+    <rect x="540" y="420" width="80" height="56" rx="28" fill="#10B981" opacity="0.8"/>
+
+    <circle cx="480" cy="280" r="24" fill="url(#accentGradient)" opacity="0.9"/>
+    <circle cx="480" cy="148" r="20" fill="url(#accentGradient)" opacity="0.7"/>
+    <circle cx="480" cy="408" r="16" fill="url(#accentGradient)" opacity="0.5"/>
   </g>
 </svg>

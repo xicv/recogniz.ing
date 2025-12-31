@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Monochrome version - Single color (#1F2937 - gray-900) -->
+  <!-- Use fill="currentColor" for dynamic theming -->
+
+  <!-- Background: Optional, remove for transparent -->
+  <rect x="32" y="32" width="960" height="960" rx="220" fill="#1F2937"/>
+
+  <!-- Main icon content -->
+  <g fill="#FFFFFF">
+    <!-- Sound Wave Section (Left) -->
+    <rect x="200" y="360" width="56" height="360" rx="28"/>
+    <rect x="292" y="420" width="56" height="240" rx="28"/>
+    <rect x="384" y="380" width="56" height="320" rx="28"/>
+    <rect x="476" y="460" width="56" height="160" rx="28"/>
+    <rect x="568" y="500" width="56" height="80" rx="28"/>
+
+    <!-- Text Lines Section (Right) -->
+    <rect x="660" y="360" width="200" height="56" rx="28"/>
+    <rect x="700" y="460" width="160" height="56" rx="28"/>
+    <rect x="660" y="560" width="120" height="56" rx="28"/>
+    <rect x="700" y="660" width="80" height="56" rx="28"/>
+
+    <!-- Connection dots -->
+    <circle cx="640" cy="520" r="24"/>
+    <circle cx="640" cy="388" r="20"/>
+    <circle cx="640" cy="648" r="16"/>
+  </g>
+</svg>
