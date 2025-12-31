@@ -183,7 +183,7 @@ onMounted(() => {
                   class="relative inline-flex rounded-full h-2 w-2 bg-sky-500"
                 ></span>
               </span>
-              v1.0.8 — Now Available
+              v1.10.0 — Now Available
             </div>
 
             <!-- Headline with kinetic text effect and better visual hierarchy -->
