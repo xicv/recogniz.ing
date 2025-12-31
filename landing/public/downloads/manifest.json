@@ -11,6 +11,15 @@
   "build_date": "2025-12-23T11:02:06Z",
   "versions": [
     {
+      "version": "1.10.0",
+      "released_at": "2025-12-31T10:21:48.679752+00:00",
+      "downloads": {
+        "macos": "downloads/1.10.0/macos/recognizing-1.10.0-macos.zip",
+        "windows": "downloads/1.10.0/windows/recognizing-1.10.0-windows.zip",
+        "web": "downloads/1.10.0/web/recognizing-1.10.0-web.zip"
+      }
+    },
+    {
       "version": "1.0.9",
       "released_at": "2025-12-31T09:03:29.076755+00:00",
       "downloads": {
@@ -29,5 +38,5 @@
       }
     }
   ],
-  "current_version": "1.0.9"
+  "current_version": "1.10.0"
 }
