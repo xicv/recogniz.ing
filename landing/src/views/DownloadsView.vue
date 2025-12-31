@@ -22,9 +22,9 @@ const platforms = ref<Platform[]>([
   {
     name: 'Android',
     icon: 'M6.382 3.968A8.962 8.962 0 0 1 12 2c2.125 0 4.078.736 5.618 1.968l1.453-1.453 1.414 1.414-1.453 1.453A8.962 8.962 0 0 1 21 11v1H3v-1c0-2.125.736-4.078 1.968-5.618L3.515 3.93l1.414-1.414 1.453 1.453zM3 14h18v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-7zm6-5a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm6 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z',
-    version: '1.10.0',
+    version: '1.11.0',
     releaseDate: '2025-12-31',
-    downloadUrl: 'https://github.com/xicv/recogniz.ing/releases/download/v1.10.0/recognizing-1.10.0.apk',
+    downloadUrl: 'https://github.com/xicv/recogniz.ing/releases/download/v1.11.0/recognizing-1.11.0.apk',
     changelog: [
       'Standalone APK - no Google Play required',
       'Works on Android 8.0+ (API 26)',
@@ -36,7 +36,7 @@ const platforms = ref<Platform[]>([
   {
     name: 'macOS',
     icon: 'M15.11 2.68 C16.03 1.59 16.68 0.11 16.51 0 C15.19 0.05 13.60 0.85 12.64 1.94 C11.79 2.89 11.04 4.39 11.24 5.85 C12.71 5.96 14.20 5.13 15.11 2.68 M17.54 10.82 C17.58 14.56 20.99 15.82 21.03 15.84 C21.00 15.92 20.49 17.66 19.24 19.45 C18.16 20.97 17.02 22.46 15.19 22.49 C13.40 22.52 12.84 21.50 10.83 21.50 C8.84 21.50 8.22 22.49 6.51 22.49 C4.77 22.55 3.46 20.84 2.36 19.46 C0.09 16.42 -1.66 10.88 0.63 7.08 C1.80 5.17 3.85 4 5.99 3.97 C7.70 3.94 9.31 5.06 10.35 5.06 C11.39 5.06 13.31 3.86 15.36 4.06 C16.23 4.09 18.63 4.39 20.20 6.51 C20.09 6.58 17.34 8.12 17.37 11.18 C17.40 14.25 20.81 15.30 20.85 15.32 C20.82 15.39 20.31 17.13 19.06 18.92 C17.98 20.44 16.84 21.93 15.01 21.96 C13.22 21.99 12.66 20.97 10.65 20.97 C8.66 20.97 8.04 21.96 6.33 21.96 C4.59 22.02 3.28 20.31 2.18 18.93 C-0.09 15.89 -1.84 10.35 0.45 6.55 C1.62 4.64 3.67 3.47 5.81 3.44 C7.52 3.41 9.13 4.53 10.17 4.53 C11.21 4.53 13.13 3.33 15.18 3.53 C16.05 3.56 18.45 3.86 20.02 5.98 C19.91 6.05 17.16 7.59 17.19 10.65',
-    version: '1.10.0',
+    version: '1.11.0',
     releaseDate: '2025-12-31',
     downloadUrl: 'https://github.com/xicv/recogniz.ing/releases/download/v1.10.0/recognizing-1.10.0-macos.zip',
     changelog: [
@@ -51,7 +51,7 @@ const platforms = ref<Platform[]>([
   {
     name: 'Windows',
     icon: 'M3 12V6.7L9 5.4v6.5L3 12M20 3v8.8L10 11.9V5.2L20 3M3 13l6 .1V19.9L3 18.7V13m17 .3V22L10 20.1v-7',
-    version: '1.10.0',
+    version: '1.11.0',
     releaseDate: '2025-12-31',
     downloadUrl: 'https://github.com/xicv/recogniz.ing/releases/download/v1.10.0/recognizing-1.10.0-windows.zip',
     changelog: [
@@ -65,7 +65,7 @@ const platforms = ref<Platform[]>([
   {
     name: 'Linux',
     icon: 'M4 17h16a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2zM8 7h8v2H8V7zm0 4h8v2H8v-2z',
-    version: '1.10.0',
+    version: '1.11.0',
     releaseDate: '2025-12-31',
     downloadUrl: 'https://github.com/xicv/recogniz.ing/releases/download/v1.10.0/recognizing-1.10.0-linux.tar.gz',
     changelog: [
@@ -447,7 +447,7 @@ const getPlatformColor = (color?: string) => {
 
           <!-- Version cards -->
           <div class="space-y-6">
-            <!-- v1.10.0 -->
+            <!-- v1.11.0 -->
             <div class="card scroll-reveal">
               <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
                 <div class="flex items-center gap-4">
@@ -460,7 +460,7 @@ const getPlatformColor = (color?: string) => {
                     <h3
                       class="text-2xl font-semibold text-slate-950 dark:text-slate-50 transition-colors duration-300"
                     >
-                      Version 1.10.0
+                      Version 1.11.0
                     </h3>
                     <p class="text-sm text-slate-500 dark:text-slate-400">
                       December 31, 2025
@@ -476,16 +476,57 @@ const getPlatformColor = (color?: string) => {
                   <svg class="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                   </svg>
-                  Transcription status tracking with pending, processing, completed, failed states
+                  Complete app logo redesign with bold 'R' for Recogniz.ing
                 </li>
                 <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
                   <svg class="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                   </svg>
-                  Audio backup functionality for retrying failed transcriptions
+                  Red recording dot positioned at end of R's right leg for clear visual metaphor
                 </li>
                 <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
                   <svg class="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  New blue-to-teal-to-emerald gradient conveying trust and reliability
+                </li>
+              </ul>
+            </div>
+
+            <!-- v1.10.0 -->
+            <div class="card scroll-reveal">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+                <div class="flex items-center gap-4">
+                  <div class="w-14 h-14 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                    <span class="text-xl font-bold text-slate-500 dark:text-slate-400">1.10.0</span>
+                  </div>
+                  <div>
+                    <h3
+                      class="text-2xl font-semibold text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                    >
+                      Version 1.10.0
+                    </h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">
+                      December 31, 2025
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <ul class="space-y-3">
+                <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                  <svg class="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  Transcription status tracking with pending, processing, completed, failed states
+                </li>
+                <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                  <svg class="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  Audio backup functionality for retrying failed transcriptions
+                </li>
+                <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                  <svg class="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                   </svg>
                   Enhanced error tracking with retry count and completion timestamps
