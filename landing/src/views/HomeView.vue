@@ -33,7 +33,7 @@ const faqs = [
   {
     question: "How much does the API cost?",
     answer:
-      "It depends on your cloud API provider's charges. You can easily monitor this via your own console.",
+      "It depends on your cloud API provider's charges. You can easily monitor this via your own console. If you worry about costs, you can set usage limits or alerts in your cloud API provider's console to avoid unexpected charges.",
   },
   {
     question: "Can I customize vocabulary?",

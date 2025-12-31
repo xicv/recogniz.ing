@@ -10,52 +10,6 @@ AI-powered voice typing application built with Flutter, featuring modern Materia
 
 ---
 
-## ✨ What's New
-
-### **Latest Version: 1.0.8** (December 29, 2025)
-- **🔧 CI/CD Fix**: Fixed detached HEAD error when pushing landing downloads
-- **🍎🪟 Platform Releases**: macOS and Windows installers available
-- **📋 Version Sync**: New `make sync-version` command to sync from CHANGELOG.json
-
-### **Previous Version: 1.0.5** (December 29, 2025)
-- **⭐ Favorites Filter**: Quick access to starred transcriptions
-- **🎨 Cleaner VAD UI**: Static processing indicator (no flashing)
-- **🔧 Simplified Recording**: Removed auto-stop for manual control
-- **✅ Code Quality**: Zero static analysis warnings
-
-### **Version 1.0.4** (December 23, 2025)
-- **📋 Changelog System**: New structured changelog with JSON format and auto-generated Markdown
-- **🔄 Single Source of Truth**: CHANGELOG.json is now the authoritative source, CHANGELOG.md is auto-generated
-- **📦 Automated Version Management**: Updated version_manager.dart with changelog entry templates
-- **🌐 Landing Page Updates**: Added Android platform downloads with proper installation instructions
-- **🐛 Fixed Downloads**: Corrected download URLs to point to GitHub Pages instead of GitHub Releases
-- **🔧 Build System**: Upgraded Android Gradle Plugin to 8.10, Gradle to 8.11.1, Kotlin to 2.1.0
-- **🏗️ Deployment**: Fixed detached HEAD issue in GitHub Actions release workflow
-- **📱 Android Support**: Fixed Android build with AGP 8.10 compatibility
-- **🎨 UI Enhancements**: User preferences with persistent desktop settings, VAD modal UI fixes
-
-### **Previous Improvements (v1.0.3)**
-- **🔐 macOS Security**: Fixed macOS Gatekeeper verification issues with improved app signing
-- **🪟 Windows Release**: Initial Windows release with native installer support
-- **🛠️ Build System**: Improved build scripts and Makefile with `make quick-run` fix
-- **🎨 UI Updates**: Updated platform icons on landing page (iMac for macOS, Apple logo for iOS)
-- **⚡ Performance**: Enhanced stability and performance across all platforms
-- **📦 Downloads**: Updated download links and version management
-- **🏗️ Deployment**: Simplified single-repository deployment architecture
-
-### **Previous Improvements (v1.0.2)**
-- **📦 Version Management System**: Implemented proper semantic versioning with automated tools
-- **⌨️ Keyboard Shortcuts**: Added Cmd/Ctrl+S to save edited transcriptions
-- **🔧 Settings Navigation**: Fixed menu bar Settings navigation to open correct tab
-- **🏗️ Deployment System**: Automated build and deployment pipeline for all platforms
-- **📱 Code Signing**: macOS code signing and notarization support for distribution
-- **📋 Landing Page**: New landing page with download management system
-- **🎨 Enhanced UI Components**: New modern transcription tiles with improved interactions
-- **📊 Simplified Dashboard**: Consolidated stats display with expandable details
-- **🧩 Shared Widget Library**: Comprehensive reusable UI components for consistency
-
----
-
 ## Quick Start
 
 ### Prerequisites
