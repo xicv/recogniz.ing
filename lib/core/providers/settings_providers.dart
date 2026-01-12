@@ -80,6 +80,12 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     state = newState;
   }
 
+  Future<void> updateTranscriptionLanguage(String language) async {
+    final newState = state.copyWith(transcriptionLanguage: language);
+    await StorageService.saveSettings(newState);
+    state = newState;
+  }
+
   Future<void> toggleStartAtLogin() async {
     final newValue = !state.startAtLogin;
     final service = StartAtLoginService();

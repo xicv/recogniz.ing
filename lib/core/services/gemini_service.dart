@@ -39,14 +39,16 @@ class GeminiService implements TranscriptionServiceInterface {
   String get modelName => _modelName;
 
   /// Initialize the service with API key and optional model name
-  void initialize(String apiKey, {String? model}) {
+  void initialize(String apiKey, {String? model, String? systemInstruction}) {
     if (model != null) {
       _modelName = model;
     }
+    final instruction = systemInstruction ?? _buildSystemInstruction();
     debugPrint('[GeminiService] Initializing with model: $_modelName...');
     _model = GenerativeModel(
       model: _modelName,
       apiKey: apiKey,
+      systemInstruction: Content.text(instruction),
       generationConfig: GenerationConfig(
         temperature: 0.1,
         maxOutputTokens: 8192, // Increased for longer transcriptions
@@ -59,6 +61,7 @@ class GeminiService implements TranscriptionServiceInterface {
     _lightningModel = GenerativeModel(
       model: _modelName,
       apiKey: apiKey,
+      systemInstruction: Content.text(instruction),
       generationConfig: GenerationConfig(
         temperature: 0.1,
         maxOutputTokens:
@@ -69,6 +72,21 @@ class GeminiService implements TranscriptionServiceInterface {
     );
 
     debugPrint('[GeminiService] Models initialized successfully');
+  }
+
+  /// Build system instruction for multi-language transcription
+  String _buildSystemInstruction() {
+    return '''
+You are a multilingual transcription assistant.
+
+<TRANSCRIPTION_RULES>
+- Detect the language automatically from the audio
+- Transcribe in the ORIGINAL language only - NEVER translate
+- If the audio mixes languages (code-switching), preserve each language as spoken
+- Example: "这个feature很酷" should be transcribed exactly as-is
+- Only transcribe actual speech; respond [NO_SPEECH] for only silence/noise
+</TRANSCRIPTION_RULES>
+''';
   }
 
   /// Generate a cache key for the audio and parameters
@@ -105,11 +123,13 @@ class GeminiService implements TranscriptionServiceInterface {
     required String rawText,
     required String processedText,
     int? tokenUsage,
+    String? detectedLanguage,
   }) {
     final result = TranscriptionResult(
       rawText: rawText,
       processedText: processedText,
       tokenUsage: tokenUsage ?? 0,
+      detectedLanguage: detectedLanguage,
     );
     _storeInCache(cacheKey, result);
     return result;
@@ -121,6 +141,7 @@ class GeminiService implements TranscriptionServiceInterface {
     required String vocabulary,
     required String promptTemplate,
     String? criticalInstructions,
+    String? targetLanguage,
     bool useSingleCall = true,
   }) async {
     debugPrint('[GeminiService] transcribeAudio called');

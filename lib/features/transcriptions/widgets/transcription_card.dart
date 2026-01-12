@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../core/constants/ui_constants.dart';
+import '../../../core/constants/languages.dart';
 import '../../../core/models/transcription.dart';
 import '../../../core/models/transcription_status.dart';
 import '../../../core/theme/app_theme.dart';
@@ -731,6 +732,16 @@ class _TranscriptionCardState extends State<TranscriptionCard>
           label: _formatDuration(widget.transcription.audioDurationSeconds),
           color: colorScheme.outline,
         ),
+
+        // Detected language (if available)
+        if (widget.transcription.detectedLanguage != null)
+          _MetadataItem(
+            icon: LucideIcons.languages,
+            label: TranscriptionLanguages.getDisplayName(
+              widget.transcription.detectedLanguage,
+            ),
+            color: colorScheme.outline,
+          ),
       ],
     );
   }

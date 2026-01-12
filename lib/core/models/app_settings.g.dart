@@ -26,13 +26,14 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       showNotifications: fields[6] as bool,
       criticalInstructions: fields[7] as String?,
       startAtLogin: fields[10] as bool,
+      transcriptionLanguage: fields[11] == null ? 'auto' : fields[11] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, AppSettings obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.geminiApiKey)
       ..writeByte(1)
@@ -50,7 +51,9 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       ..writeByte(7)
       ..write(obj.criticalInstructions)
       ..writeByte(10)
-      ..write(obj.startAtLogin);
+      ..write(obj.startAtLogin)
+      ..writeByte(11)
+      ..write(obj.transcriptionLanguage);
   }
 
   @override

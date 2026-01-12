@@ -38,9 +38,13 @@ make quick-run        # get + run-macos
 ### Version Management
 ```bash
 make version          # Show current version
+make sync-version     # Sync pubspec.yaml from CHANGELOG.json (SSOT)
 make bump-patch        # 1.0.0 → 1.0.1
 make bump-minor        # 1.0.0 → 1.1.0
 make bump-major        # 1.0.0 → 2.0.0
+make bump-patch-entry  # Bump patch + add changelog entry template
+make bump-minor-entry  # Bump minor + add changelog entry template
+make bump-major-entry  # Bump major + add changelog entry template
 make release           # Bump patch + deploy all platforms
 ```
 
@@ -63,6 +67,7 @@ make verify-changelog # Verify changelogs are in sync
 ### Code Generation
 ```bash
 make generate         # build_runner with delete-conflicting-outputs
+make generate-watch   # Run code generator in watch mode (useful during model development)
 # IMPORTANT: Run after modifying any model files with @HiveType annotations
 ```
 
@@ -236,16 +241,18 @@ dart scripts/version_manager.dart --bump patch --add-entry  # Bump + add templat
 
 ## Recent Major Changes (v1.0.4+)
 
-1. **Changelog System**: JSON-first changelog with `CHANGELOG.json` as source of truth, `CHANGELOG.md` auto-generated
-2. **Navigation Architecture**: Moved from bottom tabs to collapsible left drawer
-3. **UI Enhancements**: Modern transcription cards with hover effects and keyboard shortcuts
-4. **Gemini Model**: Updated to `gemini-3-flash-preview` for improved transcription
-5. **Architecture Fixes**:
+1. **App Logo Redesign (v1.11.0)**: Complete branding overhaul with bold geometric 'R' on blue-teal-emerald gradient, red recording dot positioned at end of R's right leg
+2. **Transcription Status Tracking (v1.10.0)**: Added lifecycle states (pending, processing, completed, failed), audio backup for retry functionality, enhanced error tracking with retry count and completion timestamps
+3. **Changelog System**: JSON-first changelog with `CHANGELOG.json` as source of truth, `CHANGELOG.md` auto-generated
+4. **Navigation Architecture**: Moved from bottom tabs to collapsible left drawer
+5. **UI Enhancements**: Modern transcription cards with hover effects and keyboard shortcuts
+6. **Gemini Model**: Updated to `gemini-3-flash-preview` for improved transcription
+7. **Architecture Fixes**:
    - Removed duplicate app shell implementations
    - Fixed VoiceRecordingUseCase tight coupling by using async interface methods
    - Updated StorageServiceInterface to include `getPrompt()` and `getVocabulary()`
-6. **Keyboard Navigation**: Added shortcuts for all main pages (Ctrl/Cmd+1-5)
-7. **Type Safety**: Fixed RecordingResult type usage (use RecordingResultInterface)
+8. **Keyboard Navigation**: Added shortcuts for all main pages (Ctrl/Cmd+1-5)
+9. **Type Safety**: Fixed RecordingResult type usage (use RecordingResultInterface)
 
 ## Common Pitfalls
 

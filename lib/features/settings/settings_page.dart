@@ -8,7 +8,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/providers/app_providers.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/constants/app_constants.dart';
+import '../../core/constants/languages.dart';
 import 'widgets/critical_instructions_editor.dart';
 import 'widgets/hotkey_editor.dart';
 import 'widgets/settings_section.dart';
@@ -192,6 +192,28 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     });
                   },
                 ),
+                ListTile(
+                  title: const Text('Transcription Language'),
+                  subtitle: Text(
+                    _getLanguageDisplayName(settings.transcriptionLanguage),
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  leading: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      LucideIcons.languages,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
+                  ),
+                  trailing: const Icon(LucideIcons.chevronRight),
+                  onTap: () => _showLanguageSelector(context),
+                ),
                 // Start at Login - Desktop only
                 if (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
                   SwitchListTile(
@@ -210,42 +232,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   ),
               ],
             ).animate().fadeIn(duration: 300.ms, delay: 300.ms),
-
-            const SizedBox(height: 20),
-
-            // About
-            SettingsSection(
-              title: 'About',
-              icon: LucideIcons.info,
-              children: [
-                FutureBuilder<String>(
-                  future: AppConstants.getVersionDisplayName(),
-                  builder: (context, snapshot) {
-                    final version = snapshot.data ?? 'Loading...';
-                    return ListTile(
-                      title: Text('Version'),
-                      trailing: Text(version),
-                    );
-                  },
-                ),
-                ListTile(
-                  title: const Text('Documentation'),
-                  subtitle: const Text('View user guide and tutorials'),
-                  trailing: const Icon(LucideIcons.externalLink),
-                  onTap: () {
-                    // TODO: Open documentation
-                  },
-                ),
-                ListTile(
-                  title: const Text('Feedback'),
-                  subtitle: const Text('Report issues or request features'),
-                  trailing: const Icon(LucideIcons.externalLink),
-                  onTap: () {
-                    // TODO: Open feedback form
-                  },
-                ),
-              ],
-            ).animate().fadeIn(duration: 300.ms, delay: 350.ms),
 
             const SizedBox(height: 100),
           ],
@@ -427,6 +413,116 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     showDialog(
       context: context,
       builder: (context) => const HotkeyEditorDialog(),
+    );
+  }
+
+  String _getLanguageDisplayName(String code) {
+    final language = TranscriptionLanguages.findByCode(code);
+    if (language != null) {
+      return language.isAuto ? 'Auto Detect' : language.nativeName;
+    }
+    return 'Auto Detect';
+  }
+
+  void _showLanguageSelector(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => const LanguageSelectorDialog(),
+    );
+  }
+}
+
+/// Language selector dialog
+class LanguageSelectorDialog extends ConsumerWidget {
+  const LanguageSelectorDialog({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settings = ref.watch(settingsProvider);
+    final selectedCode = settings.transcriptionLanguage;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 400, maxHeight: 500),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    LucideIcons.languages,
+                    color: AppColors.primary,
+                  ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'Transcription Language',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(LucideIcons.x),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+            ),
+            // Language list
+            Flexible(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: TranscriptionLanguages.all.length,
+                itemBuilder: (context, index) {
+                  final language = TranscriptionLanguages.all[index];
+                  final isSelected = language.code == selectedCode;
+
+                  return ListTile(
+                    title: Text(
+                      language.isAuto ? 'Auto Detect' : language.name,
+                      style: const TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                    subtitle: language.isAuto
+                        ? Text(
+                            'Automatically detect the language spoken',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          )
+                        : Text(
+                            language.nativeName,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                    leading: Icon(
+                      isSelected ? LucideIcons.check : LucideIcons.circle,
+                      size: 20,
+                      color: isSelected ? AppColors.primary : colorScheme.outline,
+                    ),
+                    selected: isSelected,
+                    onTap: () {
+                      ref
+                          .read(settingsProvider.notifier)
+                          .updateTranscriptionLanguage(language.code);
+                      Navigator.of(context).pop();
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

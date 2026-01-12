@@ -27,6 +27,7 @@ abstract class TranscriptionServiceInterface {
     required String vocabulary,
     required String promptTemplate,
     String? criticalInstructions,
+    String? targetLanguage,
   });
 }
 

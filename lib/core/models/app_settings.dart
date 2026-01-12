@@ -31,6 +31,9 @@ class AppSettings extends HiveObject {
   @HiveField(10)
   final bool startAtLogin;
 
+  @HiveField(11, defaultValue: 'auto')
+  final String transcriptionLanguage;
+
   AppSettings({
     this.geminiApiKey,
     this.selectedPromptId = 'default-clean',
@@ -45,6 +48,7 @@ class AppSettings extends HiveObject {
 - Do NOT transcribe the vocabulary list or any text that is not spoken in the audio
 - The vocabulary below is for reference ONLY - do not use it to generate fake transcriptions''',
     this.startAtLogin = false,
+    this.transcriptionLanguage = 'auto',
   });
 
   AppSettings copyWith({
@@ -57,6 +61,7 @@ class AppSettings extends HiveObject {
     bool? showNotifications,
     String? criticalInstructions,
     bool? startAtLogin,
+    String? transcriptionLanguage,
   }) {
     return AppSettings(
       geminiApiKey: geminiApiKey ?? this.geminiApiKey,
@@ -68,6 +73,7 @@ class AppSettings extends HiveObject {
       showNotifications: showNotifications ?? this.showNotifications,
       criticalInstructions: criticalInstructions ?? this.criticalInstructions,
       startAtLogin: startAtLogin ?? this.startAtLogin,
+      transcriptionLanguage: transcriptionLanguage ?? this.transcriptionLanguage,
     );
   }
 
