@@ -261,13 +261,13 @@ class Changelog {
     return buffer.toString();
   }
 
-  /// Add a new version entry
+  /// Add a new version entry (inserts at beginning for reverse chronological order)
   Changelog addVersion(ChangelogVersion version) {
     return Changelog(
       title: title,
       description: description,
       categories: categories,
-      versions: [...versions, version],
+      versions: [version, ...versions],
     );
   }
 
@@ -383,6 +383,54 @@ class ChangelogManager {
   }
 }
 
+/// Sync landing/package.json version from pubspec.yaml
+Future<void> _syncLandingVersion(String projectRoot) async {
+  final pubspecPath = path.join(projectRoot, 'pubspec.yaml');
+  final landingPackagePath = path.join(projectRoot, 'landing', 'package.json');
+
+  // Read pubspec.yaml
+  if (!await File(pubspecPath).exists()) {
+    stdout.writeln('Error: pubspec.yaml not found!');
+    exit(1);
+  }
+
+  final pubspecContent = await File(pubspecPath).readAsString();
+  final versionLine = pubspecContent.split('\n').firstWhere(
+    (line) => line.startsWith('version:'),
+    orElse: () => '',
+  );
+
+  if (versionLine.isEmpty) {
+    stdout.writeln('Error: Version line not found in pubspec.yaml!');
+    exit(1);
+  }
+
+  final appVersion = versionLine.replaceFirst('version: ', '').trim();
+  // Remove build number if present
+  final cleanVersion = appVersion.split('+').first;
+
+  // Read landing/package.json
+  if (!await File(landingPackagePath).exists()) {
+    stdout.writeln('Warning: landing/package.json not found, skipping...');
+    return;
+  }
+
+  final landingContent = await File(landingPackagePath).readAsString();
+  final packageJson = json.decode(landingContent) as Map<String, dynamic>;
+  final landingVersion = packageJson['version'] as String?;
+
+  if (landingVersion == cleanVersion) {
+    stdout.writeln('landing/package.json already at version $cleanVersion');
+    return;
+  }
+
+  stdout.writeln('Updating landing/package.json: $landingVersion → $cleanVersion');
+  packageJson['version'] = cleanVersion;
+  const encoder = JsonEncoder.withIndent('  ');
+  await File(landingPackagePath).writeAsString(encoder.convert(packageJson));
+  stdout.writeln('landing/package.json updated to version $cleanVersion');
+}
+
 /// Sync pubspec.yaml version from CHANGELOG.json (Single Source of Truth)
 Future<void> _syncFromChangelog(String projectRoot) async {
   final changelogPath = path.join(projectRoot, 'CHANGELOG.json');
@@ -462,6 +510,13 @@ Future<void> main(List<String> args) async {
   // Sync version from CHANGELOG.json (Single Source of Truth)
   if (args.contains('--sync-from-changelog')) {
     await _syncFromChangelog(projectRoot);
+    await _syncLandingVersion(projectRoot);
+    return;
+  }
+
+  // Sync landing/package.json version from pubspec.yaml
+  if (args.contains('--sync-landing')) {
+    await _syncLandingVersion(projectRoot);
     return;
   }
 
@@ -556,6 +611,9 @@ Future<void> main(List<String> args) async {
     await File(pubspecPath).writeAsString(updatedContent);
     stdout.writeln('✅ Version updated successfully!');
 
+    // Sync landing version
+    await _syncLandingVersion(projectRoot);
+
     // Add changelog entry if requested
     if (shouldAddChangelogEntry) {
       final now = DateTime.now();
@@ -590,7 +648,8 @@ USAGE:
 VERSION OPTIONS:
   --help                    Show this help message
   --current                 Show current version
-  --sync-from-changelog     Sync pubspec.yaml from CHANGELOG.json (SSOT)
+  --sync-from-changelog     Sync pubspec.yaml and landing from CHANGELOG.json (SSOT)
+  --sync-landing            Sync landing/package.json from pubspec.yaml
   --bump <type>            Bump version (patch, minor, major, prerelease)
   --add-entry              Add changelog entry template when bumping
   --pub-get                Run 'flutter pub get' after updating version

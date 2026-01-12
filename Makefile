@@ -7,7 +7,7 @@
 .PHONY: generate debug-release install-release logs deploy deploy-all
 .PHONY: package-macos package-windows package-linux package-android package-web
 .PHONY: sign-macos notarize-macos codesign-setup
-.PHONY: version sync-version changelog verify-changelog
+.PHONY: version sync-version sync-landing changelog verify-changelog
 .PHONY: bump-patch bump-minor bump-major bump-prerelease
 .PHONY: bump-patch-entry bump-minor-entry bump-major-entry
 
@@ -354,9 +354,13 @@ version: ## Show current version
 	@echo "📋 Current version:"
 	@dart scripts/version_manager.dart --current
 
-sync-version: ## Sync pubspec.yaml version from CHANGELOG.json (SSOT)
-	@echo "🔄 Syncing version from CHANGELOG.json..."
+sync-version: ## Sync pubspec.yaml and landing version from CHANGELOG.json (SSOT)
+	@echo "Syncing version from CHANGELOG.json..."
 	@dart scripts/version_manager.dart --sync-from-changelog
+
+sync-landing: ## Sync landing/package.json version from pubspec.yaml
+	@echo "Syncing landing version..."
+	@dart scripts/version_manager.dart --sync-landing
 
 changelog: ## Generate CHANGELOG.md from CHANGELOG.json
 	@echo "📝 Generating changelog..."
@@ -414,17 +418,40 @@ bump-major-entry: ## Bump major version and add changelog entry template
 	@echo "📝 Edit CHANGELOG.json to add actual changes"
 	@echo "   Then run: make changelog"
 
-release: ## Create a release (bump patch, build, and deploy)
-	@echo "🚀 Creating release..."
+release: ## Create a release (bump patch, update changelog, commit, tag, and push)
+	@echo "Creating release..."
 	@$(MAKE) bump-patch-entry
-	@echo "⏳ Pausing for changelog edits..."
-	@echo "   1. Edit CHANGELOG.json to add actual changes"
-	@echo "   2. Press Enter to continue..."
+	@echo ""
+	@echo "====================================================================="
+	@echo "STOP: Edit CHANGELOG.json to add actual changes before continuing"
+	@echo "====================================================================="
+	@echo ""
 	@read -r
 	@$(MAKE) changelog
-	@$(MAKE) deploy-all
-	@echo "✅ Release complete!"
-	@echo "📋 Don't forget to:"
-	@echo "   1. Commit the changes: git add pubspec.yaml CHANGELOG.json CHANGELOG.md && git commit -m 'chore: bump version and update changelog'"
-	@echo "   2. Create a git tag: git tag v$$(dart scripts/version_manager.dart --current | sed 's/.*: //' | sed 's/+.*//')"
-	@echo "   3. Push to remote: git push && git push --tags"
+	@git add pubspec.yaml landing/package.json CHANGELOG.json CHANGELOG.md
+	@VERSION=$$(dart scripts/version_manager.dart --current | sed 's/.*: //' | sed 's/+.*//'); \
+	git commit -m "chore: bump version to $$VERSION"; \
+	git tag -a "$$VERSION" -m "Release $$VERSION"; \
+	git push && git push --tags
+	@echo ""
+	@echo "Release tagged and pushed! GitHub Actions will build and create release."
+	@echo "Monitor at: https://github.com/xicv/recogniz.ing/actions"
+
+release-minor: ## Create a minor release (same as release but bumps minor version)
+	@echo "Creating minor release..."
+	@$(MAKE) bump-minor-entry
+	@echo ""
+	@echo "====================================================================="
+	@echo "STOP: Edit CHANGELOG.json to add actual changes before continuing"
+	@echo "====================================================================="
+	@echo ""
+	@read -r
+	@$(MAKE) changelog
+	@git add pubspec.yaml landing/package.json CHANGELOG.json CHANGELOG.md
+	@VERSION=$$(dart scripts/version_manager.dart --current | sed 's/.*: //' | sed 's/+.*//'); \
+	git commit -m "chore: bump version to $$VERSION"; \
+	git tag -a "$$VERSION" -m "Release $$VERSION"; \
+	git push && git push --tags
+	@echo ""
+	@echo "Release tagged and pushed! GitHub Actions will build and create release."
+	@echo "Monitor at: https://github.com/xicv/recogniz.ing/actions"

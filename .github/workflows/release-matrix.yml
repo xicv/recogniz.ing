@@ -349,30 +349,66 @@ jobs:
           python3 /tmp/update_manifest.py "$VERSION"
           cat landing/public/downloads/manifest.json
 
-      - name: Generate changelog
+      - name: Generate changelog from CHANGELOG.json
         id: changelog
         run: |
           VERSION="${{ needs.version.outputs.version_name }}"
 
-          # Get previous tag
-          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          # Use Python to parse CHANGELOG.json and format for release
+          python3 -c "
+          import json
+          import sys
 
-          # Generate changelog
-          if [[ -n "$PREVIOUS_TAG" ]]; then
-            CHANGELOG=$(git log --pretty=format:"- %s (%h)" $PREVIOUS_TAG..HEAD)
-          else
-            CHANGELOG=$(git log --pretty=format:"- %s (%h)")
-          fi
+          version = '$VERSION'
 
-          # Save to file
-          echo "$CHANGELOG" > CHANGELOG.md
+          with open('CHANGELOG.json', 'r') as f:
+              data = json.load(f)
 
-          # Set output for GitHub release
-          {
-            echo 'changelog<<EOF'
-            echo "$CHANGELOG"
-            echo EOF
-          } >> $GITHUB_OUTPUT
+          version_entry = None
+          for v in data.get('versions', []):
+              if v['version'] == version:
+                  version_entry = v
+                  break
+
+          if not version_entry:
+              print(f'Version {version} not found in CHANGELOG.json')
+              sys.exit(1)
+
+          output = []
+          highlights = version_entry.get('highlights', [])
+          if highlights:
+              output.append('## Highlights')
+              for h in highlights:
+                  output.append(f'- {h}')
+              output.append('')
+
+          categories = {
+              'added': 'Added',
+              'changed': 'Changed',
+              'fixed': 'Fixed',
+              'removed': 'Removed',
+              'security': 'Security'
+          }
+
+          changes = version_entry.get('changes', [])
+          grouped = {}
+          for c in changes:
+              cat = c['category']
+              if cat not in grouped:
+                  grouped[cat] = []
+              grouped[cat].append(c)
+
+          for cat_key, cat_label in categories.items():
+              if cat_key in grouped:
+                  output.append(f'## {cat_label}')
+                  for change in grouped[cat_key]:
+                      output.append(f\"- **{change['title']}** - {change['description']}\")
+                  output.append('')
+
+          with open('$GITHUB_OUTPUT', 'a') as f:
+              f.write(f\"changelog<<EOF\n{'\n'.join(output)}\nEOF\n\")
+          "
+
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
