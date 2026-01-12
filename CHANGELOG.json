@@ -335,6 +335,63 @@
           "description": "Material Design 3 UI with dark/light theme support and system preference detection."
         }
       ]
+    },
+    {
+      "version": "1.12.0",
+      "date": "2026-01-12",
+      "stable": true,
+      "highlights": [
+        "Multi-language transcription support with automatic language detection",
+        "Language selector in Settings with 20+ supported languages",
+        "Detected language display on transcription cards"
+      ],
+      "changes": [
+        {
+          "category": "added",
+          "title": "Multi-Language Transcription",
+          "description": "Added automatic language detection for transcriptions. The app now detects the language spoken automatically and transcribes in the original language without translation. Supports code-switching (e.g., mixed Chinese-English speech)."
+        },
+        {
+          "category": "added",
+          "title": "Language Selector",
+          "description": "Added transcription language selector in Settings with 20+ supported languages including English, Chinese, Japanese, Korean, Spanish, French, German, Italian, Portuguese, Russian, Arabic, Hindi, Thai, Vietnamese, Indonesian, Malay, Tagalog, Dutch, Polish, Turkish, and Ukrainian."
+        },
+        {
+          "category": "added",
+          "title": "Detected Language Display",
+          "description": "Added detected language badge on transcription cards showing the language of each transcription. Displays native language names for better user recognition."
+        },
+        {
+          "category": "added",
+          "title": "System Instructions",
+          "description": "Added system instruction support to GeminiService for consistent multi-language behavior across all API calls. Instructions now tell Gemini to NEVER translate and to preserve code-switching exactly as spoken."
+        },
+        {
+          "category": "added",
+          "title": "Language Constants",
+          "description": "Added TranscriptionLanguages helper class with language code normalization for handling various locale code formats (e.g., zh-CN, zh-TW, en-US, en-GB)."
+        },
+        {
+          "category": "added",
+          "title": "Transcription Language Setting",
+          "description": "Added transcriptionLanguage field to AppSettings with auto-detect as default. Allows users to optionally specify a target output language."
+        },
+        {
+          "category": "changed",
+          "title": "GeminiService Interface",
+          "description": "Updated TranscriptionServiceInterface to accept optional targetLanguage parameter for future translation capabilities."
+        },
+        {
+          "category": "removed",
+          "title": "About Section from Settings",
+          "description": "Removed the About section from Settings page for a cleaner, more focused UI."
+        },
+        {
+          "category": "fixed",
+          "title": "Hive Backward Compatibility",
+          "description": "Added defaultValue to HiveField annotations for new fields to ensure backward compatibility with existing user data."
+        }
+      ]
     }
   ]
 }

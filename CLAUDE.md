@@ -241,7 +241,7 @@ dart scripts/version_manager.dart --bump patch --add-entry  # Bump + add templat
 
 ## Recent Major Changes (v1.0.4+)
 
-1. **App Logo Redesign (v1.11.0)**: Complete branding overhaul with bold geometric 'R' on blue-teal-emerald gradient, red recording dot positioned at end of R's right leg
+1. **App Logo Redesign (v1.12.0)**: Complete branding overhaul with bold geometric 'R' on blue-teal-emerald gradient, red recording dot positioned at end of R's right leg
 2. **Transcription Status Tracking (v1.10.0)**: Added lifecycle states (pending, processing, completed, failed), audio backup for retry functionality, enhanced error tracking with retry count and completion timestamps
 3. **Changelog System**: JSON-first changelog with `CHANGELOG.json` as source of truth, `CHANGELOG.md` auto-generated
 4. **Navigation Architecture**: Moved from bottom tabs to collapsible left drawer
