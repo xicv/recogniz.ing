@@ -115,6 +115,12 @@ const settings = [
     badge: 'Required'
   },
   {
+    title: 'Transcription Language',
+    description: 'Auto-detect or choose from 20+ languages',
+    icon: 'M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129',
+    badge: 'New'
+  },
+  {
     title: 'Global Hotkey',
     description: 'Set up global hotkeys for quick recording access',
     icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4'
@@ -151,9 +157,9 @@ const coreFeatures = [
     span: 'col-span-1'
   },
   {
-    title: 'AI-Powered Transcription',
-    description: 'Gemini 3.0 Flash with intelligent optimization',
-    icon: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
+    title: 'Multi-Language Transcription',
+    description: 'Auto-detect language or choose from 20+ languages',
+    icon: 'M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129',
     gradient: 'from-sky-500 to-cyan-500',
     span: 'col-span-1 sm:col-span-2 row-span-2'
   },
