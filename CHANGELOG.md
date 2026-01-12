@@ -7,31 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.12.0] - 2026-01-12
-
-### Added
-
-- **Multi-Language Transcription** - Added automatic language detection for transcriptions. The app now detects the language spoken automatically and transcribes in the original language without translation. Supports code-switching (e.g., mixed Chinese-English speech).
-- **Language Selector** - Added transcription language selector in Settings with 20+ supported languages including English, Chinese, Japanese, Korean, Spanish, French, German, Italian, Portuguese, Russian, Arabic, Hindi, Thai, Vietnamese, Indonesian, Malay, Tagalog, Dutch, Polish, Turkish, and Ukrainian.
-- **Detected Language Display** - Added detected language badge on transcription cards showing the language of each transcription. Displays native language names for better user recognition.
-- **System Instructions** - Added system instruction support to GeminiService for consistent multi-language behavior across all API calls. Instructions now tell Gemini to NEVER translate and to preserve code-switching exactly as spoken.
-- **Language Constants** - Added TranscriptionLanguages helper class with language code normalization for handling various locale code formats (e.g., zh-CN, zh-TW, en-US, en-GB).
-- **Transcription Language Setting** - Added transcriptionLanguage field to AppSettings with auto-detect as default. Allows users to optionally specify a target output language.
-
-### Changed
-
-- **GeminiService Interface** - Updated TranscriptionServiceInterface to accept optional targetLanguage parameter for future translation capabilities.
-
-### Fixed
-
-- **Hive Backward Compatibility** - Added defaultValue to HiveField annotations for new fields to ensure backward compatibility with existing user data.
-
-### Removed
-
-- **About Section from Settings** - Removed the About section from Settings page for a cleaner, more focused UI.
-
----
-
 ## [1.0.0] - 2024-11-01
 
 ### Added
@@ -162,6 +137,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - **Unused Logo Files** - Removed redundant assets/logo/ folder. Consolidated all icon assets to assets/icons/ as single source of truth.
+
+---
+
+## [1.12.0] - 2026-01-12
+
+### Added
+
+- **Multi-Language Transcription** - Added automatic language detection for transcriptions. The app now detects the language spoken automatically and transcribes in the original language without translation. Supports code-switching (e.g., mixed Chinese-English speech).
+- **Language Selector** - Added transcription language selector in Settings with 20+ supported languages including English, Chinese, Japanese, Korean, Spanish, French, German, Italian, Portuguese, Russian, Arabic, Hindi, Thai, Vietnamese, Indonesian, Malay, Tagalog, Dutch, Polish, Turkish, and Ukrainian.
+- **Detected Language Display** - Added detected language badge on transcription cards showing the language of each transcription. Displays native language names for better user recognition.
+- **System Instructions** - Added system instruction support to GeminiService for consistent multi-language behavior across all API calls. Instructions now tell Gemini to NEVER translate and to preserve code-switching exactly as spoken.
+- **Language Constants** - Added TranscriptionLanguages helper class with language code normalization for handling various locale code formats (e.g., zh-CN, zh-TW, en-US, en-GB).
+- **Transcription Language Setting** - Added transcriptionLanguage field to AppSettings with auto-detect as default. Allows users to optionally specify a target output language.
+
+### Changed
+
+- **GeminiService Interface** - Updated TranscriptionServiceInterface to accept optional targetLanguage parameter for future translation capabilities.
+
+### Fixed
+
+- **Hive Backward Compatibility** - Added defaultValue to HiveField annotations for new fields to ensure backward compatibility with existing user data.
+
+### Removed
+
+- **About Section from Settings** - Removed the About section from Settings page for a cleaner, more focused UI.
+
+---
+
+## [1.12.1] - 2026-01-13
+
+### Added
+
+- **Automated Release Workflow** - The make release command now automatically commits changes, creates git tags, and pushes to trigger GitHub Actions builds. Run make release and the entire process is automated.
+- **Landing Version Sync** - landing/package.json version is now automatically synchronized with pubspec.yaml during version bumps.
+- **Release Notes from CHANGELOG.json** - GitHub Actions now generates release notes from CHANGELOG.json data, showing highlights and categorized changes instead of git log.
+
+### Changed
+
+- **Features Page** - Updated features page to highlight Multi-Language Transcription as a core feature with 20+ supported languages.
+
+### Fixed
+
+- **Changelog Version Order** - Fixed bug where new versions were appended to the end of the versions array instead of being inserted at the beginning. The landing changelog now correctly shows the newest version first.
+
+### Removed
+
+- **Duplicate Version Script** - Removed scripts/version-bump.sh as it duplicated functionality from version_manager.dart.
 
 ---
 

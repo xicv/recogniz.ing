@@ -30,6 +30,48 @@
   },
   "versions": [
     {
+      "version": "1.12.1",
+      "date": "2026-01-13",
+      "stable": true,
+      "highlights": [
+        "Automated version bump and release workflow",
+        "Landing page version now syncs automatically with app version",
+        "GitHub release notes now use CHANGELOG.json data"
+      ],
+      "changes": [
+        {
+          "category": "added",
+          "title": "Automated Release Workflow",
+          "description": "The make release command now automatically commits changes, creates git tags, and pushes to trigger GitHub Actions builds. Run make release and the entire process is automated."
+        },
+        {
+          "category": "added",
+          "title": "Landing Version Sync",
+          "description": "landing/package.json version is now automatically synchronized with pubspec.yaml during version bumps."
+        },
+        {
+          "category": "added",
+          "title": "Release Notes from CHANGELOG.json",
+          "description": "GitHub Actions now generates release notes from CHANGELOG.json data, showing highlights and categorized changes instead of git log."
+        },
+        {
+          "category": "changed",
+          "title": "Features Page",
+          "description": "Updated features page to highlight Multi-Language Transcription as a core feature with 20+ supported languages."
+        },
+        {
+          "category": "fixed",
+          "title": "Changelog Version Order",
+          "description": "Fixed bug where new versions were appended to the end of the versions array instead of being inserted at the beginning. The landing changelog now correctly shows the newest version first."
+        },
+        {
+          "category": "removed",
+          "title": "Duplicate Version Script",
+          "description": "Removed scripts/version-bump.sh as it duplicated functionality from version_manager.dart."
+        }
+      ]
+    },
+    {
       "version": "1.12.0",
       "date": "2026-01-12",
       "stable": true,
