@@ -329,6 +329,14 @@ jobs:
           python3 /tmp/update_manifest.py "$VERSION"
           cat landing/public/downloads/manifest.json
 
+      - name: Sync landing version.ts from pubspec.yaml
+        run: |
+          # Sync landing/src/version.ts from pubspec.yaml
+          dart scripts/version_manager.dart --sync-landing
+          # Verify the update
+          echo "version.ts content:"
+          cat landing/src/version.ts
+
       - name: Generate changelog from CHANGELOG.json
         id: changelog
         run: |
@@ -437,8 +445,8 @@ jobs:
           # (tag checkout puts us in detached HEAD, which can't push)
           git checkout main
 
-          # Add landing downloads and manifest
-          git add landing/public/downloads/
+          # Add landing downloads, manifest, and version.ts
+          git add landing/public/downloads/ landing/src/version.ts
 
           # Commit and push (this triggers the landing deployment workflow)
           git commit -m "chore: update landing downloads for v${{ needs.version.outputs.version_name }}" || echo "No changes to commit"
