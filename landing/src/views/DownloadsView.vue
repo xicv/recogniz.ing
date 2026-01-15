@@ -467,7 +467,7 @@ const getPlatformColor = (color?: string) => {
 
           <!-- Version cards -->
           <div class="space-y-6">
-            <!-- v1.12.0 -->
+            <!-- v1.13.0 -->
             <div class="card scroll-reveal">
               <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
                 <div class="flex items-center gap-4">
@@ -480,10 +480,10 @@ const getPlatformColor = (color?: string) => {
                     <h3
                       class="text-2xl font-semibold text-slate-950 dark:text-slate-50 transition-colors duration-300"
                     >
-                      Version 1.12.0
+                      Version 1.13.0
                     </h3>
                     <p class="text-sm text-slate-500 dark:text-slate-400">
-                      December 31, 2025
+                      January 15, 2026
                     </p>
                   </div>
                 </div>
@@ -496,16 +496,145 @@ const getPlatformColor = (color?: string) => {
                   <svg class="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                   </svg>
-                  Complete app logo redesign with bold 'R' for Recogniz.ing
+                  ML-based Voice Activity Detection with Silero VAD (~95% accuracy)
                 </li>
                 <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
                   <svg class="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                   </svg>
-                  Red recording dot positioned at end of R's right leg for clear visual metaphor
+                  50% reduction in API calls through optimized single-call transcription
                 </li>
                 <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
                   <svg class="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  Token-efficient prompts reducing overhead by ~67%
+                </li>
+                <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                  <svg class="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  Support for up to 3.5 hours of audio per request (100MB inline limit)
+                </li>
+              </ul>
+            </div>
+
+            <!-- v1.12.1 -->
+            <div class="card scroll-reveal">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+                <div class="flex items-center gap-4">
+                  <div class="w-14 h-14 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                    <span class="text-xl font-bold text-slate-500 dark:text-slate-400">1.12.1</span>
+                  </div>
+                  <div>
+                    <h3
+                      class="text-2xl font-semibold text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                    >
+                      Version 1.12.1
+                    </h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">
+                      January 13, 2026
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <ul class="space-y-3">
+                <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                  <svg class="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  Automated version bump and release workflow
+                </li>
+                <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                  <svg class="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  Landing page version now syncs automatically with app version
+                </li>
+                <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                  <svg class="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  GitHub release notes now use CHANGELOG.json data
+                </li>
+              </ul>
+            </div>
+
+            <!-- v1.12.0 -->
+            <div class="card scroll-reveal">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+                <div class="flex items-center gap-4">
+                  <div class="w-14 h-14 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                    <span class="text-xl font-bold text-slate-500 dark:text-slate-400">1.12.0</span>
+                  </div>
+                  <div>
+                    <h3
+                      class="text-2xl font-semibold text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                    >
+                      Version 1.12.0
+                    </h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">
+                      January 12, 2026
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <ul class="space-y-3">
+                <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                  <svg class="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  Multi-language transcription support with automatic language detection
+                </li>
+                <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                  <svg class="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  Language selector in Settings with 20+ supported languages
+                </li>
+                <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                  <svg class="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  Detected language display on transcription cards
+                </li>
+              </ul>
+            </div>
+
+            <!-- v1.11.0 -->
+            <div class="card scroll-reveal">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+                <div class="flex items-center gap-4">
+                  <div class="w-14 h-14 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                    <span class="text-xl font-bold text-slate-500 dark:text-slate-400">1.11.0</span>
+                  </div>
+                  <div>
+                    <h3
+                      class="text-2xl font-semibold text-slate-950 dark:text-slate-50 transition-colors duration-300"
+                    >
+                      Version 1.11.0
+                    </h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">
+                      December 31, 2025
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <ul class="space-y-3">
+                <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                  <svg class="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  Complete app logo redesign with bold 'R' for Recogniz.ing
+                </li>
+                <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                  <svg class="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  Red recording dot positioned at end of R's right leg for clear visual metaphor
+                </li>
+                <li class="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                  <svg class="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                   </svg>
                   New blue-to-teal-to-emerald gradient conveying trust and reliability
