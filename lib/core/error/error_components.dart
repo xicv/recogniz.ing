@@ -392,7 +392,10 @@ class TechnicalDetailsDialog extends StatelessWidget {
             // Copy to clipboard
             Clipboard.setData(ClipboardData(text: content));
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Copied to clipboard')),
+              const SnackBar(
+                content: Text('Copied to clipboard'),
+                duration: Duration(seconds: 2),
+              ),
             );
           },
           icon: const Icon(Icons.copy, size: 16),

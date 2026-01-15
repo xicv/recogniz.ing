@@ -294,6 +294,7 @@ class _TranscriptionTileState extends State<TranscriptionTile> {
                           const SnackBar(
                             content: Text('Copied to clipboard'),
                             behavior: SnackBarBehavior.floating,
+                            duration: Duration(seconds: 2),
                           ),
                         );
                       },
@@ -310,6 +311,7 @@ class _TranscriptionTileState extends State<TranscriptionTile> {
                           const SnackBar(
                             content: Text('Raw text copied'),
                             behavior: SnackBarBehavior.floating,
+                            duration: Duration(seconds: 2),
                           ),
                         );
                       },
