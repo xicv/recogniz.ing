@@ -459,6 +459,15 @@ Future<void> _syncLandingVersion(String projectRoot) async {
   // Sync version.ts first (always attempt this)
   await _syncLandingVersionTs(projectRoot, cleanVersion);
 
+  // Copy CHANGELOG.json to landing/public/ for dynamic loading
+  final changelogSourcePath = path.join(projectRoot, 'CHANGELOG.json');
+  final changelogDestPath = path.join(projectRoot, 'landing', 'public', 'CHANGELOG.json');
+  if (await File(changelogSourcePath).exists()) {
+    final changelogContent = await File(changelogSourcePath).readAsString();
+    await File(changelogDestPath).writeAsString(changelogContent);
+    stdout.writeln('Copied CHANGELOG.json to landing/public/');
+  }
+
   // Read landing/package.json
   if (!await File(landingPackagePath).exists()) {
     stdout.writeln('Warning: landing/package.json not found, skipping...');

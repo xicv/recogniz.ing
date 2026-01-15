@@ -337,6 +337,12 @@ jobs:
           echo "version.ts content:"
           cat landing/src/version.ts
 
+      - name: Copy CHANGELOG.json to landing public folder
+        run: |
+          # Copy CHANGELOG.json to landing/public/ for dynamic loading
+          cp CHANGELOG.json landing/public/CHANGELOG.json
+          echo "Copied CHANGELOG.json to landing/public/"
+
       - name: Generate changelog from CHANGELOG.json
         id: changelog
         run: |
@@ -445,8 +451,8 @@ jobs:
           # (tag checkout puts us in detached HEAD, which can't push)
           git checkout main
 
-          # Add landing downloads, manifest, and version.ts
-          git add landing/public/downloads/ landing/src/version.ts
+          # Add landing downloads, manifest, version.ts, and CHANGELOG.json
+          git add landing/public/downloads/ landing/src/version.ts landing/public/CHANGELOG.json
 
           # Commit and push (this triggers the landing deployment workflow)
           git commit -m "chore: update landing downloads for v${{ needs.version.outputs.version_name }}" || echo "No changes to commit"
