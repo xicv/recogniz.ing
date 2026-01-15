@@ -207,3 +207,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.13.1] - 2026-01-15
+
+### Changed
+
+- **Notification Appearance** - Ensured all SnackBars use behavior: SnackBarBehavior.floating for consistent modern Material Design appearance across all pages including settings, prompts, vocabulary, and transcriptions.
+
+### Fixed
+
+- **SnackBar Duration Consistency** - Standardized all 73 SnackBar instances to use Duration(seconds: 2) for consistent auto-dismiss behavior. Previously, some notifications would persist indefinitely until manually dismissed.
+
+---
+
