@@ -663,6 +663,7 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
       const SnackBar(
         content: Text('Transcription deleted'),
         behavior: SnackBarBehavior.floating,
+        duration: Duration(seconds: 2),
       ),
     );
   }

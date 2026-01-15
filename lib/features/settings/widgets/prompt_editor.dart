@@ -136,6 +136,7 @@ class _PromptEditorState extends ConsumerState<PromptEditor> {
         const SnackBar(
           content: Text('Name and template are required'),
           behavior: SnackBarBehavior.floating,
+          duration: Duration(seconds: 2),
         ),
       );
       return;

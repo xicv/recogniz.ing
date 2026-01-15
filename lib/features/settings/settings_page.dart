@@ -320,6 +320,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                                               content: Text(
                                                   'API key saved successfully'),
                                               backgroundColor: Colors.green,
+                                              behavior:
+                                                  SnackBarBehavior.floating,
+                                              duration: Duration(seconds: 2),
                                             ),
                                           );
                                         }
@@ -347,6 +350,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                                             const SnackBar(
                                               content: Text('API key saved'),
                                               backgroundColor: Colors.green,
+                                              behavior:
+                                                  SnackBarBehavior.floating,
+                                              duration: Duration(seconds: 2),
                                             ),
                                           );
                                         }

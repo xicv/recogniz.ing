@@ -139,6 +139,7 @@ class _VocabularyEditorState extends ConsumerState<VocabularyEditor> {
         const SnackBar(
           content: Text('Name and words are required'),
           behavior: SnackBarBehavior.floating,
+          duration: Duration(seconds: 2),
         ),
       );
       return;
