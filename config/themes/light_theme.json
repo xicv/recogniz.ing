@@ -1,0 +1,42 @@
+{
+  "name": "light",
+  "displayName": "Light Theme",
+  "colors": {
+    "primary": "#6366F1",
+    "primaryLight": "#818CF8",
+    "primaryDark": "#4F46E5",
+    "accent": "#22D3EE",
+    "success": "#10B981",
+    "warning": "#F59E0B",
+    "error": "#EF4444",
+    "info": "#64748B",
+    "background": "#F8FAFC",
+    "surface": "#FFFFFF",
+    "textPrimary": "#1E293B",
+    "textSecondary": "#64748B"
+  },
+  "borderRadius": {
+    "small": 8,
+    "medium": 12,
+    "large": 16,
+    "xlarge": 24
+  },
+  "spacing": {
+    "xs": 4,
+    "sm": 8,
+    "md": 16,
+    "lg": 24,
+    "xl": 32,
+    "xxl": 48
+  },
+  "elevation": {
+    "card": 0,
+    "button": 0,
+    "fab": 6
+  },
+  "padding": {
+    "small": 8,
+    "medium": 16,
+    "large": 24
+  }
+}

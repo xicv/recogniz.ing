@@ -1,0 +1,178 @@
+name: Build Windows Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g., 1.0.3)'
+        required: true
+        type: string
+      upload_artifact:
+        description: 'Upload Windows build as artifact'
+        required: false
+        default: true
+        type: boolean
+  repository_dispatch:
+    types: [build-windows]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Get version from tag or input
+        id: version
+        run: |
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            $VERSION = "${{ github.event.inputs.version }}"
+          } elseif ("${{ github.event_name }}" -eq "repository_dispatch") {
+            $VERSION = "${{ github.event.inputs.version }}"
+          } else {
+            # Extract version from tag (remove 'v' prefix)
+            $VERSION = "${{ github.ref_name }}" -replace "^v", ""
+          }
+          echo "version=$VERSION" >> $env:GITHUB_OUTPUT
+          Write-Host "Building version: $VERSION"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code
+        run: flutter packages pub run build_runner build --delete-conflicting-outputs
+
+      - name: Build Windows Release
+        run: flutter build windows --release
+
+      - name: Create distribution package
+        run: |
+          New-Item -ItemType Directory -Path "dist/windows" -Force
+          Copy-Item -Path "build\windows\x64\runner\Release\*" -Destination "dist\windows" -Recurse
+
+          # Create NSIS installer script
+          @"
+          !define APPNAME "Recogniz.ing"
+          !define VERSION "${{ steps.version.outputs.version }}"
+          !define PUBLISHER "Recogniz.ing"
+          !define DESCRIPTION "AI-powered voice typing application"
+          !define URL "https://github.com/xicv/recogniz.ing"
+
+          !include "MUI2.nsh"
+
+          Name "${APPNAME}"
+          OutFile "recognizing-${VERSION}-windows.exe"
+          InstallDir "$PROGRAMFILES64\${APPNAME}"
+          RequestExecutionLevel admin
+
+          VIProductVersion "${VERSION}.0"
+          VIAddVersionKey "ProductName" "${APPNAME}"
+          VIAddVersionKey "CompanyName" "${PUBLISHER}"
+          VIAddVersionKey "FileDescription" "${DESCRIPTION}"
+          VIAddVersionKey "FileVersion" "${VERSION}"
+          VIAddVersionKey "ProductVersion" "${VERSION}"
+          VIAddVersionKey "LegalCopyright" "© ${PUBLISHER}"
+          VIAddVersionKey "OriginalFilename" "recognizing-${VERSION}-windows.exe"
+
+          ; Modern UI
+          !define MUI_ABORTWARNING
+          !define MUI_ICON "windows\runner\resources\app_icon.ico"
+          !define MUI_UNICON "windows\runner\resources\app_icon.ico"
+
+          ; Pages
+          !insertmacro MUI_PAGE_WELCOME
+          !insertmacro MUI_PAGE_LICENSE "LICENSE"
+          !insertmacro MUI_PAGE_COMPONENTS
+          !insertmacro MUI_PAGE_DIRECTORY
+          !insertmacro MUI_PAGE_INSTFILES
+          !insertmacro MUI_PAGE_FINISH
+
+          !insertmacro MUI_UNPAGE_WELCOME
+          !insertmacro MUI_UNPAGE_CONFIRM
+          !insertmacro MUI_UNPAGE_INSTFILES
+          !insertmacro MUI_UNPAGE_FINISH
+
+          ; Languages
+          !insertmacro MUI_LANGUAGE "English"
+
+          ; Installer sections
+          Section "Main Application" SEC01
+              SetOutPath "$INSTDIR"
+              File /r "*\*"
+              CreateDirectory "$SMPROGRAMS\${APPNAME}"
+              CreateShortCut "$SMPROGRAMS\${APPNAME}\${APPNAME}.lnk" "$INSTDIR\recognizing.exe"
+              CreateShortCut "$DESKTOP\${APPNAME}.lnk" "$INSTDIR\recognizing.exe"
+              WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "DisplayName" "${APPNAME}"
+              WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "UninstallString" "$INSTDIR\uninstall.exe"
+              WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "DisplayVersion" "${VERSION}"
+              WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "Publisher" "${PUBLISHER}"
+              WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "URLInfoAbout" "${URL}"
+              WriteUninstaller "$INSTDIR\uninstall.exe"
+          SectionEnd
+
+          ; Uninstaller section
+          Section "Uninstall"
+              Delete "$INSTDIR\uninstall.exe"
+              Delete "$SMPROGRAMS\${APPNAME}\${APPNAME}.lnk"
+              Delete "$DESKTOP\${APPNAME}.lnk"
+              RMDir /r "$SMPROGRAMS\${APPNAME}"
+              RMDir /r "$INSTDIR"
+              DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}"
+          SectionEnd
+          "@ | Out-File -FilePath "installer.nsi" -Encoding utf8
+
+          Set-Location "dist\windows"
+
+          # Try to create NSIS installer if makensis is available
+          if (Get-Command makensis -ErrorAction SilentlyContinue) {
+            Write-Host "Creating NSIS installer..."
+            makensis ..\installer.nsi
+            if (Test-Path "recognizing-${{ steps.version.outputs.version }}-windows.exe") {
+              Write-Host "Successfully created Windows installer"
+            } else {
+              Write-Host "NSIS installer creation failed, falling back to ZIP"
+              7z a -tzip "recognizing-${{ steps.version.outputs.version }}-windows.zip" *
+            }
+          } else {
+            Write-Host "NSIS not found, creating ZIP package..."
+            7z a -tzip "recognizing-${{ steps.version.outputs.version }}-windows.zip" *
+          }
+
+      - name: Upload build artifact
+        if: github.event.inputs.upload_artifact == 'true' || github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: recognizing-windows-${{ steps.version.outputs.version }}
+          path: |
+            dist/windows/recognizing-${{ steps.version.outputs.version }}-windows.exe
+            dist/windows/recognizing-${{ steps.version.outputs.version }}-windows.zip
+          retention-days: 30
+
+      - name: Create complete release package
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch'
+        run: |
+          # Create directories
+          New-Item -ItemType Directory -Path "landing/public/downloads/${{ steps.version.outputs.version }}/windows" -Force
+
+          # Copy Windows build
+          Copy-Item -Path "dist/windows/recognizing-${{ steps.version.outputs.version }}-windows.zip" -Destination "landing/public/downloads/${{ steps.version.outputs.version }}/windows/"
+
+      - name: Commit downloads to main
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add landing/public/downloads/${{ steps.version.outputs.version }}/windows/
+          git commit -m "build: Add Windows v${{ steps.version.outputs.version }} download" || echo "No changes to commit"
+          git push origin main

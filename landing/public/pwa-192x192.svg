@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="192" height="192" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E40AF"/>
+      <stop offset="50%" stop-color="#0891B2"/>
+      <stop offset="100%" stop-color="#10B981"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="32" y="32" width="960" height="960" rx="220" fill="url(#bgGradient)"/>
+
+  <g transform="translate(512, 512)">
+    <path d="
+      M -180 -260
+      L -180 260
+      L -90 260
+      L -90 30
+      L 40 30
+      L 180 260
+      L 280 260
+      L 130 10
+      C 180 -10, 220 -50, 220 -115
+      C 220 -190, 170 -230, 90 -230
+      L -90 -230
+      L -90 -260
+      L -180 -260
+      Z
+      M -90 -160
+      L 80 -160
+      C 130 -160, 150 -140, 150 -105
+      C 150 -70, 130 -50, 80 -50
+      L -90 -50
+      L -90 -160
+      Z
+    " fill="#FFFFFF"/>
+  </g>
+
+  <circle cx="785" cy="765" r="40" fill="#EF4444" stroke="#FFFFFF" stroke-width="6"/>
+</svg>

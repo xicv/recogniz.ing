@@ -1,0 +1,53 @@
+{
+  "version": "1.0.0",
+  "prompts": [
+    {
+      "id": "default-clean",
+      "name": "Clean Transcription",
+      "description": "Clean up speech, fix grammar, remove filler words",
+      "category": "general",
+      "template": "Fix grammar, remove fillers (um/uh/like), preserve meaning:\n\n{{text}}",
+      "isDefault": true
+    },
+    {
+      "id": "default-formal",
+      "name": "Formal Writing",
+      "description": "Convert speech to formal written text",
+      "category": "professional",
+      "template": "Convert to formal written text with proper structure and professional language:\n\n{{text}}",
+      "isDefault": true
+    },
+    {
+      "id": "default-bullet",
+      "name": "Bullet Points",
+      "description": "Convert speech to organized bullet points",
+      "category": "organization",
+      "template": "Extract and organize key points as bullet points:\n\n{{text}}",
+      "isDefault": true
+    },
+    {
+      "id": "default-email",
+      "name": "Email Draft",
+      "description": "Convert speech to email format",
+      "category": "communication",
+      "template": "Convert to a professional email with greeting and closing:\n\n{{text}}",
+      "isDefault": true
+    },
+    {
+      "id": "default-meeting",
+      "name": "Meeting Notes",
+      "description": "Convert speech to structured meeting notes",
+      "category": "business",
+      "template": "Format as meeting notes with action items, decisions, and key points:\n\n{{text}}",
+      "isDefault": true
+    },
+    {
+      "id": "default-social",
+      "name": "Social Media Post",
+      "description": "Convert speech to social media friendly text",
+      "category": "social",
+      "template": "Convert to an engaging social media post with relevant hashtags:\n\n{{text}}",
+      "isDefault": true
+    }
+  ]
+}

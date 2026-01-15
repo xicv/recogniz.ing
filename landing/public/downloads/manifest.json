@@ -1,0 +1,60 @@
+{
+  "version": "1.0.4",
+  "platforms": {
+    "macos": "downloads/macos/1.0.4/recognizing-1.0.4-macos.zip",
+    "windows": "downloads/windows/1.0.4/recognizing-1.0.4-windows.zip",
+    "linux": "downloads/linux/1.0.4/recognizing-1.0.4-linux.tar.gz",
+    "android_apk": "downloads/android/1.0.4/recognizing-1.0.4.apk",
+    "android_aab": "downloads/android/1.0.4/recognizing-1.0.4.aab",
+    "web": "downloads/web/1.0.4/recognizing-1.0.4-web.zip"
+  },
+  "build_date": "2025-12-23T11:02:06Z",
+  "versions": [
+    {
+      "version": "1.12.1",
+      "released_at": "2026-01-12T23:27:22.359114+00:00",
+      "downloads": {
+        "macos": "downloads/1.12.1/macos/recognizing-1.12.1-macos.zip",
+        "windows": "downloads/1.12.1/windows/recognizing-1.12.1-windows.zip",
+        "web": "downloads/1.12.1/web/recognizing-1.12.1-web.zip"
+      }
+    },
+    {
+      "version": "1.12.0",
+      "released_at": "2025-12-31T12:41:18.785791+00:00",
+      "downloads": {
+        "macos": "downloads/1.12.0/macos/recognizing-1.12.0-macos.zip",
+        "windows": "downloads/1.12.0/windows/recognizing-1.12.0-windows.zip",
+        "web": "downloads/1.12.0/web/recognizing-1.12.0-web.zip"
+      }
+    },
+    {
+      "version": "1.10.0",
+      "released_at": "2025-12-31T10:21:48.679752+00:00",
+      "downloads": {
+        "macos": "downloads/1.10.0/macos/recognizing-1.10.0-macos.zip",
+        "windows": "downloads/1.10.0/windows/recognizing-1.10.0-windows.zip",
+        "web": "downloads/1.10.0/web/recognizing-1.10.0-web.zip"
+      }
+    },
+    {
+      "version": "1.0.9",
+      "released_at": "2025-12-31T09:03:29.076755+00:00",
+      "downloads": {
+        "macos": "downloads/1.0.9/macos/recognizing-1.0.9-macos.zip",
+        "windows": "downloads/1.0.9/windows/recognizing-1.0.9-windows.zip",
+        "web": "downloads/1.0.9/web/recognizing-1.0.9-web.zip"
+      }
+    },
+    {
+      "version": "1.0.8",
+      "released_at": "2025-12-29T03:41:21.406615+00:00",
+      "downloads": {
+        "macos": "downloads/1.0.8/macos/recognizing-1.0.8-macos.zip",
+        "windows": "downloads/1.0.8/windows/recognizing-1.0.8-windows.zip",
+        "web": "downloads/1.0.8/web/recognizing-1.0.8-web.zip"
+      }
+    }
+  ],
+  "current_version": "1.12.1"
+}
