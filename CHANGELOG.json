@@ -30,23 +30,91 @@
   },
   "versions": [
     {
-      "version": "1.13.1",
-      "date": "2026-01-15",
+      "version": "1.13.2",
+      "date": "2026-01-16",
       "stable": true,
       "highlights": [
-        "Consistent notification auto-dismiss behavior across all SnackBars",
-        "All notifications now dismiss after 2 seconds with floating appearance"
+        "Consistent notification auto-dismiss behavior (4 seconds) with Dismiss button",
+        "Fixed CI/CD path package dependency issue"
       ],
       "changes": [
         {
           "category": "fixed",
-          "title": "SnackBar Duration Consistency",
-          "description": "Standardized all 73 SnackBar instances to use Duration(seconds: 2) for consistent auto-dismiss behavior. Previously, some notifications would persist indefinitely until manually dismissed."
+          "title": "SnackBar Duration and Action Consistency",
+          "description": "Standardized all SnackBar instances to use Duration(seconds: 4) with a Dismiss button for consistent auto-dismiss behavior. Notifications in transcriptions, dashboard, dictionaries, and prompts pages all follow the same pattern."
         },
         {
           "category": "changed",
           "title": "Notification Appearance",
-          "description": "Ensured all SnackBars use behavior: SnackBarBehavior.floating for consistent modern Material Design appearance across all pages including settings, prompts, vocabulary, and transcriptions."
+          "description": "Ensured all SnackBars use behavior: SnackBarBehavior.floating with consistent Dismiss button styling (white text color) across all pages."
+        },
+        {
+          "category": "fixed",
+          "title": "Path Package Dependency",
+          "description": "Fixed path package indentation in pubspec.yaml dev_dependencies to resolve CI workflow failures."
+        }
+      ]
+    },
+    {
+      "version": "1.13.1",
+      "date": "2026-01-15",
+      "stable": true,
+      "highlights": [
+        "ML-based Voice Activity Detection with Silero VAD (~95% accuracy)",
+        "50% reduction in API calls through optimized single-call transcription",
+        "Token-efficient prompts reducing overhead by ~67%",
+        "Support for up to 3.5 hours of audio per request (100MB inline limit)"
+      ],
+      "changes": [
+        {
+          "category": "added",
+          "title": "Silero VAD Integration",
+          "description": "Integrated Silero VAD (ML-based voice activity detection) with ~95% accuracy for speech detection. Uses ONNX Runtime for native performance with FFI bindings to vad package v0.0.7."
+        },
+        {
+          "category": "added",
+          "title": "Graceful VAD Fallback",
+          "description": "Implemented facade pattern with automatic fallback from Silero VAD to amplitude-based VAD (~75% accuracy) when ML model is unavailable. Ensures functionality across all platforms."
+        },
+        {
+          "category": "added",
+          "title": "VadServiceInterface",
+          "description": "Created abstraction layer for VAD implementations enabling runtime switching between Silero and amplitude-based detection methods."
+        },
+        {
+          "category": "changed",
+          "title": "Single-Call Transcription",
+          "description": "Eliminated two-call transcription pattern. Now uses single optimized API call combining all transcription requirements, reducing API calls by 50% and latency by ~50%."
+        },
+        {
+          "category": "changed",
+          "title": "Token-Efficient Prompts",
+          "description": "Condensed prompt templates from ~120 tokens to ~40 tokens, removing verbose instructions and redundant 'CLEAN VERSION:' markers across all 6 default prompts."
+        },
+        {
+          "category": "changed",
+          "title": "Cache Key Optimization",
+          "description": "Optimized cache key generation from O(n) full audio iteration to O(1) sampling using first/last 100 bytes. Dramatically improves performance for cached requests."
+        },
+        {
+          "category": "changed",
+          "title": "Audio Configuration",
+          "description": "Standardized audio encoding to 16kHz sample rate with AAC at 64kbps for optimal speech recognition quality and file size."
+        },
+        {
+          "category": "changed",
+          "title": "Audio MIME Type",
+          "description": "Fixed audio MIME type from audio/mp4 to audio/aac for better API compatibility."
+        },
+        {
+          "category": "changed",
+          "title": "Storage Pagination",
+          "description": "Optimized storage list operations using sublist instead of removeRange for O(1) pagination performance."
+        },
+        {
+          "category": "changed",
+          "title": "Documentation",
+          "description": "Updated README.md with VAD features, performance optimizations, and accurate technical specifications."
         }
       ]
     },

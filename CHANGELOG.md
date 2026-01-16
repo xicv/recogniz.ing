@@ -209,13 +209,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.13.1] - 2026-01-15
 
+### Added
+
+- **Silero VAD Integration** - Integrated Silero VAD (ML-based voice activity detection) with ~95% accuracy for speech detection. Uses ONNX Runtime for native performance with FFI bindings to vad package v0.0.7.
+- **Graceful VAD Fallback** - Implemented facade pattern with automatic fallback from Silero VAD to amplitude-based VAD (~75% accuracy) when ML model is unavailable. Ensures functionality across all platforms.
+- **VadServiceInterface** - Created abstraction layer for VAD implementations enabling runtime switching between Silero and amplitude-based detection methods.
+
 ### Changed
 
-- **Notification Appearance** - Ensured all SnackBars use behavior: SnackBarBehavior.floating for consistent modern Material Design appearance across all pages including settings, prompts, vocabulary, and transcriptions.
+- **Single-Call Transcription** - Eliminated two-call transcription pattern. Now uses single optimized API call combining all transcription requirements, reducing API calls by 50% and latency by ~50%.
+- **Token-Efficient Prompts** - Condensed prompt templates from ~120 tokens to ~40 tokens, removing verbose instructions and redundant 'CLEAN VERSION:' markers across all 6 default prompts.
+- **Cache Key Optimization** - Optimized cache key generation from O(n) full audio iteration to O(1) sampling using first/last 100 bytes. Dramatically improves performance for cached requests.
+- **Audio Configuration** - Standardized audio encoding to 16kHz sample rate with AAC at 64kbps for optimal speech recognition quality and file size.
+- **Audio MIME Type** - Fixed audio MIME type from audio/mp4 to audio/aac for better API compatibility.
+- **Storage Pagination** - Optimized storage list operations using sublist instead of removeRange for O(1) pagination performance.
+- **Documentation** - Updated README.md with VAD features, performance optimizations, and accurate technical specifications.
+
+---
+
+## [1.13.2] - 2026-01-16
+
+### Changed
+
+- **Notification Appearance** - Ensured all SnackBars use behavior: SnackBarBehavior.floating with consistent Dismiss button styling (white text color) across all pages.
 
 ### Fixed
 
-- **SnackBar Duration Consistency** - Standardized all 73 SnackBar instances to use Duration(seconds: 2) for consistent auto-dismiss behavior. Previously, some notifications would persist indefinitely until manually dismissed.
+- **SnackBar Duration and Action Consistency** - Standardized all SnackBar instances to use Duration(seconds: 4) with a Dismiss button for consistent auto-dismiss behavior. Notifications in transcriptions, dashboard, dictionaries, and prompts pages all follow the same pattern.
+- **Path Package Dependency** - Fixed path package indentation in pubspec.yaml dev_dependencies to resolve CI workflow failures.
 
 ---
 
