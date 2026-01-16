@@ -1,0 +1,85 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../use_cases/voice_recording_use_case.dart';
+import '../interfaces/audio_service_interface.dart';
+import '../services/audio_service.dart';
+import '../services/gemini_service.dart';
+import '../services/storage_service.dart';
+import '../services/notification_service.dart';
+import 'app_providers.dart';
+import 'config_providers.dart';
+import '../models/app_settings.dart';
+
+// Service providers
+final audioServiceProvider = Provider<AudioServiceInterface>((ref) {
+  final service = AudioService();
+  ref.onDispose(() {
+    service.dispose();
+  });
+  return service;
+});
+
+// Unified Gemini service provider (singleton)
+// This replaces the separate transcriptionServiceProvider
+final geminiServiceProvider = Provider<GeminiService>((ref) {
+  final service = GeminiService();
+  final settings = ref.watch(settingsProvider);
+  final config = ref.read(appConfigProvider);
+
+  // Get model name from config or use default
+  String modelName = 'gemini-3-flash-preview';
+  config.whenData((value) => modelName = value.api.model);
+
+  if (settings.geminiApiKey?.isNotEmpty == true) {
+    service.initialize(settings.geminiApiKey!, model: modelName);
+  }
+
+  ref.onDispose(() {
+    // Clear any resources if needed
+  });
+
+  return service;
+});
+
+// Transcription service provider (alias to geminiServiceProvider)
+final transcriptionServiceProvider =
+    Provider<TranscriptionServiceInterface>((ref) {
+  return ref.watch(geminiServiceProvider);
+});
+
+final storageServiceProvider = Provider<StorageServiceInterface>((ref) {
+  return StorageService();
+});
+
+final notificationServiceProvider =
+    Provider<NotificationServiceInterface>((ref) {
+  final notificationService = NotificationService();
+  // Navigator key should be set by the main app initialization
+  // notificationService.setNavigatorKey(navigatorKey);
+  return notificationService;
+});
+
+// App settings provider to access API key for streaming services
+final appSettingsProvider = Provider<AppSettings>((ref) {
+  return ref.watch(settingsProvider);
+});
+
+// Recording use case provider
+final voiceRecordingUseCaseProvider = Provider<VoiceRecordingUseCase>((ref) {
+  final audioService = ref.watch(audioServiceProvider);
+  final transcriptionService = ref.watch(transcriptionServiceProvider);
+  final storageService = ref.watch(storageServiceProvider);
+  final notificationService = ref.watch(notificationServiceProvider);
+
+  return VoiceRecordingUseCase(
+    audioService: audioService,
+    transcriptionService: transcriptionService,
+    storageService: storageService,
+    notificationService: notificationService,
+    onStateChanged: (RecordingState state) {
+      ref.read(recordingStateProvider.notifier).state = state;
+    },
+    onTranscriptionComplete: (transcription) {
+      ref.read(transcriptionsProvider.notifier).addTranscription(transcription);
+    },
+  );
+});

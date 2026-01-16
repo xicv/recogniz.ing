@@ -1,0 +1,460 @@
+name: Release Matrix (All Platforms)
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - prerelease
+      prerelease_id:
+        description: 'Pre-release identifier (if prerelease)'
+        required: false
+        default: 'beta'
+
+jobs:
+  # Extract version - shared by all jobs
+  version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      version_name: ${{ steps.version.outputs.version_name }}
+      version_string: ${{ steps.version.outputs.version_string }}
+      is_prerelease: ${{ steps.version.outputs.is_prerelease }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Get current version
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            # Manual trigger - bump version
+            BUMP_TYPE="${{ github.event.inputs.version_bump }}"
+            PRE_RELEASE_ID="${{ github.event.inputs.prerelease_id }}"
+
+            if [[ "$BUMP_TYPE" == "prerelease" ]]; then
+              dart scripts/version_manager.dart --bump prerelease "$PRE_RELEASE_ID"
+              VERSION_STRING=$(dart scripts/version_manager.dart --current | sed 's/.*: //')
+              VERSION_NAME=${VERSION_STRING%+*}
+              IS_PRERELEASE="true"
+            else
+              dart scripts/version_manager.dart --bump "$BUMP_TYPE"
+              VERSION_STRING=$(dart scripts/version_manager.dart --current | sed 's/.*: //')
+              VERSION_NAME=${VERSION_STRING%+*}
+              IS_PRERELEASE="false"
+            fi
+
+            # Commit and push new version
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git add pubspec.yaml
+            git commit -m "chore: bump version to $VERSION_STRING"
+            git push
+          else
+            # Tag push - extract version from tag
+            VERSION_NAME=${GITHUB_REF#refs/tags/v*}
+            VERSION_STRING=$(dart scripts/version_manager.dart --current | sed 's/.*: //')
+
+            # Check if prerelease
+            if [[ "$VERSION_NAME" == *"-"* ]]; then
+              IS_PRERELEASE="true"
+            else
+              IS_PRERELEASE="false"
+            fi
+          fi
+
+          echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
+          echo "version_string=$VERSION_STRING" >> $GITHUB_OUTPUT
+          echo "is_prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION_STRING (Prerelease: $IS_PRERELEASE)"
+
+  # Build matrix - runs in parallel on appropriate runners
+  build:
+    needs: version
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos
+            os: macos-latest
+            build_command: flutter build macos --release
+            artifact_zip_name: recognizing-${{ needs.version.outputs.version_name }}-macos.zip
+            artifact_source: build/macos/Build/Products/Release
+            app_bundle_name: recognizing
+          - platform: windows
+            os: windows-latest
+            build_command: flutter build windows --release
+            artifact_zip_name: recognizing-${{ needs.version.outputs.version_name }}-windows.zip
+            artifact_exe_name: recognizing-${{ needs.version.outputs.version_name }}-windows.exe
+
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code
+        run: flutter packages pub run build_runner build --delete-conflicting-outputs
+
+      - name: Build ${{ matrix.platform }}
+        run: ${{ matrix.build_command }}
+
+      - name: Create macOS archive
+        if: matrix.platform == 'macos'
+        run: |
+          cd ${{ matrix.artifact_source }}
+          zip -r ${{ matrix.artifact_zip_name }} ${{ matrix.app_bundle_name }}.app
+          cd ../../../../../
+
+      - name: Create Windows archive with NSIS installer
+        if: matrix.platform == 'windows'
+        run: |
+          # Create NSIS installer script
+          @"
+          !define APPNAME "Recogniz.ing"
+          !define VERSION "${{ needs.version.outputs.version_name }}"
+          !define PUBLISHER "Recogniz.ing"
+          !define DESCRIPTION "AI-powered voice typing application"
+          !define URL "https://github.com/xicv/recogniz.ing"
+
+          !include "MUI2.nsh"
+
+          Name "${APPNAME}"
+          OutFile "recognizing-${VERSION}-installer.exe"
+          InstallDir "$PROGRAMFILES64\${APPNAME}"
+          RequestExecutionLevel admin
+
+          VIProductVersion "${VERSION}.0"
+          VIAddVersionKey "ProductName" "${APPNAME}"
+          VIAddVersionKey "CompanyName" "${PUBLISHER}"
+          VIAddVersionKey "FileDescription" "${DESCRIPTION}"
+          VIAddVersionKey "FileVersion" "${VERSION}"
+          VIAddVersionKey "ProductVersion" "${VERSION}"
+          VIAddVersionKey "LegalCopyright" "© ${PUBLISHER}"
+
+          !define MUI_ABORTWARNING
+          !define MUI_ICON "windows\runner\resources\app_icon.ico"
+          !define MUI_UNICON "windows\runner\resources\app_icon.ico"
+
+          !insertmacro MUI_PAGE_WELCOME
+          !insertmacro MUI_PAGE_LICENSE "LICENSE"
+          !insertmacro MUI_PAGE_COMPONENTS
+          !insertmacro MUI_PAGE_DIRECTORY
+          !insertmacro MUI_PAGE_INSTFILES
+          !insertmacro MUI_PAGE_FINISH
+
+          !insertmacro MUI_UNPAGE_WELCOME
+          !insertmacro MUI_UNPAGE_CONFIRM
+          !insertmacro MUI_UNPAGE_INSTFILES
+          !insertmacro MUI_UNPAGE_FINISH
+
+          !insertmacro MUI_LANGUAGE "English"
+
+          Section "Main Application" SEC01
+              SetOutPath "$INSTDIR"
+              File /r "${{ matrix.artifact_source }}\*"
+              CreateDirectory "$SMPROGRAMS\${APPNAME}"
+              CreateShortCut "$SMPROGRAMS\${APPNAME}\${APPNAME}.lnk" "$INSTDIR\recognizing.exe"
+              CreateShortCut "$DESKTOP\${APPNAME}.lnk" "$INSTDIR\recognizing.exe"
+              WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "DisplayName" "${APPNAME}"
+              WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "UninstallString" "$INSTDIR\uninstall.exe"
+              WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "DisplayVersion" "${VERSION}"
+              WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "Publisher" "${PUBLISHER}"
+              WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "URLInfoAbout" "${URL}"
+              WriteUninstaller "$INSTDIR\uninstall.exe"
+          SectionEnd
+
+          Section "Uninstall"
+              Delete "$INSTDIR\uninstall.exe"
+              Delete "$SMPROGRAMS\${APPNAME}\${APPNAME}.lnk"
+              Delete "$DESKTOP\${APPNAME}.lnk"
+              RMDir /r "$SMPROGRAMS\${APPNAME}"
+              RMDir /r "$INSTDIR"
+              DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}"
+          SectionEnd
+          "@ | Out-File -FilePath "installer.nsi" -Encoding utf8
+
+          # Try NSIS installer first, fallback to ZIP
+          if (Get-Command makensis -ErrorAction SilentlyContinue) {
+            Write-Host "Creating NSIS installer..."
+            makensis installer.nsi
+            if (Test-Path "recognizing-${{ needs.version.outputs.version_name }}-installer.exe") {
+              Write-Host "Successfully created Windows installer"
+              # Rename to standard artifact name
+              Move-Item -Path "recognizing-${{ needs.version.outputs.version_name }}-installer.exe" -Destination "recognizing-${{ needs.version.outputs.version_name }}-windows.exe"
+            } else {
+              throw "NSIS installer creation failed"
+            }
+          } else {
+            Write-Host "NSIS not found, creating ZIP package..."
+            Compress-Archive -Path "${{ matrix.artifact_source }}\*" -DestinationPath "${{ matrix.artifact_zip_name }}"
+          }
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.platform }}-${{ needs.version.outputs.version_name }}
+          path: |
+            ${{ matrix.artifact_source }}/${{ matrix.artifact_zip_name }}
+            ${{ matrix.artifact_exe_name }}
+          retention-days: 7
+          if-no-files-found: warn
+
+  # Create release - waits for all builds to complete
+  release:
+    needs: [version, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Prepare release files
+        run: |
+          VERSION="${{ needs.version.outputs.version_name }}"
+
+          # Create landing downloads directory structure
+          mkdir -p landing/public/downloads/${VERSION}/macos
+          mkdir -p landing/public/downloads/${VERSION}/windows
+
+          # Copy macOS artifact
+          if [ -f "artifacts/build-macos-${VERSION}/recognizing-${VERSION}-macos.zip" ]; then
+            cp artifacts/build-macos-${VERSION}/recognizing-${VERSION}-macos.zip \
+              landing/public/downloads/${VERSION}/macos/recognizing-${VERSION}-macos.zip
+          fi
+
+          # Copy Windows artifact (check for exe or zip)
+          if [ -f "artifacts/build-windows-${VERSION}/recognizing-${VERSION}-windows.exe" ]; then
+            cp artifacts/build-windows-${VERSION}/recognizing-${VERSION}-windows.exe \
+              landing/public/downloads/${VERSION}/windows/recognizing-${VERSION}-windows.exe
+          elif [ -f "artifacts/build-windows-${VERSION}/recognizing-${VERSION}-windows.zip" ]; then
+            cp artifacts/build-windows-${VERSION}/recognizing-${VERSION}-windows.zip \
+              landing/public/downloads/${VERSION}/windows/recognizing-${VERSION}-windows.zip
+          fi
+
+          # List prepared files
+          find landing/public/downloads/${VERSION} -type f
+
+      - name: Update downloads manifest
+        run: |
+          VERSION="${{ needs.version.outputs.version_name }}"
+
+          # Create manifest.json if it doesn't exist
+          if [ ! -f "landing/public/downloads/manifest.json" ]; then
+            echo '{"versions":[],"current_version":""}' > landing/public/downloads/manifest.json
+          fi
+
+          # Create Python script to update manifest
+          cat > /tmp/update_manifest.py << 'EOF'
+          import json
+          import sys
+          from datetime import datetime, timezone
+
+          version = sys.argv[1]
+          manifest_path = "landing/public/downloads/manifest.json"
+
+          with open(manifest_path, "r") as f:
+              data = json.load(f)
+
+          # Check if version already exists
+          existing = next((v for v in data.get("versions", []) if v["version"] == version), None)
+
+          if not existing:
+              new_version = {
+                  "version": version,
+                  "released_at": datetime.now(timezone.utc).isoformat(),
+                  "downloads": {
+                      "macos": f"downloads/{version}/macos/recognizing-{version}-macos.zip",
+                      "windows": f"downloads/{version}/windows/recognizing-{version}-windows.zip"
+                  }
+              }
+
+              if "versions" not in data:
+                  data["versions"] = []
+              data["versions"].insert(0, new_version)
+              data["current_version"] = version
+
+              with open(manifest_path, "w") as f:
+                  json.dump(data, f, indent=2)
+
+          EOF
+
+          python3 /tmp/update_manifest.py "$VERSION"
+          cat landing/public/downloads/manifest.json
+
+      - name: Sync landing version.ts from pubspec.yaml
+        run: |
+          # Sync landing/src/version.ts from pubspec.yaml
+          # This step is optional since files are already synced locally
+          flutter dart scripts/version_manager.dart --sync-landing || true
+          # Verify the update
+          echo "version.ts content:"
+          cat landing/src/version.ts
+
+      - name: Copy CHANGELOG.json to landing public folder
+        run: |
+          # Copy CHANGELOG.json to landing/public/ for dynamic loading
+          cp CHANGELOG.json landing/public/CHANGELOG.json
+          echo "Copied CHANGELOG.json to landing/public/"
+
+      - name: Generate changelog from CHANGELOG.json
+        id: changelog
+        run: |
+          VERSION="${{ needs.version.outputs.version_name }}"
+
+          # Use Python to parse CHANGELOG.json and format for release
+          python3 -c "
+          import json
+          import sys
+
+          version = '$VERSION'
+
+          with open('CHANGELOG.json', 'r') as f:
+              data = json.load(f)
+
+          version_entry = None
+          for v in data.get('versions', []):
+              if v['version'] == version:
+                  version_entry = v
+                  break
+
+          if not version_entry:
+              print(f'Version {version} not found in CHANGELOG.json')
+              sys.exit(1)
+
+          output = []
+          highlights = version_entry.get('highlights', [])
+          if highlights:
+              output.append('## Highlights')
+              for h in highlights:
+                  output.append(f'- {h}')
+              output.append('')
+
+          categories = {
+              'added': 'Added',
+              'changed': 'Changed',
+              'fixed': 'Fixed',
+              'removed': 'Removed',
+              'security': 'Security'
+          }
+
+          changes = version_entry.get('changes', [])
+          grouped = {}
+          for c in changes:
+              cat = c['category']
+              if cat not in grouped:
+                  grouped[cat] = []
+              grouped[cat].append(c)
+
+          for cat_key, cat_label in categories.items():
+              if cat_key in grouped:
+                  output.append(f'## {cat_label}')
+                  for change in grouped[cat_key]:
+                      output.append(f\"- **{change['title']}** - {change['description']}\")
+                  output.append('')
+
+          with open('$GITHUB_OUTPUT', 'a') as f:
+              f.write(f\"changelog<<EOF\n{'\n'.join(output)}\nEOF\n\")
+          "
+
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ needs.version.outputs.version_name }}
+          tag_name: v${{ needs.version.outputs.version_name }}
+          body: |
+            ## Changes in this release
+
+            ${{ steps.changelog.outputs.changelog }}
+
+            ### Downloads
+
+            - **macOS**: `recognizing-${{ needs.version.outputs.version_name }}-macos.zip`
+            - **Windows**: `recognizing-${{ needs.version.outputs.version_name }}-windows.exe` (or `.zip`)
+
+            ### Installation
+
+            **macOS:**
+            1. Download the ZIP file
+            2. Extract `recognizing.app`
+            3. Move to Applications folder
+            4. Right-click and Open (to bypass Gatekeeper)
+
+            **Windows:**
+            1. Download the EXE installer (or ZIP if installer not available)
+            2. Run the installer
+            3. Launch from Start Menu or Desktop shortcut
+
+            ---
+          files: |
+            landing/public/downloads/${{ needs.version.outputs.version_name }}/**/*.zip
+            landing/public/downloads/${{ needs.version.outputs.version_name }}/**/*.exe
+            CHANGELOG.md
+          draft: false
+          prerelease: ${{ needs.version.outputs.is_prerelease == 'true' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit landing downloads (triggers deployment)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Switch to main branch to avoid detached HEAD state
+          # (tag checkout puts us in detached HEAD, which can't push)
+          git checkout main
+
+          # Add landing downloads, manifest, version.ts, and CHANGELOG.json
+          git add landing/public/downloads/ landing/src/version.ts landing/public/CHANGELOG.json
+
+          # Commit and push (this triggers the landing deployment workflow)
+          git commit -m "chore: update landing downloads for v${{ needs.version.outputs.version_name }}" || echo "No changes to commit"
+          git push

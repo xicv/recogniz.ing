@@ -1,0 +1,528 @@
+{
+  "title": "Recogniz.ing Changelog",
+  "description": "AI-powered voice typing with real-time transcription powered by Google's Gemini AI.",
+  "categories": {
+    "added": {
+      "label": "Added",
+      "icon": "plus-circle",
+      "color": "bg-emerald-500"
+    },
+    "changed": {
+      "label": "Changed",
+      "icon": "refresh-cw",
+      "color": "bg-blue-500"
+    },
+    "fixed": {
+      "label": "Fixed",
+      "icon": "bug",
+      "color": "bg-amber-500"
+    },
+    "removed": {
+      "label": "Removed",
+      "icon": "trash-2",
+      "color": "bg-red-500"
+    },
+    "security": {
+      "label": "Security",
+      "icon": "shield",
+      "color": "bg-purple-500"
+    }
+  },
+  "versions": [
+    {
+      "version": "1.13.1",
+      "date": "2026-01-16",
+      "stable": true,
+      "highlights": [
+        "Consistent notification auto-dismiss behavior across all SnackBars",
+        "All notifications now dismiss after 4 seconds with Dismiss button"
+      ],
+      "changes": [
+        {
+          "category": "fixed",
+          "title": "SnackBar Duration and Action Consistency",
+          "description": "Standardized all SnackBar instances to use Duration(seconds: 4) with a Dismiss button for consistent auto-dismiss behavior. Notifications in transcriptions, dashboard, dictionaries, and prompts pages all follow the same pattern."
+        },
+        {
+          "category": "changed",
+          "title": "Notification Appearance",
+          "description": "Ensured all SnackBars use behavior: SnackBarBehavior.floating with consistent Dismiss button styling (white text color) across all pages."
+        },
+        {
+          "category": "fixed",
+          "title": "Path Package Dependency",
+          "description": "Fixed path package indentation in pubspec.yaml dev_dependencies to resolve CI workflow failures."
+        }
+      ]
+    },
+    {
+      "version": "1.13.0",
+      "date": "2026-01-15",
+      "stable": true,
+      "highlights": [
+        "ML-based Voice Activity Detection with Silero VAD (~95% accuracy)",
+        "50% reduction in API calls through optimized single-call transcription",
+        "Token-efficient prompts reducing overhead by ~67%",
+        "Support for up to 3.5 hours of audio per request (100MB inline limit)"
+      ],
+      "changes": [
+        {
+          "category": "added",
+          "title": "Silero VAD Integration",
+          "description": "Integrated Silero VAD (ML-based voice activity detection) with ~95% accuracy for speech detection. Uses ONNX Runtime for native performance with FFI bindings to vad package v0.0.7."
+        },
+        {
+          "category": "added",
+          "title": "Graceful VAD Fallback",
+          "description": "Implemented facade pattern with automatic fallback from Silero VAD to amplitude-based VAD (~75% accuracy) when ML model is unavailable. Ensures functionality across all platforms."
+        },
+        {
+          "category": "added",
+          "title": "VadServiceInterface",
+          "description": "Created abstraction layer for VAD implementations enabling runtime switching between Silero and amplitude-based detection methods."
+        },
+        {
+          "category": "changed",
+          "title": "Single-Call Transcription",
+          "description": "Eliminated two-call transcription pattern. Now uses single optimized API call combining all transcription requirements, reducing API calls by 50% and latency by ~50%."
+        },
+        {
+          "category": "changed",
+          "title": "Token-Efficient Prompts",
+          "description": "Condensed prompt templates from ~120 tokens to ~40 tokens, removing verbose instructions and redundant 'CLEAN VERSION:' markers across all 6 default prompts."
+        },
+        {
+          "category": "changed",
+          "title": "Cache Key Optimization",
+          "description": "Optimized cache key generation from O(n) full audio iteration to O(1) sampling using first/last 100 bytes. Dramatically improves performance for cached requests."
+        },
+        {
+          "category": "changed",
+          "title": "Audio Configuration",
+          "description": "Standardized audio encoding to 16kHz sample rate with AAC at 64kbps for optimal speech recognition quality and file size."
+        },
+        {
+          "category": "changed",
+          "title": "Audio MIME Type",
+          "description": "Fixed audio MIME type from audio/mp4 to audio/aac for better API compatibility."
+        },
+        {
+          "category": "changed",
+          "title": "Storage Pagination",
+          "description": "Optimized storage list operations using sublist instead of removeRange for O(1) pagination performance."
+        },
+        {
+          "category": "changed",
+          "title": "Documentation",
+          "description": "Updated README.md with VAD features, performance optimizations, and accurate technical specifications."
+        }
+      ]
+    },
+    {
+      "version": "1.12.1",
+      "date": "2026-01-13",
+      "stable": true,
+      "highlights": [
+        "Automated version bump and release workflow",
+        "Landing page version now syncs automatically with app version",
+        "GitHub release notes now use CHANGELOG.json data"
+      ],
+      "changes": [
+        {
+          "category": "added",
+          "title": "Automated Release Workflow",
+          "description": "The make release command now automatically commits changes, creates git tags, and pushes to trigger GitHub Actions builds. Run make release and the entire process is automated."
+        },
+        {
+          "category": "added",
+          "title": "Landing Version Sync",
+          "description": "landing/package.json version is now automatically synchronized with pubspec.yaml during version bumps."
+        },
+        {
+          "category": "added",
+          "title": "Release Notes from CHANGELOG.json",
+          "description": "GitHub Actions now generates release notes from CHANGELOG.json data, showing highlights and categorized changes instead of git log."
+        },
+        {
+          "category": "changed",
+          "title": "Features Page",
+          "description": "Updated features page to highlight Multi-Language Transcription as a core feature with 20+ supported languages."
+        },
+        {
+          "category": "fixed",
+          "title": "Changelog Version Order",
+          "description": "Fixed bug where new versions were appended to the end of the versions array instead of being inserted at the beginning. The landing changelog now correctly shows the newest version first."
+        },
+        {
+          "category": "removed",
+          "title": "Duplicate Version Script",
+          "description": "Removed scripts/version-bump.sh as it duplicated functionality from version_manager.dart."
+        }
+      ]
+    },
+    {
+      "version": "1.12.0",
+      "date": "2026-01-12",
+      "stable": true,
+      "highlights": [
+        "Multi-language transcription support with automatic language detection",
+        "Language selector in Settings with 20+ supported languages",
+        "Detected language display on transcription cards"
+      ],
+      "changes": [
+        {
+          "category": "added",
+          "title": "Multi-Language Transcription",
+          "description": "Added automatic language detection for transcriptions. The app now detects the language spoken automatically and transcribes in the original language without translation. Supports code-switching (e.g., mixed Chinese-English speech)."
+        },
+        {
+          "category": "added",
+          "title": "Language Selector",
+          "description": "Added transcription language selector in Settings with 20+ supported languages including English, Chinese, Japanese, Korean, Spanish, French, German, Italian, Portuguese, Russian, Arabic, Hindi, Thai, Vietnamese, Indonesian, Malay, Tagalog, Dutch, Polish, Turkish, and Ukrainian."
+        },
+        {
+          "category": "added",
+          "title": "Detected Language Display",
+          "description": "Added detected language badge on transcription cards showing the language of each transcription. Displays native language names for better user recognition."
+        },
+        {
+          "category": "added",
+          "title": "System Instructions",
+          "description": "Added system instruction support to GeminiService for consistent multi-language behavior across all API calls. Instructions now tell Gemini to NEVER translate and to preserve code-switching exactly as spoken."
+        },
+        {
+          "category": "added",
+          "title": "Language Constants",
+          "description": "Added TranscriptionLanguages helper class with language code normalization for handling various locale code formats (e.g., zh-CN, zh-TW, en-US, en-GB)."
+        },
+        {
+          "category": "added",
+          "title": "Transcription Language Setting",
+          "description": "Added transcriptionLanguage field to AppSettings with auto-detect as default. Allows users to optionally specify a target output language."
+        },
+        {
+          "category": "changed",
+          "title": "GeminiService Interface",
+          "description": "Updated TranscriptionServiceInterface to accept optional targetLanguage parameter for future translation capabilities."
+        },
+        {
+          "category": "removed",
+          "title": "About Section from Settings",
+          "description": "Removed the About section from Settings page for a cleaner, more focused UI."
+        },
+        {
+          "category": "fixed",
+          "title": "Hive Backward Compatibility",
+          "description": "Added defaultValue to HiveField annotations for new fields to ensure backward compatibility with existing user data."
+        }
+      ]
+    },
+    {
+      "version": "1.11.0",
+      "date": "2025-12-31",
+      "stable": true,
+      "highlights": [
+        "Complete app logo redesign with bold 'R' for Recogniz.ing",
+        "Red recording dot positioned at end of R's right leg",
+        "New blue-teal-emerald gradient conveying trust and reliability"
+      ],
+      "changes": [
+        {
+          "category": "changed",
+          "title": "App Logo Redesign",
+          "description": "Complete logo redesign featuring a bold geometric 'R' letter in white on a blue-to-teal-to-emerald gradient background. The red recording dot is positioned at the end of the R's right leg, creating a clear visual metaphor for the app's voice recording functionality."
+        },
+        {
+          "category": "changed",
+          "title": "Color Scheme Update",
+          "description": "Updated from cyan-indigo-emerald to a more professional deep blue (#1E40AF) → cyan/teal (#0891B2) → emerald (#10B981) gradient that conveys trust, reliability, and accuracy."
+        },
+        {
+          "category": "changed",
+          "title": "Platform Icons",
+          "description": "Regenerated all platform icons (Android, iOS, macOS, Windows, Web) and landing page assets with the new modern design following 2025 minimalist trends."
+        },
+        {
+          "category": "removed",
+          "title": "Unused Logo Files",
+          "description": "Removed redundant assets/logo/ folder. Consolidated all icon assets to assets/icons/ as single source of truth."
+        }
+      ]
+    },
+    {
+      "version": "1.10.0",
+      "date": "2025-12-31",
+      "stable": true,
+      "highlights": [
+        "Transcription status tracking with pending, processing, completed, failed states",
+        "Audio backup functionality for retrying failed transcriptions",
+        "Enhanced error tracking with retry count and completion timestamps"
+      ],
+      "changes": [
+        {
+          "category": "added",
+          "title": "Transcription Status Tracking",
+          "description": "Added TranscriptionStatus enum with states: pending, processing, completed, failed. Each transcription now tracks its lifecycle from initial recording through API processing to final result."
+        },
+        {
+          "category": "added",
+          "title": "Audio Backup for Retry",
+          "description": "Original audio files are now backed up to local storage, enabling retry functionality for failed transcriptions without requiring users to re-record."
+        },
+        {
+          "category": "added",
+          "title": "Error Tracking",
+          "description": "Added errorMessage field and retryCount to track transcription failures and retry attempts."
+        },
+        {
+          "category": "added",
+          "title": "Completion Timestamp",
+          "description": "Added completedAt field to track when transcription processing finished, enabling better analytics and user insights."
+        }
+      ]
+    },
+    {
+      "version": "1.0.9",
+      "date": "2025-12-31",
+      "stable": true,
+      "highlights": [
+        "Redesigned app logo with modern voice-to-text metaphor",
+        "New distinctive icon with sound-wave-to-text transformation"
+      ],
+      "changes": [
+        {
+          "category": "changed",
+          "title": "App Logo Redesign",
+          "description": "Complete logo redesign featuring vertical sound-wave bars that transform into horizontal text lines. Uses brand color progression (cyan → indigo → emerald) to visually represent the transcription flow."
+        },
+        {
+          "category": "changed",
+          "title": "Platform Icons",
+          "description": "Updated all platform icons (Android, iOS, macOS, Windows, Web) and landing page favicons with the new modern design."
+        }
+      ]
+    },
+    {
+      "version": "1.0.8",
+      "date": "2025-12-29",
+      "stable": true,
+      "highlights": [
+        "Fixed detached HEAD error when pushing landing downloads",
+        "macOS and Windows downloads now available"
+      ],
+      "changes": [
+        {
+          "category": "fixed",
+          "title": "CI/CD Fix",
+          "description": "Fixed detached HEAD error when pushing landing downloads to repository."
+        },
+        {
+          "category": "added",
+          "title": "Platform Releases",
+          "description": "macOS and Windows installers now available for download."
+        }
+      ]
+    },
+    {
+      "version": "1.0.5",
+      "date": "2025-12-29",
+      "stable": true,
+      "highlights": [
+        "Favorites filter for quick access to starred transcriptions",
+        "Cleaner VAD overlay with static processing indicator",
+        "Removed auto-stop after silence for simplified workflow",
+        "Zero static analysis warnings and errors"
+      ],
+      "changes": [
+        {
+          "category": "added",
+          "title": "Favorites Filter",
+          "description": "New filter option to quickly access starred transcriptions. Toggle between All and Favorites with a single click in the transcriptions view."
+        },
+        {
+          "category": "changed",
+          "title": "VAD Overlay UI",
+          "description": "Improved VAD recording overlay with static processing indicator (no flashing animations). Removed 'Speech Detection' and 'Audio Quality' status labels for cleaner interface."
+        },
+        {
+          "category": "removed",
+          "title": "Auto-Stop After Silence",
+          "description": "Removed auto-stop after silence feature for simplified manual recording control. Users now have full control over when to stop recording."
+        },
+        {
+          "category": "fixed",
+          "title": "Code Quality",
+          "description": "Fixed all static analysis warnings. Zero errors, zero warnings across entire codebase. Removed unused imports and variables."
+        },
+        {
+          "category": "fixed",
+          "title": "Hive Schema",
+          "description": "Fixed Hive schema compatibility by making isFavorite field nullable for backward compatibility with existing user data."
+        }
+      ]
+    },
+    {
+      "version": "1.0.4",
+      "date": "2025-12-23",
+      "stable": true,
+      "highlights": [
+        "New Changelog system with JSON and Markdown formats",
+        "Simplified single-repository deployment architecture",
+        "Updated landing page with modern design"
+      ],
+      "changes": [
+        {
+          "category": "added",
+          "title": "Changelog System",
+          "description": "New structured changelog with JSON format for landing page display and Markdown for GitHub. Includes beautiful Vue component with filtering and search."
+        },
+        {
+          "category": "added",
+          "title": "Deployment Architecture",
+          "description": "Simplified single-repository deployment using GitHub Actions. Release workflow automatically commits downloads to landing folder and triggers GitHub Pages deployment."
+        },
+        {
+          "category": "changed",
+          "title": "Repository Structure",
+          "description": "Consolidated to xicv/recogniz.ing as the single source of truth. Both Flutter app and Vue landing page now in one repository."
+        },
+        {
+          "category": "changed",
+          "title": "Documentation",
+          "description": "Updated README.md files with latest deployment architecture, added CLAUDE.md section for landing page deployment."
+        },
+        {
+          "category": "removed",
+          "title": "Outdated Files",
+          "description": "Removed outdated DEPLOYMENT.md and Flutter-generated recognizing/README.md files."
+        }
+      ]
+    },
+    {
+      "version": "1.0.3",
+      "date": "2025-12-21",
+      "stable": true,
+      "highlights": [
+        "macOS Gatekeeper verification fixed",
+        "Initial Windows release with native installer",
+        "Improved build scripts and Makefile"
+      ],
+      "changes": [
+        {
+          "category": "fixed",
+          "title": "macOS Gatekeeper",
+          "description": "Fixed macOS Gatekeeper verification issues with improved app signing and notarization."
+        },
+        {
+          "category": "added",
+          "title": "Windows Release",
+          "description": "Initial Windows release with native installer support. Download as recognizing-{version}-windows.zip"
+        },
+        {
+          "category": "fixed",
+          "title": "Build System",
+          "description": "Fixed make quick-run command to properly clean build directory and prevent code signing errors."
+        },
+        {
+          "category": "changed",
+          "title": "Platform Icons",
+          "description": "Updated landing page platform icons - iMac for macOS, Apple logo for iOS for better visual representation."
+        },
+        {
+          "category": "changed",
+          "title": "Performance",
+          "description": "Enhanced stability and performance improvements across all platforms."
+        }
+      ]
+    },
+    {
+      "version": "1.0.2",
+      "date": "2024-12-15",
+      "stable": true,
+      "highlights": [
+        "Version management system with semantic versioning",
+        "Keyboard shortcuts (Cmd/Ctrl+S to save)",
+        "Automated deployment pipeline"
+      ],
+      "changes": [
+        {
+          "category": "added",
+          "title": "Version Management",
+          "description": "Comprehensive semantic versioning system with automated tools (Dart script, shell script, Makefile targets)."
+        },
+        {
+          "category": "added",
+          "title": "Keyboard Shortcuts",
+          "description": "Added Cmd/Ctrl+S keyboard shortcut for saving edited transcriptions."
+        },
+        {
+          "category": "fixed",
+          "title": "Settings Navigation",
+          "description": "Fixed menu bar Settings navigation to open correct Settings tab."
+        },
+        {
+          "category": "added",
+          "title": "Deployment System",
+          "description": "Automated build and deployment pipeline for all platforms to landing page."
+        },
+        {
+          "category": "added",
+          "title": "Code Signing",
+          "description": "macOS code signing and notarization support for distribution."
+        },
+        {
+          "category": "added",
+          "title": "Landing Page",
+          "description": "New landing page with download management system and version tracking."
+        }
+      ]
+    },
+    {
+      "version": "1.0.0",
+      "date": "2024-11-01",
+      "stable": true,
+      "highlights": [
+        "Initial release with core voice typing functionality",
+        "Material Design 3 UI",
+        "Cross-platform support"
+      ],
+      "changes": [
+        {
+          "category": "added",
+          "title": "Voice Recording",
+          "description": "Smart voice activity detection (VAD) with configurable sensitivity and RMS-based audio analysis."
+        },
+        {
+          "category": "added",
+          "title": "AI Transcription",
+          "description": "Powered by Google Gemini 3.0 Flash with intelligent noise filtering and silence detection."
+        },
+        {
+          "category": "added",
+          "title": "Custom Prompts",
+          "description": "6 pre-configured prompts (Clean, Formal, Bullets, Email, Meeting Notes, Social Media) with custom prompt creation."
+        },
+        {
+          "category": "added",
+          "title": "Vocabulary Sets",
+          "description": "6 industry vocabulary sets (General, Technology, Business, Medical, Legal, Finance)."
+        },
+        {
+          "category": "added",
+          "title": "Dashboard",
+          "description": "Real-time transcription history with search, usage statistics, and inline editing."
+        },
+        {
+          "category": "added",
+          "title": "Global Hotkeys",
+          "description": "Desktop global hotkey support (Cmd+Shift+Space / Ctrl+Shift+Space) with system tray integration."
+        },
+        {
+          "category": "added",
+          "title": "Themes",
+          "description": "Material Design 3 UI with dark/light theme support and system preference detection."
+        }
+      ]
+    }
+  ]
+}

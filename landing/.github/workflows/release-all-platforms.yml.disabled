@@ -1,0 +1,240 @@
+name: Release All Platforms
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - prerelease
+      prerelease_id:
+        description: 'Pre-release identifier (if prerelease)'
+        required: false
+        default: 'beta'
+
+jobs:
+  release:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Get current version
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            # Manual trigger - bump version
+            BUMP_TYPE="${{ github.event.inputs.version_bump }}"
+            PRE_RELEASE_ID="${{ github.event.inputs.prerelease_id }}"
+
+            if [[ "$BUMP_TYPE" == "prerelease" ]]; then
+              dart scripts/version_manager.dart --bump prerelease "$PRE_RELEASE_ID"
+              VERSION_STRING=$(dart scripts/version_manager.dart --current | sed 's/.*: //')
+              VERSION_NAME=${VERSION_STRING%+*}
+            else
+              dart scripts/version_manager.dart --bump "$BUMP_TYPE"
+              VERSION_STRING=$(dart scripts/version_manager.dart --current | sed 's/.*: //')
+              VERSION_NAME=${VERSION_STRING%+*}
+            fi
+
+            # Commit and push new version
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git add pubspec.yaml
+            git commit -m "chore: bump version to $VERSION_STRING"
+            git push
+          else
+            # Tag push - extract version from tag
+            VERSION_NAME=${GITHUB_REF#refs/tags/v*}
+            VERSION_STRING=$(dart scripts/version_manager.dart --current | sed 's/.*: //')
+          fi
+
+          echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
+          echo "version_string=$VERSION_STRING" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION_STRING"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Build macOS
+        run: |
+          flutter build macos --release
+          mkdir -p landing/public/downloads/${{ steps.version.outputs.version_name }}/macos
+          cd build/macos/Build/Products/Release
+          zip -r recognizing.app.zip recognizing.app
+          cd ../../../../../
+          mv build/macos/Build/Products/Release/recognizing.app.zip landing/public/downloads/${{ steps.version.outputs.version_name }}/macos/recognizing-${{ steps.version.outputs.version_name }}-macos.zip
+
+      - name: Build Web
+        run: |
+          flutter build web --release
+          mkdir -p landing/public/downloads/${{ steps.version.outputs.version_name }}/web
+          cd build/web
+          zip -r recognizing-${{ steps.version.outputs.version_name }}-web.zip .
+          cd ../../
+          mv build/web/recognizing-${{ steps.version.outputs.version_name }}-web.zip landing/public/downloads/${{ steps.version.outputs.version_name }}/web/
+
+      - name: Trigger Windows build
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          workflow: build-windows
+          inputs:
+            version: ${{ steps.version.outputs.version_name }}
+
+      - name: Wait for Windows build (1 minute)
+        run: sleep 60
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get previous tag
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          # Generate changelog
+          if [[ -n "$PREVIOUS_TAG" ]]; then
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" $PREVIOUS_TAG..HEAD)
+          else
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)")
+          fi
+
+          # Save to file
+          echo "$CHANGELOG" > CHANGELOG.md
+
+          # Set output for GitHub release
+          {
+            echo 'changelog<<EOF'
+            echo "$CHANGELOG"
+            echo EOF
+          } >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ steps.version.outputs.version_name }}
+          tag_name: v${{ steps.version.outputs.version_name }}
+          body: |
+            ## Changes in this release
+
+            ${{ steps.changelog.outputs.changelog }}
+
+            ### Downloads
+
+            - **macOS**: `recognizing-${{ steps.version.outputs.version_name }}-macos.zip`
+            - **Windows**: Built separately via GitHub Actions
+            - **Web**: `recognizing-${{ steps.version.outputs.version_name }}-web.zip`
+
+            ### Installation
+
+            **macOS:**
+            1. Download the ZIP file
+            2. Extract `recognizing.app`
+            3. Move to Applications folder
+            4. Right-click and Open (to bypass Gatekeeper)
+
+            **Windows:**
+            1. Use the "Build Windows Release" workflow
+            2. Download the Windows ZIP from artifacts
+            3. Extract and run `recognizing.exe`
+
+            **Web:**
+            1. Open the web build in your browser
+
+            ---
+          files: |
+            landing/public/downloads/${{ steps.version.outputs.version_name }}/**/*.zip
+            CHANGELOG.md
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.version_name, '-') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update landing downloads manifest
+        run: |
+          VERSION="${{ steps.version.outputs.version_name }}"
+
+          # Update manifest.json
+          if [ -f "landing/public/downloads/manifest.json" ]; then
+            echo "Updating existing manifest.json"
+          else
+            echo "Creating new manifest.json"
+            echo '{"versions":[]}' > landing/public/downloads/manifest.json
+          fi
+
+          # Create Python script to update manifest
+          cat > /tmp/update_manifest.py << 'EOF'
+          import json
+          import sys
+          from datetime import datetime, timezone
+
+          version = sys.argv[1]
+          manifest_path = "landing/public/downloads/manifest.json"
+
+          with open(manifest_path, "r") as f:
+              data = json.load(f)
+
+          # Check if version already exists
+          existing = next((v for v in data.get("versions", []) if v["version"] == version), None)
+
+          if not existing:
+              new_version = {
+                  "version": version,
+                  "released_at": datetime.now(timezone.utc).isoformat(),
+                  "downloads": {
+                      "macos": f"downloads/{version}/macos/recognizing-{version}-macos.zip",
+                      "windows": f"downloads/{version}/windows/recognizing-{version}-windows.zip",
+                      "linux": f"downloads/{version}/linux/recognizing-{version}-linux.tar.gz",
+                      "android_apk": f"downloads/{version}/android/recognizing-{version}.apk",
+                      "android_aab": f"downloads/{version}/android/recognizing-{version}.aab",
+                      "web": f"downloads/{version}/web/recognizing-{version}-web.zip"
+                  }
+              }
+
+              if "versions" not in data:
+                  data["versions"] = []
+              data["versions"].insert(0, new_version)
+              data["current_version"] = version
+
+              with open(manifest_path, "w") as f:
+                  json.dump(data, f, indent=2)
+
+          EOF
+
+          python3 /tmp/update_manifest.py "$VERSION"
+          cat landing/public/downloads/manifest.json
+
+      - name: Commit landing downloads (triggers deployment)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Add landing downloads and manifest
+          git add landing/public/downloads/
+
+          # Commit and push (this triggers the landing deployment workflow)
+          git commit -m "chore: update landing downloads for v${{ steps.version.outputs.version_name }}" || echo "No changes to commit"
+          git push

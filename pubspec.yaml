@@ -1,0 +1,103 @@
+name: recognizing
+description: AI-powered voice typing application
+
+publish_to: 'none'
+
+version: 1.13.1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management
+  flutter_riverpod: ^3.1.0
+
+  # Local Storage
+  hive_flutter: ^1.1.0
+  hive: ^2.2.3
+
+  # Audio Recording
+  record: ^6.1.2
+  path_provider: ^2.1.4
+
+  # AI Integration - updated version
+  google_generative_ai: ^0.4.0
+  flutter_gemini: ^2.0.0
+
+  # Hotkeys (Desktop)
+  hotkey_manager: ^0.2.0
+
+  # System Tray / Menu Bar (Desktop)
+  tray_manager: ^0.5.2
+
+  # Start at Login (Desktop)
+  launch_at_startup: ^0.3.1
+
+  # UI Components
+  flutter_animate: ^4.3.0
+  google_fonts: ^6.1.0
+  lucide_icons: ^0.257.0
+  infinite_scroll_pagination: ^4.0.0
+
+  # Audio Processing
+  vad: ^0.0.7
+
+  # Utilities
+  uuid: ^4.2.2
+  intl: ^0.20.2
+
+  # Clipboard
+  super_clipboard: ^0.8.4
+
+  # Package info
+  package_info_plus: ^9.0.0
+
+dependency_overrides:
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  hive_generator: ^2.0.1
+  build_runner: ^2.4.9
+  flutter_launcher_icons: ^0.14.4
+  path: ^1.9.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/
+    - assets/icons/
+    - config/
+    - config/themes/
+    - config/prompts/
+    - config/vocabulary/
+
+# Flutter Launcher Icons configuration
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/app_icon.png"
+  remove_alpha_ios: true  # Remove alpha channel for App Store compliance
+  # Adaptive icons for Android
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "assets/icons/app_icon_adaptive.png"
+  # Web icons
+  web:
+    generate: true
+    image_path: "assets/icons/app_icon.png"
+    background_color: "#0ea5e9"
+    theme_color: "#0ea5e9"
+  # Windows icons
+  windows:
+    generate: true
+    image_path: "assets/icons/app_icon.png"
+    icon_size: 48
+  # macOS icons
+  macos:
+    generate: true
+    image_path: "assets/icons/app_icon.png"
