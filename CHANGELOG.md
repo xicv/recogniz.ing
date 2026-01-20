@@ -240,3 +240,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.14.0] - 2026-01-21
+
+### Added
+
+- **PCM Audio Format Support** - Added support for uncompressed PCM (16-bit) audio recording format. This eliminates AAC encoder buffering issues that caused audio truncation at the end of recordings. Results in 4x larger files (3.36 MB/min vs 840 KB/min) but guarantees all audio is captured.
+- **Audio Diagnostic Service** - New AudioDiagnosticService detects audio truncation by comparing timer duration with actual file duration. Provides quick file-size-based checks and full audio-duration-based diagnostics with detailed assessment messages.
+- **Reliable Recording Mode** - Added useReliableFormat flag to AudioCompressionService. When enabled (default), uses uncompressed PCM format for maximum reliability. Can be toggled for compressed AAC format when file size is more important than complete audio capture.
+
+### Changed
+
+- **Gemini SDK Migration** - Migrated from deprecated google_generative_ai package to googleai_dart v2.1.0. The new SDK provides better type safety, improved error handling, and active maintenance.
+- **Audio Format Handling** - Enhanced audio service to properly handle both compressed AAC/M4A and uncompressed WAV/PCM formats. Each format path optimized for its specific characteristics.
+- **Dependency Updates** - Updated dependencies: flutter_riverpod 3.2.0, path_provider 2.1.5, google_fonts 6.3.0, infinite_scroll_pagination 4.1.0, build_runner 2.4.13. Added just_audio 0.9.46 for audio duration verification.
+
+---
+

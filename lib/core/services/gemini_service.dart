@@ -1,7 +1,8 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:googleai_dart/googleai_dart.dart';
 
 import '../models/transcription_result.dart';
 import '../interfaces/audio_service_interface.dart';
@@ -22,41 +23,46 @@ class GeminiPerformanceConfig {
 }
 
 class GeminiService implements TranscriptionServiceInterface {
-  GenerativeModel? _model;
+  GoogleAIClient? _client;
+  bool _disposed = false;
 
   // Model name from configuration
   static const String _defaultModelName = 'gemini-3-flash-preview';
   String _modelName = _defaultModelName;
 
+  // API key
+  String? _apiKey;
+
   // Simple LRU cache for transcription results
   final Map<String, TranscriptionResult> _cache = {};
   static const int _maxCacheSize = 50;
 
-  bool get isInitialized => _model != null;
+  bool get isInitialized => _client != null && _apiKey != null;
 
   /// Get the current model name
   String get modelName => _modelName;
 
   /// Initialize the service with API key and optional model name
   void initialize(String apiKey, {String? model, String? systemInstruction}) {
+    if (_disposed) {
+      debugPrint('[GeminiService] Service was disposed, creating new client');
+      _disposed = false;
+    }
+
     if (model != null) {
       _modelName = model;
     }
-    final instruction = systemInstruction ?? _buildSystemInstruction();
-    debugPrint('[GeminiService] Initializing with model: $_modelName...');
-    _model = GenerativeModel(
-      model: _modelName,
-      apiKey: apiKey,
-      systemInstruction: Content.text(instruction),
-      generationConfig: GenerationConfig(
-        temperature: 0.1,
-        maxOutputTokens: 8192,
-        topP: 0.8,
-        topK: 40,
+
+    _apiKey = apiKey;
+    debugPrint('[GeminiService] Initializing googleai_dart with model: $_modelName...');
+
+    _client = GoogleAIClient(
+      config: GoogleAIConfig(
+        authProvider: ApiKeyProvider(apiKey),
       ),
     );
 
-    debugPrint('[GeminiService] Model initialized successfully');
+    debugPrint('[GeminiService] Client initialized successfully');
   }
 
   /// Build system instruction for multi-language transcription
@@ -148,7 +154,7 @@ You are a multilingual transcription assistant.
     debugPrint('[GeminiService] transcribeAudio called');
     debugPrint('[GeminiService] Audio bytes: ${audioBytes.length}');
 
-    if (_model == null) {
+    if (_client == null || _apiKey == null) {
       throw Exception('Gemini service not initialized. Please set API key.');
     }
 
@@ -173,18 +179,28 @@ You are a multilingual transcription assistant.
   Future<(bool isValid, String? error)> validateApiKey(String apiKey) async {
     debugPrint('[GeminiService] Validating API key...');
     try {
-      final testModel = GenerativeModel(
-        model: _modelName,
-        apiKey: apiKey,
+      final testClient = GoogleAIClient(
+        config: GoogleAIConfig(
+          authProvider: ApiKeyProvider(apiKey),
+        ),
       );
 
-      final response = await testModel.generateContent([
-        Content.text('Say "OK"'),
-      ]);
+      final response = await testClient.models.generateContent(
+        model: _modelName,
+        request: const GenerateContentRequest(
+          contents: [
+            Content(
+              parts: [TextPart('Say "OK"')],
+              role: 'user',
+            ),
+          ],
+        ),
+      );
 
-      debugPrint('[GeminiService] Validation response: ${response.text}');
+      final text = _extractTextFromResponse(response);
+      debugPrint('[GeminiService] Validation response: $text');
 
-      if (response.text != null && response.text!.isNotEmpty) {
+      if (text != null && text.isNotEmpty) {
         debugPrint('[GeminiService] API key is valid');
         return (true, null);
       }
@@ -289,17 +305,42 @@ You are a multilingual transcription assistant.
     debugPrint('[GeminiService] Using combined transcription mode...');
 
     try {
-      final audioContent = Content.multi([
-        TextPart(combinedPrompt),
-        DataPart('audio/aac', audioBytes),
-      ]);
+      // Use Blob.fromBytes convenience factory for cleaner code
+      final audioBlob = Blob.fromBytes('audio/wav', audioBytes);
+
+      // Use audio/wav for PCM format (recommended for Gemini API)
+      final audioContent = Content(
+        parts: [
+          TextPart(combinedPrompt),
+          InlineDataPart(audioBlob),
+        ],
+        role: 'user',
+      );
+
+      // Build request with system instruction
+      final request = GenerateContentRequest(
+        contents: [audioContent],
+        systemInstruction: Content(
+          parts: [TextPart(_buildSystemInstruction())],
+          role: 'user',
+        ),
+        generationConfig: const GenerationConfig(
+          temperature: 0.1,
+          maxOutputTokens: 8192,
+          topP: 0.8,
+          topK: 40,
+        ),
+      );
 
       final response = await _executeWithRetry(
-        () => _model!.generateContent([audioContent]),
+        () => _client!.models.generateContent(
+          model: _modelName,
+          request: request,
+        ),
         operationName: 'combined-transcription',
       );
 
-      final resultText = response.text ?? '';
+      final resultText = _extractTextFromResponse(response) ?? '';
       debugPrint('[GeminiService] Combined transcription complete');
 
       if (resultText.isEmpty) {
@@ -320,18 +361,32 @@ You are a multilingual transcription assistant.
         throw Exception('No speech detected in audio');
       }
 
-      final estimatedTokens = (resultText.length / 4).round();
+      // Get token usage from response metadata
+      final tokenUsage = response.usageMetadata?.totalTokenCount ??
+          (resultText.length / 4).round();
 
       return _createResult(
         cacheKey: cacheKey,
         rawText: rawText,
         processedText: processedText,
-        tokenUsage: estimatedTokens,
+        tokenUsage: tokenUsage,
       );
     } catch (e) {
       debugPrint('[GeminiService] Combined transcription error: $e');
       rethrow;
     }
+  }
+
+  /// Extract text from GenerateContentResponse
+  String? _extractTextFromResponse(GenerateContentResponse response) {
+    for (final candidate in response.candidates ?? []) {
+      for (final part in candidate.content?.parts ?? []) {
+        if (part is TextPart) {
+          return part.text;
+        }
+      }
+    }
+    return null;
   }
 
   /// Build combined prompt for single-call processing
@@ -355,6 +410,10 @@ You are a multilingual transcription assistant.
   }
 
   void dispose() {
-    _model = null;
+    _client?.close();
+    _client = null;
+    _apiKey = null;
+    _disposed = true;
+    debugPrint('[GeminiService] Service disposed');
   }
 }

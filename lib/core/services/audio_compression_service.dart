@@ -2,8 +2,23 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:record/record.dart';
 
+/// Audio format options for recording
+enum AudioFormat {
+  /// AAC-LC compressed format (default, smaller files, but may have truncation issues)
+  aacLc,
+
+  /// Uncompressed PCM format (larger files, but no truncation risk)
+  pcm16bits,
+}
+
 /// Audio compression service for optimizing audio files before API upload
 class AudioCompressionService {
+  /// Whether to use PCM format for reliable recording (no truncation)
+  ///
+  /// Set to true to use uncompressed PCM format which guarantees all audio
+  /// is captured, but results in 4x larger files. Set to false for AAC compression
+  /// which is smaller but may lose some audio due to encoder buffering issues.
+  static bool useReliableFormat = true; // ENABLED: Using PCM for reliable recording
   /// Compress audio file to a more efficient format
   static Future<String?> compressAudioFile({
     required String inputPath,
@@ -92,13 +107,61 @@ class AudioCompressionService {
   }
 
   /// Get recommended recording config for voice
-  static RecordConfig getVoiceOptimizedConfig() {
+  ///
+  /// By default uses AAC-LC compression for smaller file sizes. If [useReliableFormat]
+  /// is true, returns an uncompressed PCM config that eliminates truncation issues
+  /// at the cost of 4x larger file sizes.
+  static RecordConfig getVoiceOptimizedConfig({bool? forceReliable}) {
+    final useReliable = forceReliable ?? useReliableFormat;
+
+    if (useReliable) {
+      // Use uncompressed PCM for maximum reliability
+      return const RecordConfig(
+        encoder: AudioEncoder.pcm16bits,
+        sampleRate: 16000,
+        numChannels: 1,
+      );
+    }
+
+    // Default: AAC-LC compression for smaller files
     return const RecordConfig(
       encoder: AudioEncoder.aacLc, // AAC-LC is efficient for voice
       sampleRate: 16000, // Voice optimized
       bitRate: 64000, // 64kbps - good balance of quality and size
       numChannels: 1, // Mono for voice
     );
+  }
+
+  /// Get a reliable recording config that guarantees no audio truncation
+  ///
+  /// Uses uncompressed PCM format which eliminates the AAC encoder buffering
+  /// issues that cause audio loss. Results in 4x larger files (3.36 MB/min
+  /// vs 840 KB/min for 105 second recordings).
+  static RecordConfig getReliableConfig() {
+    return const RecordConfig(
+      encoder: AudioEncoder.pcm16bits, // Uncompressed - no encoder buffering
+      sampleRate: 16000,
+      numChannels: 1,
+    );
+  }
+
+  /// Get recording config for a specific audio format
+  static RecordConfig getConfigForFormat(AudioFormat format) {
+    switch (format) {
+      case AudioFormat.pcm16bits:
+        return const RecordConfig(
+          encoder: AudioEncoder.pcm16bits,
+          sampleRate: 16000,
+          numChannels: 1,
+        );
+      case AudioFormat.aacLc:
+        return const RecordConfig(
+          encoder: AudioEncoder.aacLc,
+          sampleRate: 16000,
+          bitRate: 64000,
+          numChannels: 1,
+        );
+    }
   }
 
   /// Estimate compression ratio for given settings

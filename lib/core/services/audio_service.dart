@@ -7,6 +7,7 @@ import 'package:record/record.dart';
 import 'package:uuid/uuid.dart';
 import 'audio_processor.dart';
 import 'audio_compression_service.dart';
+import 'audio_diagnostic_service.dart';
 import 'audio_processing_service.dart';
 import 'audio_storage_service.dart';
 import '../config/app_config.dart';
@@ -64,15 +65,21 @@ class AudioService implements AudioServiceInterface {
 
     final dir = await getTemporaryDirectory();
     final uuid = const Uuid().v4();
-    _currentRecordingPath = '${dir.path}/recording_$uuid.m4a';
+
+    // Determine file extension based on format
+    final recordConfig = AudioCompressionService.getVoiceOptimizedConfig();
+    final fileExtension = recordConfig.encoder == AudioEncoder.pcm16bits ? 'wav' : 'm4a';
+    _currentRecordingPath = '${dir.path}/recording_$uuid.$fileExtension';
 
     if (kDebugMode) {
       debugPrint('[AudioService] Recording to: $_currentRecordingPath');
+      debugPrint('[AudioService] Format: ${recordConfig.encoder == AudioEncoder.pcm16bits ? "PCM (uncompressed)" : "AAC (compressed)"}');
+      if (recordConfig.encoder == AudioEncoder.pcm16bits) {
+        debugPrint('[AudioService] Using reliable format - larger files but no truncation risk');
+      }
     }
 
-    // Start with voice-optimized config
-    final config = AudioCompressionService.getVoiceOptimizedConfig();
-    await _recorder.start(config, path: _currentRecordingPath!);
+    await _recorder.start(recordConfig, path: _currentRecordingPath!);
 
     _isRecording = true;
     _recordingStartTime = DateTime.now();
@@ -145,20 +152,56 @@ class AudioService implements AudioServiceInterface {
       debugPrint('[AudioService] Read ${bytes.length} bytes');
     }
 
+    // Run diagnostic to detect audio truncation
+    final recordConfig = AudioCompressionService.getVoiceOptimizedConfig();
+    // Calculate bit rate: for PCM use sample rate * bit depth * channels,
+    // for compressed formats use the configured bit rate
+    final effectiveBitrate = recordConfig.encoder == AudioEncoder.pcm16bits
+        ? recordConfig.sampleRate * 16 * recordConfig.numChannels
+        : recordConfig.bitRate;
+
+    // Quick diagnostic check (no audio decoding required)
+    final diagnostic = AudioDiagnosticService.quickCheck(
+      fileSizeBytes: bytes.length,
+      timerDurationSeconds: duration,
+      bitrate: effectiveBitrate,
+    );
+
+    if (kDebugMode) {
+      debugPrint('[AudioDiagnostic] ${diagnostic.assessment}');
+      if (diagnostic.hasTruncation) {
+        debugPrint('[AudioDiagnostic] WARNING: Audio truncation detected! Missing ${diagnostic.missingSeconds?.toStringAsFixed(1)}s');
+        debugPrint('[AudioDiagnostic] Consider using AudioCompressionService.useReliableFormat = true');
+      }
+    }
+
+    // Full diagnostic with actual file duration (slower but more accurate)
+    if (kDebugMode && diagnostic.hasTruncation) {
+      final fullDiagnostic = await AudioDiagnosticService.diagnose(
+        filePath: _currentRecordingPath!,
+        timerDurationSeconds: duration,
+        bitrate: effectiveBitrate,
+      );
+      debugPrint('[AudioDiagnostic] Full diagnostic: ${fullDiagnostic.fileDurationSeconds?.toStringAsFixed(2)}s actual duration');
+    }
+
     _currentRecordingPath = null;
     _recordingStartTime = null;
 
     // Load config for thresholds
-    final config = await AppConfig.fromAsset();
-    final audioConfig = config.audio;
+    final appConfig = await AppConfig.fromAsset();
+    final audioConfig = appConfig.audio;
 
-    // For AAC/M4A compressed audio, processing is not needed
-    // The processing service expects raw PCM format and will fail on compressed data
+    // For AAC/M4A or WAV/PCM, different handling applies
+    // AAC/M4A is compressed and doesn't need PCM processing
+    // WAV/PCM is already uncompressed
     final isCompressedFormat = path.endsWith('.m4a') || path.endsWith('.aac');
+    final isPcmFormat = path.endsWith('.wav') || path.endsWith('.pcm');
+    final needsProcessing = !isCompressedFormat && !isPcmFormat;
 
     // Apply audio processing and compression only for uncompressed formats
     Uint8List finalBytes = bytes;
-    if (!isCompressedFormat) {
+    if (needsProcessing) {
       try {
         // First process the audio
         final processedBytes = AudioProcessingService.processVoice(bytes);
@@ -196,8 +239,13 @@ class AudioService implements AudioServiceInterface {
       }
     } else {
       if (kDebugMode) {
-        debugPrint(
-            '[AudioService] Using compressed AAC audio directly (processing not needed)');
+        if (isCompressedFormat) {
+          debugPrint(
+              '[AudioService] Using compressed AAC audio directly (processing not needed)');
+        } else if (isPcmFormat) {
+          debugPrint(
+              '[AudioService] Using uncompressed PCM audio (no processing needed)');
+        }
       }
     }
 
@@ -221,10 +269,10 @@ class AudioService implements AudioServiceInterface {
       return null;
     }
 
-    // For compressed formats (AAC/M4A), skip PCM-based analysis
-    // The audio is already compressed and we can't analyze raw PCM samples
+    // For compressed formats (AAC/M4A) or PCM formats (WAV), skip PCM-based analysis
+    // The audio is already in the correct format and we can't analyze raw compressed samples
     AudioAnalysisResult? analysis;
-    if (!isCompressedFormat) {
+    if (!isCompressedFormat && !isPcmFormat) {
       // Analyze audio to detect speech using background analyzer
       final audioBytes = Uint8List.fromList(finalBytes);
       analysis = await AudioProcessor.analyzeAudio(
@@ -249,18 +297,19 @@ class AudioService implements AudioServiceInterface {
         debugPrint('[AudioService] Recording validation passed');
       }
     } else {
-      // For compressed formats, create a basic analysis result
+      // For compressed formats (AAC/M4A) or PCM formats (WAV), create a basic analysis result
       // We assume the audio is valid if it passed duration and file size checks
-      analysis = const AudioAnalysisResult(
+      final formatName = isCompressedFormat ? 'AAC' : 'PCM';
+      analysis = AudioAnalysisResult(
         containsSpeech: true,
-        reason: 'Compressed AAC format - validation bypassed',
+        reason: '$formatName format - validation bypassed',
         averageAmplitude: 0.1,
         maxAmplitude: 0.2,
         speechRatio: 0.5,
       );
       if (kDebugMode) {
         debugPrint(
-            '[AudioService] Compressed format validation passed (PCM analysis skipped)');
+            '[AudioService] $formatName format validation passed (PCM analysis skipped)');
       }
     }
 
