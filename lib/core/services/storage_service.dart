@@ -4,6 +4,8 @@ import '../models/transcription.dart';
 import '../models/custom_prompt.dart';
 import '../models/vocabulary.dart';
 import '../models/app_settings.dart';
+import '../models/api_key_info.dart';
+import '../models/api_key_usage_stats.dart';
 import '../config/prompt_config.dart';
 import '../config/vocabulary_config.dart';
 import '../interfaces/audio_service_interface.dart';
@@ -24,6 +26,10 @@ class StorageService implements StorageServiceInterface {
     Hive.registerAdapter(TranscriptionAdapter());
     Hive.registerAdapter(CustomPromptAdapter());
     Hive.registerAdapter(VocabularySetAdapter());
+    Hive.registerAdapter(AudioCompressionPreferenceAdapter());
+    Hive.registerAdapter(ApiKeyInfoAdapter());
+    Hive.registerAdapter(DailyUsageAdapter());
+    Hive.registerAdapter(ApiKeyUsageStatsAdapter());
     Hive.registerAdapter(AppSettingsAdapter());
 
     // Open boxes

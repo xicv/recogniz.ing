@@ -8,6 +8,7 @@ import '../../core/theme/app_theme.dart';
 import '../../widgets/shared/empty_states.dart';
 import 'widgets/compact_stats_card.dart';
 import 'widgets/dashboard_metrics.dart';
+import 'widgets/quota_status_card.dart';
 
 class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});
@@ -100,6 +101,11 @@ class DashboardPage extends ConsumerWidget {
 
                   const SizedBox(height: 16),
 
+                  // Quota Status Card (NEW)
+                  const QuotaStatusCard(),
+
+                  const SizedBox(height: 16),
+
                   // Compact stats card
                   CompactStatsCard(
                     totalUsage: statistics.totalUsage,
@@ -107,6 +113,16 @@ class DashboardPage extends ConsumerWidget {
                     totalTokens: statistics.totalTokens,
                     totalDurationMinutes: statistics.totalDurationMinutes,
                   ),
+
+                  const SizedBox(height: 16),
+
+                  // Enhanced Stats Grid (NEW)
+                  const EnhancedStatsGrid(),
+
+                  const SizedBox(height: 12),
+
+                  // Usage Insights (NEW)
+                  const UsageInsightsCard(),
 
                   const SizedBox(height: 16),
 

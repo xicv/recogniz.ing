@@ -69,9 +69,9 @@ make release          # Bump patch + deploy all platforms
 
 1. Launch the app
 2. Go to **Settings** tab
-3. Enter your **Gemini API Key**
+3. Enter your **Gemini API Key** (or add multiple keys for automatic failover)
 4. (Optional) Customize prompts and vocabulary
-5. Return to **Dashboard**
+5. Return to **Dashboard** to see your free tier quota
 6. Tap the **microphone button** or use global hotkey (Cmd+Shift+Space / Ctrl+Shift+Space)
 7. Tap again to stop and transcribe
 
@@ -106,9 +106,13 @@ make release          # Bump patch + deploy all platforms
 - **Audio format preference**: Auto (smart), Compact (AAC), or Full (PCM)
 
 ### 📊 Dashboard & Analytics
+- **Free tier quota tracking** with visual progress indicator
+- **Multi-API key management** with automatic failover on rate limits
+- Per-key usage statistics and daily averages
+- Days until exhaustion projection
 - Real-time transcription history with search functionality
 - Favorites filter to quickly access starred transcriptions
-- Usage statistics tracking (transcriptions, tokens, duration)
+- Usage statistics tracking (transcriptions, tokens, duration, words)
 - Editable transcriptions with auto-save
 - Copy to clipboard with one-click
 - Detailed transcription metadata (duration, tokens, detected language)

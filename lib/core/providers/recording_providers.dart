@@ -7,6 +7,7 @@ import '../services/storage_service.dart';
 import '../services/notification_service.dart';
 import 'app_providers.dart';
 import 'config_providers.dart';
+import 'api_keys_provider.dart';
 import '../models/app_settings.dart';
 
 // Service providers
@@ -23,14 +24,46 @@ final audioServiceProvider = Provider<AudioServiceInterface>((ref) {
 final geminiServiceProvider = Provider<GeminiService>((ref) {
   final service = GeminiService();
   final settings = ref.watch(settingsProvider);
+  final apiKeys = ref.watch(apiKeysProvider);
   final config = ref.read(appConfigProvider);
 
   // Get model name from config or use default
   String modelName = 'gemini-3-flash-preview';
   config.whenData((value) => modelName = value.api.model);
 
-  if (settings.geminiApiKey?.isNotEmpty == true) {
-    service.initialize(settings.geminiApiKey!, model: modelName);
+  // Get the effective API key (prioritizing multi-key system)
+  final apiKey = settings.effectiveApiKey;
+
+  if (apiKey?.isNotEmpty == true) {
+    service.initialize(
+      apiKey!,
+      model: modelName,
+      // Rate limit callback - mark the current key as rate limited
+      onRateLimit: (key) {
+        final currentKey = apiKeys.firstWhere(
+          (k) => k.apiKey == key,
+          orElse: () => apiKeys.firstWhere(
+            (k) => k.isSelected,
+            orElse: () => throw Exception('No matching API key found'),
+          ),
+        );
+        ref.read(apiKeysProvider.notifier).markRateLimited(currentKey.id);
+      },
+      // Get next available API key callback
+      getNextApiKey: (currentKey) {
+        final availableKeys = ref.read(availableApiKeysProvider);
+
+        // Return first available key that isn't the current one
+        final nextKey = availableKeys.firstWhere(
+          (k) => k.apiKey != currentKey,
+          orElse: () => availableKeys.firstWhere(
+            (k) => k.apiKey != currentKey,
+            orElse: () => throw Exception('No alternative API key available'),
+          ),
+        );
+        return nextKey.apiKey;
+      },
+    );
   }
 
   ref.onDispose(() {

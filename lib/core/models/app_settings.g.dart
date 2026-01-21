@@ -30,13 +30,16 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       audioCompressionPreference: fields[13] == null
           ? AudioCompressionPreference.auto
           : fields[13] as AudioCompressionPreference,
+      apiKeys:
+          fields[14] == null ? [] : (fields[14] as List).cast<ApiKeyInfo>(),
+      selectedApiKeyId: fields[15] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, AppSettings obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(13)
       ..writeByte(0)
       ..write(obj.geminiApiKey)
       ..writeByte(1)
@@ -58,7 +61,11 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       ..writeByte(11)
       ..write(obj.transcriptionLanguage)
       ..writeByte(13)
-      ..write(obj.audioCompressionPreference);
+      ..write(obj.audioCompressionPreference)
+      ..writeByte(14)
+      ..write(obj.apiKeys)
+      ..writeByte(15)
+      ..write(obj.selectedApiKeyId);
   }
 
   @override

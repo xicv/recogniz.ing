@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:googleai_dart/googleai_dart.dart';
@@ -24,6 +23,12 @@ class GeminiPerformanceConfig {
   static const double maxAudioDuration = 60.0;
 }
 
+/// Callback for when rate limit is hit
+typedef RateLimitCallback = void Function(String apiKey);
+
+/// Callback to get next available API key
+typedef NextApiKeyCallback = String? Function(String currentApiKey);
+
 class GeminiService implements TranscriptionServiceInterface {
   GoogleAIClient? _client;
   bool _disposed = false;
@@ -34,6 +39,12 @@ class GeminiService implements TranscriptionServiceInterface {
 
   // API key
   String? _apiKey;
+
+  // Callback when rate limit is hit
+  RateLimitCallback? _onRateLimit;
+
+  // Callback to get next available API key for auto-switching
+  NextApiKeyCallback? _getNextApiKey;
 
   // Request timeout for large audio files (5 minutes for files up to 100MB)
   static const Duration _requestTimeout = Duration(minutes: 5);
@@ -48,7 +59,13 @@ class GeminiService implements TranscriptionServiceInterface {
   String get modelName => _modelName;
 
   /// Initialize the service with API key and optional model name
-  void initialize(String apiKey, {String? model, String? systemInstruction}) {
+  void initialize(
+    String apiKey, {
+    String? model,
+    String? systemInstruction,
+    RateLimitCallback? onRateLimit,
+    NextApiKeyCallback? getNextApiKey,
+  }) {
     if (_disposed) {
       debugPrint('[GeminiService] Service was disposed, creating new client');
       _disposed = false;
@@ -59,6 +76,9 @@ class GeminiService implements TranscriptionServiceInterface {
     }
 
     _apiKey = apiKey;
+    _onRateLimit = onRateLimit;
+    _getNextApiKey = getNextApiKey;
+
     debugPrint(
         '[GeminiService] Initializing googleai_dart with model: $_modelName...');
 
@@ -71,6 +91,21 @@ class GeminiService implements TranscriptionServiceInterface {
 
     debugPrint(
         '[GeminiService] Client initialized successfully (timeout: ${_requestTimeout.inMinutes}min)');
+  }
+
+  /// Update the API key (for auto-switching)
+  void updateApiKey(String newApiKey) {
+    if (newApiKey == _apiKey) return;
+
+    _apiKey = newApiKey;
+    debugPrint('[GeminiService] Switching to new API key');
+
+    _client = GoogleAIClient(
+      config: GoogleAIConfig(
+        authProvider: ApiKeyProvider(newApiKey),
+        timeout: _requestTimeout,
+      ),
+    );
   }
 
   /// Build system instruction for multi-language transcription
@@ -170,14 +205,67 @@ You are a multilingual transcription assistant.
       return cachedResult;
     }
 
-    // Always use combined call for optimal performance
-    return await _combinedTranscription(
+    // Try transcription with auto-switch on rate limit
+    return await _transcribeWithAutoSwitch(
       audioBytes,
       vocabulary,
       promptTemplate,
       criticalInstructions,
       cacheKey,
     );
+  }
+
+  /// Transcribe with automatic API key switching on rate limit
+  Future<TranscriptionResult> _transcribeWithAutoSwitch(
+    Uint8List audioBytes,
+    String vocabulary,
+    String promptTemplate,
+    String? criticalInstructions,
+    String cacheKey,
+  ) async {
+    const maxKeySwitches = 3;
+    int attempts = 0;
+
+    while (attempts <= maxKeySwitches) {
+      try {
+        return await _combinedTranscription(
+          audioBytes,
+          vocabulary,
+          promptTemplate,
+          criticalInstructions,
+          cacheKey,
+        );
+      } catch (e) {
+        final errorStr = e.toString().toLowerCase();
+
+        // Check if this is a rate limit error (429)
+        final isRateLimit = errorStr.contains('429') ||
+            errorStr.contains('resource_exhausted') ||
+            errorStr.contains('rate limit');
+
+        if (isRateLimit && _apiKey != null) {
+          debugPrint('[GeminiService] Rate limit hit for API key');
+
+          // Notify rate limit callback
+          _onRateLimit?.call(_apiKey!);
+
+          // Try to switch to another key
+          final nextKey = _getNextApiKey?.call(_apiKey!);
+          if (nextKey != null && nextKey != _apiKey) {
+            attempts++;
+            debugPrint('[GeminiService] Auto-switching to alternative API key (attempt $attempts/$maxKeySwitches)');
+            updateApiKey(nextKey);
+            // Retry with new key
+            continue;
+          }
+        }
+
+        // If not rate limit, or no more keys to try, rethrow
+        rethrow;
+      }
+    }
+
+    throw Exception('All API keys are rate limited. Please wait or add more keys.');
   }
 
   Future<(bool isValid, String? error)> validateApiKey(String apiKey) async {

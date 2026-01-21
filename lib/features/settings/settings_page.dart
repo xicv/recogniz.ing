@@ -13,6 +13,7 @@ import '../../core/models/app_settings.dart';
 import 'widgets/critical_instructions_editor.dart';
 import 'widgets/hotkey_editor.dart';
 import 'widgets/settings_section.dart';
+import 'widgets/api_keys_manager.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
@@ -38,10 +39,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           children: [
             // API Configuration
             SettingsSection(
-              title: 'API Configuration',
+              title: 'API Keys',
               icon: LucideIcons.key,
               children: [
-                _buildApiKeyField(context, ref, settings.geminiApiKey),
+                const ApiKeysManager(),
               ],
             ).animate().fadeIn(duration: 300.ms, delay: 100.ms),
 

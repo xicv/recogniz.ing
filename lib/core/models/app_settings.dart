@@ -1,4 +1,7 @@
+import 'package:collection/collection.dart';
 import 'package:hive/hive.dart';
+
+import 'api_key_info.dart';
 
 part 'app_settings.g.dart';
 
@@ -60,6 +63,12 @@ class AppSettings extends HiveObject {
   @HiveField(13, defaultValue: AudioCompressionPreference.auto)
   final AudioCompressionPreference audioCompressionPreference;
 
+  @HiveField(14, defaultValue: [])
+  final List<ApiKeyInfo> apiKeys;
+
+  @HiveField(15)
+  final String? selectedApiKeyId;
+
   AppSettings({
     this.geminiApiKey,
     this.selectedPromptId = 'default-clean',
@@ -76,6 +85,8 @@ class AppSettings extends HiveObject {
     this.startAtLogin = false,
     this.transcriptionLanguage = 'auto',
     this.audioCompressionPreference = AudioCompressionPreference.auto,
+    this.apiKeys = const [],
+    this.selectedApiKeyId,
   });
 
   AppSettings copyWith({
@@ -90,6 +101,8 @@ class AppSettings extends HiveObject {
     bool? startAtLogin,
     String? transcriptionLanguage,
     AudioCompressionPreference? audioCompressionPreference,
+    List<ApiKeyInfo>? apiKeys,
+    String? selectedApiKeyId,
   }) {
     return AppSettings(
       geminiApiKey: geminiApiKey ?? this.geminiApiKey,
@@ -105,10 +118,42 @@ class AppSettings extends HiveObject {
           transcriptionLanguage ?? this.transcriptionLanguage,
       audioCompressionPreference:
           audioCompressionPreference ?? this.audioCompressionPreference,
+      apiKeys: apiKeys ?? this.apiKeys,
+      selectedApiKeyId: selectedApiKeyId ?? this.selectedApiKeyId,
     );
   }
 
   bool get hasApiKey => geminiApiKey != null && geminiApiKey!.isNotEmpty;
+
+  /// Get the currently selected API key from the multi-key system
+  ///
+  /// Returns the ApiKeyInfo that is currently selected, or null if:
+  /// - No keys are stored
+  /// - No key is selected
+  /// - The selected key ID is invalid
+  ApiKeyInfo? get selectedApiKey {
+    if (selectedApiKeyId == null) return null;
+    return apiKeys.firstWhereOrNull((key) => key.id == selectedApiKeyId);
+  }
+
+  /// Get the actual API key string to use
+  ///
+  /// Priority:
+  /// 1. Selected key from multi-key system
+  /// 2. Legacy geminiApiKey field (for backward compatibility)
+  String? get effectiveApiKey {
+    // Try new multi-key system first
+    final selected = selectedApiKey;
+    if (selected != null && !selected.isRateLimited) {
+      return selected.apiKey;
+    }
+    // Fall back to legacy single key
+    return geminiApiKey;
+  }
+
+  /// Get all available (non-rate-limited) API keys
+  List<ApiKeyInfo> get availableApiKeys =>
+      apiKeys.where((key) => !key.isRateLimited || key.isRateLimitExpired).toList();
 
   String get effectiveCriticalInstructions =>
       criticalInstructions ??
