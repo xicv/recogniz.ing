@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:googleai_dart/googleai_dart.dart';
+import 'package:crypto/crypto.dart';
 
 import '../models/transcription_result.dart';
 import '../interfaces/audio_service_interface.dart';
@@ -87,28 +89,24 @@ You are a multilingual transcription assistant.
   }
 
   /// Generate a cache key for the audio and parameters
-  /// Uses length + first/last bytes for faster hash computation
+  ///
+  /// Uses SHA-256 hash of the full audio bytes for accurate cache keys.
+  /// This prevents false cache hits from different recordings that happen
+  /// to have similar start/end byte patterns.
   String _generateCacheKey(
       Uint8List audioBytes, String vocabulary, String promptTemplate) {
-    // Fast hash using length + sample of bytes (first 100 and last 100)
-    final length = audioBytes.length;
-    var audioHash = length * 31;
+    // Use SHA-256 for accurate, collision-resistant cache keys
+    final audioDigest = sha256.convert(audioBytes);
+    final audioHash = audioDigest.toString();
 
-    // Sample first 100 bytes
-    final sampleSize = length < 200 ? length : 100;
-    for (int i = 0; i < sampleSize; i++) {
-      audioHash = ((audioHash << 5) - audioHash) + audioBytes[i];
-    }
+    // Include parameters in the hash
+    final paramsDigest = sha256.convert(
+      Uint8List.fromList('$vocabulary|$promptTemplate'.codeUnits),
+    );
+    final paramsHash = paramsDigest.toString();
 
-    // Sample last 100 bytes for longer audio
-    if (length > 200) {
-      for (int i = length - 100; i < length; i++) {
-        audioHash = ((audioHash << 5) - audioHash) + audioBytes[i];
-      }
-    }
-
-    final paramsHash = '${vocabulary.length}_${promptTemplate.length}'.hashCode;
-    return '${audioHash}_$paramsHash';
+    // Use first 16 chars of each hash for shorter keys
+    return '${audioHash.substring(0, 16)}_$paramsHash';
   }
 
   /// Get result from cache if available
@@ -222,6 +220,17 @@ You are a multilingual transcription assistant.
   /// Parse API error and return user-friendly message
   (bool, String? error) _parseApiError(dynamic error) {
     final errorStr = error.toString().toLowerCase();
+
+    // Handle empty response errors specifically
+    if (errorStr.contains('empty transcription') ||
+        errorStr.contains('empty_response') ||
+        errorStr.contains('finishreason')) {
+      return (
+        false,
+        'The API returned an empty response. This is a temporary issue. '
+            'Please try again. If it persists, try recording again.'
+      );
+    }
 
     if (errorStr.contains('403') ||
         errorStr.contains('permission_denied') ||
@@ -338,6 +347,9 @@ You are a multilingual transcription assistant.
   }
 
   /// Combined transcription and processing in a single API call
+  ///
+  /// Includes automatic retry for empty responses, which can occur due to
+  /// transient API issues even with valid audio input.
   Future<TranscriptionResult> _combinedTranscription(
     Uint8List audioBytes,
     String vocabulary,
@@ -350,78 +362,125 @@ You are a multilingual transcription assistant.
 
     debugPrint('[GeminiService] Using combined transcription mode...');
 
-    try {
-      // Use Blob.fromBytes convenience factory for cleaner code
-      final audioBlob = Blob.fromBytes('audio/wav', audioBytes);
+    // Auto-retry for empty responses (known Gemini API transient issue)
+    const maxEmptyRetries = 2;
+    int emptyRetryCount = 0;
 
-      // Use audio/wav for PCM format (recommended for Gemini API)
-      final audioContent = Content(
-        parts: [
-          TextPart(combinedPrompt),
-          InlineDataPart(audioBlob),
-        ],
-        role: 'user',
-      );
+    while (emptyRetryCount <= maxEmptyRetries) {
+      try {
+        // Use Blob.fromBytes convenience factory for cleaner code
+        final audioBlob = Blob.fromBytes('audio/wav', audioBytes);
 
-      // Build request with system instruction
-      final request = GenerateContentRequest(
-        contents: [audioContent],
-        systemInstruction: Content(
-          parts: [TextPart(_buildSystemInstruction())],
+        // Use audio/wav for PCM format (recommended for Gemini API)
+        final audioContent = Content(
+          parts: [
+            TextPart(combinedPrompt),
+            InlineDataPart(audioBlob),
+          ],
           role: 'user',
-        ),
-        generationConfig: const GenerationConfig(
-          temperature: 0.1,
-          maxOutputTokens: 8192,
-          topP: 0.8,
-          topK: 40,
-        ),
-      );
+        );
 
-      final response = await _executeWithRetry(
-        () => _client!.models.generateContent(
-          model: _modelName,
-          request: request,
-        ),
-        operationName: 'combined-transcription',
-      );
+        // Build request with system instruction
+        final request = GenerateContentRequest(
+          contents: [audioContent],
+          systemInstruction: Content(
+            parts: [TextPart(_buildSystemInstruction())],
+            role: 'user',
+          ),
+          generationConfig: const GenerationConfig(
+            temperature: 0.1,
+            maxOutputTokens: 8192,
+            topP: 0.8,
+            topK: 40,
+          ),
+        );
 
-      final resultText = _extractTextFromResponse(response) ?? '';
-      debugPrint('[GeminiService] Combined transcription complete');
+        final response = await _executeWithRetry(
+          () => _client!.models.generateContent(
+            model: _modelName,
+            request: request,
+          ),
+          operationName: 'combined-transcription',
+        );
 
-      if (resultText.isEmpty) {
-        throw Exception('Empty transcription received from API');
+        final resultText = _extractTextFromResponse(response) ?? '';
+        debugPrint('[GeminiService] Combined transcription complete');
+
+        // Handle empty response with automatic retry
+        if (resultText.isEmpty) {
+          if (emptyRetryCount < maxEmptyRetries) {
+            emptyRetryCount++;
+            debugPrint(
+                '[GeminiService] Empty response received (attempt $emptyRetryCount/$maxEmptyRetries), retrying...');
+            await Future.delayed(Duration(milliseconds: 500 * emptyRetryCount));
+            continue;
+          } else {
+            // Final retry failed, throw detailed error
+            debugPrint(
+                '[GeminiService] Empty response after $maxEmptyRetries retries');
+            throw _createEmptyResponseException(response);
+          }
+        }
+
+        // Extract raw and processed text from the response
+        final parts = resultText.split('\n---\n');
+        String rawText = resultText;
+        String processedText = resultText;
+
+        if (parts.length >= 2) {
+          rawText = parts[0].trim();
+          processedText = parts[1].trim();
+        }
+
+        if (rawText.trim() == '[NO_SPEECH]') {
+          throw Exception('No speech detected in audio');
+        }
+
+        // Get token usage from response metadata
+        final tokenUsage = response.usageMetadata?.totalTokenCount ??
+            (resultText.length / 4).round();
+
+        return _createResult(
+          cacheKey: cacheKey,
+          rawText: rawText,
+          processedText: processedText,
+          tokenUsage: tokenUsage,
+        );
+      } catch (e) {
+        // If it's not an empty response error, fail immediately
+        if (!e.toString().contains('Empty transcription') &&
+            !e.toString().contains('empty_response')) {
+          debugPrint('[GeminiService] Combined transcription error: $e');
+          final (_, userError) = _parseApiError(e);
+          throw Exception(userError ?? 'Transcription failed: $e');
+        }
+        // If it's the last empty retry, rethrow
+        if (emptyRetryCount >= maxEmptyRetries) {
+          debugPrint('[GeminiService] Combined transcription error: $e');
+          rethrow;
+        }
       }
-
-      // Extract raw and processed text from the response
-      final parts = resultText.split('\n---\n');
-      String rawText = resultText;
-      String processedText = resultText;
-
-      if (parts.length >= 2) {
-        rawText = parts[0].trim();
-        processedText = parts[1].trim();
-      }
-
-      if (rawText.trim() == '[NO_SPEECH]') {
-        throw Exception('No speech detected in audio');
-      }
-
-      // Get token usage from response metadata
-      final tokenUsage = response.usageMetadata?.totalTokenCount ??
-          (resultText.length / 4).round();
-
-      return _createResult(
-        cacheKey: cacheKey,
-        rawText: rawText,
-        processedText: processedText,
-        tokenUsage: tokenUsage,
-      );
-    } catch (e) {
-      debugPrint('[GeminiService] Combined transcription error: $e');
-      final (_, userError) = _parseApiError(e);
-      throw Exception(userError ?? 'Transcription failed: $e');
     }
+
+    // Should never reach here, but satisfy the type checker
+    throw Exception('Transcription failed after retries');
+  }
+
+  /// Create a detailed exception for empty API responses
+  Exception _createEmptyResponseException(GenerateContentResponse response) {
+    final candidates = response.candidates ?? [];
+    final finishReason = candidates.isNotEmpty
+        ? candidates.first.finishReason?.name ?? 'unknown'
+        : 'no candidates';
+
+    final buffer = StringBuffer(
+        'Empty transcription received from API (finishReason: $finishReason)');
+
+    if (response.promptFeedback != null) {
+      buffer.write('. Prompt feedback: ${response.promptFeedback}');
+    }
+
+    return Exception(buffer.toString());
   }
 
   /// Extract text from GenerateContentResponse
