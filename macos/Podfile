@@ -51,6 +51,9 @@ post_install do |installer|
       # Treat warnings as non-errors for pods
       config.build_settings['GCC_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
       config.build_settings['SWIFT_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
+
+      # Suppress unused value warning (audio_session plugin has this)
+      config.build_settings['GCC_WARN_UNUSED_VALUE'] = 'NO'
     end
   end
 
