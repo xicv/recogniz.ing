@@ -1,6 +1,6 @@
 # Recogniz.ing
 
-AI-powered voice typing application built with Flutter, featuring modern Material Design 3, enhanced performance optimizations, and comprehensive error handling.
+**AI-powered voice typing that adapts to your workflow.** Privacy-first, cross-platform, and powered by Google Gemini 3 Flash.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Flutter](https://img.shields.io/badge/Flutter-3.24+-blue.svg)](https://flutter.dev)
@@ -20,6 +20,8 @@ AI-powered voice typing application built with Flutter, featuring modern Materia
    ```
 
 2. **Gemini API Key** - Get your free API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
+   - **Generous free tier**: Gemini 3 Flash offers free requests that cover daily personal use for most users
+   - Paid tier only ~$0.075 per million characters when needed (very affordable)
 
 ### Installation & Running
 
@@ -39,12 +41,10 @@ flutter run -d ios        # iOS Simulator
 flutter run -d android    # Android device/emulator
 flutter run -d windows    # Windows
 flutter run -d linux      # Linux
-flutter run -d web        # Web browser
+flutter run -d web        # Web browser (limited)
 ```
 
 ### Using the Makefile
-
-The project includes a comprehensive Makefile for common tasks:
 
 ```bash
 # Dependencies & Development
@@ -72,35 +72,38 @@ make release          # Bump patch + deploy all platforms
 3. Enter your **Gemini API Key**
 4. (Optional) Customize prompts and vocabulary
 5. Return to **Dashboard**
-6. Tap the **microphone button** or use global hotkey (Cmd+Shift+Space) to start recording
+6. Tap the **microphone button** or use global hotkey (Cmd+Shift+Space / Ctrl+Shift+Space)
 7. Tap again to stop and transcribe
 
 ---
 
 ## Features
 
-### 🎤 Voice Recording
-- **ML-based Voice Activity Detection** with Silero VAD (~95% accuracy)
-- Graceful fallback to amplitude-based VAD (~75% accuracy) when Silero unavailable
+### 🎤 Smart Voice Recording
+- **Silero VAD** (~95% accuracy) ML-based voice activity detection
+- **Graceful fallback** to amplitude-based VAD (~75% accuracy) when ML unavailable
 - Real-time speech probability feedback with visual state indicators
-- Visual recording feedback with timer, waveform, and state indicators
-- Clean, static processing indicator (no flashing animations)
-- Desktop global hotkey support (Cmd+Shift+Space on macOS, Ctrl+Shift+Space on Windows/Linux)
-- System tray integration for desktop platforms
-- RMS-based amplitude detection with optimized thresholds (fallback)
-- Pre-validation to filter non-speech audio before API calls (reduces costs)
+- **Global hotkeys** (Cmd+Shift+Space / Ctrl+Shift+Space) with system tray integration
+- RMS-based audio validation filters non-speech before API calls
 - Background audio analysis in isolates for smooth UI performance
-- Optimized audio encoding: 16kHz sample rate, AAC 64kbps
+- **Smart audio format selection**: Auto/Compact/Full modes based on recording duration
 
-### 🤖 AI-Powered Transcription
-- Powered by **Google Gemini 3 Flash** (gemini-3-flash-preview)
-- **Optimized single-call transcription** (50% fewer API calls)
-- **Token-efficient prompts** (~67% reduction in prompt overhead)
-- **O(1) cache key generation** using sampling vs O(n) full iteration
+### 🤖 Gemini 3 Flash Transcription
+- Powered by **Google Gemini 3 Flash** (gemini-3-flash-preview) - Google's fastest AI model
+- **Generous free tier** covers daily personal use for most users—no payment required
+- **Token-efficient prompts** with 67% reduction in overhead
+- **Auto-retry mechanism** handles transient API errors automatically
+- **Multi-language support** with auto-detection (20+ languages including Chinese, Japanese, Korean)
+- **SHA-256 cache key generation** for accurate transcription caching
 - Support for up to ~3.5 hours of audio per request (100MB inline limit)
-- Automatic retry mechanism with exponential backoff
-- Editable critical instructions for fine-tuning AI behavior
-- Smart retry logic with circuit breaker pattern
+
+### 🎛️ Customization
+- **6 pre-configured prompts**: Clean, Formal, Bullets, Email, Meeting Notes, Social Media
+- **6 vocabulary sets**: General, Technology, Business, Medical, Legal, Finance
+- **Custom vocabulary** support for industry-specific terms
+- **Custom prompt creation** with template variables
+- **Language selection** or auto-detection for transcriptions
+- **Audio format preference**: Auto (smart), Compact (AAC), or Full (PCM)
 
 ### 📊 Dashboard & Analytics
 - Real-time transcription history with search functionality
@@ -108,41 +111,39 @@ make release          # Bump patch + deploy all platforms
 - Usage statistics tracking (transcriptions, tokens, duration)
 - Editable transcriptions with auto-save
 - Copy to clipboard with one-click
-- Detailed transcription metadata (duration, tokens used, creation time)
+- Detailed transcription metadata (duration, tokens, detected language)
 
-### ⚙️ Customization
-- 6 pre-configured prompts for different use cases
-- Custom vocabulary sets for technical terms
-- Theme switching (Light/Dark mode)
-- Global hotkey customization
-- Auto-copy to clipboard option
-- Show notifications toggle
-- Start at login (desktop platforms)
+### 🔒 Privacy & Security
+- **Privacy-first design**: All data stored locally on your device
+- **No account required**: Use the app immediately after setup
+- **No telemetry or analytics**: No user data collected or sent to our servers
+- **Audio only sent to API**: Recordings sent only to Google for transcription, not stored
+- **Local-only storage**: Transcriptions, settings, and audio files never leave your device
 
-### 📝 Smart Prompts System
-- Clean Transcription, Formal Writing, Bullet Points, Email Draft, Meeting Notes, Social Media Post
-- Custom prompt creation with template variables
-- Prompt categories for easy organization
-- Editable critical instructions
+### 🔧 Audio Format Options
+- **Smart mode**: Automatically chooses format based on recording duration
+  - < 2 minutes: AAC (compressed, fast)
+  - 2-5 minutes: AAC with warning about potential truncation
+  - 5+ minutes: PCM (uncompressed, reliable)
+- **Compact mode**: Always AAC format (smaller files, may lose 0.5-2s at end)
+- **Full mode**: Always PCM format (larger files, no audio loss)
+- **Audio diagnostic** to detect truncation issues
+- **Auto-retry** for transient API empty responses
 
-### 📚 Enhanced Vocabulary Management
-- 6 Pre-configured Vocabulary Sets: General, Technology, Business, Medical, Legal, Finance
-- Dynamic vocabulary loading from JSON configuration
-- Multi-word phrase recognition
-- Visual vocabulary preview with expandable tiles
+### 🌍 Multi-Language Support
+- **20+ languages** supported including Chinese, Japanese, Korean, Spanish, French, German, and more
+- **Automatic language detection** with native display names
+- **Code-switching support** preserves mixed-language speech
+- **Language preference** setting or auto-detect by default
 
 ### 🎨 Modern UI/UX
-- Material Design 3 with expressive shapes and colors
+- Material Design 3 with dynamic theming and expressive components
 - Collapsible left drawer navigation (replaces bottom tabs)
-- Smooth 250ms animations with easeOutCubic easing
+- Smooth animations with scroll-reveal effects
 - Responsive design adapting to all screen sizes
-- Clean, minimal interface with thoughtful micro-interactions
-- Dark/Light theme support with system preference detection
-- Consistent border radius system (8, 12, 16, 20px)
-- Typography hierarchy with refined font weights (w500 for labels, w600 for headlines)
-- Hover effects on cards with subtle shadows
-- Empty states with gradient icon backgrounds
+- Light/Dark theme with system preference detection
 - WCAG AAA compliant with 7:1 minimum contrast ratio
+- Keyboard shortcuts: Cmd/Ctrl+1-5 for navigation, Cmd/Ctrl+S to save edits
 
 ---
 
@@ -179,7 +180,7 @@ lib/
 **Note**: The Flutter project root IS the repository root (`/recogniz.ing/`), not a subdirectory. All Flutter commands run from the root.
 
 ### State Management
-- Uses Riverpod for reactive state management
+- Riverpod for reactive state management
 - Providers organized by feature for better maintainability
 - Clean separation between UI and business logic
 

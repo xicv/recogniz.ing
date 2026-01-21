@@ -19,32 +19,32 @@ const faqs = [
   {
     question: "Is the application free to use?",
     answer:
-      "Yes, it's free to download and use. You only need to provide your own API key. The API key provider has free tiers which are usually generous enough for daily use over a long period. You can monitor usage through your cloud API provider's platform.",
+      "Yes, Recogniz.ing is completely free and open-source. You only need to provide your own Gemini API key from Google AI Studio. Gemini 3 Flash has a generous free tier that covers daily personal use for most users—no payment required.",
   },
   {
-    question: "What AI service provider do you support?",
+    question: "What AI model does it use?",
     answer:
-      "We currently use Google Gemini API. There are plans to support more AI services in the future.",
+      "Recogniz.ing uses Google Gemini 3 Flash (gemini-3-flash-preview), Google's fastest AI model for transcription. It features auto-retry for transient errors, supports 20+ languages, and offers a free tier that's sufficient for most users.",
   },
   {
-    question: "What AI model do you support?",
+    question: "Will I need to pay for the API?",
     answer:
-      "We currently use Google Gemini 3 Flash. There are plans to support more AI models via API key in the future.",
-  },
-  {
-    question: "How much does the API cost?",
-    answer:
-      "It depends on your cloud API provider's charges. You can easily monitor this via your own console. If you worry about costs, you can set usage limits or alerts in your cloud API provider's console to avoid unexpected charges.",
+      "Probably not! Gemini 3 Flash's generous free tier typically covers daily personal voice typing. Even if you exceed it, pricing is very affordable (~$0.075 per million characters). A 5-minute recording costs only fractions of a cent. You can set budget alerts in Google Cloud for peace of mind.",
   },
   {
     question: "Can I customize vocabulary?",
     answer:
-      "Yes, absolutely. There are built-in vocabulary sets, and you can also create your own. Add industry-specific terms, custom prompts, and vocabulary tailored to your needs.",
+      "Yes. Recogniz.ing includes 6 pre-built vocabulary sets (General, Technology, Business, Medical, Legal, Finance) and you can create custom vocabulary lists with industry-specific terms for better accuracy.",
   },
   {
-    question: "Is my data secure?",
+    question: "Does it record my voice?",
     answer:
-      "All of your data stays local on your device. We only send necessary audio data to the cloud API provider for transcription, and we don't store any raw data or your personal details.",
+      "Recogniz.ing uses ML-based Voice Activity Detection (Silero VAD) with ~95% accuracy to automatically detect when you speak and pause. Recording stops when you stop talking or manually via hotkey (Cmd+Shift+Space). All recordings and transcriptions are stored locally on your device.",
+  },
+  {
+    question: "Is my data private?",
+    answer:
+      "Yes, privacy-first design. All audio recordings, transcriptions, and settings are stored locally on your device. Audio is only sent to Google's API for transcription and is not stored by Google. No user data is collected or sent to our servers.",
   },
 ];
 
@@ -60,9 +60,9 @@ const features = [
   },
   {
     icon: "sparkles",
-    title: "AI-Powered",
+    title: "Gemini 3 Flash AI",
     description:
-      "Powered by Google Gemini 3.0 Flash for accurate transcription with intelligent context understanding",
+      "Powered by Google Gemini 3 Flash (gemini-3-flash-preview) for accurate, fast transcription with intelligent context understanding and auto-retry for reliability",
     gradient: "bg-gradient-to-br from-sky-500 to-cyan-500",
     span: "col-span-1 sm:col-span-2 row-span-2",
     category: "recording",
