@@ -142,7 +142,8 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
                 decoration: BoxDecoration(
                   color: AppColors.warning.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
+                  border: Border.all(
+                      color: AppColors.warning.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
@@ -587,7 +588,10 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        color: Theme.of(context)
+            .colorScheme
+            .surfaceContainerHighest
+            .withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
@@ -775,8 +779,10 @@ class _FavoritesFilterChip extends StatelessWidget {
       onSelected: (selected) {
         onFilterChanged(selected ? FilterOption.favorites : FilterOption.all);
       },
-      backgroundColor:
-          Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+      backgroundColor: Theme.of(context)
+          .colorScheme
+          .surfaceContainerHighest
+          .withValues(alpha: 0.5),
       selectedColor: Theme.of(context).colorScheme.primary,
       checkmarkColor: Theme.of(context).colorScheme.onPrimary,
       shape: RoundedRectangleBorder(

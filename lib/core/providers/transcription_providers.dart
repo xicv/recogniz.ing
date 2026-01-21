@@ -47,7 +47,8 @@ class FilterOptionNotifier extends Notifier<FilterOption> {
 
 /// Filter option for transcriptions
 final filterOptionProvider =
-    NotifierProvider<FilterOptionNotifier, FilterOption>(FilterOptionNotifier.new);
+    NotifierProvider<FilterOptionNotifier, FilterOption>(
+        FilterOptionNotifier.new);
 
 /// Filtered transcriptions based on search query, filter option, and sort option
 final filteredTranscriptionsProvider = Provider<List<Transcription>>((ref) {

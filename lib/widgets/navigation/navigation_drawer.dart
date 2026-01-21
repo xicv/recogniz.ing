@@ -242,7 +242,8 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
                       waitDuration: const Duration(milliseconds: 500),
                       child: Material(
                         color: isSelected
-                            ? colorScheme.primaryContainer.withValues(alpha: 0.6)
+                            ? colorScheme.primaryContainer
+                                .withValues(alpha: 0.6)
                             : Colors.transparent,
                         borderRadius:
                             BorderRadius.circular(AppTheme.radiusMedium),
@@ -253,8 +254,10 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
                           },
                           borderRadius:
                               BorderRadius.circular(AppTheme.radiusMedium),
-                          hoverColor: colorScheme.onSurface.withValues(alpha: 0.08),
-                          splashColor: colorScheme.onSurface.withValues(alpha: 0.12),
+                          hoverColor:
+                              colorScheme.onSurface.withValues(alpha: 0.08),
+                          splashColor:
+                              colorScheme.onSurface.withValues(alpha: 0.12),
                           child: Container(
                             height: 48,
                             decoration: BoxDecoration(
@@ -319,8 +322,8 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
                       },
                       borderRadius:
                           BorderRadius.circular(AppTheme.radiusMedium),
-                      hoverColor:
-                          colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                      hoverColor: colorScheme.surfaceContainerHighest
+                          .withValues(alpha: 0.6),
                       splashColor: colorScheme.onSurface.withValues(alpha: 0.1),
                       child: Container(
                         padding: const EdgeInsets.symmetric(

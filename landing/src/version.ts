@@ -1,6 +1,6 @@
 // Version information - auto-synced from package.json during version bump
 // DO NOT EDIT MANUALLY - updated by scripts/version_manager.dart
-export const VERSION = '1.14.0'
+export const VERSION = '1.15.0'
 
 // Get current version as string
 export function getVersion(): string {

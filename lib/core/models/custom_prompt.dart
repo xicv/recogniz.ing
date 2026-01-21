@@ -55,7 +55,8 @@ class CustomPrompt extends HiveObject {
           id: 'default-clean',
           name: 'Clean Transcription',
           description: 'Clean up speech, fix grammar, remove filler words',
-          promptTemplate: 'Fix grammar, remove fillers (um/uh/like), preserve meaning:\n\n{{text}}',
+          promptTemplate:
+              'Fix grammar, remove fillers (um/uh/like), preserve meaning:\n\n{{text}}',
           isDefault: true,
           createdAt: DateTime.now(),
         ),
@@ -63,7 +64,8 @@ class CustomPrompt extends HiveObject {
           id: 'default-formal',
           name: 'Formal Writing',
           description: 'Convert speech to formal written text',
-          promptTemplate: 'Convert to formal written text with proper structure and professional language:\n\n{{text}}',
+          promptTemplate:
+              'Convert to formal written text with proper structure and professional language:\n\n{{text}}',
           isDefault: true,
           createdAt: DateTime.now(),
         ),
@@ -71,7 +73,8 @@ class CustomPrompt extends HiveObject {
           id: 'default-bullet',
           name: 'Bullet Points',
           description: 'Convert speech to organized bullet points',
-          promptTemplate: 'Extract and organize key points as bullet points:\n\n{{text}}',
+          promptTemplate:
+              'Extract and organize key points as bullet points:\n\n{{text}}',
           isDefault: true,
           createdAt: DateTime.now(),
         ),
@@ -79,7 +82,8 @@ class CustomPrompt extends HiveObject {
           id: 'default-email',
           name: 'Email Draft',
           description: 'Convert speech to email format',
-          promptTemplate: 'Convert to a professional email with greeting and closing:\n\n{{text}}',
+          promptTemplate:
+              'Convert to a professional email with greeting and closing:\n\n{{text}}',
           isDefault: true,
           createdAt: DateTime.now(),
         ),

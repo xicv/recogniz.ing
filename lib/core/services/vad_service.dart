@@ -83,7 +83,8 @@ class VadService {
       }
 
       if (kDebugMode) {
-        print('[VadService] Silero VAD failed to initialize, falling back to Amplitude VAD');
+        print(
+            '[VadService] Silero VAD failed to initialize, falling back to Amplitude VAD');
         if (sileroVad.initError != null) {
           print('[VadService] Silero error: ${sileroVad.initError}');
         }
@@ -155,7 +156,8 @@ class VadService {
     );
 
     if (kDebugMode) {
-      print('[VadService] VAD listening started using: $activeImplementationName');
+      print(
+          '[VadService] VAD listening started using: $activeImplementationName');
     }
   }
 

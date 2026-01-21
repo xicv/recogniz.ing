@@ -38,8 +38,8 @@ class CurrentPageNotifier extends Notifier<int> {
 }
 
 /// Current page index for navigation
-final currentPageProvider = NotifierProvider<CurrentPageNotifier, int>(
-    CurrentPageNotifier.new);
+final currentPageProvider =
+    NotifierProvider<CurrentPageNotifier, int>(CurrentPageNotifier.new);
 
 /// Notifier for global error message
 class LastErrorNotifier extends Notifier<String?> {
@@ -48,8 +48,8 @@ class LastErrorNotifier extends Notifier<String?> {
 }
 
 /// Global error message provider
-final lastErrorProvider = NotifierProvider<LastErrorNotifier, String?>(
-    LastErrorNotifier.new);
+final lastErrorProvider =
+    NotifierProvider<LastErrorNotifier, String?>(LastErrorNotifier.new);
 
 /// Notifier for tray recording trigger
 class TrayRecordingTriggerNotifier extends Notifier<int> {

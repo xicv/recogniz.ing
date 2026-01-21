@@ -68,14 +68,17 @@ class AudioService implements AudioServiceInterface {
 
     // Determine file extension based on format
     final recordConfig = AudioCompressionService.getVoiceOptimizedConfig();
-    final fileExtension = recordConfig.encoder == AudioEncoder.pcm16bits ? 'wav' : 'm4a';
+    final fileExtension =
+        recordConfig.encoder == AudioEncoder.pcm16bits ? 'wav' : 'm4a';
     _currentRecordingPath = '${dir.path}/recording_$uuid.$fileExtension';
 
     if (kDebugMode) {
       debugPrint('[AudioService] Recording to: $_currentRecordingPath');
-      debugPrint('[AudioService] Format: ${recordConfig.encoder == AudioEncoder.pcm16bits ? "PCM (uncompressed)" : "AAC (compressed)"}');
+      debugPrint(
+          '[AudioService] Format: ${recordConfig.encoder == AudioEncoder.pcm16bits ? "PCM (uncompressed)" : "AAC (compressed)"}');
       if (recordConfig.encoder == AudioEncoder.pcm16bits) {
-        debugPrint('[AudioService] Using reliable format - larger files but no truncation risk');
+        debugPrint(
+            '[AudioService] Using reliable format - larger files but no truncation risk');
       }
     }
 
@@ -170,8 +173,10 @@ class AudioService implements AudioServiceInterface {
     if (kDebugMode) {
       debugPrint('[AudioDiagnostic] ${diagnostic.assessment}');
       if (diagnostic.hasTruncation) {
-        debugPrint('[AudioDiagnostic] WARNING: Audio truncation detected! Missing ${diagnostic.missingSeconds?.toStringAsFixed(1)}s');
-        debugPrint('[AudioDiagnostic] Consider using AudioCompressionService.useReliableFormat = true');
+        debugPrint(
+            '[AudioDiagnostic] WARNING: Audio truncation detected! Missing ${diagnostic.missingSeconds?.toStringAsFixed(1)}s');
+        debugPrint(
+            '[AudioDiagnostic] Consider using AudioCompressionService.useReliableFormat = true');
       }
     }
 
@@ -182,7 +187,8 @@ class AudioService implements AudioServiceInterface {
         timerDurationSeconds: duration,
         bitrate: effectiveBitrate,
       );
-      debugPrint('[AudioDiagnostic] Full diagnostic: ${fullDiagnostic.fileDurationSeconds?.toStringAsFixed(2)}s actual duration');
+      debugPrint(
+          '[AudioDiagnostic] Full diagnostic: ${fullDiagnostic.fileDurationSeconds?.toStringAsFixed(2)}s actual duration');
     }
 
     _currentRecordingPath = null;

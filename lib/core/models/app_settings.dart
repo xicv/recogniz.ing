@@ -2,6 +2,29 @@ import 'package:hive/hive.dart';
 
 part 'app_settings.g.dart';
 
+/// Audio compression preference for recordings
+///
+/// - **auto**: Smart format selection based on recording duration
+///   - < 2 minutes: AAC (compressed, faster)
+///   - 2-5 minutes: AAC with warning about potential truncation
+///   - 5+ minutes: PCM (uncompressed, no truncation risk)
+/// - **alwaysCompressed**: Always use AAC format regardless of duration
+///   - May lose 0.5-2 seconds at end due to encoder buffering
+///   - Smaller file size (~480 KB/min vs 1.92 MB/min for PCM)
+/// - **uncompressed**: Always use PCM format regardless of duration
+///   - No truncation risk, but larger file size
+@HiveType(typeId: 12)
+enum AudioCompressionPreference {
+  @HiveField(0)
+  auto,
+
+  @HiveField(1)
+  alwaysCompressed,
+
+  @HiveField(2)
+  uncompressed,
+}
+
 @HiveType(typeId: 3)
 class AppSettings extends HiveObject {
   @HiveField(0)
@@ -34,6 +57,9 @@ class AppSettings extends HiveObject {
   @HiveField(11, defaultValue: 'auto')
   final String transcriptionLanguage;
 
+  @HiveField(13, defaultValue: AudioCompressionPreference.auto)
+  final AudioCompressionPreference audioCompressionPreference;
+
   AppSettings({
     this.geminiApiKey,
     this.selectedPromptId = 'default-clean',
@@ -49,6 +75,7 @@ class AppSettings extends HiveObject {
 - The vocabulary below is for reference ONLY - do not use it to generate fake transcriptions''',
     this.startAtLogin = false,
     this.transcriptionLanguage = 'auto',
+    this.audioCompressionPreference = AudioCompressionPreference.auto,
   });
 
   AppSettings copyWith({
@@ -62,6 +89,7 @@ class AppSettings extends HiveObject {
     String? criticalInstructions,
     bool? startAtLogin,
     String? transcriptionLanguage,
+    AudioCompressionPreference? audioCompressionPreference,
   }) {
     return AppSettings(
       geminiApiKey: geminiApiKey ?? this.geminiApiKey,
@@ -73,7 +101,10 @@ class AppSettings extends HiveObject {
       showNotifications: showNotifications ?? this.showNotifications,
       criticalInstructions: criticalInstructions ?? this.criticalInstructions,
       startAtLogin: startAtLogin ?? this.startAtLogin,
-      transcriptionLanguage: transcriptionLanguage ?? this.transcriptionLanguage,
+      transcriptionLanguage:
+          transcriptionLanguage ?? this.transcriptionLanguage,
+      audioCompressionPreference:
+          audioCompressionPreference ?? this.audioCompressionPreference,
     );
   }
 

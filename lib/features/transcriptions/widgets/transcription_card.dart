@@ -348,7 +348,8 @@ class _TranscriptionCardState extends State<TranscriptionCard>
               Text(
                 dateFormat.format(widget.transcription.createdAt),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                      color:
+                          colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                     ),
               ),
             ],
@@ -669,7 +670,8 @@ class _TranscriptionCardState extends State<TranscriptionCard>
             ),
             contentPadding: const EdgeInsets.all(12),
             filled: true,
-            fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+            fillColor:
+                colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
           ),
           onChanged: (value) {
             setState(() {
@@ -1230,7 +1232,8 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                    color: colorScheme.surfaceContainerHighest
+                        .withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -1303,8 +1306,8 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
                       ),
                       contentPadding: const EdgeInsets.all(20),
                       filled: true,
-                      fillColor:
-                          colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                      fillColor: colorScheme.surfaceContainerHighest
+                          .withValues(alpha: 0.3),
                     ),
                   ),
                 ),
@@ -1316,7 +1319,8 @@ class _TranscriptionEditModalState extends State<_TranscriptionEditModal> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
-                      color: colorScheme.primaryContainer.withValues(alpha: 0.5),
+                      color:
+                          colorScheme.primaryContainer.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(

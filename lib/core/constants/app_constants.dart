@@ -5,7 +5,8 @@ class AppConstants {
   static const int millisecondsPerSecond = 1000;
   static const double minRecordingDurationSeconds = 0.5;
   static const double maxRecordingDurationSeconds = 300.0; // 5 minutes
-  static const int audioSampleRate = 16000; // 16kHz standard for speech recognition
+  static const int audioSampleRate =
+      16000; // 16kHz standard for speech recognition
   static const int audioBitRate = 64000; // 64kbps optimized for voice
 
   // Transcription
@@ -75,7 +76,8 @@ class AppConstants {
 
   // Default prompt templates
   // Optimized: concise, no redundant "CLEAN VERSION:" marker
-  static const String defaultPromptTemplate = 'Fix grammar, remove fillers (um/uh/like), preserve meaning:\n\n{{text}}';
+  static const String defaultPromptTemplate =
+      'Fix grammar, remove fillers (um/uh/like), preserve meaning:\n\n{{text}}';
 
   static const String defaultPromptId = 'default-clean';
   static const String defaultVocabularyId = 'default-general';

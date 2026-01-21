@@ -256,3 +256,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.15.0] - 2026-01-21
+
+### Added
+
+- **Smart Audio Format Selection** - Added intelligent audio format selection based on recording duration and user preference. Auto mode uses AAC for short recordings (< 2 min), AAC with warning for medium recordings (2-5 min), and PCM for long recordings (5+ min).
+- **Audio Compression Preference Setting** - Added AudioCompressionPreference enum with three options: Auto (smart selection), Always Compressed (AAC only), and Uncompressed (PCM only). Preference stored in AppSettings with Hive persistence.
+- **Audio Format Settings UI** - Added SegmentedButton UI in Settings page for audio format selection. Shows format descriptions: 'Smart format based on recording length' for Auto, 'Smaller files, may lose 0.5-2s at end' for Compact, and 'Larger files, no audio loss' for Full.
+
+### Changed
+
+- **AudioCompressionService Enhancement** - Added getConfigForPreference() method that returns RecordConfig with optional warning message. Duration-based thresholds: < 2 min = AAC (fast, small), 2-5 min = AAC with warning, 5+ min = PCM (reliable).
+
+---
+

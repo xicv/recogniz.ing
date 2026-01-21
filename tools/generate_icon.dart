@@ -22,7 +22,8 @@ Future<void> main() async {
 
   // Save adaptive icon
   final adaptiveFile = File('assets/icons/app_icon_adaptive.png');
-  final adaptiveByteData = await iconAdaptive.toByteData(format: ui.ImageByteFormat.png);
+  final adaptiveByteData =
+      await iconAdaptive.toByteData(format: ui.ImageByteFormat.png);
   await adaptiveFile.writeAsBytes(adaptiveByteData!.buffer.asUint8List());
   stdout.writeln('Adaptive icon generated at ${adaptiveFile.path}');
 
@@ -33,16 +34,21 @@ Future<void> main() async {
   stdout.writeln('Mac icon generated at ${macFile.path}');
 
   // Generate additional sizes
-  await generateSizeVariant(icon, 'assets/icons/generated/app_icon_1024.png', 1024);
-  await generateSizeVariant(icon, 'assets/icons/generated/app_icon_512.png', 512);
-  await generateSizeVariant(icon, 'assets/icons/generated/app_icon_256.png', 256);
-  await generateSizeVariant(icon, 'assets/icons/generated/app_icon_128.png', 128);
+  await generateSizeVariant(
+      icon, 'assets/icons/generated/app_icon_1024.png', 1024);
+  await generateSizeVariant(
+      icon, 'assets/icons/generated/app_icon_512.png', 512);
+  await generateSizeVariant(
+      icon, 'assets/icons/generated/app_icon_256.png', 256);
+  await generateSizeVariant(
+      icon, 'assets/icons/generated/app_icon_128.png', 128);
   await generateSizeVariant(icon, 'assets/icons/generated/app_icon_64.png', 64);
   await generateSizeVariant(icon, 'assets/icons/generated/app_icon_32.png', 32);
   await generateSizeVariant(icon, 'assets/icons/generated/app_icon_16.png', 16);
 
   stdout.writeln('\nAll icons generated successfully!');
-  stdout.writeln('Run "flutter pub run flutter_launcher_icons" to update platform icons.');
+  stdout.writeln(
+      'Run "flutter pub run flutter_launcher_icons" to update platform icons.');
 }
 
 Future<void> generateSizeVariant(ui.Image source, String path, int size) async {
@@ -52,7 +58,8 @@ Future<void> generateSizeVariant(ui.Image source, String path, int size) async {
   // Create resized version
   final recorder = ui.PictureRecorder();
   final canvas = Canvas(recorder);
-  final src = Rect.fromLTWH(0, 0, source.width.toDouble(), source.height.toDouble());
+  final src =
+      Rect.fromLTWH(0, 0, source.width.toDouble(), source.height.toDouble());
   final dst = Rect.fromLTWH(0, 0, size.toDouble(), size.toDouble());
   final paint = Paint()..isAntiAlias = true;
 
@@ -61,7 +68,8 @@ Future<void> generateSizeVariant(ui.Image source, String path, int size) async {
 
   final picture = recorder.endRecording();
   final resizedImage = await picture.toImage(size, size);
-  final byteData = await resizedImage.toByteData(format: ui.ImageByteFormat.png);
+  final byteData =
+      await resizedImage.toByteData(format: ui.ImageByteFormat.png);
   await file.writeAsBytes(byteData!.buffer.asUint8List());
 
   stdout.writeln('  Generated: $path (${size}x$size)');
@@ -178,7 +186,11 @@ void drawRLetter(Canvas canvas, double size, {Color? letterColor}) {
   // Top of R (going right)
   path.lineTo((centerX + 40) * s, (centerY + 30) * s);
   path.arcTo(
-    Rect.fromCenter(center: (centerX + 130) * s, centerY: (centerY - 115) * s, width: 180 * s, height: 230 * s),
+    Rect.fromCenter(
+        center: (centerX + 130) * s,
+        centerY: (centerY - 115) * s,
+        width: 180 * s,
+        height: 230 * s),
     3.14159,
     -3.14159,
     false,
@@ -198,7 +210,11 @@ void drawRLetter(Canvas canvas, double size, {Color? letterColor}) {
   innerPath.lineTo((centerX + 40) * s, (centerY + 30) * s);
   innerPath.lineTo((centerX + 40) * s, (centerY - 50) * s);
   innerPath.arcTo(
-    Rect.fromCenter(center: (centerX + 40) * s, centerY: (centerY - 80) * s, width: 120 * s, height: 120 * s),
+    Rect.fromCenter(
+        center: (centerX + 40) * s,
+        centerY: (centerY - 80) * s,
+        width: 120 * s,
+        height: 120 * s),
     1.5708,
     3.14159,
     false,
@@ -211,7 +227,8 @@ void drawRLetter(Canvas canvas, double size, {Color? letterColor}) {
   if (letterColor == null) {
     // For icons with background, cut out using composite operation
     final cutoutPaint = Paint()
-      ..color = const Color(0xFF1E40AF) // Use gradient start color as approximation
+      ..color =
+          const Color(0xFF1E40AF) // Use gradient start color as approximation
       ..blendMode = BlendMode.srcOut;
     canvas.drawPath(innerPath, cutoutPaint);
   } else {
@@ -231,10 +248,12 @@ void drawRLetter(Canvas canvas, double size, {Color? letterColor}) {
   rPath.lineTo((centerX2 - 180) * s, (centerY2 + 260) * s); // Down to bottom
   rPath.lineTo((centerX2 - 90) * s, (centerY2 + 260) * s); // Right a bit
   rPath.lineTo((centerX2 - 90) * s, (centerY2 + 30) * s); // Up to middle
-  rPath.lineTo((centerX2 + 40) * s, (centerY2 + 30) * s); // Right to start of diagonal
+  rPath.lineTo(
+      (centerX2 + 40) * s, (centerY2 + 30) * s); // Right to start of diagonal
 
   // Draw the bowl of R
-  rPath.lineTo((centerX2 + 180) * s, (centerY2 + 260) * s); // Diagonal down-right
+  rPath.lineTo(
+      (centerX2 + 180) * s, (centerY2 + 260) * s); // Diagonal down-right
   rPath.lineTo((centerX2 + 280) * s, (centerY2 + 260) * s); // Right a bit more
   rPath.lineTo((centerX2 + 130) * s, (centerY2 + 10) * s); // Diagonal up-left
 
@@ -270,12 +289,12 @@ void drawRLetter(Canvas canvas, double size, {Color? letterColor}) {
   cutoutPath.close();
 
   // For cutout, we need to use the background gradient
-  final cutoutPaint = Paint()
-    ..blendMode = BlendMode.srcOut;
+  final cutoutPaint = Paint()..blendMode = BlendMode.srcOut;
   canvas.drawPath(cutoutPath, cutoutPaint);
 }
 
-void drawRecordingDot(Canvas canvas, double size, {required bool hasBackground}) {
+void drawRecordingDot(Canvas canvas, double size,
+    {required bool hasBackground}) {
   // Red recording dot at bottom right of the R
   final dotPaint = Paint()
     ..color = const Color(0xFFEF4444) // Red

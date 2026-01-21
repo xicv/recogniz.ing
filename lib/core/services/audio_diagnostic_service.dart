@@ -110,7 +110,8 @@ class AudioDiagnosticService {
     if (actualDuration < timerDurationSeconds) {
       missingSeconds = timerDurationSeconds - actualDuration;
       lossPercentage = (missingSeconds / timerDurationSeconds) * 100;
-      hasTruncation = lossPercentage > 5.0; // More than 5% loss is considered truncation
+      hasTruncation =
+          lossPercentage > 5.0; // More than 5% loss is considered truncation
     }
 
     // Generate assessment
@@ -118,11 +119,14 @@ class AudioDiagnosticService {
     if (lossPercentage == null) {
       assessment = 'Unable to determine (file duration not available)';
     } else if (lossPercentage < 5) {
-      assessment = 'Normal - minimal loss (${lossPercentage.toStringAsFixed(1)}%)';
+      assessment =
+          'Normal - minimal loss (${lossPercentage.toStringAsFixed(1)}%)';
     } else if (lossPercentage < 15) {
-      assessment = 'WARNING - Moderate truncation detected (${lossPercentage.toStringAsFixed(1)}% loss)';
+      assessment =
+          'WARNING - Moderate truncation detected (${lossPercentage.toStringAsFixed(1)}% loss)';
     } else {
-      assessment = 'CRITICAL - Severe truncation detected (${lossPercentage.toStringAsFixed(1)}% loss)';
+      assessment =
+          'CRITICAL - Severe truncation detected (${lossPercentage.toStringAsFixed(1)}% loss)';
     }
 
     final result = DiagnosticResult(
@@ -163,11 +167,14 @@ class AudioDiagnosticService {
 
     String assessment;
     if (lossPercentage < 5) {
-      assessment = 'Normal - minimal loss (${lossPercentage.toStringAsFixed(1)}%)';
+      assessment =
+          'Normal - minimal loss (${lossPercentage.toStringAsFixed(1)}%)';
     } else if (lossPercentage < 15) {
-      assessment = 'WARNING - Moderate truncation (${lossPercentage.toStringAsFixed(1)}% loss)';
+      assessment =
+          'WARNING - Moderate truncation (${lossPercentage.toStringAsFixed(1)}% loss)';
     } else {
-      assessment = 'CRITICAL - Severe truncation (${lossPercentage.toStringAsFixed(1)}% loss)';
+      assessment =
+          'CRITICAL - Severe truncation (${lossPercentage.toStringAsFixed(1)}% loss)';
     }
 
     final result = DiagnosticResult(

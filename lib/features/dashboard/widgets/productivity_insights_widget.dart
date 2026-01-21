@@ -158,8 +158,7 @@ class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
                   child: _buildMetricCard(
                     context,
                     icon: LucideIcons.messageSquare,
-                    value:
-                        widget.stats.avgWordsPerMinute.toStringAsFixed(0),
+                    value: widget.stats.avgWordsPerMinute.toStringAsFixed(0),
                     label: 'Words/min',
                     color: AppColors.warning,
                   ),

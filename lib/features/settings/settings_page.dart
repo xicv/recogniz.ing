@@ -9,6 +9,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/providers/app_providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/constants/languages.dart';
+import '../../core/models/app_settings.dart';
 import 'widgets/critical_instructions_editor.dart';
 import 'widgets/hotkey_editor.dart';
 import 'widgets/settings_section.dart';
@@ -213,6 +214,99 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   ),
                   trailing: const Icon(LucideIcons.chevronRight),
                   onTap: () => _showLanguageSelector(context),
+                ),
+                // Audio Compression Preference
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              LucideIcons.fileAudio,
+                              color: AppColors.primary,
+                              size: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Audio Format',
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
+                                ),
+                                Text(
+                                  _getCompressionDescription(
+                                      settings.audioCompressionPreference),
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      // SegmentedButton for format selection
+                      SegmentedButton<AudioCompressionPreference>(
+                        segments: const [
+                          ButtonSegment(
+                            value: AudioCompressionPreference.auto,
+                            label: Text('Auto'),
+                            icon: Icon(LucideIcons.wand2, size: 16),
+                          ),
+                          ButtonSegment(
+                            value: AudioCompressionPreference.alwaysCompressed,
+                            label: Text('Compact'),
+                            icon: Icon(LucideIcons.file, size: 16),
+                          ),
+                          ButtonSegment(
+                            value: AudioCompressionPreference.uncompressed,
+                            label: Text('Full'),
+                            icon: Icon(LucideIcons.hardDrive, size: 16),
+                          ),
+                        ],
+                        selected: {settings.audioCompressionPreference},
+                        onSelectionChanged:
+                            (Set<AudioCompressionPreference> selection) {
+                          SchedulerBinding.instance.addPostFrameCallback((_) {
+                            ref
+                                .read(settingsProvider.notifier)
+                                .updateCompressionPreference(
+                                  selection.first,
+                                );
+                          });
+                        },
+                        style: ButtonStyle(
+                          backgroundColor:
+                              WidgetStateProperty.resolveWith((states) {
+                            if (states.contains(WidgetState.selected)) {
+                              return AppColors.primary.withValues(alpha: 0.15);
+                            }
+                            return null;
+                          }),
+                          foregroundColor:
+                              WidgetStateProperty.resolveWith((states) {
+                            if (states.contains(WidgetState.selected)) {
+                              return AppColors.primary;
+                            }
+                            return null;
+                          }),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 // Start at Login - Desktop only
                 if (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
@@ -430,6 +524,17 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     return 'Auto Detect';
   }
 
+  String _getCompressionDescription(AudioCompressionPreference preference) {
+    switch (preference) {
+      case AudioCompressionPreference.auto:
+        return 'Smart format based on recording length';
+      case AudioCompressionPreference.alwaysCompressed:
+        return 'Smaller files, may lose 0.5-2s at end';
+      case AudioCompressionPreference.uncompressed:
+        return 'Larger files, no audio loss';
+    }
+  }
+
   void _showLanguageSelector(BuildContext context) {
     showDialog(
       context: context,
@@ -513,7 +618,8 @@ class LanguageSelectorDialog extends ConsumerWidget {
                     leading: Icon(
                       isSelected ? LucideIcons.check : LucideIcons.circle,
                       size: 20,
-                      color: isSelected ? AppColors.primary : colorScheme.outline,
+                      color:
+                          isSelected ? AppColors.primary : colorScheme.outline,
                     ),
                     selected: isSelected,
                     onTap: () {

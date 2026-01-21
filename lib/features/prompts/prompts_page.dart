@@ -174,7 +174,9 @@ class _PromptsPageState extends ConsumerState<PromptsPage> {
                                   .colorScheme
                                   .primary
                                   .withValues(alpha: 0.1)
-                              : Theme.of(context).colorScheme.surfaceContainerHighest,
+                              : Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(

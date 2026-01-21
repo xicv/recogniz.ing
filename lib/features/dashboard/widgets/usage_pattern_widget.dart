@@ -213,7 +213,9 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
                       width: 32,
                       height: 80,
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Align(
@@ -282,8 +284,10 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
                                     color: isActive
                                         ? (index >= 9 &&
                                                 index <= 17) // Business hours
-                                            ? AppColors.success.withValues(alpha: 0.8)
-                                            : AppColors.primary.withValues(alpha: 0.8)
+                                            ? AppColors.success
+                                                .withValues(alpha: 0.8)
+                                            : AppColors.primary
+                                                .withValues(alpha: 0.8)
                                         : Theme.of(context)
                                             .colorScheme
                                             .surfaceContainerHighest,

@@ -85,6 +85,13 @@ class SettingsNotifier extends Notifier<AppSettings> {
     state = newState;
   }
 
+  Future<void> updateCompressionPreference(
+      AudioCompressionPreference preference) async {
+    final newState = state.copyWith(audioCompressionPreference: preference);
+    await StorageService.saveSettings(newState);
+    state = newState;
+  }
+
   Future<void> toggleStartAtLogin() async {
     final newValue = !state.startAtLogin;
     final service = StartAtLoginService();

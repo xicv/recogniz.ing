@@ -240,7 +240,8 @@ class _HotkeyEditorDialogState extends ConsumerState<HotkeyEditorDialog> {
     final isSelected = _recordedHotkey == hotkey;
     return ActionChip(
       label: Text(_formatForDisplay(hotkey)),
-      backgroundColor: isSelected ? AppColors.primary.withValues(alpha: 0.2) : null,
+      backgroundColor:
+          isSelected ? AppColors.primary.withValues(alpha: 0.2) : null,
       onPressed: () {
         setState(() {
           _recordedHotkey = hotkey;

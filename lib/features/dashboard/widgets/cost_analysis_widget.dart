@@ -165,7 +165,8 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              (widget.stats.totalTokens * 0.5).toStringAsFixed(0),
+                              (widget.stats.totalTokens * 0.5)
+                                  .toStringAsFixed(0),
                               style: Theme.of(context)
                                   .textTheme
                                   .titleMedium
@@ -200,7 +201,8 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              (widget.stats.totalTokens * 0.5).toStringAsFixed(0),
+                              (widget.stats.totalTokens * 0.5)
+                                  .toStringAsFixed(0),
                               style: Theme.of(context)
                                   .textTheme
                                   .titleMedium

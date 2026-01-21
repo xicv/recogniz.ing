@@ -142,7 +142,8 @@ class AppCards {
       child: child,
       icon: Icons.warning_outlined,
       iconColor: Theme.of(context).colorScheme.secondary,
-      backgroundColor: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
+      backgroundColor:
+          Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
       margin: margin,
       padding: padding,
     );
@@ -160,7 +161,8 @@ class AppCards {
       child: child,
       icon: Icons.error_outline,
       iconColor: Theme.of(context).colorScheme.error,
-      backgroundColor: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
+      backgroundColor:
+          Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
       margin: margin,
       padding: padding,
     );
@@ -178,7 +180,8 @@ class AppCards {
       child: child,
       icon: Icons.check_circle_outline,
       iconColor: Theme.of(context).colorScheme.primary,
-      backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+      backgroundColor:
+          Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
       margin: margin,
       padding: padding,
     );

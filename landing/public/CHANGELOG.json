@@ -30,6 +30,80 @@
   },
   "versions": [
     {
+      "version": "1.15.0",
+      "date": "2026-01-21",
+      "stable": true,
+      "highlights": [
+        "Smart audio format selection based on recording duration",
+        "New settings UI with Auto/Compact/Full audio format options",
+        "Automatic format switching optimizes for file size vs reliability"
+      ],
+      "changes": [
+        {
+          "category": "added",
+          "title": "Smart Audio Format Selection",
+          "description": "Added intelligent audio format selection based on recording duration and user preference. Auto mode uses AAC for short recordings (< 2 min), AAC with warning for medium recordings (2-5 min), and PCM for long recordings (5+ min)."
+        },
+        {
+          "category": "added",
+          "title": "Audio Compression Preference Setting",
+          "description": "Added AudioCompressionPreference enum with three options: Auto (smart selection), Always Compressed (AAC only), and Uncompressed (PCM only). Preference stored in AppSettings with Hive persistence."
+        },
+        {
+          "category": "added",
+          "title": "Audio Format Settings UI",
+          "description": "Added SegmentedButton UI in Settings page for audio format selection. Shows format descriptions: 'Smart format based on recording length' for Auto, 'Smaller files, may lose 0.5-2s at end' for Compact, and 'Larger files, no audio loss' for Full."
+        },
+        {
+          "category": "changed",
+          "title": "AudioCompressionService Enhancement",
+          "description": "Added getConfigForPreference() method that returns RecordConfig with optional warning message. Duration-based thresholds: < 2 min = AAC (fast, small), 2-5 min = AAC with warning, 5+ min = PCM (reliable)."
+        }
+      ]
+    },
+    {
+      "version": "1.14.0",
+      "date": "2026-01-21",
+      "stable": true,
+      "highlights": [
+        "Uncompressed PCM audio format option eliminates truncation issues",
+        "Audio diagnostic service for detecting recording problems",
+        "Migrated to googleai_dart SDK for improved Gemini API integration"
+      ],
+      "changes": [
+        {
+          "category": "added",
+          "title": "PCM Audio Format Support",
+          "description": "Added support for uncompressed PCM (16-bit) audio recording format. This eliminates AAC encoder buffering issues that caused audio truncation at the end of recordings. Results in 4x larger files (3.36 MB/min vs 840 KB/min) but guarantees all audio is captured."
+        },
+        {
+          "category": "added",
+          "title": "Audio Diagnostic Service",
+          "description": "New AudioDiagnosticService detects audio truncation by comparing timer duration with actual file duration. Provides quick file-size-based checks and full audio-duration-based diagnostics with detailed assessment messages."
+        },
+        {
+          "category": "added",
+          "title": "Reliable Recording Mode",
+          "description": "Added useReliableFormat flag to AudioCompressionService. When enabled (default), uses uncompressed PCM format for maximum reliability. Can be toggled for compressed AAC format when file size is more important than complete audio capture."
+        },
+        {
+          "category": "changed",
+          "title": "Gemini SDK Migration",
+          "description": "Migrated from deprecated google_generative_ai package to googleai_dart v2.1.0. The new SDK provides better type safety, improved error handling, and active maintenance."
+        },
+        {
+          "category": "changed",
+          "title": "Audio Format Handling",
+          "description": "Enhanced audio service to properly handle both compressed AAC/M4A and uncompressed WAV/PCM formats. Each format path optimized for its specific characteristics."
+        },
+        {
+          "category": "changed",
+          "title": "Dependency Updates",
+          "description": "Updated dependencies: flutter_riverpod 3.2.0, path_provider 2.1.5, google_fonts 6.3.0, infinite_scroll_pagination 4.1.0, build_runner 2.4.13. Added just_audio 0.9.46 for audio duration verification."
+        }
+      ]
+    },
+    {
       "version": "1.13.2",
       "date": "2026-01-16",
       "stable": true,

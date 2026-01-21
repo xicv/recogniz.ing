@@ -57,7 +57,8 @@ class GeminiService implements TranscriptionServiceInterface {
     }
 
     _apiKey = apiKey;
-    debugPrint('[GeminiService] Initializing googleai_dart with model: $_modelName...');
+    debugPrint(
+        '[GeminiService] Initializing googleai_dart with model: $_modelName...');
 
     _client = GoogleAIClient(
       config: GoogleAIConfig(
@@ -66,7 +67,8 @@ class GeminiService implements TranscriptionServiceInterface {
       ),
     );
 
-    debugPrint('[GeminiService] Client initialized successfully (timeout: ${_requestTimeout.inMinutes}min)');
+    debugPrint(
+        '[GeminiService] Client initialized successfully (timeout: ${_requestTimeout.inMinutes}min)');
   }
 
   /// Build system instruction for multi-language transcription
@@ -186,7 +188,8 @@ You are a multilingual transcription assistant.
       final testClient = GoogleAIClient(
         config: GoogleAIConfig(
           authProvider: ApiKeyProvider(apiKey),
-          timeout: const Duration(seconds: 30), // Shorter timeout for validation
+          timeout:
+              const Duration(seconds: 30), // Shorter timeout for validation
         ),
       );
 
@@ -225,10 +228,16 @@ You are a multilingual transcription assistant.
         errorStr.contains('api_key_invalid') ||
         errorStr.contains('invalid api key') ||
         errorStr.contains('leaked')) {
-      return (false, 'Invalid API Key. Please check your Gemini API key in Settings.');
+      return (
+        false,
+        'Invalid API Key. Please check your Gemini API key in Settings.'
+      );
     }
     if (errorStr.contains('404') || errorStr.contains('not_found')) {
-      return (false, 'Model not found. Please check the model name in Settings.');
+      return (
+        false,
+        'Model not found. Please check the model name in Settings.'
+      );
     }
     if (errorStr.contains('429') ||
         errorStr.contains('resource_exhausted') ||
@@ -238,13 +247,19 @@ You are a multilingual transcription assistant.
     if (errorStr.contains('timeout') ||
         errorStr.contains('deadline_exceeded') ||
         errorStr.contains('504')) {
-      return (false, 'Request timed out. Your recording may be too long or your connection is slow. Try again or use a shorter recording.');
+      return (
+        false,
+        'Request timed out. Your recording may be too long or your connection is slow. Try again or use a shorter recording.'
+      );
     }
     if (errorStr.contains('500') || errorStr.contains('internal')) {
       return (false, 'Gemini API error. Please try again in a moment.');
     }
     if (errorStr.contains('503') || errorStr.contains('unavailable')) {
-      return (false, 'Gemini API temporarily unavailable. Please try again in a moment.');
+      return (
+        false,
+        'Gemini API temporarily unavailable. Please try again in a moment.'
+      );
     }
     if (errorStr.contains('network') ||
         errorStr.contains('connection') ||
@@ -425,7 +440,8 @@ You are a multilingual transcription assistant.
   /// Optimized: concise instructions, reduced token overhead
   String _buildCombinedPrompt(
       String promptTemplate, String vocabulary, String? criticalInstructions) {
-    final buffer = StringBuffer('Transcribe the audio, then apply:\n\n$promptTemplate');
+    final buffer =
+        StringBuffer('Transcribe the audio, then apply:\n\n$promptTemplate');
 
     if (vocabulary.isNotEmpty) {
       buffer.write('\n\nVocabulary reference (use only if heard): $vocabulary');

@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:record/record.dart';
 
+import '../models/app_settings.dart';
+
 /// Audio format options for recording
 enum AudioFormat {
   /// AAC-LC compressed format (default, smaller files, but may have truncation issues)
@@ -53,7 +55,8 @@ class AudioCompressionService {
   /// which is smaller but may lose some audio due to encoder buffering issues.
   ///
   /// ⚠️ IMPORTANT: If set to false (AAC), recordings may lose the last 0.5-2 seconds.
-  static bool useReliableFormat = true; // ENABLED: Using PCM for reliable recording
+  static bool useReliableFormat =
+      true; // ENABLED: Using PCM for reliable recording
   /// Compress audio file to a more efficient format
   static Future<String?> compressAudioFile({
     required String inputPath,
@@ -165,6 +168,75 @@ class AudioCompressionService {
       bitRate: 64000, // 64kbps - good balance of quality and size
       numChannels: 1, // Mono for voice
     );
+  }
+
+  /// Get recommended recording config based on duration and user preference
+  ///
+  /// Implements smart format selection:
+  /// - **auto**: Duration-based selection
+  ///   - < 2 min: AAC (compressed, fast)
+  ///   - 2-5 min: AAC with warning about potential truncation
+  ///   - 5+ min: PCM (uncompressed, no truncation risk)
+  /// - **alwaysCompressed**: Always use AAC regardless of duration
+  /// - **uncompressed**: Always use PCM regardless of duration
+  ///
+  /// Returns a tuple of (RecordConfig, shouldShowWarning, warningMessage).
+  static (RecordConfig config, bool showWarning, String? warning)
+      getConfigForPreference({
+    required Duration estimatedDuration,
+    required AudioCompressionPreference preference,
+  }) {
+    final durationSeconds = estimatedDuration.inSeconds;
+
+    switch (preference) {
+      case AudioCompressionPreference.alwaysCompressed:
+        return (
+          getConfigForFormat(AudioFormat.aacLc),
+          true,
+          'AAC format may lose 0.5-2 seconds at the end due to encoder buffering. '
+              'Use "Uncompressed" for important recordings.',
+        );
+
+      case AudioCompressionPreference.uncompressed:
+        return (
+          getConfigForFormat(AudioFormat.pcm16bits),
+          false,
+          null,
+        );
+
+      case AudioCompressionPreference.auto:
+        // Auto mode: smart selection based on duration
+        if (durationSeconds < 120) {
+          // < 2 minutes: Use AAC (fast, small files, minimal impact)
+          return (
+            getConfigForFormat(AudioFormat.aacLc),
+            false,
+            null,
+          );
+        } else if (durationSeconds < 300) {
+          // 2-5 minutes: Use AAC with warning
+          return (
+            getConfigForFormat(AudioFormat.aacLc),
+            true,
+            'Recording is ${_formatDuration(durationSeconds)}. AAC format may lose 0.5-2 seconds '
+                'at the end. Consider using "Uncompressed" preference for better reliability.',
+          );
+        } else {
+          // 5+ minutes: Use PCM automatically
+          return (
+            getConfigForFormat(AudioFormat.pcm16bits),
+            false,
+            null,
+          );
+        }
+    }
+  }
+
+  /// Format duration for display (e.g., "2:30", "5:15")
+  static String _formatDuration(int seconds) {
+    final minutes = seconds ~/ 60;
+    final secs = seconds % 60;
+    return '$minutes:${secs.toString().padLeft(2, '0')}';
   }
 
   /// Get a reliable recording config that guarantees no audio truncation

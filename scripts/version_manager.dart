@@ -156,7 +156,13 @@ class ChangelogVersion {
     }
 
     // Write each category
-    for (final category in ['added', 'changed', 'fixed', 'removed', 'security']) {
+    for (final category in [
+      'added',
+      'changed',
+      'fixed',
+      'removed',
+      'security'
+    ]) {
       if (grouped.containsKey(category)) {
         final label = _categoryLabel(category);
         buffer.writeln('### $label');
@@ -228,11 +234,23 @@ class Changelog {
 
   static Map<String, dynamic> _defaultCategories() {
     return {
-      'added': {'label': 'Added', 'icon': 'plus-circle', 'color': 'bg-emerald-500'},
-      'changed': {'label': 'Changed', 'icon': 'refresh-cw', 'color': 'bg-blue-500'},
+      'added': {
+        'label': 'Added',
+        'icon': 'plus-circle',
+        'color': 'bg-emerald-500'
+      },
+      'changed': {
+        'label': 'Changed',
+        'icon': 'refresh-cw',
+        'color': 'bg-blue-500'
+      },
       'fixed': {'label': 'Fixed', 'icon': 'bug', 'color': 'bg-amber-500'},
       'removed': {'label': 'Removed', 'icon': 'trash-2', 'color': 'bg-red-500'},
-      'security': {'label': 'Security', 'icon': 'shield', 'color': 'bg-purple-500'},
+      'security': {
+        'label': 'Security',
+        'icon': 'shield',
+        'color': 'bg-purple-500'
+      },
     };
   }
 
@@ -245,8 +263,10 @@ class Changelog {
     buffer.writeln();
     buffer.writeln(description);
     buffer.writeln();
-    buffer.writeln('The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),');
-    buffer.writeln('and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).');
+    buffer.writeln(
+        'The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),');
+    buffer.writeln(
+        'and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).');
     buffer.writeln();
     buffer.writeln('---');
     buffer.writeln();
@@ -384,14 +404,16 @@ class ChangelogManager {
 }
 
 /// Sync landing/src/version.ts for runtime version access
-Future<void> _syncLandingVersionTs(String projectRoot, String cleanVersion) async {
+Future<void> _syncLandingVersionTs(
+    String projectRoot, String cleanVersion) async {
   final versionTsPath = path.join(projectRoot, 'landing', 'src', 'version.ts');
 
   // Read existing version.ts to check current version
   String currentVersion = '';
   if (await File(versionTsPath).exists()) {
     final content = await File(versionTsPath).readAsString();
-    final versionMatch = RegExp(r"export const VERSION = '([\d.]+)'").firstMatch(content);
+    final versionMatch =
+        RegExp(r"export const VERSION = '([\d.]+)'").firstMatch(content);
     if (versionMatch != null) {
       currentVersion = versionMatch.group(1)!;
     }
@@ -402,7 +424,8 @@ Future<void> _syncLandingVersionTs(String projectRoot, String cleanVersion) asyn
     return;
   }
 
-  stdout.writeln('Updating landing/src/version.ts: $currentVersion → $cleanVersion');
+  stdout.writeln(
+      'Updating landing/src/version.ts: $currentVersion → $cleanVersion');
 
   // Generate new version.ts content
   final newContent = '''
@@ -443,9 +466,9 @@ Future<void> _syncLandingVersion(String projectRoot) async {
 
   final pubspecContent = await File(pubspecPath).readAsString();
   final versionLine = pubspecContent.split('\n').firstWhere(
-    (line) => line.startsWith('version:'),
-    orElse: () => '',
-  );
+        (line) => line.startsWith('version:'),
+        orElse: () => '',
+      );
 
   if (versionLine.isEmpty) {
     stdout.writeln('Error: Version line not found in pubspec.yaml!');
@@ -461,7 +484,8 @@ Future<void> _syncLandingVersion(String projectRoot) async {
 
   // Copy CHANGELOG.json to landing/public/ for dynamic loading
   final changelogSourcePath = path.join(projectRoot, 'CHANGELOG.json');
-  final changelogDestPath = path.join(projectRoot, 'landing', 'public', 'CHANGELOG.json');
+  final changelogDestPath =
+      path.join(projectRoot, 'landing', 'public', 'CHANGELOG.json');
   if (await File(changelogSourcePath).exists()) {
     final changelogContent = await File(changelogSourcePath).readAsString();
     await File(changelogDestPath).writeAsString(changelogContent);
@@ -483,7 +507,8 @@ Future<void> _syncLandingVersion(String projectRoot) async {
     return;
   }
 
-  stdout.writeln('Updating landing/package.json: $landingVersion → $cleanVersion');
+  stdout.writeln(
+      'Updating landing/package.json: $landingVersion → $cleanVersion');
   packageJson['version'] = cleanVersion;
   const encoder = JsonEncoder.withIndent('  ');
   await File(landingPackagePath).writeAsString(encoder.convert(packageJson));
@@ -533,7 +558,8 @@ Future<void> _syncFromChangelog(String projectRoot) async {
         return;
       }
 
-      stdout.writeln('🔄 Updating pubspec.yaml: $currentVersion → $latestVersion');
+      stdout.writeln(
+          '🔄 Updating pubspec.yaml: $currentVersion → $latestVersion');
       lines[i] = 'version: $latestVersion';
 
       await File(pubspecPath).writeAsString(lines.join('\n'));
@@ -588,17 +614,16 @@ Future<void> main(List<String> args) async {
 
   final content = await File(pubspecPath).readAsString();
   final versionLine = content.split('\n').firstWhere(
-    (line) => line.startsWith('version:'),
-    orElse: () => '',
-  );
+        (line) => line.startsWith('version:'),
+        orElse: () => '',
+      );
 
   if (versionLine.isEmpty) {
     stdout.writeln('Error: Version line not found in pubspec.yaml!');
     exit(1);
   }
 
-  final currentVersionString =
-      versionLine.replaceFirst('version: ', '').trim();
+  final currentVersionString = versionLine.replaceFirst('version: ', '').trim();
   final currentVersion = VersionInfo.parse(currentVersionString);
 
   if (args.contains('--current')) {
@@ -612,7 +637,8 @@ Future<void> main(List<String> args) async {
   if (args.contains('--bump')) {
     final bumpIndex = args.indexOf('--bump');
     if (bumpIndex + 1 >= args.length) {
-      stdout.writeln('Error: Please specify bump type (patch, minor, major, prerelease)');
+      stdout.writeln(
+          'Error: Please specify bump type (patch, minor, major, prerelease)');
       exit(1);
     }
 
@@ -626,7 +652,8 @@ Future<void> main(List<String> args) async {
 
     int major = int.parse(versionParts[0]);
     int minor = int.parse(versionParts[1]);
-    int patch = int.parse(versionParts[2].split('-').first); // Handle pre-release
+    int patch =
+        int.parse(versionParts[2].split('-').first); // Handle pre-release
 
     switch (bumpType) {
       case 'patch':
@@ -653,13 +680,15 @@ Future<void> main(List<String> args) async {
         newVersion = VersionInfo(version: '$major.$minor.$patch-$preReleaseId');
         break;
       default:
-        stdout.writeln('Error: Invalid bump type! Use patch, minor, major, or prerelease');
+        stdout.writeln(
+            'Error: Invalid bump type! Use patch, minor, major, or prerelease');
         exit(1);
     }
   }
 
   if (newVersion.toString() != currentVersionString) {
-    stdout.writeln('Updating version: $currentVersionString → ${newVersion.toString()}');
+    stdout.writeln(
+        'Updating version: $currentVersionString → ${newVersion.toString()}');
 
     // Update pubspec.yaml
     final updatedContent = content.replaceFirst(

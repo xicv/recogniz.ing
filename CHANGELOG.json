@@ -30,6 +30,38 @@
   },
   "versions": [
     {
+      "version": "1.15.0",
+      "date": "2026-01-21",
+      "stable": true,
+      "highlights": [
+        "Smart audio format selection based on recording duration",
+        "New settings UI with Auto/Compact/Full audio format options",
+        "Automatic format switching optimizes for file size vs reliability"
+      ],
+      "changes": [
+        {
+          "category": "added",
+          "title": "Smart Audio Format Selection",
+          "description": "Added intelligent audio format selection based on recording duration and user preference. Auto mode uses AAC for short recordings (< 2 min), AAC with warning for medium recordings (2-5 min), and PCM for long recordings (5+ min)."
+        },
+        {
+          "category": "added",
+          "title": "Audio Compression Preference Setting",
+          "description": "Added AudioCompressionPreference enum with three options: Auto (smart selection), Always Compressed (AAC only), and Uncompressed (PCM only). Preference stored in AppSettings with Hive persistence."
+        },
+        {
+          "category": "added",
+          "title": "Audio Format Settings UI",
+          "description": "Added SegmentedButton UI in Settings page for audio format selection. Shows format descriptions: 'Smart format based on recording length' for Auto, 'Smaller files, may lose 0.5-2s at end' for Compact, and 'Larger files, no audio loss' for Full."
+        },
+        {
+          "category": "changed",
+          "title": "AudioCompressionService Enhancement",
+          "description": "Added getConfigForPreference() method that returns RecordConfig with optional warning message. Duration-based thresholds: < 2 min = AAC (fast, small), 2-5 min = AAC with warning, 5+ min = PCM (reliable)."
+        }
+      ]
+    },
+    {
       "version": "1.14.0",
       "date": "2026-01-21",
       "stable": true,
