@@ -33,6 +33,9 @@ class GeminiService implements TranscriptionServiceInterface {
   // API key
   String? _apiKey;
 
+  // Request timeout for large audio files (5 minutes for files up to 100MB)
+  static const Duration _requestTimeout = Duration(minutes: 5);
+
   // Simple LRU cache for transcription results
   final Map<String, TranscriptionResult> _cache = {};
   static const int _maxCacheSize = 50;
@@ -59,10 +62,11 @@ class GeminiService implements TranscriptionServiceInterface {
     _client = GoogleAIClient(
       config: GoogleAIConfig(
         authProvider: ApiKeyProvider(apiKey),
+        timeout: _requestTimeout, // Extended timeout for large audio files
       ),
     );
 
-    debugPrint('[GeminiService] Client initialized successfully');
+    debugPrint('[GeminiService] Client initialized successfully (timeout: ${_requestTimeout.inMinutes}min)');
   }
 
   /// Build system instruction for multi-language transcription
@@ -182,6 +186,7 @@ You are a multilingual transcription assistant.
       final testClient = GoogleAIClient(
         config: GoogleAIConfig(
           authProvider: ApiKeyProvider(apiKey),
+          timeout: const Duration(seconds: 30), // Shorter timeout for validation
         ),
       );
 
@@ -207,25 +212,51 @@ You are a multilingual transcription assistant.
       return (false, 'No response from API');
     } catch (e) {
       debugPrint('[GeminiService] Validation error: $e');
-      final errorStr = e.toString();
-
-      if (errorStr.contains('403') ||
-          errorStr.contains('API_KEY_INVALID') ||
-          errorStr.contains('invalid')) {
-        return (false, 'Invalid API Key');
-      }
-      if (errorStr.contains('404') || errorStr.contains('not found')) {
-        return (false, 'Model not found');
-      }
-      if (errorStr.contains('429')) {
-        return (false, 'Rate limited');
-      }
-
-      return (
-        false,
-        errorStr.length > 100 ? errorStr.substring(0, 100) : errorStr
-      );
+      return _parseApiError(e);
     }
+  }
+
+  /// Parse API error and return user-friendly message
+  (bool, String? error) _parseApiError(dynamic error) {
+    final errorStr = error.toString().toLowerCase();
+
+    if (errorStr.contains('403') ||
+        errorStr.contains('permission_denied') ||
+        errorStr.contains('api_key_invalid') ||
+        errorStr.contains('invalid api key') ||
+        errorStr.contains('leaked')) {
+      return (false, 'Invalid API Key. Please check your Gemini API key in Settings.');
+    }
+    if (errorStr.contains('404') || errorStr.contains('not_found')) {
+      return (false, 'Model not found. Please check the model name in Settings.');
+    }
+    if (errorStr.contains('429') ||
+        errorStr.contains('resource_exhausted') ||
+        errorStr.contains('rate limit')) {
+      return (false, 'Rate limited. Please wait a moment and try again.');
+    }
+    if (errorStr.contains('timeout') ||
+        errorStr.contains('deadline_exceeded') ||
+        errorStr.contains('504')) {
+      return (false, 'Request timed out. Your recording may be too long or your connection is slow. Try again or use a shorter recording.');
+    }
+    if (errorStr.contains('500') || errorStr.contains('internal')) {
+      return (false, 'Gemini API error. Please try again in a moment.');
+    }
+    if (errorStr.contains('503') || errorStr.contains('unavailable')) {
+      return (false, 'Gemini API temporarily unavailable. Please try again in a moment.');
+    }
+    if (errorStr.contains('network') ||
+        errorStr.contains('connection') ||
+        errorStr.contains('socket')) {
+      return (false, 'Network error. Please check your internet connection.');
+    }
+
+    // Default error message
+    final message = errorStr.length > 150
+        ? 'Transcription failed. Please try again.'
+        : errorStr;
+    return (false, message);
   }
 
   // Execute operation with exponential backoff retry
@@ -373,7 +404,8 @@ You are a multilingual transcription assistant.
       );
     } catch (e) {
       debugPrint('[GeminiService] Combined transcription error: $e');
-      rethrow;
+      final (_, userError) = _parseApiError(e);
+      throw Exception(userError ?? 'Transcription failed: $e');
     }
   }
 

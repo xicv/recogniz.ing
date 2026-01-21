@@ -5,19 +5,54 @@ import 'package:record/record.dart';
 /// Audio format options for recording
 enum AudioFormat {
   /// AAC-LC compressed format (default, smaller files, but may have truncation issues)
+  ///
+  /// ⚠️ WARNING: AAC encoders have a KNOWN BUG where they lose 0.5-2 seconds
+  /// at the end of recordings due to unflushed encoder buffers. This is a bug in
+  /// Android/iOS AAC encoders that cannot be worked around at recording time.
+  ///
+  /// Format: M4A/AAC
+  /// Size: ~480 KB/minute (at 64 kbps)
+  /// Truncation Risk: HIGH (0.5-2 seconds lost at end)
   aacLc,
 
   /// Uncompressed PCM format (larger files, but no truncation risk)
+  ///
+  /// ✅ SAFE: PCM format has no encoder buffering and guarantees all audio
+  /// is captured exactly as recorded. This is the RECOMMENDED format for
+  /// important recordings.
+  ///
+  /// Format: WAV/PCM
+  /// Size: ~1.92 MB/minute (at 16kHz, 16-bit, mono)
+  /// Truncation Risk: NONE
   pcm16bits,
 }
 
 /// Audio compression service for optimizing audio files before API upload
+///
+/// ## Important Note on AAC Truncation Bug
+///
+/// There is a KNOWN BUG in Android/iOS AAC encoders where recordings lose
+/// 0.5-2 seconds at the end due to unflushed encoder buffers. This is
+/// documented in multiple Stack Overflow threads and cannot be worked around
+/// during recording.
+///
+/// References:
+/// - https://stackoverflow.com/questions/15886416/mediarecorder-cuts-off-end-of-file
+/// - https://stackoverflow.com/questions/31658736/android-audiorecording-losing-last-few-seconds-of-audio
+///
+/// ## Solution
+///
+/// Use PCM format for recording (guarantees no truncation), then optionally
+/// compress to AAC AFTER recording is complete if smaller file size is needed.
+/// The original PCM file should always be preserved locally as backup.
 class AudioCompressionService {
   /// Whether to use PCM format for reliable recording (no truncation)
   ///
   /// Set to true to use uncompressed PCM format which guarantees all audio
   /// is captured, but results in 4x larger files. Set to false for AAC compression
   /// which is smaller but may lose some audio due to encoder buffering issues.
+  ///
+  /// ⚠️ IMPORTANT: If set to false (AAC), recordings may lose the last 0.5-2 seconds.
   static bool useReliableFormat = true; // ENABLED: Using PCM for reliable recording
   /// Compress audio file to a more efficient format
   static Future<String?> compressAudioFile({
