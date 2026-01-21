@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img src="assets/icons/app_icon_macos_1024.png" alt="Recogniz.ing Logo" width="120" height="120">
+  <img src="assets/icons/generated/app_icon_1024.png" alt="Recogniz.ing Logo" width="120" height="120">
 
   # Recogniz.ing
 
