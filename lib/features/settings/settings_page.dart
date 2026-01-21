@@ -193,6 +193,22 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     });
                   },
                 ),
+                // Start at Login - Desktop only
+                if (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
+                  SwitchListTile(
+                    title: const Text('Start at Login'),
+                    subtitle: Text(settings.startAtLogin
+                        ? 'App will launch automatically on login'
+                        : 'Launch app manually'),
+                    value: settings.startAtLogin,
+                    onChanged: (value) {
+                      SchedulerBinding.instance.addPostFrameCallback((_) {
+                        ref
+                            .read(settingsProvider.notifier)
+                            .toggleStartAtLogin();
+                      });
+                    },
+                  ),
                 ListTile(
                   title: const Text('Transcription Language'),
                   subtitle: Text(
@@ -308,22 +324,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     ],
                   ),
                 ),
-                // Start at Login - Desktop only
-                if (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
-                  SwitchListTile(
-                    title: const Text('Start at Login'),
-                    subtitle: Text(settings.startAtLogin
-                        ? 'App will launch automatically on login'
-                        : 'Launch app manually'),
-                    value: settings.startAtLogin,
-                    onChanged: (value) {
-                      SchedulerBinding.instance.addPostFrameCallback((_) {
-                        ref
-                            .read(settingsProvider.notifier)
-                            .toggleStartAtLogin();
-                      });
-                    },
-                  ),
               ],
             ).animate().fadeIn(duration: 300.ms, delay: 300.ms),
 
