@@ -270,3 +270,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.15.1] - 2026-01-21
+
+### Added
+
+- **Multi-API Key Management** - Added support for managing multiple Gemini API keys with add, edit, delete, and select functionality. Users can now add backup keys for automatic failover when hitting rate limits (HTTP 429).
+- **Automatic Rate Limit Failover** - GeminiService now automatically switches to another available API key when receiving a 429 rate limit error. Tries up to 3 keys with exponential backoff before giving up.
+- **Free Tier Quota Tracking** - Dashboard now shows free tier quota usage with a circular progress indicator. Displays percentage used, remaining requests, and status (Good, Near Limit, Exhausted).
+- **Usage Projections** - Projects days until free tier exhaustion based on current daily usage. Helps users understand when they might need to upgrade or add more keys.
+- **Per-Key Usage Statistics** - Track usage statistics per API key including transcriptions, words, duration, and daily averages. Data stored locally using Hive with DailyUsage model for 90-day history.
+- **ApiKeyInfo Model** - New Hive model with typeId: 13 for storing API key metadata including id, name, masked key, creation timestamp, rate limit timestamp, and selected status.
+- **ApiKeyUsageStats Model** - New Hive model with typeId: 16 for tracking per-key usage statistics. Includes total transcriptions, tokens, duration, words, first/last used timestamps, daily usage array, and total estimated cost.
+- **DailyUsage Model** - Hive model with typeId: 15 for tracking daily usage breakdown with transcription count, tokens, duration minutes, words, and date.
+
+### Changed
+
+- **Dashboard Data Display** - Changed from showing dollar costs (confusing for free tier) to showing percentage of free tier quota used. Stats grid now shows 'Daily Average' transcriptions instead of duplicate 'Free Tier Today'.
+- **Dashboard Spacing System** - Implemented DashboardSpacing constant class with 8-point grid values: 16px card padding, 20px horizontal margin, 24px vertical margin, 16px grid gap, 16px border radius, 40px icon containers.
+- **AppSettings Multi-Key Support** - Extended AppSettings with apiKeys list (HiveField 14) and selectedApiKeyId (HiveField 15). Maintains backward compatibility with legacy geminiApiKey field.
+
+---
+
