@@ -109,16 +109,31 @@ const vocabulary = [
 
 const settings = [
   {
+    title: 'Multi-API Key Management',
+    description: 'Add multiple keys with automatic failover on rate limits',
+    icon: 'M13 10V3L4 14h7v7l9-11h-7z',
+    badge: 'New'
+  },
+  {
     title: 'API Configuration',
     description: 'Manage your Gemini API key for transcription',
-    icon: 'M13 10V3L4 14h7v7l9-11h-7z',
-    badge: 'Required'
+    icon: 'M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z'
+  },
+  {
+    title: 'Free Tier Quota Tracking',
+    description: 'Dashboard shows usage percentage and remaining requests',
+    icon: 'M11 3.055A9.001 9.001 0 1020.945 13H11V5a9 9 0 018 0v8.945L11 3.055z M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z',
+    badge: 'New'
   },
   {
     title: 'Transcription Language',
     description: 'Auto-detect or choose from 20+ languages',
-    icon: 'M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129',
-    badge: 'New'
+    icon: 'M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129'
+  },
+  {
+    title: 'Usage Projections',
+    description: 'See days until free tier exhaustion based on usage',
+    icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'
   },
   {
     title: 'Global Hotkey',
@@ -139,11 +154,6 @@ const settings = [
     title: 'Show Notifications',
     description: 'Get notified when transcription completes',
     icon: 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4h.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9'
-  },
-  {
-    title: 'Start at Login',
-    description: 'Automatically launch app on system startup (desktop)',
-    icon: 'M13 10V3L4 14h7v7l9-11h-7z'
   }
 ]
 
@@ -164,8 +174,15 @@ const coreFeatures = [
     span: 'col-span-1 sm:col-span-2 row-span-2'
   },
   {
+    title: 'Multi-API Key Management',
+    description: 'Automatic failover with rate limit detection',
+    icon: 'M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z',
+    gradient: 'from-rose-500 to-pink-500',
+    span: 'col-span-1'
+  },
+  {
     title: 'Dashboard & Analytics',
-    description: 'Searchable history with editing & stats',
+    description: 'Quota tracking, usage stats & multi-key insights',
     icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
     gradient: 'from-violet-500 to-purple-500',
     span: 'col-span-1'
