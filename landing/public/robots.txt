@@ -1,0 +1,9 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://recogniz.ing/sitemap.xml
+
+# Crawl-delay (optional, polite to servers)
+Crawl-delay: 1
