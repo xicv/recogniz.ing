@@ -584,6 +584,15 @@ Future<void> main(List<String> args) async {
   // Handle changelog-only commands
   if (args.contains('--changelog')) {
     await changelogManager.generateMarkdown();
+    // Also copy CHANGELOG.json to landing/public for the Vue app
+    final changelogSourcePath = path.join(projectRoot, 'CHANGELOG.json');
+    final changelogDestPath =
+        path.join(projectRoot, 'landing', 'public', 'CHANGELOG.json');
+    if (await File(changelogSourcePath).exists()) {
+      final changelogContent = await File(changelogSourcePath).readAsString();
+      await File(changelogDestPath).writeAsString(changelogContent);
+      stdout.writeln('✅ Copied CHANGELOG.json to landing/public/');
+    }
     return;
   }
 

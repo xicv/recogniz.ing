@@ -341,9 +341,12 @@ sync-landing: ## Sync landing/package.json version from pubspec.yaml
 	@echo "Syncing landing version..."
 	@dart scripts/version_manager.dart --sync-landing
 
-changelog: ## Generate CHANGELOG.md from CHANGELOG.json
+changelog: ## Generate CHANGELOG.md from CHANGELOG.json and sync to landing
 	@echo "📝 Generating changelog..."
 	@dart scripts/version_manager.dart --changelog
+	@echo "📋 Copying CHANGELOG.json to landing/public..."
+	@cp CHANGELOG.json landing/public/CHANGELOG.json
+	@echo "✅ Changelog generated and synced to landing"
 
 verify-changelog: ## Verify JSON and Markdown changelogs are in sync
 	@echo "🔍 Verifying changelogs..."
