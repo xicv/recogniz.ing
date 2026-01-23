@@ -17,7 +17,7 @@ abstract class RecordingResultInterface {
 
 abstract class AudioServiceInterface {
   Future<bool> hasPermission();
-  Future<void> startRecording();
+  Future<void> startRecording({AudioCompressionPreference? compressionPreference});
   Future<RecordingResultInterface?> stopRecording();
 }
 

@@ -157,13 +157,12 @@ const formatDate = (dateStr: string): string => {
   })
 }
 
-// Display versions for changelog cards (limit to recent versions)
+// Display only the latest stable version for the Downloads page
 const displayVersions = computed(() => {
   if (!changelogData.value) return []
-  // Show all stable versions, newest first
-  return changelogData.value.versions
-    .filter(v => v.stable)
-    .slice(0, 10) // Show latest 10 versions
+  // Show only the latest stable version (first in array)
+  const latestStable = changelogData.value.versions.find(v => v.stable)
+  return latestStable ? [latestStable] : []
 })
 
 // Load changelog on mount
@@ -521,10 +520,10 @@ const getPlatformColor = (color?: string) => {
             <h2
               class="text-3xl sm:text-4xl font-semibold mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
             >
-              What's New
+              What's New in <span class="gradient-text-accent">v{{ changelogData?.versions.find(v => v.stable)?.version || getVersion() }}</span>
             </h2>
             <p class="text-lg text-slate-600 dark:text-slate-400">
-              Track the latest features and improvements
+              The latest features and improvements
             </p>
           </div>
 
@@ -624,7 +623,7 @@ const getPlatformColor = (color?: string) => {
               to="/changelog"
               class="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all border border-slate-200 hover:border-slate-300 text-slate-700 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-600 min-h-[48px]"
             >
-              View Full Changelog
+              View All Versions
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
               </svg>

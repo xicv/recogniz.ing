@@ -43,8 +43,14 @@ class VoiceRecordingUseCase {
         return;
       }
 
+      // Get user's audio compression preference from settings
+      final settings = await _storageService.getSettings();
+      debugPrint('Starting recording with compression preference: ${settings.audioCompressionPreference}');
+
       debugPrint('Starting recording...');
-      await _audioService.startRecording();
+      await _audioService.startRecording(
+        compressionPreference: settings.audioCompressionPreference,
+      );
       _onStateChanged(RecordingState.recording);
       debugPrint('Recording started successfully');
     } catch (e) {

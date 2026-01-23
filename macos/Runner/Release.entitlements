@@ -2,8 +2,11 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- App Sandbox DISABLED for direct GitHub distribution -->
+	<!-- Required for AVFoundation to access system Audio Units for recording -->
+	<!-- NOTE: Cannot distribute to Mac App Store with sandbox disabled -->
 	<key>com.apple.security.app-sandbox</key>
-	<true/>
+	<false/>
 	<key>com.apple.security.cs.allow-jit</key>
 	<true/>
 	<key>com.apple.security.network.server</key>
@@ -11,6 +14,15 @@
 	<key>com.apple.security.network.client</key>
 	<true/>
 	<key>com.apple.security.device.audio-input</key>
+	<true/>
+	<!-- Allow access to microphone (alias for audio-input, ensures compatibility) -->
+	<key>com.apple.security.device.microphone</key>
+	<true/>
+	<!-- Allow access to camera devices (required by AVFoundation even for audio-only capture) -->
+	<key>com.apple.security.device.camera</key>
+	<true/>
+	<!-- Allow loading system libraries and plugins (Audio Units) not signed with same certificate -->
+	<key>com.apple.security.cs.disable-library-validation</key>
 	<true/>
 </dict>
 </plist>

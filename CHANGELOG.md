@@ -291,3 +291,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.15.2] - 2026-01-23
+
+### Changed
+
+- **macOS Entitlements** - Updated Release.entitlements and DebugProfile.entitlements with additional entitlements: com.apple.security.device.camera (required by AVFoundation), com.apple.security.cs.disable-library-validation (allows loading system Audio Units), and com.apple.security.app-sandbox set to false for direct distribution.
+
+### Fixed
+
+- **macOS Release Build Audio Recording** - Fixed audio recording failure in macOS release builds by disabling App Sandbox for direct GitHub distribution. The sandbox was blocking AVFoundation from loading system Audio Units required for audio encoding. This fix enables proper audio recording in release mode while maintaining compatibility with direct distribution (non-App Store).
+- **App Quit Crash (Cmd+Q)** - Fixed 'quit unexpectedly' dialog when pressing Cmd+Q. Added proper app lifecycle handling with didChangeAppLifecycleState to ensure async resources (TrayService, HotkeyService) are properly disposed before app termination. Previously, async dispose methods were being called synchronously without waiting.
+
+---
+

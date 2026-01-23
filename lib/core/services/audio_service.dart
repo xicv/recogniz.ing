@@ -12,6 +12,7 @@ import 'audio_processing_service.dart';
 import 'audio_storage_service.dart';
 import '../config/app_config.dart';
 import '../constants/constants.dart';
+import '../models/app_settings.dart';
 import '../interfaces/audio_service_interface.dart';
 
 class AudioService implements AudioServiceInterface {
@@ -43,7 +44,7 @@ class AudioService implements AudioServiceInterface {
   }
 
   @override
-  Future<void> startRecording() async {
+  Future<void> startRecording({AudioCompressionPreference? compressionPreference}) async {
     if (_isRecording) {
       if (kDebugMode) {
         debugPrint('[AudioService] Already recording, ignoring start');
@@ -67,7 +68,9 @@ class AudioService implements AudioServiceInterface {
     final uuid = const Uuid().v4();
 
     // Determine file extension based on format
-    final recordConfig = AudioCompressionService.getVoiceOptimizedConfig();
+    final recordConfig = AudioCompressionService.getVoiceOptimizedConfig(
+      preference: compressionPreference,
+    );
     final fileExtension =
         recordConfig.encoder == AudioEncoder.pcm16bits ? 'wav' : 'm4a';
     _currentRecordingPath = '${dir.path}/recording_$uuid.$fileExtension';

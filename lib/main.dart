@@ -66,6 +66,7 @@ class _RecognizingAppState extends ConsumerState<RecognizingApp>
     with WidgetsBindingObserver {
   late final HotkeyService _hotkeyService;
   late final TrayService _trayService;
+  bool _isDisposing = false;
 
   @override
   void initState() {
@@ -169,8 +170,8 @@ class _RecognizingAppState extends ConsumerState<RecognizingApp>
     }
   }
 
-  void _quitApp() {
-    _trayService.dispose();
+  Future<void> _quitApp() async {
+    await _cleanupServices();
     // Use proper app lifecycle instead of force exit
     if (mounted) {
       SystemNavigator.pop();
@@ -179,10 +180,45 @@ class _RecognizingAppState extends ConsumerState<RecognizingApp>
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    _trayService.dispose();
-    _hotkeyService.dispose();
-    super.dispose();
+    if (!_isDisposing) {
+      _isDisposing = true;
+      WidgetsBinding.instance.removeObserver(this);
+      // Note: async dispose is handled in didChangeAppLifecycleState
+      _hotkeyService.dispose();
+      super.dispose();
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (kDebugMode) {
+      debugPrint('[MainApp] Lifecycle state changed to: $state');
+    }
+    // When app is being destroyed, properly dispose async resources
+    if (state == AppLifecycleState.detached || state == AppLifecycleState.hidden) {
+      _cleanupServices();
+    }
+  }
+
+  Future<void> _cleanupServices() async {
+    if (_isDisposing) return;
+    _isDisposing = true;
+
+    try {
+      if (kDebugMode) {
+        debugPrint('[MainApp] Cleaning up services...');
+      }
+      await _trayService.dispose();
+      await _hotkeyService.dispose();
+      if (kDebugMode) {
+        debugPrint('[MainApp] Services cleaned up');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[MainApp] Error during cleanup: $e');
+      }
+    }
   }
 
   @override

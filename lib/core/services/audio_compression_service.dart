@@ -149,8 +149,26 @@ class AudioCompressionService {
   /// By default uses AAC-LC compression for smaller file sizes. If [useReliableFormat]
   /// is true, returns an uncompressed PCM config that eliminates truncation issues
   /// at the cost of 4x larger file sizes.
-  static RecordConfig getVoiceOptimizedConfig({bool? forceReliable}) {
-    final useReliable = forceReliable ?? useReliableFormat;
+  ///
+  /// If [preference] is provided, it will be used instead of the static [useReliableFormat].
+  /// This allows the recording to respect the user's audio compression preference from settings.
+  static RecordConfig getVoiceOptimizedConfig({
+    bool? forceReliable,
+    AudioCompressionPreference? preference,
+  }) {
+    // Determine which format to use based on parameters
+    bool useReliable;
+    if (preference != null) {
+      // User preference takes precedence
+      useReliable = switch (preference) {
+        AudioCompressionPreference.uncompressed => true,
+        AudioCompressionPreference.alwaysCompressed => false,
+        AudioCompressionPreference.auto => useReliableFormat,
+      };
+    } else {
+      // Fall back to static flag or forceReliable parameter
+      useReliable = forceReliable ?? useReliableFormat;
+    }
 
     if (useReliable) {
       // Use uncompressed PCM for maximum reliability
