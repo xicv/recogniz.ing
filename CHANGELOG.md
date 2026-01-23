@@ -304,3 +304,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.15.3] - 2026-01-23
+
+### Changed
+
+- **Reactive Gemini Service Initialization** - Made geminiServiceProvider reactive to API key changes by adding ref.listen() callbacks. The service now automatically reinitializes when: (1) the effective API key changes in settings, or (2) the selected API key changes in the multi-key system. This ensures transcription always uses the correct API key.
+
+### Fixed
+
+- **API Key State Refresh Race Condition** - Fixed a race condition where entering an API key for the first time wouldn't refresh the app state. The async _loadSettings() method was overwriting user changes before they were persisted. Added _hasPendingUserUpdate flag to SettingsNotifier to prevent overwrites during user actions.
+- **Multi-API Keys State Synchronization** - Fixed create/update/delete/select API key operations not triggering app state changes. Applied the same race condition protection to ApiKeysNotifier, ensuring all CRUD operations properly refresh the UI and reinitialize the Gemini service when needed.
+
+---
+

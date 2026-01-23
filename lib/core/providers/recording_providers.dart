@@ -9,6 +9,7 @@ import 'app_providers.dart';
 import 'config_providers.dart';
 import 'api_keys_provider.dart';
 import '../models/app_settings.dart';
+import '../models/api_key_info.dart';
 
 // Service providers
 final audioServiceProvider = Provider<AudioServiceInterface>((ref) {
@@ -26,7 +27,7 @@ final geminiServiceProvider = Provider<GeminiService>((ref) {
 
   // Listen to settings provider changes to reinitialize when API key changes
   ref.listen(settingsProvider, (prev, next) {
-    final prevKey = prev.effectiveApiKey;
+    final prevKey = prev?.effectiveApiKey;
     final nextKey = next.effectiveApiKey;
     // Only reinitialize if the API key actually changed
     if (prevKey != nextKey && nextKey?.isNotEmpty == true) {
@@ -36,7 +37,7 @@ final geminiServiceProvider = Provider<GeminiService>((ref) {
 
   // Listen to API keys provider changes to reinitialize when selection changes
   ref.listen(apiKeysProvider, (prev, next) {
-    final prevSelected = prev.where((k) => k.isSelected).firstOrNull;
+    final prevSelected = prev?.where((k) => k.isSelected).firstOrNull;
     final nextSelected = next.where((k) => k.isSelected).firstOrNull;
     // Only reinitialize if the selected key changed
     if (prevSelected?.id != nextSelected?.id && nextSelected != null) {
@@ -55,7 +56,7 @@ final geminiServiceProvider = Provider<GeminiService>((ref) {
 });
 
 /// Initialize the Gemini service with current API key and configuration
-void _initializeService(GeminiService service, WidgetRef ref) {
+void _initializeService(GeminiService service, Ref ref) {
   final settings = ref.read(settingsProvider);
   final apiKeys = ref.read(apiKeysProvider);
   final config = ref.read(appConfigProvider);
@@ -73,26 +74,34 @@ void _initializeService(GeminiService service, WidgetRef ref) {
       model: modelName,
       // Rate limit callback - mark the current key as rate limited
       onRateLimit: (key) {
-        final currentKey = apiKeys.firstWhere(
-          (k) => k.apiKey == key,
-          orElse: () => apiKeys.firstWhere(
-            (k) => k.isSelected,
-            orElse: () => throw Exception('No matching API key found'),
-          ),
-        );
-        ref.read(apiKeysProvider.notifier).markRateLimited(currentKey.id);
+        // Find the key that matches, or fall back to selected key
+        ApiKeyInfo? keyToMark;
+        try {
+          keyToMark = apiKeys.firstWhere(
+            (k) => k.apiKey == key,
+            orElse: () => apiKeys.firstWhere(
+              (k) => k.isSelected,
+              orElse: () => throw Exception('No matching API key found'),
+            ),
+          );
+        } catch (_) {
+          // No key found - can't mark as rate limited
+          return;
+        }
+        ref.read(apiKeysProvider.notifier).markRateLimited(keyToMark.id);
       },
       // Get next available API key callback
       getNextApiKey: (currentKey) {
         final availableKeys = ref.read(availableApiKeysProvider);
 
+        if (availableKeys.isEmpty) {
+          throw Exception('No alternative API key available');
+        }
+
         // Return first available key that isn't the current one
         final nextKey = availableKeys.firstWhere(
           (k) => k.apiKey != currentKey,
-          orElse: () => availableKeys.firstWhere(
-            (k) => k.apiKey != currentKey,
-            orElse: () => throw Exception('No alternative API key available'),
-          ),
+          orElse: () => throw Exception('No alternative API key available'),
         );
         return nextKey.apiKey;
       },
