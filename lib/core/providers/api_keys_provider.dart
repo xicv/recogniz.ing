@@ -6,6 +6,9 @@ import '../services/storage_service.dart';
 
 /// Notifier for managing API keys
 class ApiKeysNotifier extends Notifier<List<ApiKeyInfo>> {
+  bool _isLoadingFromStorage = false;
+  bool _hasPendingUserUpdate = false;
+
   @override
   List<ApiKeyInfo> build() {
     // Start with empty list and load asynchronously
@@ -15,6 +18,10 @@ class ApiKeysNotifier extends Notifier<List<ApiKeyInfo>> {
 
   /// Load API keys from storage
   Future<void> _loadApiKeys() async {
+    // Prevent concurrent loading and overwrite after user changes
+    if (_isLoadingFromStorage || _hasPendingUserUpdate) return;
+    _isLoadingFromStorage = true;
+
     try {
       await Future.delayed(const Duration(milliseconds: 100));
       final settings = StorageService.settings;
@@ -26,6 +33,8 @@ class ApiKeysNotifier extends Notifier<List<ApiKeyInfo>> {
       if (kDebugMode) {
         debugPrint('[ApiKeysNotifier] Failed to load API keys: $e');
       }
+    } finally {
+      _isLoadingFromStorage = false;
     }
   }
 
@@ -47,6 +56,7 @@ class ApiKeysNotifier extends Notifier<List<ApiKeyInfo>> {
 
   /// Add a new API key
   Future<void> addApiKey(ApiKeyInfo key) async {
+    _hasPendingUserUpdate = true; // Mark user made changes
     final updatedKeys = [...state, key];
     await _saveApiKeys(updatedKeys);
     state = updatedKeys;
@@ -68,6 +78,7 @@ class ApiKeysNotifier extends Notifier<List<ApiKeyInfo>> {
 
   /// Remove an API key by ID
   Future<void> removeApiKey(String keyId) async {
+    _hasPendingUserUpdate = true; // Mark user made changes
     final keyToRemove = state.firstWhere((k) => k.id == keyId);
     final wasSelected = keyToRemove.isSelected;
 
@@ -100,6 +111,7 @@ class ApiKeysNotifier extends Notifier<List<ApiKeyInfo>> {
 
   /// Select an API key as the active key
   Future<void> selectApiKey(String keyId) async {
+    _hasPendingUserUpdate = true; // Mark user made changes
     final updatedKeys = <ApiKeyInfo>[];
     for (final key in state) {
       updatedKeys.add(key.copyWith(isSelected: key.id == keyId));
@@ -111,6 +123,7 @@ class ApiKeysNotifier extends Notifier<List<ApiKeyInfo>> {
 
   /// Mark an API key as rate limited
   Future<void> markRateLimited(String keyId) async {
+    _hasPendingUserUpdate = true; // Mark user made changes
     ApiKeyInfo? targetKey;
     int targetIndex = -1;
 
@@ -150,6 +163,7 @@ class ApiKeysNotifier extends Notifier<List<ApiKeyInfo>> {
 
   /// Clear rate limit status for an API key
   Future<void> clearRateLimit(String keyId) async {
+    _hasPendingUserUpdate = true; // Mark user made changes
     final updatedKeys = <ApiKeyInfo>[...state];
     for (int i = 0; i < updatedKeys.length; i++) {
       if (updatedKeys[i].id == keyId) {
@@ -164,6 +178,7 @@ class ApiKeysNotifier extends Notifier<List<ApiKeyInfo>> {
 
   /// Update an API key's name
   Future<void> updateKeyName(String keyId, String newName) async {
+    _hasPendingUserUpdate = true; // Mark user made changes
     final updatedKeys = <ApiKeyInfo>[...state];
     for (int i = 0; i < updatedKeys.length; i++) {
       if (updatedKeys[i].id == keyId) {

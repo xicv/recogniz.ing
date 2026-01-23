@@ -23,8 +23,41 @@ final audioServiceProvider = Provider<AudioServiceInterface>((ref) {
 // This replaces the separate transcriptionServiceProvider
 final geminiServiceProvider = Provider<GeminiService>((ref) {
   final service = GeminiService();
-  final settings = ref.watch(settingsProvider);
-  final apiKeys = ref.watch(apiKeysProvider);
+
+  // Listen to settings provider changes to reinitialize when API key changes
+  ref.listen(settingsProvider, (prev, next) {
+    final prevKey = prev.effectiveApiKey;
+    final nextKey = next.effectiveApiKey;
+    // Only reinitialize if the API key actually changed
+    if (prevKey != nextKey && nextKey?.isNotEmpty == true) {
+      _initializeService(service, ref);
+    }
+  });
+
+  // Listen to API keys provider changes to reinitialize when selection changes
+  ref.listen(apiKeysProvider, (prev, next) {
+    final prevSelected = prev.where((k) => k.isSelected).firstOrNull;
+    final nextSelected = next.where((k) => k.isSelected).firstOrNull;
+    // Only reinitialize if the selected key changed
+    if (prevSelected?.id != nextSelected?.id && nextSelected != null) {
+      _initializeService(service, ref);
+    }
+  });
+
+  // Initial initialization
+  _initializeService(service, ref);
+
+  ref.onDispose(() {
+    // Clear any resources if needed
+  });
+
+  return service;
+});
+
+/// Initialize the Gemini service with current API key and configuration
+void _initializeService(GeminiService service, WidgetRef ref) {
+  final settings = ref.read(settingsProvider);
+  final apiKeys = ref.read(apiKeysProvider);
   final config = ref.read(appConfigProvider);
 
   // Get model name from config or use default
@@ -65,13 +98,7 @@ final geminiServiceProvider = Provider<GeminiService>((ref) {
       },
     );
   }
-
-  ref.onDispose(() {
-    // Clear any resources if needed
-  });
-
-  return service;
-});
+}
 
 // Transcription service provider (alias to geminiServiceProvider)
 final transcriptionServiceProvider =

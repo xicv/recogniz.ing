@@ -7,6 +7,9 @@ import '../services/start_at_login_service.dart';
 
 /// Notifier for managing app settings
 class SettingsNotifier extends Notifier<AppSettings> {
+  bool _isLoadingFromStorage = false;
+  bool _hasPendingUserUpdate = false;
+
   @override
   AppSettings build() {
     // Start with default settings
@@ -17,43 +20,58 @@ class SettingsNotifier extends Notifier<AppSettings> {
   }
 
   Future<void> _loadSettings() async {
+    // Prevent concurrent loading
+    if (_isLoadingFromStorage) return;
+    _isLoadingFromStorage = true;
+
     try {
       // Use a small delay to ensure Hive is initialized
       await Future.delayed(const Duration(milliseconds: 100));
       final settings = StorageService.settings;
-      state = settings;
+
+      // Only update state if user hasn't made changes since load started
+      if (!_hasPendingUserUpdate) {
+        state = settings;
+      }
     } catch (e) {
       if (kDebugMode) {
         debugPrint('[SettingsNotifier] Failed to load settings: $e');
       }
+    } finally {
+      _isLoadingFromStorage = false;
     }
   }
 
   Future<void> updateApiKey(String apiKey) async {
+    _hasPendingUserUpdate = true; // Mark that user made changes
     final newState = state.copyWith(geminiApiKey: apiKey);
     await StorageService.saveSettings(newState);
     state = newState;
   }
 
   Future<void> updateSelectedPrompt(String promptId) async {
+    _hasPendingUserUpdate = true;
     final newState = state.copyWith(selectedPromptId: promptId);
     await StorageService.saveSettings(newState);
     state = newState;
   }
 
   Future<void> updateSelectedVocabulary(String vocabularyId) async {
+    _hasPendingUserUpdate = true;
     final newState = state.copyWith(selectedVocabularyId: vocabularyId);
     await StorageService.saveSettings(newState);
     state = newState;
   }
 
   Future<void> updateHotkey(String hotkey) async {
+    _hasPendingUserUpdate = true;
     final newState = state.copyWith(globalHotkey: hotkey);
     await StorageService.saveSettings(newState);
     state = newState;
   }
 
   Future<void> toggleAutoCopy() async {
+    _hasPendingUserUpdate = true;
     final newState =
         state.copyWith(autoCopyToClipboard: !state.autoCopyToClipboard);
     await StorageService.saveSettings(newState);
@@ -61,6 +79,7 @@ class SettingsNotifier extends Notifier<AppSettings> {
   }
 
   Future<void> toggleNotifications() async {
+    _hasPendingUserUpdate = true;
     final newState =
         state.copyWith(showNotifications: !state.showNotifications);
     await StorageService.saveSettings(newState);
@@ -68,18 +87,21 @@ class SettingsNotifier extends Notifier<AppSettings> {
   }
 
   Future<void> toggleDarkMode() async {
+    _hasPendingUserUpdate = true;
     final newState = state.copyWith(darkMode: !state.darkMode);
     await StorageService.saveSettings(newState);
     state = newState;
   }
 
   Future<void> updateCriticalInstructions(String instructions) async {
+    _hasPendingUserUpdate = true;
     final newState = state.copyWith(criticalInstructions: instructions);
     await StorageService.saveSettings(newState);
     state = newState;
   }
 
   Future<void> updateTranscriptionLanguage(String language) async {
+    _hasPendingUserUpdate = true;
     final newState = state.copyWith(transcriptionLanguage: language);
     await StorageService.saveSettings(newState);
     state = newState;
@@ -87,12 +109,14 @@ class SettingsNotifier extends Notifier<AppSettings> {
 
   Future<void> updateCompressionPreference(
       AudioCompressionPreference preference) async {
+    _hasPendingUserUpdate = true;
     final newState = state.copyWith(audioCompressionPreference: preference);
     await StorageService.saveSettings(newState);
     state = newState;
   }
 
   Future<void> toggleStartAtLogin() async {
+    _hasPendingUserUpdate = true;
     final newValue = !state.startAtLogin;
     final service = StartAtLoginService();
 
