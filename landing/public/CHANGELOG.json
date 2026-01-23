@@ -30,6 +30,33 @@
   },
   "versions": [
     {
+      "version": "1.15.2",
+      "date": "2026-01-23",
+      "stable": true,
+      "highlights": [
+        "Fixed macOS release build audio recording not working",
+        "Fixed app crash on quit (Cmd+Q)",
+        "Updated macOS entitlements for direct distribution"
+      ],
+      "changes": [
+        {
+          "category": "fixed",
+          "title": "macOS Release Build Audio Recording",
+          "description": "Fixed audio recording failure in macOS release builds by disabling App Sandbox for direct GitHub distribution. The sandbox was blocking AVFoundation from loading system Audio Units required for audio encoding. This fix enables proper audio recording in release mode while maintaining compatibility with direct distribution (non-App Store)."
+        },
+        {
+          "category": "fixed",
+          "title": "App Quit Crash (Cmd+Q)",
+          "description": "Fixed 'quit unexpectedly' dialog when pressing Cmd+Q. Added proper app lifecycle handling with didChangeAppLifecycleState to ensure async resources (TrayService, HotkeyService) are properly disposed before app termination. Previously, async dispose methods were being called synchronously without waiting."
+        },
+        {
+          "category": "changed",
+          "title": "macOS Entitlements",
+          "description": "Updated Release.entitlements and DebugProfile.entitlements with additional entitlements: com.apple.security.device.camera (required by AVFoundation), com.apple.security.cs.disable-library-validation (allows loading system Audio Units), and com.apple.security.app-sandbox set to false for direct distribution."
+        }
+      ]
+    },
+    {
       "version": "1.15.1",
       "date": "2026-01-21",
       "stable": true,
