@@ -23,9 +23,6 @@ class HotkeyService {
   Future<void> registerHotkey(String hotkeyString) async {
     if (!isSupported) return;
 
-    // Unregister existing hotkey
-    await unregisterHotkey();
-
     try {
       final hotKey = parseHotkeyString(hotkeyString);
       if (hotKey == null) {

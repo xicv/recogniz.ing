@@ -123,7 +123,18 @@ class AppSettings extends HiveObject {
     );
   }
 
-  bool get hasApiKey => geminiApiKey != null && geminiApiKey!.isNotEmpty;
+  /// Check if user has a valid API key configured
+  ///
+  /// Checks both the new multi-key system and legacy single key field
+  bool get hasApiKey {
+    // Check new multi-key system first
+    if (apiKeys.isNotEmpty) {
+      // Check if there's at least one available (non-rate-limited or expired) key
+      return apiKeys.any((key) => !key.isRateLimited || key.isRateLimitExpired);
+    }
+    // Fall back to legacy single key
+    return geminiApiKey != null && geminiApiKey!.isNotEmpty;
+  }
 
   /// Get the currently selected API key from the multi-key system
   ///

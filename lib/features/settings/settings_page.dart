@@ -7,9 +7,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/providers/app_providers.dart';
+import '../../core/providers/accessibility_permission_providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/constants/languages.dart';
 import '../../core/models/app_settings.dart';
+import '../../widgets/shared/accessibility_permission_prompt.dart';
 import 'widgets/critical_instructions_editor.dart';
 import 'widgets/hotkey_editor.dart';
 import 'widgets/settings_section.dart';
@@ -37,6 +39,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Accessibility Permission Prompt (macOS only)
+            if (Platform.isMacOS)
+              const AccessibilityPermissionPrompt()
+                  .animate()
+                  .fadeIn(duration: 300.ms),
+
+            if (Platform.isMacOS) const SizedBox(height: 20),
+
             // API Configuration
             SettingsSection(
               title: 'API Keys',
