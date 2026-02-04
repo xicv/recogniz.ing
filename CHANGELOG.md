@@ -317,3 +317,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.15.4] - 2026-02-04
+
+### Changed
+
+- **Flutter Upgrade** - Updated Flutter from 3.38.7 to 3.38.9, the latest stable release. This includes Dart 3.10.8 and brings performance improvements and bug fixes.
+- **Documentation Update** - Updated README.md to reflect Flutter 3.38+ requirement instead of 3.24+.
+
+---
+

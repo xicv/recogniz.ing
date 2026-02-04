@@ -9,7 +9,7 @@
   *AI-powered voice typing that adapts to your workflow—privacy-first, cross-platform, and powered by Google Gemini 3 Flash*
 
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-  [![Flutter](https://img.shields.io/badge/Flutter-3.24+-blue.svg)](https://flutter.dev)
+  [![Flutter](https://img.shields.io/badge/Flutter-3.38+-blue.svg)](https://flutter.dev)
   [![GitHub Stars](https://img.shields.io/github/stars/xicv/recogniz.ing?style=social)](https://github.com/xicv/recogniz.ing)
 
   [Website](https://recogniz.ing) • [Documentation](#-quick-start) • [Changelog](CHANGELOG.md) • [Report Issue](https://github.com/xicv/recogniz.ing/issues)
@@ -37,7 +37,7 @@ Recogniz.ing turns your voice into text—intelligently. Whether you're writing 
 
 You'll need two things:
 
-1. **Flutter SDK** (3.24+)
+1. **Flutter SDK** (3.38+)
    ```bash
    flutter doctor
    ```
