@@ -6,7 +6,7 @@
 .PHONY: test test-coverage test-single analyze format clean upgrade deps-tree
 .PHONY: generate debug-release install-release logs deploy deploy-all
 .PHONY: package-macos package-windows package-linux package-android
-.PHONY: sign-macos notarize-macos codesign-setup
+.PHONY: sign-macos codesign-setup distribute-macos verify-codesign
 .PHONY: version sync-version sync-landing changelog verify-changelog
 .PHONY: bump-patch bump-minor bump-major bump-prerelease
 .PHONY: bump-patch-entry bump-minor-entry bump-major-entry
@@ -293,44 +293,18 @@ codesign-setup: ## Set up code signing configuration
 	@echo "After setup, verify with: make verify-codesign"
 
 verify-codesign: ## Verify code signing setup and certificates
-	@echo "🔍 Verifying code signing configuration..."
+	@echo "Verifying code signing configuration..."
 	@source scripts/codesign-config.sh && verify_codesign_config
 	@source scripts/codesign-config.sh && check_codesign_certificates
 	@source scripts/codesign-config.sh && check_notarytool_credentials
+	@echo ""
+	@echo "All checks passed. Ready to sign with: make distribute-macos"
 
-sign-macos: ## Sign macOS build (requires codesign-setup)
-	@echo "🔐 Signing macOS build..."
-	@source scripts/codesign-config.sh && verify_codesign_config
-	@flutter clean
-	@flutter pub get
-	@flutter build macos --release
-	@echo "📋 Signing application..."
-	@find build/macos/Build/Products/Release/recognizing.app/Contents/Frameworks -name "*.framework" -exec codesign --force --options runtime --sign "$$DEVELOPER_ID_APPLICATION_NAME" {} \;
-	@find build/macos/Build/Products/Release/recognizing.app -name "*.dylib" -exec codesign --force --sign "$$DEVELOPER_ID_APPLICATION_NAME" {} \;
-	@codesign --force --options runtime --sign "$$DEVELOPER_ID_APPLICATION_NAME" --deep build/macos/Build/Products/Release/recognizing.app
-	@codesign --verify --deep --strict --verbose=2 build/macos/Build/Products/Release/recognizing.app
-	@echo "✅ macOS build signed successfully"
+sign-macos: ## Build and sign macOS release (no notarization)
+	@./scripts/sign-macos.sh --sign-only
 
-notarize-macos: ## Notarize signed macOS build (requires Apple Developer account)
-	@echo "📬 Notarizing macOS build..."
-	@source scripts/codesign-config.sh && verify_codesign_config
-	@if [ ! -f scripts/sign-macos.sh ]; then \
-		echo "❌ scripts/sign-macos.sh not found!"; \
-		exit 1; \
-	fi
+distribute-macos: ## Build, sign, create DMG, and notarize for distribution
 	@./scripts/sign-macos.sh
-
-distribute-macos: ## Build, sign, and notarize macOS distribution
-	@echo "📦 Creating macOS distribution package..."
-	@$(MAKE) sign-macos
-	@mkdir -p landing/public/downloads/macos/$(VERSION)
-	@hdiutil create -srcfolder build/macos/Build/Products/Release/recognizing.app -volname "Recogniz.ing" -fs HFS+ -fsargs "-c c=64,a=16,e=16" landing/public/downloads/macos/$(VERSION)/recognizing-$(VERSION)-macos-unsigned.dmg
-	@if [ -n "$$DEVELOPER_TEAM_ID" ] && [ -n "$$APPLE_DEVELOPER_ID" ]; then \
-		echo "🔐 Code signing configured - creating signed distribution..."; \
-		$(MAKE) notarize-macos; \
-		cp recognizing-$(VERSION)-macos.dmg landing/public/downloads/macos/$(VERSION)/; \
-	fi
-	@echo "✅ macOS distribution package ready"
 
 # Version Management
 version: ## Show current version
