@@ -274,13 +274,17 @@ deploy-all: ## Build and deploy all platform releases (host-aware)
 codesign-setup: ## Set up code signing configuration
 	@echo "📋 Setting up code signing configuration..."
 	@if [ ! -f scripts/codesign-config.sh ]; then \
-		echo "❌ scripts/codesign-config.sh not found!"; \
-		exit 1; \
+		if [ -f scripts/codesign-config.sh.template ]; then \
+			echo "Creating scripts/codesign-config.sh from template..."; \
+			cp scripts/codesign-config.sh.template scripts/codesign-config.sh; \
+		else \
+			echo "❌ scripts/codesign-config.sh.template not found!"; \
+			exit 1; \
+		fi; \
 	fi
 	@echo "Please edit scripts/codesign-config.sh with your Apple Developer credentials:"
 	@echo "  - DEVELOPER_TEAM_ID: Your 10-character Apple Developer Team ID"
 	@echo "  - APPLE_DEVELOPER_ID: Your Apple ID email"
-	@echo "  - APPLE_APP_PASSWORD: App-specific password from Apple ID"
 	@echo ""
 	@echo "Then run the following to store notarytool credentials in keychain:"
 	@echo "  source scripts/codesign-config.sh"

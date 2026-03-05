@@ -8,9 +8,10 @@
 #   ./scripts/sign-macos.sh --dmg-only   # Create DMG from signed build (skip build+sign)
 #
 # Prerequisites:
-# 1. Fill in scripts/codesign-config.sh with your Apple Developer credentials
-# 2. Run: source scripts/codesign-config.sh && setup_notarytool_credentials
-# 3. Have Developer ID Application certificate installed in Keychain Access
+# 1. Copy scripts/codesign-config.sh.template to scripts/codesign-config.sh
+# 2. Fill in scripts/codesign-config.sh with your Apple Developer credentials
+# 3. Run: source scripts/codesign-config.sh && setup_notarytool_credentials
+# 4. Have Developer ID Application certificate installed in Keychain Access
 
 set -euo pipefail
 
@@ -22,6 +23,10 @@ if [ -f "$SCRIPT_DIR/codesign-config.sh" ]; then
     source "$SCRIPT_DIR/codesign-config.sh"
 else
     echo "ERROR: scripts/codesign-config.sh not found"
+    echo ""
+    echo "Create it by copying the template:"
+    echo "  cp scripts/codesign-config.sh.template scripts/codesign-config.sh"
+    echo "  # Then fill in your Apple Developer credentials"
     exit 1
 fi
 
@@ -29,7 +34,7 @@ fi
 APP_NAME="recognizing"
 APP_PATH="$PROJECT_DIR/build/macos/Build/Products/Release/$APP_NAME.app"
 ENTITLEMENTS="$PROJECT_DIR/macos/Runner/Release.entitlements"
-VERSION=$(grep "version:" "$PROJECT_DIR/pubspec.yaml" | head -1 | cut -d: -f2 | xargs)
+VERSION=$(grep "^version:" "$PROJECT_DIR/pubspec.yaml" | head -1 | cut -d: -f2 | xargs)
 VERSION_NAME="${VERSION%%+*}"
 DMG_NAME="recognizing-$VERSION_NAME-macos.dmg"
 DMG_PATH="$PROJECT_DIR/$DMG_NAME"
@@ -52,7 +57,7 @@ preflight() {
     info "Preflight checks..."
 
     # Verify required tools
-    for tool in codesign xcrun hdiutil ditto; do
+    for tool in codesign xcrun hdiutil; do
         if ! command -v "$tool" &>/dev/null; then
             error "$tool not found. Install Xcode Command Line Tools."
             exit 1
@@ -63,7 +68,7 @@ preflight() {
     verify_codesign_config || exit 1
 
     # Verify certificate exists in keychain
-    if ! security find-identity -v -p codesigning | grep -q "$DEVELOPER_ID_APPLICATION_NAME"; then
+    if ! security find-identity -v -p codesigning | grep -qF "$DEVELOPER_ID_APPLICATION_NAME"; then
         error "Certificate not found: $DEVELOPER_ID_APPLICATION_NAME"
         echo ""
         echo "Available signing identities:"
@@ -121,7 +126,7 @@ sign_app() {
     # Step 1: Sign all nested frameworks (deepest first)
     info "Signing frameworks..."
     if [ -d "$APP_PATH/Contents/Frameworks" ]; then
-        find "$APP_PATH/Contents/Frameworks" -name "*.framework" -print0 | while IFS= read -r -d '' fw; do
+        while IFS= read -r -d '' fw; do
             # Sign the framework's executable inside, then the framework itself
             local fw_name
             fw_name=$(basename "$fw" .framework)
@@ -130,28 +135,28 @@ sign_app() {
             fi
             codesign --force --options runtime --sign "$identity" "$fw"
             success "  Signed: $(basename "$fw")"
-        done
+        done < <(find "$APP_PATH/Contents/Frameworks" -name "*.framework" -print0)
     fi
 
     # Step 2: Sign all dylibs
     info "Signing dynamic libraries..."
-    find "$APP_PATH" -name "*.dylib" -print0 | while IFS= read -r -d '' dylib; do
+    while IFS= read -r -d '' dylib; do
         codesign --force --options runtime --sign "$identity" "$dylib"
         success "  Signed: $(basename "$dylib")"
-    done
+    done < <(find "$APP_PATH" -name "*.dylib" -print0)
 
     # Step 3: Sign all .so files (if any, e.g., from Dart plugins)
-    find "$APP_PATH" -name "*.so" -print0 | while IFS= read -r -d '' so; do
+    while IFS= read -r -d '' so; do
         codesign --force --options runtime --sign "$identity" "$so"
         success "  Signed: $(basename "$so")"
-    done
+    done < <(find "$APP_PATH" -name "*.so" -print0)
 
     # Step 4: Sign any helper executables
     if [ -d "$APP_PATH/Contents/MacOS" ]; then
-        find "$APP_PATH/Contents/MacOS" -type f -perm +111 ! -name "$APP_NAME" -print0 | while IFS= read -r -d '' helper; do
+        while IFS= read -r -d '' helper; do
             codesign --force --options runtime --entitlements "$ENTITLEMENTS" --sign "$identity" "$helper"
             success "  Signed helper: $(basename "$helper")"
-        done
+        done < <(find "$APP_PATH/Contents/MacOS" -type f -perm +111 ! -name "$APP_NAME" -print0)
     fi
 
     # Step 5: Sign the main app bundle (with entitlements)
@@ -161,7 +166,10 @@ sign_app() {
 
     # Step 6: Verify
     info "Verifying signature..."
-    codesign --verify --deep --strict --verbose=2 "$APP_PATH" 2>&1
+    if ! codesign --verify --deep --strict --verbose=2 "$APP_PATH"; then
+        error "Signature verification failed for $APP_PATH"
+        exit 1
+    fi
 
     # Gatekeeper assessment
     if spctl --assess --type execute "$APP_PATH" 2>&1; then
@@ -220,6 +228,7 @@ create_dmg() {
 _create_dmg_hdiutil() {
     local tmp_dir
     tmp_dir=$(mktemp -d)
+    trap 'rm -rf "$tmp_dir"' RETURN
 
     cp -R "$APP_PATH" "$tmp_dir/"
     ln -s /Applications "$tmp_dir/Applications"
@@ -231,8 +240,6 @@ _create_dmg_hdiutil() {
         -fsargs "-c c=64,a=16,e=16" \
         -format UDZO \
         "$DMG_PATH"
-
-    rm -rf "$tmp_dir"
 }
 
 # ── Notarize ──────────────────────────────────────────────────────
@@ -248,37 +255,37 @@ notarize_dmg() {
     # Submit and wait
     local result_json
     result_json=$(mktemp)
+    trap 'rm -f "$result_json"' RETURN
 
-    if xcrun notarytool submit "$DMG_PATH" \
+    local exit_code=0
+    xcrun notarytool submit "$DMG_PATH" \
         --keychain-profile "$NOTARY_PROFILE" \
         --wait \
-        --output-format json 2>&1 | tee "$result_json"; then
+        --output-format json > "$result_json" 2>&1 || exit_code=$?
 
-        if grep -q '"status"' "$result_json" && grep -q '"Accepted"' "$result_json"; then
-            success "Notarization accepted"
-        elif grep -q '"Invalid"' "$result_json"; then
-            error "Notarization REJECTED"
-            echo ""
-            # Extract submission ID for log retrieval
-            local submission_id
-            submission_id=$(grep -o '"id":"[^"]*"' "$result_json" | head -1 | cut -d'"' -f4)
-            if [ -n "$submission_id" ]; then
-                echo "Fetching rejection details..."
-                xcrun notarytool log "$submission_id" --keychain-profile "$NOTARY_PROFILE" || true
-            fi
-            rm -f "$result_json"
-            exit 1
-        else
-            warn "Notarization status unclear. Check output above."
-        fi
-    else
-        error "Notarization submission failed"
-        cat "$result_json"
-        rm -f "$result_json"
+    cat "$result_json"
+
+    if [ $exit_code -ne 0 ]; then
+        error "Notarization submission failed (exit code: $exit_code)"
         exit 1
     fi
 
-    rm -f "$result_json"
+    if grep -q '"status"' "$result_json" && grep -q '"Accepted"' "$result_json"; then
+        success "Notarization accepted"
+    elif grep -q '"Invalid"' "$result_json"; then
+        error "Notarization REJECTED"
+        echo ""
+        # Extract submission ID for log retrieval
+        local submission_id
+        submission_id=$(grep -o '"id":"[^"]*"' "$result_json" | head -1 | cut -d'"' -f4)
+        if [ -n "$submission_id" ]; then
+            echo "Fetching rejection details..."
+            xcrun notarytool log "$submission_id" --keychain-profile "$NOTARY_PROFILE" || true
+        fi
+        exit 1
+    else
+        warn "Notarization status unclear. Check output above."
+    fi
 
     # Staple the ticket
     info "Stapling notarization ticket to DMG..."
@@ -318,14 +325,23 @@ main() {
                 error "No build found at $APP_PATH."
                 exit 1
             fi
+            if ! codesign --verify --deep --strict "$APP_PATH" &>/dev/null; then
+                error "App at $APP_PATH is not properly signed. Run --sign-only first."
+                exit 1
+            fi
             create_dmg
             notarize_dmg
             ;;
-        full|*)
+        full)
             build_app
             sign_app
             create_dmg
             notarize_dmg
+            ;;
+        *)
+            error "Unknown option: $mode"
+            echo "Usage: $0 [--sign-only | --dmg-only | full]"
+            exit 1
             ;;
     esac
 

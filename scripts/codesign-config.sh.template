@@ -15,10 +15,6 @@ export DEVELOPER_TEAM_ID=""
 # Your Apple Developer ID (email address)
 export APPLE_DEVELOPER_ID=""
 
-# Application-specific password for Apple ID
-# Generate at: https://appleid.apple.com/account/manage/security/apps
-export APPLE_APP_PASSWORD=""
-
 # Certificate Common Name (as it appears in Keychain Access)
 export DEVELOPER_ID_APPLICATION_NAME="Developer ID Application: Your Name ($DEVELOPER_TEAM_ID)"
 
@@ -41,10 +37,6 @@ verify_codesign_config() {
 
     if [ -z "$APPLE_DEVELOPER_ID" ]; then
         missing_vars+=("APPLE_DEVELOPER_ID")
-    fi
-
-    if [ -z "$APPLE_APP_PASSWORD" ]; then
-        missing_vars+=("APPLE_APP_PASSWORD")
     fi
 
     if [ ${#missing_vars[@]} -ne 0 ]; then
@@ -87,11 +79,12 @@ setup_notarytool_credentials() {
     verify_codesign_config || return 1
 
     echo "🔐 Storing notarytool credentials in keychain..."
+    echo "You will be prompted for your app-specific password."
+    echo "Generate one at: https://appleid.apple.com/account/manage/security/apps"
 
     xcrun notarytool store-credentials "$NOTARY_PROFILE" \
         --apple-id "$APPLE_DEVELOPER_ID" \
-        --team-id "$DEVELOPER_TEAM_ID" \
-        --password "$APPLE_APP_PASSWORD"
+        --team-id "$DEVELOPER_TEAM_ID"
 
     if [ $? -eq 0 ]; then
         echo "✅ Notarytool credentials stored in keychain"

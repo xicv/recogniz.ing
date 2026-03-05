@@ -110,6 +110,9 @@ coverage/
 .env.*
 *.env
 
+# Code signing config (contains credentials; use .template to create)
+scripts/codesign-config.sh
+
 # Hive database files (local storage)
 *.hive
 *.lock
