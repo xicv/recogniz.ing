@@ -2,12 +2,16 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!-- App Sandbox DISABLED for direct GitHub distribution -->
-	<!-- Required for AVFoundation to access system Audio Units for recording -->
+	<!-- App Sandbox DISABLED for direct distribution (Developer ID) -->
+	<!-- Notarized via Apple's notarytool for clean Gatekeeper experience -->
 	<!-- NOTE: Cannot distribute to Mac App Store with sandbox disabled -->
 	<key>com.apple.security.app-sandbox</key>
 	<false/>
+	<!-- Required by Dart VM for JIT compilation -->
 	<key>com.apple.security.cs.allow-jit</key>
+	<true/>
+	<!-- Required by Dart VM for hardened runtime compatibility -->
+	<key>com.apple.security.cs.allow-unsigned-executable-memory</key>
 	<true/>
 	<key>com.apple.security.network.server</key>
 	<true/>
