@@ -1,23 +1,38 @@
 #!/bin/bash
 
 # macOS Code Signing and Notarization Script for Recogniz.ing
-# This script signs and notarizes the macOS build for distribution
+#
+# Usage:
+#   ./scripts/sign-macos.sh              # Full pipeline: build, sign, DMG, notarize
+#   ./scripts/sign-macos.sh --sign-only  # Sign an existing build (skip flutter build)
+#   ./scripts/sign-macos.sh --dmg-only   # Create DMG from signed build (skip build+sign)
 #
 # Prerequisites:
-# 1. Run 'xcrun notarytool store-credentials' to store your Apple ID credentials
-# 2. Have Developer ID Application certificate installed in Keychain Access
-#
-# Store credentials one-time:
-#   xcrun notarytool store-credentials "recognizing" \
-#     --apple-id "your@email.com" \
-#     --team-id "YOUR_TEAM_ID" \
-#     --password "app-specific-password"
+# 1. Fill in scripts/codesign-config.sh with your Apple Developer credentials
+# 2. Run: source scripts/codesign-config.sh && setup_notarytool_credentials
+# 3. Have Developer ID Application certificate installed in Keychain Access
 
-set -e
+set -euo pipefail
 
-# Configuration
-NOTARY_PROFILE="recognizing"  # Keychain profile name for notarytool credentials
-DEVELOPER_ID_APPLICATION=""   # Your Apple Developer ID Application certificate name
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Source configuration
+if [ -f "$SCRIPT_DIR/codesign-config.sh" ]; then
+    source "$SCRIPT_DIR/codesign-config.sh"
+else
+    echo "ERROR: scripts/codesign-config.sh not found"
+    exit 1
+fi
+
+# Paths
+APP_NAME="recognizing"
+APP_PATH="$PROJECT_DIR/build/macos/Build/Products/Release/$APP_NAME.app"
+ENTITLEMENTS="$PROJECT_DIR/macos/Runner/Release.entitlements"
+VERSION=$(grep "version:" "$PROJECT_DIR/pubspec.yaml" | head -1 | cut -d: -f2 | xargs)
+VERSION_NAME="${VERSION%%+*}"
+DMG_NAME="recognizing-$VERSION_NAME-macos.dmg"
+DMG_PATH="$PROJECT_DIR/$DMG_NAME"
 
 # Colors
 RED='\033[0;31m'
@@ -26,237 +41,299 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-print_status() {
-    echo -e "${BLUE}[INFO]${NC} $1"
-}
+info()    { echo -e "${BLUE}[INFO]${NC} $1"; }
+success() { echo -e "${GREEN}[OK]${NC} $1"; }
+warn()    { echo -e "${YELLOW}[WARN]${NC} $1"; }
+error()   { echo -e "${RED}[ERROR]${NC} $1"; }
 
-print_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
-}
+# ── Preflight checks ─────────────────────────────────────────────
 
-print_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
-}
+preflight() {
+    info "Preflight checks..."
 
-print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
+    # Verify required tools
+    for tool in codesign xcrun hdiutil ditto; do
+        if ! command -v "$tool" &>/dev/null; then
+            error "$tool not found. Install Xcode Command Line Tools."
+            exit 1
+        fi
+    done
 
-# Check if required tools are installed
-check_requirements() {
-    print_status "Checking requirements..."
+    # Verify config is filled in
+    verify_codesign_config || exit 1
 
-    if ! command -v codesign &> /dev/null; then
-        print_error "codesign not found. Please install Xcode Command Line Tools."
+    # Verify certificate exists in keychain
+    if ! security find-identity -v -p codesigning | grep -q "$DEVELOPER_ID_APPLICATION_NAME"; then
+        error "Certificate not found: $DEVELOPER_ID_APPLICATION_NAME"
+        echo ""
+        echo "Available signing identities:"
+        security find-identity -v -p codesigning
+        echo ""
+        echo "To fix: download your Developer ID Application certificate from"
+        echo "https://developer.apple.com/account/resources/certificates/list"
+        echo "and double-click to install in Keychain Access."
         exit 1
     fi
+    success "Certificate found: $DEVELOPER_ID_APPLICATION_NAME"
 
-    if ! command -v xcrun &> /dev/null; then
-        print_error "xcrun not found. Please install Xcode."
+    # Verify entitlements file exists
+    if [ ! -f "$ENTITLEMENTS" ]; then
+        error "Entitlements file not found: $ENTITLEMENTS"
         exit 1
     fi
+    success "Entitlements file found"
 
-    if ! command -v ditto &> /dev/null; then
-        print_error "ditto not found."
+    # Verify notarytool credentials
+    if ! xcrun notarytool history --keychain-profile "$NOTARY_PROFILE" &>/dev/null; then
+        error "Notarytool credentials not found for profile: $NOTARY_PROFILE"
+        echo ""
+        echo "Run: source scripts/codesign-config.sh && setup_notarytool_credentials"
         exit 1
     fi
-
-    print_success "All required tools found"
+    success "Notarytool credentials verified"
 }
 
-# Check certificates
-check_certificates() {
-    print_status "Checking available certificates..."
+# ── Build ─────────────────────────────────────────────────────────
 
-    if [ -z "$DEVELOPER_ID_APPLICATION" ]; then
-        print_error "DEVELOPER_ID_APPLICATION not set"
-        print_status "Please set this to your Developer ID Application certificate name"
-        exit 1
-    fi
-
-    if security find-identity -v -p codesigning | grep "$DEVELOPER_ID_APPLICATION" > /dev/null 2>&1; then
-        print_success "Developer ID certificate found: $DEVELOPER_ID_APPLICATION"
-    else
-        print_error "No valid Developer ID certificates found matching: $DEVELOPER_ID_APPLICATION"
-        print_status "Please ensure you have:"
-        print_status "1. An Apple Developer Account"
-        print_status "2. Generated a Developer ID Application certificate"
-        print_status "3. Downloaded and installed the certificate in Keychain Access"
-        print_status ""
-        print_status "Available certificates:"
-        security find-identity -v -p codesigning | head -5
-        exit 1
-    fi
-}
-
-# Build the app
 build_app() {
-    print_status "Building Flutter app for macOS..."
+    info "Building Flutter app for macOS (release)..."
+
+    cd "$PROJECT_DIR"
     flutter clean
     flutter pub get
+    dart run build_runner build --delete-conflicting-outputs
     flutter build macos --release
 
-    APP_PATH="build/macos/Build/Products/Release/recognizing.app"
-
     if [ ! -d "$APP_PATH" ]; then
-        print_error "Build failed: app not found at $APP_PATH"
+        error "Build failed: $APP_PATH not found"
         exit 1
     fi
-
-    print_success "Build completed"
+    success "Build completed: $APP_PATH"
 }
 
-# Sign the app
+# ── Sign ──────────────────────────────────────────────────────────
+
 sign_app() {
-    print_status "Signing the application..."
+    info "Signing application bundle..."
 
-    APP_PATH="build/macos/Build/Products/Release/recognizing.app"
+    local identity="$DEVELOPER_ID_APPLICATION_NAME"
 
-    # First, sign all frameworks and dylibs
-    find "$APP_PATH/Contents/Frameworks" -name "*.framework" -exec codesign --force --options runtime --sign "$DEVELOPER_ID_APPLICATION" {} \;
-    find "$APP_PATH" -name "*.dylib" -exec codesign --force --sign "$DEVELOPER_ID_APPLICATION" {} \;
+    # Step 1: Sign all nested frameworks (deepest first)
+    info "Signing frameworks..."
+    if [ -d "$APP_PATH/Contents/Frameworks" ]; then
+        find "$APP_PATH/Contents/Frameworks" -name "*.framework" -print0 | while IFS= read -r -d '' fw; do
+            # Sign the framework's executable inside, then the framework itself
+            local fw_name
+            fw_name=$(basename "$fw" .framework)
+            if [ -f "$fw/Versions/A/$fw_name" ]; then
+                codesign --force --options runtime --sign "$identity" "$fw/Versions/A/$fw_name"
+            fi
+            codesign --force --options runtime --sign "$identity" "$fw"
+            success "  Signed: $(basename "$fw")"
+        done
+    fi
 
-    # Sign the app itself
-    codesign --force --options runtime --sign "$DEVELOPER_ID_APPLICATION" --deep "$APP_PATH"
+    # Step 2: Sign all dylibs
+    info "Signing dynamic libraries..."
+    find "$APP_PATH" -name "*.dylib" -print0 | while IFS= read -r -d '' dylib; do
+        codesign --force --options runtime --sign "$identity" "$dylib"
+        success "  Signed: $(basename "$dylib")"
+    done
 
-    # Verify signature
-    codesign --verify --deep --strict --verbose=2 "$APP_PATH"
+    # Step 3: Sign all .so files (if any, e.g., from Dart plugins)
+    find "$APP_PATH" -name "*.so" -print0 | while IFS= read -r -d '' so; do
+        codesign --force --options runtime --sign "$identity" "$so"
+        success "  Signed: $(basename "$so")"
+    done
 
-    print_success "Application signed successfully"
+    # Step 4: Sign any helper executables
+    if [ -d "$APP_PATH/Contents/MacOS" ]; then
+        find "$APP_PATH/Contents/MacOS" -type f -perm +111 ! -name "$APP_NAME" -print0 | while IFS= read -r -d '' helper; do
+            codesign --force --options runtime --entitlements "$ENTITLEMENTS" --sign "$identity" "$helper"
+            success "  Signed helper: $(basename "$helper")"
+        done
+    fi
+
+    # Step 5: Sign the main app bundle (with entitlements)
+    info "Signing main app bundle with entitlements..."
+    codesign --force --options runtime --entitlements "$ENTITLEMENTS" --sign "$identity" "$APP_PATH"
+    success "App bundle signed"
+
+    # Step 6: Verify
+    info "Verifying signature..."
+    codesign --verify --deep --strict --verbose=2 "$APP_PATH" 2>&1
+
+    # Gatekeeper assessment
+    if spctl --assess --type execute "$APP_PATH" 2>&1; then
+        success "Gatekeeper assessment: PASSED"
+    else
+        warn "Gatekeeper assessment failed (expected before notarization)"
+    fi
+
+    success "Signing complete"
 }
 
-# Create DMG
+# ── DMG ───────────────────────────────────────────────────────────
+
 create_dmg() {
-    print_status "Creating DMG package..."
+    info "Creating DMG: $DMG_NAME"
 
-    VERSION=$(grep "version:" pubspec.yaml | cut -d: -f2 | xargs)
-    DMG_NAME="recognizing-$VERSION-macos"
-    DMG_PATH="$DMG_NAME.dmg"
+    # Remove existing DMG if present
+    [ -f "$DMG_PATH" ] && rm "$DMG_PATH"
 
-    APP_PATH="build/macos/Build/Products/Release/recognizing.app"
+    # Try create-dmg first (prettier result), fall back to hdiutil
+    if command -v create-dmg &>/dev/null; then
+        info "Using create-dmg for styled DMG..."
 
-    # Create DMG
-    create-dmg \
-        --volname "Recogniz.ing" \
-        --volicon "$APP_PATH/Contents/Resources/AppIcon.icns" \
-        --window-pos 200 120 \
-        --window-size 600 450 \
-        --icon-size 100 \
-        --icon "$APP_PATH" 175 120 \
-        --hide-extension "$APP_PATH" \
-        --app-drop-link 425 120 \
-        --background "$PWD/scripts/dmg-background.png" \
-        --disk-image-size 200 \
-        "$DMG_PATH" \
-        "$APP_PATH" || {
-        # Fallback if create-dmg is not installed
-        print_warning "create-dmg not found, using hdiutil..."
+        local create_dmg_args=(
+            --volname "Recogniz.ing"
+            --window-pos 200 120
+            --window-size 600 450
+            --icon-size 100
+            --icon "recognizing.app" 175 190
+            --hide-extension "recognizing.app"
+            --app-drop-link 425 190
+        )
 
-        # Create temporary directory
-        TMP_DIR="$DMG_NAME-tmp"
-        mkdir "$TMP_DIR"
+        # Add icon if it exists
+        if [ -f "$APP_PATH/Contents/Resources/AppIcon.icns" ]; then
+            create_dmg_args+=(--volicon "$APP_PATH/Contents/Resources/AppIcon.icns")
+        fi
 
-        # Copy app
-        cp -R "$APP_PATH" "$TMP_DIR/"
-
-        # Create Applications symlink
-        ln -s /Applications "$TMP_DIR/Applications"
-
-        # Create DMG
-        hdiutil create -srcfolder "$TMP_DIR" -volname "Recogniz.ing" -fs HFS+ -fsargs "-c c=64,a=16,e=16" "$DMG_PATH"
-
-        # Clean up
-        rm -rf "$TMP_DIR"
-    }
-
-    print_success "DMG created: $DMG_PATH"
-}
-
-# Submit for notarization
-notarize_app() {
-    print_status "Submitting for notarization..."
-
-    DMG_PATH="recognizing-$(grep "version:" pubspec.yaml | cut -d: -f2 | xargs)-macos.dmg"
+        create-dmg "${create_dmg_args[@]}" "$DMG_PATH" "$APP_PATH" || {
+            warn "create-dmg failed, falling back to hdiutil..."
+            _create_dmg_hdiutil
+        }
+    else
+        info "create-dmg not installed, using hdiutil..."
+        _create_dmg_hdiutil
+    fi
 
     if [ ! -f "$DMG_PATH" ]; then
-        print_error "DMG file not found: $DMG_PATH"
+        error "DMG creation failed"
         exit 1
     fi
 
-    # Check if notarytool profile exists (by testing history command)
-    print_status "Verifying notarytool credentials..."
-    if ! xcrun notarytool history --keychain-profile "$NOTARY_PROFILE" &>/dev/null; then
-        print_error "Notarytool credentials not found in keychain for profile: $NOTARY_PROFILE"
-        print_status ""
-        print_status "Run the following command to store credentials:"
-        print_status "  xcrun notarytool store-credentials \"$NOTARY_PROFILE\" \\"
-        print_status "    --apple-id \"your@email.com\" \\"
-        print_status "    --team-id \"YOUR_TEAM_ID\" \\"
-        print_status "    --password \"app-specific-password\""
-        print_status ""
+    success "DMG created: $DMG_PATH"
+}
+
+_create_dmg_hdiutil() {
+    local tmp_dir
+    tmp_dir=$(mktemp -d)
+
+    cp -R "$APP_PATH" "$tmp_dir/"
+    ln -s /Applications "$tmp_dir/Applications"
+
+    hdiutil create \
+        -srcfolder "$tmp_dir" \
+        -volname "Recogniz.ing" \
+        -fs HFS+ \
+        -fsargs "-c c=64,a=16,e=16" \
+        -format UDZO \
+        "$DMG_PATH"
+
+    rm -rf "$tmp_dir"
+}
+
+# ── Notarize ──────────────────────────────────────────────────────
+
+notarize_dmg() {
+    info "Submitting for notarization (this may take 2-10 minutes)..."
+
+    if [ ! -f "$DMG_PATH" ]; then
+        error "DMG not found: $DMG_PATH"
         exit 1
     fi
 
-    # Submit for notarization (waits for completion)
-    print_status "Uploading to Apple's notarization service..."
-    print_status "This may take a few minutes..."
+    # Submit and wait
+    local result_json
+    result_json=$(mktemp)
 
     if xcrun notarytool submit "$DMG_PATH" \
         --keychain-profile "$NOTARY_PROFILE" \
         --wait \
-        --output-format json > notarization.json 2>&1; then
+        --output-format json 2>&1 | tee "$result_json"; then
 
-        # Check the result
-        if grep -q '"status": "Accepted"' notarization.json; then
-            print_success "Notarization completed successfully"
+        if grep -q '"status"' "$result_json" && grep -q '"Accepted"' "$result_json"; then
+            success "Notarization accepted"
+        elif grep -q '"Invalid"' "$result_json"; then
+            error "Notarization REJECTED"
+            echo ""
+            # Extract submission ID for log retrieval
+            local submission_id
+            submission_id=$(grep -o '"id":"[^"]*"' "$result_json" | head -1 | cut -d'"' -f4)
+            if [ -n "$submission_id" ]; then
+                echo "Fetching rejection details..."
+                xcrun notarytool log "$submission_id" --keychain-profile "$NOTARY_PROFILE" || true
+            fi
+            rm -f "$result_json"
+            exit 1
         else
-            print_warning "Could not confirm 'Accepted' status. Check notarization.json for details."
-            # Continue anyway - JSON format may vary
+            warn "Notarization status unclear. Check output above."
         fi
     else
-        print_error "Notarization failed"
-        cat notarization.json
+        error "Notarization submission failed"
+        cat "$result_json"
+        rm -f "$result_json"
         exit 1
     fi
 
-    # Staple the notarization ticket to the DMG
-    print_status "Stapling notarization ticket to DMG..."
+    rm -f "$result_json"
+
+    # Staple the ticket
+    info "Stapling notarization ticket to DMG..."
     xcrun stapler staple "$DMG_PATH"
+    success "Ticket stapled"
 
-    print_success "Notarization ticket stapled to DMG"
-
-    # Verify notarization
-    print_status "Verifying notarization..."
-    xcrun stapler validate -v "$DMG_PATH"
-
-    print_success "DMG is properly notarized and ready for distribution"
+    # Final verification
+    info "Verifying notarized DMG..."
+    xcrun stapler validate "$DMG_PATH"
+    success "DMG is notarized and ready for distribution"
 }
 
-# Main execution
+# ── Main ──────────────────────────────────────────────────────────
+
 main() {
-    print_status "Starting macOS code signing and notarization process"
+    echo ""
+    echo "=========================================="
+    echo "  Recogniz.ing macOS Signing & Notarization"
+    echo "  Version: $VERSION_NAME"
+    echo "=========================================="
+    echo ""
 
-    # Check configuration
-    if [ -z "$DEVELOPER_ID_APPLICATION" ]; then
-        print_error "Please configure DEVELOPER_ID_APPLICATION at the top of this script"
-        print_status "Set it to your Developer ID Application certificate name, e.g.:"
-        print_status '  DEVELOPER_ID_APPLICATION="Developer ID Application: Your Name (TEAM_ID)"'
-        print_status ""
-        print_status "To find your certificate name, run:"
-        print_status "  security find-identity -v -p codesigning"
-        exit 1
-    fi
+    local mode="${1:-full}"
 
-    check_requirements
-    check_certificates
-    build_app
-    sign_app
-    create_dmg
-    notarize_app
+    preflight
 
-    print_success "Code signing and notarization completed successfully!"
-    print_status "You can now distribute the signed and notarized DMG file"
+    case "$mode" in
+        --sign-only)
+            if [ ! -d "$APP_PATH" ]; then
+                error "No build found at $APP_PATH. Run without --sign-only first."
+                exit 1
+            fi
+            sign_app
+            ;;
+        --dmg-only)
+            if [ ! -d "$APP_PATH" ]; then
+                error "No build found at $APP_PATH."
+                exit 1
+            fi
+            create_dmg
+            notarize_dmg
+            ;;
+        full|*)
+            build_app
+            sign_app
+            create_dmg
+            notarize_dmg
+            ;;
+    esac
+
+    echo ""
+    success "Done! Distribute: $DMG_PATH"
+    echo ""
+    echo "To install: Open DMG -> Drag to Applications -> Launch normally"
+    echo ""
 }
 
-# Run main function
 main "$@"
