@@ -248,15 +248,8 @@ jobs:
 
           echo "Notarization complete"
 
-      - name: Create macOS archive (unsigned fallback)
-        if: matrix.platform == 'macos' && env.SIGNING_IDENTITY == ''
-        run: |
-          cd ${{ matrix.artifact_source }}
-          zip -r ${{ matrix.artifact_zip_name }} ${{ matrix.app_bundle_name }}.app
-          cd ../../../../../
-
       - name: Cleanup keychain
-        if: matrix.platform == 'macos' && always()
+        if: always() && matrix.platform == 'macos'
         run: |
           if [ -n "${KEYCHAIN_PATH:-}" ]; then
             security delete-keychain "$KEYCHAIN_PATH" 2>/dev/null || true
