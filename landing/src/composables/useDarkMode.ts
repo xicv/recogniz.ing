@@ -1,37 +1,31 @@
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 
 export function useDarkMode() {
-  const isDark = ref(false)
+  // Sync initial state with DOM (dark class may already be set by inline script in index.html)
+  const isDark = ref(document.documentElement.classList.contains('dark'))
 
-  // Check localStorage and system preference on mount
-  onMounted(() => {
-    const stored = localStorage.getItem('theme')
-    if (stored) {
-      isDark.value = stored === 'dark'
-    } else {
-      // Check system preference
-      isDark.value = window.matchMedia('(prefers-color-scheme: dark)').matches
-    }
-    updateTheme()
-  })
-
-  // Watch for changes and update DOM
+  // Watch for changes and update DOM + localStorage
   watch(isDark, () => {
     updateTheme()
     localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
   })
 
   // Listen for system theme changes
-  onMounted(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    const handleChange = (e: MediaQueryListEvent) => {
-      // Only update if user hasn't set a preference
-      if (!localStorage.getItem('theme')) {
-        isDark.value = e.matches
-      }
+  let mediaQuery: MediaQueryList | null = null
+  const handleChange = (e: MediaQueryListEvent) => {
+    // Only update if user hasn't set a preference
+    if (!localStorage.getItem('theme')) {
+      isDark.value = e.matches
     }
+  }
+
+  onMounted(() => {
+    mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
     mediaQuery.addEventListener('change', handleChange)
-    return () => mediaQuery.removeEventListener('change', handleChange)
+  })
+
+  onUnmounted(() => {
+    mediaQuery?.removeEventListener('change', handleChange)
   })
 
   function updateTheme() {

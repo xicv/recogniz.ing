@@ -39,6 +39,16 @@
     <meta name="googlebot" content="index, follow" />
     <meta name="theme-color" content="#0891b2" />
 
+    <!-- Dark mode: apply .dark class synchronously to prevent FOUC -->
+    <script>
+      (function() {
+        var theme = localStorage.getItem('theme');
+        if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+
     <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
