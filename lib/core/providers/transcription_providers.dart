@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/transcription.dart';
 import '../services/storage_service.dart';
-import '../services/analytics_service.dart';
 
 /// Sort options for transcriptions
 enum SortOption {
@@ -99,35 +98,6 @@ final filteredTranscriptionsProvider = Provider<List<Transcription>>((ref) {
   return filtered;
 });
 
-/// Enhanced statistics provider for dashboard
-final enhancedStatisticsProvider = Provider<EnhancedStatistics>((ref) {
-  final transcriptions = ref.watch(transcriptionsProvider);
-
-  return AnalyticsService.calculateEnhancedStats(transcriptions);
-});
-
-/// Legacy statistics provider for backward compatibility
-final statisticsProvider = Provider<Statistics>((ref) {
-  final enhancedStats = ref.watch(enhancedStatisticsProvider);
-
-  final now = DateTime.now();
-  final weekAgo = now.subtract(const Duration(days: 7));
-
-  // Calculate this week's usage from enhanced data
-  int thisWeekUsage = 0;
-  enhancedStats.usageByDay.forEach((date, count) {
-    if (date.isAfter(weekAgo)) {
-      thisWeekUsage += count;
-    }
-  });
-
-  return Statistics(
-    totalUsage: enhancedStats.totalTranscriptions,
-    totalTokens: enhancedStats.totalTokens,
-    totalDurationMinutes: enhancedStats.totalDurationMinutes,
-    thisWeekUsage: thisWeekUsage,
-  );
-});
 
 /// Notifier for managing transcription state
 class TranscriptionsNotifier extends Notifier<List<Transcription>> {
@@ -190,17 +160,3 @@ final transcriptionsProvider =
     NotifierProvider<TranscriptionsNotifier, List<Transcription>>(
         TranscriptionsNotifier.new);
 
-/// Statistics data model
-class Statistics {
-  final int totalUsage;
-  final int totalTokens;
-  final double totalDurationMinutes;
-  final int thisWeekUsage;
-
-  Statistics({
-    required this.totalUsage,
-    required this.totalTokens,
-    required this.totalDurationMinutes,
-    required this.thisWeekUsage,
-  });
-}
