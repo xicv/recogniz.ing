@@ -5,7 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../core/providers/api_keys_provider.dart';
 import '../../../core/providers/recording_providers.dart';
-import '../../../core/theme/app_theme.dart';
+
 
 /// Widget for managing multiple API keys
 class ApiKeysManager extends ConsumerStatefulWidget {
@@ -21,6 +21,7 @@ class _ApiKeysManagerState extends ConsumerState<ApiKeysManager> {
     final apiKeys = ref.watch(apiKeysProvider);
     final selectedKey = ref.watch(selectedApiKeyProvider);
     final availableKeys = ref.watch(availableApiKeysProvider);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -32,7 +33,7 @@ class _ApiKeysManagerState extends ConsumerState<ApiKeysManager> {
             children: [
               Icon(
                 LucideIcons.key,
-                color: AppColors.primary,
+                color: colorScheme.primary,
                 size: 20,
               ),
               const SizedBox(width: 12),
@@ -399,20 +400,21 @@ class _ApiKeyCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isRateLimited = apiKey.isRateLimited;
     final isLimitExpired = apiKey.isRateLimitExpired;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
         color: isSelected
-            ? AppColors.primary.withValues(alpha: 0.1)
-            : Theme.of(context).colorScheme.surface,
+            ? colorScheme.primary.withValues(alpha: 0.1)
+            : colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isSelected
-              ? AppColors.primary
+              ? colorScheme.primary
               : isRateLimited && !isLimitExpired
                   ? Colors.orange
-                  : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                  : colorScheme.outline.withValues(alpha: 0.3),
           width: isSelected ? 2 : 1,
         ),
       ),
@@ -431,11 +433,11 @@ class _ApiKeyCard extends ConsumerWidget {
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: isSelected
-                        ? AppColors.primary
-                        : Theme.of(context).colorScheme.outline,
+                        ? colorScheme.primary
+                        : colorScheme.outline,
                     width: 2,
                   ),
-                  color: isSelected ? AppColors.primary : null,
+                  color: isSelected ? colorScheme.primary : null,
                 ),
                 child: isSelected
                     ? const Icon(LucideIcons.check, size: 14, color: Colors.white)
@@ -466,7 +468,7 @@ class _ApiKeyCard extends ConsumerWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.primary,
+                              color: colorScheme.primary,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Text(

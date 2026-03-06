@@ -94,13 +94,6 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
                     tooltip: 'Clear All',
                     visualDensity: VisualDensity.compact,
                   ),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    onPressed: () => _showFilterDialog(context),
-                    icon: const Icon(LucideIcons.filter),
-                    tooltip: 'Filter',
-                    visualDensity: VisualDensity.compact,
-                  ),
                 ],
               ],
             ),
@@ -140,21 +133,21 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
                 margin: const EdgeInsets.all(16),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.warning.withValues(alpha: 0.1),
+                  color: Theme.of(context).colorScheme.warning.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                      color: AppColors.warning.withValues(alpha: 0.3)),
+                      color: Theme.of(context).colorScheme.warning.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
                     Icon(LucideIcons.alertTriangle,
-                        color: AppColors.warning, size: 20),
+                        color: Theme.of(context).colorScheme.warning, size: 20),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         'Add your Gemini API key in Settings to start recording',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.warning,
+                              color: Theme.of(context).colorScheme.warning,
                             ),
                       ),
                     ),
@@ -429,214 +422,13 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
               );
             },
             style: TextButton.styleFrom(
-              foregroundColor: AppColors.error,
-              backgroundColor: AppColors.error.withValues(alpha: 0.1),
+              foregroundColor: Theme.of(context).colorScheme.error,
+              backgroundColor: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
             child: const Text('Delete All'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showFilterDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: 500,
-            maxHeight: MediaQuery.of(context).size.height * 0.85,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Fixed header
-              Padding(
-                padding: const EdgeInsets.all(24),
-                child: Row(
-                  children: [
-                    Icon(
-                      LucideIcons.filter,
-                      size: 24,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Filter Transcriptions',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(LucideIcons.x),
-                      visualDensity: VisualDensity.compact,
-                    ),
-                  ],
-                ),
-              ),
-
-              // Scrollable content
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Date Range Section
-                      _buildFilterSection(
-                        context,
-                        title: 'Date Range',
-                        icon: LucideIcons.calendar,
-                        children: [
-                          'Today',
-                          'Yesterday',
-                          'This Week',
-                          'This Month',
-                          'Custom Range',
-                        ],
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // Duration Section
-                      _buildFilterSection(
-                        context,
-                        title: 'Duration',
-                        icon: LucideIcons.timer,
-                        children: [
-                          'Under 30 seconds',
-                          '30s - 1 minute',
-                          '1 - 5 minutes',
-                          'Over 5 minutes',
-                        ],
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // Status Section
-                      _buildFilterSection(
-                        context,
-                        title: 'Status',
-                        icon: LucideIcons.circle,
-                        children: [
-                          'All',
-                          'Has Text',
-                          'Empty',
-                          'Edited',
-                        ],
-                      ),
-
-                      const SizedBox(height: 24),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Fixed bottom padding for buttons
-              Padding(
-                padding: const EdgeInsets.all(24),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(LucideIcons.x, size: 16),
-                        label: const Text('Clear All'),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: FilledButton.icon(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(LucideIcons.check, size: 16),
-                        label: const Text('Apply Filters'),
-                        style: FilledButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFilterSection(
-    BuildContext context, {
-    required String title,
-    required IconData icon,
-    required List<String> children,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Theme.of(context)
-            .colorScheme
-            .surfaceContainerHighest
-            .withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Section header
-          Row(
-            children: [
-              Icon(
-                icon,
-                size: 16,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                title,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          // Filter options in a grid
-          Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            children: children.map((option) {
-              return FilterChip(
-                label: Text(
-                  option,
-                  style: const TextStyle(fontSize: 12),
-                ),
-                onSelected: (value) {},
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
-                ),
-              );
-            }).toList(),
           ),
         ],
       ),
@@ -711,7 +503,7 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
         SnackBar(
           content: Text('Retry failed: $e'),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: AppColors.error,
+          backgroundColor: Theme.of(context).colorScheme.error,
           duration: const Duration(seconds: 4),
           action: SnackBarAction(
             label: 'Dismiss',

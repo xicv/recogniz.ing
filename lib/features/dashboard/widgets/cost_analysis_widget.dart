@@ -22,6 +22,7 @@ class CostAnalysisWidget extends StatefulWidget {
 class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Card(
       elevation: 0,
       color: Theme.of(context).cardColor,
@@ -43,13 +44,13 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                 Container(
                   padding: const EdgeInsets.all(UIConstants.spacingSmall),
                   decoration: BoxDecoration(
-                    color: AppColors.accent.withValues(alpha: 0.1),
+                    color: colorScheme.secondary.withValues(alpha: 0.1),
                     borderRadius:
                         BorderRadius.circular(UIConstants.borderRadiusSmall),
                   ),
                   child: Icon(
                     LucideIcons.dollarSign,
-                    color: AppColors.accent,
+                    color: colorScheme.secondary,
                     size: UIConstants.iconSmall,
                   ),
                 ),
@@ -75,7 +76,7 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                     icon: LucideIcons.wallet,
                     value: '\$${widget.stats.totalCost.toStringAsFixed(3)}',
                     label: 'Total Spent',
-                    color: AppColors.accent,
+                    color: colorScheme.secondary,
                     subtitle:
                         '${widget.stats.totalTranscriptions} transcriptions',
                   ),
@@ -89,7 +90,7 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                     value:
                         '\$${widget.stats.costPerTranscription.toStringAsFixed(4)}',
                     label: 'Avg Cost',
-                    color: AppColors.primary,
+                    color: colorScheme.primary,
                     subtitle: 'per transcription',
                   ),
                 ),
@@ -102,7 +103,7 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                     value:
                         '\$${widget.stats.valueVsTraditionalSavings.toStringAsFixed(2)}',
                     label: 'Money Saved',
-                    color: AppColors.success,
+                    color: colorScheme.success,
                     subtitle: 'vs traditional',
                   ),
                 ),
@@ -127,7 +128,7 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                       Icon(
                         LucideIcons.coins,
                         size: 20,
-                        color: AppColors.accent,
+                        color: colorScheme.secondary,
                       ),
                       const SizedBox(width: UIConstants.spacingXSmall),
                       Text(
@@ -172,7 +173,7 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                                   .titleMedium
                                   ?.copyWith(
                                     fontWeight: FontWeight.bold,
-                                    color: AppColors.accent,
+                                    color: colorScheme.secondary,
                                   ),
                             ),
                           ],
@@ -208,7 +209,7 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                                   .titleMedium
                                   ?.copyWith(
                                     fontWeight: FontWeight.bold,
-                                    color: AppColors.primary,
+                                    color: colorScheme.primary,
                                   ),
                             ),
                           ],
@@ -286,6 +287,7 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
   }
 
   Widget _buildValueComparison(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     // Compare to traditional transcription services ($1 per minute)
     final traditionalCost = widget.stats.totalDurationMinutes * 1.0;
     final savings = widget.stats.valueVsTraditionalSavings;
@@ -318,7 +320,7 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                   Text(
                     '\$${traditionalCost.toStringAsFixed(2)}',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: AppColors.error,
+                          color: colorScheme.error,
                           fontWeight: FontWeight.bold,
                         ),
                   ),
@@ -329,12 +331,12 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: AppColors.success.withValues(alpha: 0.1),
+                color: colorScheme.success.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 LucideIcons.arrowRight,
-                color: AppColors.success,
+                color: colorScheme.success,
                 size: 20,
               ),
             ),
@@ -351,7 +353,7 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
                   Text(
                     '\$${widget.stats.totalCost.toStringAsFixed(3)}',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: AppColors.success,
+                          color: colorScheme.success,
                           fontWeight: FontWeight.bold,
                         ),
                   ),
@@ -366,7 +368,7 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
             width: double.infinity,
             padding: const EdgeInsets.all(UIConstants.spacingSmall),
             decoration: BoxDecoration(
-              color: AppColors.success.withValues(alpha: 0.1),
+              color: colorScheme.success.withValues(alpha: 0.1),
               borderRadius:
                   BorderRadius.circular(UIConstants.borderRadiusSmall),
             ),
@@ -374,14 +376,14 @@ class _CostAnalysisWidgetState extends State<CostAnalysisWidget> {
               children: [
                 Icon(
                   LucideIcons.trendingDown,
-                  color: AppColors.success,
+                  color: colorScheme.success,
                   size: 16,
                 ),
                 const SizedBox(width: UIConstants.spacingXSmall),
                 Text(
                   'You saved ${savingsPercentage.toStringAsFixed(0)}% on transcription costs!',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.success,
+                        color: colorScheme.success,
                         fontWeight: FontWeight.w600,
                       ),
                 ),

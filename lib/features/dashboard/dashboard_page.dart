@@ -15,6 +15,7 @@ class DashboardPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final statistics = ref.watch(statisticsProvider);
     final enhancedStats = ref.watch(enhancedStatisticsProvider);
     final transcriptions = ref.watch(filteredTranscriptionsProvider);
@@ -73,15 +74,15 @@ class DashboardPage extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.warning.withValues(alpha: 0.1),
+                        color: colorScheme.warning.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                            color: AppColors.warning.withValues(alpha: 0.3)),
+                            color: colorScheme.warning.withValues(alpha: 0.3)),
                       ),
                       child: Row(
                         children: [
                           Icon(LucideIcons.alertTriangle,
-                              color: AppColors.warning, size: 18),
+                              color: colorScheme.warning, size: 18),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
@@ -90,7 +91,7 @@ class DashboardPage extends ConsumerWidget {
                                   .textTheme
                                   .bodySmall
                                   ?.copyWith(
-                                    color: AppColors.warning,
+                                    color: colorScheme.warning,
                                   ),
                             ),
                           ),

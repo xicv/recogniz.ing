@@ -5,7 +5,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../core/models/vocabulary.dart';
 import '../../../core/providers/app_providers.dart';
-import '../../../core/theme/app_theme.dart';
+
 
 class VocabularyEditor extends ConsumerStatefulWidget {
   final VocabularySet? vocabulary;
@@ -45,17 +45,19 @@ class _VocabularyEditorState extends ConsumerState<VocabularyEditor> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        surfaceTintColor: Theme.of(context).colorScheme.surfaceTint,
+        surfaceTintColor: colorScheme.surfaceTint,
         title: Text(isEditing ? 'Edit Vocabulary' : 'New Vocabulary'),
         actions: [
           if (isEditing && !widget.vocabulary!.isDefault)
             IconButton(
               onPressed: _deleteVocabulary,
-              icon: Icon(LucideIcons.trash2, color: AppColors.error),
+              icon: Icon(LucideIcons.trash2, color: colorScheme.error),
               tooltip: 'Delete',
             ),
         ],
@@ -94,18 +96,18 @@ class _VocabularyEditorState extends ConsumerState<VocabularyEditor> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: colorScheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 children: [
-                  Icon(LucideIcons.info, size: 16, color: AppColors.primary),
+                  Icon(LucideIcons.info, size: 16, color: colorScheme.primary),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'Add proper nouns, technical terms, or domain-specific vocabulary (one per line)',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.primary,
+                            color: colorScheme.primary,
                           ),
                     ),
                   ),
@@ -189,7 +191,7 @@ class _VocabularyEditorState extends ConsumerState<VocabularyEditor> {
               Navigator.pop(context);
               Navigator.pop(context);
             },
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
             child: const Text('Delete'),
           ),
         ],

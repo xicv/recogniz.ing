@@ -2,33 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 // ============================================================
-// APP COLORS - Static color palette for compatibility
+// SEMANTIC COLORS - Theme-aware extension on ColorScheme
 // ============================================================
 
-class AppColors {
-  // Primary palette (kept for theme config compatibility)
-  static Color primary = const Color(0xFF6366F1);
-  static Color primaryLight = const Color(0xFF818CF8);
-  static Color primaryDark = const Color(0xFF4F46E5);
+/// Extension providing semantic colors (success, warning, info) that
+/// adapt to light/dark mode via the ColorScheme's brightness.
+///
+/// Usage: `Theme.of(context).colorScheme.success`
+extension SemanticColors on ColorScheme {
+  /// Success green — adapts to brightness
+  Color get success => brightness == Brightness.dark
+      ? const Color(0xFF34D399) // lighter for dark mode
+      : const Color(0xFF10B981);
 
-  // Accent colors
-  static Color accent = const Color(0xFF22D3EE);
-  static Color success = const Color(0xFF10B981);
-  static Color warning = const Color(0xFFF59E0B);
-  static Color error = const Color(0xFFEF4444);
-  static Color info = const Color(0xFF64748B);
+  /// Warning amber — adapts to brightness
+  Color get warning => brightness == Brightness.dark
+      ? const Color(0xFFFBBF24) // lighter for dark mode
+      : const Color(0xFFF59E0B);
 
-  // Neutrals - Light (for reference, Material 3 generates these)
-  static Color backgroundLight = const Color(0xFFF8FAFC);
-  static Color surfaceLight = const Color(0xFFFFFFFF);
-  static Color textPrimaryLight = const Color(0xFF1E293B);
-  static Color textSecondaryLight = const Color(0xFF64748B);
+  /// Info slate — adapts to brightness
+  Color get info => brightness == Brightness.dark
+      ? const Color(0xFF94A3B8) // lighter for dark mode
+      : const Color(0xFF64748B);
 
-  // Neutrals - Dark (updated to Material 3 defaults for better eye comfort)
-  static const Color backgroundDark = Color(0xFF121212);
-  static const Color surfaceDark = Color(0xFF1C1B1F);
-  static Color textPrimaryDark = const Color(0xFFE6E1E5);
-  static Color textSecondaryDark = const Color(0xFFCAC4D0);
+  /// Accent cyan — adapts to brightness (same as secondary)
+  Color get accent => secondary;
 }
 
 /// Enhanced theme system for Recogniz.ing 1.1.0

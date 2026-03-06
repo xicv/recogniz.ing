@@ -164,6 +164,7 @@ class QuotaStatusCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final quotaInfo = ref.watch(selectedKeyQuotaProvider);
     final selectedKey = ref.watch(selectedApiKeyProvider);
 
@@ -257,7 +258,7 @@ class QuotaStatusCard extends ConsumerWidget {
                       unit: 'days',
                       valueColor: quotaInfo.daysUntilExhaustion != null &&
                               quotaInfo.daysUntilExhaustion! < 7
-                          ? AppColors.warning
+                          ? colorScheme.warning
                           : null,
                     ),
                   ],
@@ -385,6 +386,7 @@ class EnhancedStatsGrid extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final stats = ref.watch(selectedKeyStatsProvider);
 
     if (stats == null) {
@@ -420,7 +422,7 @@ class EnhancedStatsGrid extends ConsumerWidget {
             children: [
               _StatCard(
                 icon: LucideIcons.fileText,
-                iconColor: AppColors.primary,
+                iconColor: colorScheme.primary,
                 title: 'Transcriptions',
                 value: stats.totalTranscriptions.toString(),
                 subtitle: 'all time',
@@ -551,6 +553,7 @@ class UsageInsightsCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final quotaInfo = ref.watch(selectedKeyQuotaProvider);
     final stats = ref.watch(selectedKeyStatsProvider);
 
@@ -558,7 +561,7 @@ class UsageInsightsCard extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
-    final insights = _generateInsights(quotaInfo, stats);
+    final insights = _generateInsights(quotaInfo, stats, colorScheme);
 
     return Container(
       margin: const EdgeInsets.symmetric(
@@ -574,7 +577,7 @@ class UsageInsightsCard extends ConsumerWidget {
         border: Border.all(
           color: insights.isWarning
               ? const Color(0xFFF97316).withValues(alpha: 0.25)
-              : AppColors.primary.withValues(alpha: 0.15),
+              : colorScheme.primary.withValues(alpha: 0.15),
           width: 1,
         ),
       ),
@@ -623,7 +626,7 @@ class UsageInsightsCard extends ConsumerWidget {
     ).animate().fadeIn(duration: 300.ms, delay: 250.ms);
   }
 
-  _InsightData _generateInsights(QuotaInfo quota, ApiKeyUsageStats stats) {
+  _InsightData _generateInsights(QuotaInfo quota, ApiKeyUsageStats stats, ColorScheme colorScheme) {
     if (quota.isExhausted) {
       return _InsightData(
         icon: LucideIcons.alertOctagon,
@@ -657,7 +660,7 @@ class UsageInsightsCard extends ConsumerWidget {
     if (stats.totalTranscriptions == 0) {
       return _InsightData(
         icon: LucideIcons.info,
-        iconColor: AppColors.primary,
+        iconColor: colorScheme.primary,
         title: 'Get Started',
         message: 'Make your first transcription to see usage insights.',
         isWarning: false,

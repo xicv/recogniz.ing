@@ -22,6 +22,7 @@ class InsightsWidget extends StatefulWidget {
 class _InsightsWidgetState extends State<InsightsWidget> {
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Card(
       elevation: 0,
       color: Theme.of(context).cardColor,
@@ -43,13 +44,13 @@ class _InsightsWidgetState extends State<InsightsWidget> {
                 Container(
                   padding: const EdgeInsets.all(UIConstants.spacingSmall),
                   decoration: BoxDecoration(
-                    color: AppColors.warning.withValues(alpha: 0.1),
+                    color: colorScheme.warning.withValues(alpha: 0.1),
                     borderRadius:
                         BorderRadius.circular(UIConstants.borderRadiusSmall),
                   ),
                   child: Icon(
                     LucideIcons.lightbulb,
-                    color: AppColors.warning,
+                    color: colorScheme.warning,
                     size: UIConstants.iconSmall,
                   ),
                 ),
@@ -92,6 +93,7 @@ class _InsightsWidgetState extends State<InsightsWidget> {
   }
 
   Widget _buildForecastSection(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     // Calculate trend from forecast
     final forecast = widget.stats.usageForecast;
     if (forecast.isEmpty) return const SizedBox.shrink();
@@ -106,15 +108,15 @@ class _InsightsWidgetState extends State<InsightsWidget> {
     String trendText;
 
     if (trendPercentage.abs() < 5) {
-      trendColor = AppColors.warning;
+      trendColor = colorScheme.warning;
       trendIcon = LucideIcons.minus;
       trendText = 'Stable';
     } else if (trendPercentage > 0) {
-      trendColor = AppColors.success;
+      trendColor = colorScheme.success;
       trendIcon = LucideIcons.trendingUp;
       trendText = 'Increasing';
     } else {
-      trendColor = AppColors.error;
+      trendColor = colorScheme.error;
       trendIcon = LucideIcons.trendingDown;
       trendText = 'Decreasing';
     }
@@ -191,24 +193,25 @@ class _InsightsWidgetState extends State<InsightsWidget> {
   }
 
   Widget _buildRecommendation(BuildContext context, String recommendation) {
+    final colorScheme = Theme.of(context).colorScheme;
     IconData icon;
     Color color;
 
     if (recommendation.toLowerCase().contains('microphone') ||
         recommendation.toLowerCase().contains('audio')) {
       icon = LucideIcons.mic;
-      color = AppColors.warning;
+      color = colorScheme.warning;
     } else if (recommendation.toLowerCase().contains('budget') ||
         recommendation.toLowerCase().contains('cost')) {
       icon = LucideIcons.dollarSign;
-      color = AppColors.accent;
+      color = colorScheme.secondary;
     } else if (recommendation.toLowerCase().contains('speed') ||
         recommendation.toLowerCase().contains('speaking')) {
       icon = LucideIcons.zap;
-      color = AppColors.primary;
+      color = colorScheme.primary;
     } else {
       icon = LucideIcons.info;
-      color = AppColors.info;
+      color = colorScheme.info;
     }
 
     return Container(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_theme.dart';
+
 
 class SettingsSection extends StatelessWidget {
   final String title;
@@ -18,7 +18,7 @@ class SettingsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -30,16 +30,14 @@ class SettingsSection extends StatelessWidget {
               Icon(
                 icon,
                 size: 20,
-                color: AppColors.primaryLight,
+                color: colorScheme.primary,
               ),
               const SizedBox(width: 8),
               Text(
                 title,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimaryLight,
+                      color: colorScheme.onSurface,
                     ),
               ),
               const Spacer(),

@@ -62,6 +62,7 @@ class _CompactStatsCardState extends State<CompactStatsCard>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Card(
       elevation: 0,
       color: Theme.of(context).cardColor,
@@ -87,19 +88,19 @@ class _CompactStatsCardState extends State<CompactStatsCard>
                     icon: LucideIcons.activity,
                     value: _formatNumber(widget.totalUsage),
                     label: 'Transcriptions',
-                    color: AppColors.primary,
+                    color: colorScheme.primary,
                   ),
                   _buildMainStat(
                     icon: LucideIcons.trendingUp,
                     value: widget.thisWeekUsage.toString(),
                     label: 'This Week',
-                    color: AppColors.accent,
+                    color: colorScheme.secondary,
                   ),
                   _buildMainStat(
                     icon: LucideIcons.clock,
                     value: '${widget.totalDurationMinutes.toStringAsFixed(0)}m',
                     label: 'Total Time',
-                    color: AppColors.warning,
+                    color: colorScheme.warning,
                   ),
                 ],
               ),

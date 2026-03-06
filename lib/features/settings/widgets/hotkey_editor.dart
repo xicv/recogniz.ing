@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../core/providers/app_providers.dart';
-import '../../../core/theme/app_theme.dart';
+
 
 class HotkeyEditorDialog extends ConsumerStatefulWidget {
   const HotkeyEditorDialog({super.key});
@@ -128,6 +128,7 @@ class _HotkeyEditorDialogState extends ConsumerState<HotkeyEditorDialog> {
   @override
   Widget build(BuildContext context) {
     final currentHotkey = ref.watch(settingsProvider).globalHotkey;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return AlertDialog(
       title: const Text('Set Global Hotkey'),
@@ -151,12 +152,12 @@ class _HotkeyEditorDialogState extends ConsumerState<HotkeyEditorDialog> {
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: _isRecording
-                      ? AppColors.primary.withValues(alpha: 0.1)
-                      : Theme.of(context).colorScheme.surfaceContainerHighest,
+                      ? colorScheme.primary.withValues(alpha: 0.1)
+                      : colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color:
-                        _isRecording ? AppColors.primary : Colors.transparent,
+                        _isRecording ? colorScheme.primary : Colors.transparent,
                     width: 2,
                   ),
                 ),
@@ -164,7 +165,7 @@ class _HotkeyEditorDialogState extends ConsumerState<HotkeyEditorDialog> {
                   children: [
                     if (_isRecording) ...[
                       Icon(LucideIcons.keyboard,
-                          size: 32, color: AppColors.primary),
+                          size: 32, color: colorScheme.primary),
                       const SizedBox(height: 12),
                       Text(
                         _pressedModifiers.isNotEmpty
@@ -172,7 +173,7 @@ class _HotkeyEditorDialogState extends ConsumerState<HotkeyEditorDialog> {
                             : 'Press key combination...',
                         style:
                             Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: AppColors.primary,
+                                  color: colorScheme.primary,
                                 ),
                       ),
                     ] else ...[
@@ -238,10 +239,11 @@ class _HotkeyEditorDialogState extends ConsumerState<HotkeyEditorDialog> {
 
   Widget _buildPresetChip(String hotkey) {
     final isSelected = _recordedHotkey == hotkey;
+    final chipColorScheme = Theme.of(context).colorScheme;
     return ActionChip(
       label: Text(_formatForDisplay(hotkey)),
       backgroundColor:
-          isSelected ? AppColors.primary.withValues(alpha: 0.2) : null,
+          isSelected ? chipColorScheme.primary.withValues(alpha: 0.2) : null,
       onPressed: () {
         setState(() {
           _recordedHotkey = hotkey;

@@ -54,6 +54,7 @@ class _TranscriptionTileState extends State<TranscriptionTile> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final dateFormat = DateFormat('MMM d, h:mm a');
 
     return Card(
@@ -69,13 +70,13 @@ class _TranscriptionTileState extends State<TranscriptionTile> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
+                    color: colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     dateFormat.format(widget.transcription.createdAt),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.primary,
+                          color: colorScheme.primary,
                           fontWeight: FontWeight.w500,
                         ),
                   ),
@@ -108,12 +109,12 @@ class _TranscriptionTileState extends State<TranscriptionTile> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(
-                              color: AppColors.primary.withValues(alpha: 0.5)),
+                              color: colorScheme.primary.withValues(alpha: 0.5)),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide:
-                              BorderSide(color: AppColors.primary, width: 2),
+                              BorderSide(color: colorScheme.primary, width: 2),
                         ),
                         hintText: 'Enter transcription text...',
                       ),
@@ -174,7 +175,7 @@ class _TranscriptionTileState extends State<TranscriptionTile> {
                     icon: const Icon(LucideIcons.save, size: 16),
                     label: const Text('Save'),
                     style: TextButton.styleFrom(
-                      foregroundColor: AppColors.success,
+                      foregroundColor: colorScheme.success,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -212,7 +213,7 @@ class _TranscriptionTileState extends State<TranscriptionTile> {
                 IconButton(
                   onPressed: widget.onDelete,
                   icon: Icon(LucideIcons.trash2,
-                      size: 18, color: AppColors.error),
+                      size: 18, color: colorScheme.error),
                   tooltip: 'Delete',
                   visualDensity: VisualDensity.compact,
                 ),

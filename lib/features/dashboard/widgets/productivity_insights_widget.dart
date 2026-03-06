@@ -50,6 +50,7 @@ class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Card(
       elevation: 0,
       color: Theme.of(context).cardColor,
@@ -71,13 +72,13 @@ class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
                 Container(
                   padding: const EdgeInsets.all(UIConstants.spacingSmall),
                   decoration: BoxDecoration(
-                    color: AppColors.success.withValues(alpha: 0.1),
+                    color: colorScheme.success.withValues(alpha: 0.1),
                     borderRadius:
                         BorderRadius.circular(UIConstants.borderRadiusSmall),
                   ),
                   child: Icon(
                     LucideIcons.trendingUp,
-                    color: AppColors.success,
+                    color: colorScheme.success,
                     size: UIConstants.iconSmall,
                   ),
                 ),
@@ -136,7 +137,7 @@ class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
                     value:
                         '${widget.stats.efficiencyScore.toStringAsFixed(0)}%',
                     label: 'Efficiency Score',
-                    color: AppColors.primary,
+                    color: colorScheme.primary,
                     showPulse: widget.stats.efficiencyScore > 80,
                     pulseAnimation: _pulseAnimation,
                   ),
@@ -149,7 +150,7 @@ class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
                     icon: LucideIcons.clock,
                     value: _formatDuration(widget.stats.timeSavedMinutes),
                     label: 'Time Saved',
-                    color: AppColors.accent,
+                    color: colorScheme.secondary,
                   ),
                 ),
                 const SizedBox(width: UIConstants.spacingSmall),
@@ -160,7 +161,7 @@ class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
                     icon: LucideIcons.messageSquare,
                     value: widget.stats.avgWordsPerMinute.toStringAsFixed(0),
                     label: 'Words/min',
-                    color: AppColors.warning,
+                    color: colorScheme.warning,
                   ),
                 ),
               ],
@@ -174,7 +175,7 @@ class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
               icon: LucideIcons.trendingUp,
               label: 'Voice Efficiency vs Typing',
               value: widget.stats.efficiencyScore / 100,
-              color: AppColors.success,
+              color: colorScheme.success,
               subtitle:
                   '${widget.stats.efficiencyScore.toStringAsFixed(0)}% more efficient',
             ),
@@ -187,8 +188,8 @@ class _ProductivityInsightsWidgetState extends State<ProductivityInsightsWidget>
               label: 'Audio Quality Score',
               value: widget.stats.audioQualityScore,
               color: widget.stats.audioQualityScore > 0.7
-                  ? AppColors.success
-                  : AppColors.warning,
+                  ? colorScheme.success
+                  : colorScheme.warning,
               subtitle:
                   '${(widget.stats.audioQualityScore * 100).toStringAsFixed(0)}% quality',
             ),

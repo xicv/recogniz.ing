@@ -3,7 +3,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../core/constants/ui_constants.dart';
-import '../../../core/theme/app_theme.dart';
 import '../../../core/services/analytics_service.dart';
 
 class DashboardMetrics extends StatelessWidget {
@@ -98,13 +97,13 @@ class DashboardMetrics extends StatelessWidget {
                       ? LucideIcons.trendingUp
                       : LucideIcons.trendingDown,
                   size: 16,
-                  color: AppColors.primary,
+                  color: theme.colorScheme.primary,
                 ),
                 const SizedBox(width: 4),
                 Text(
                   '${stats.totalTranscriptions} transcriptions',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.primary,
+                    color: theme.colorScheme.primary,
                   ),
                 ),
               ],

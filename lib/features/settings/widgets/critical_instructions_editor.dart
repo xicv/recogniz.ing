@@ -49,6 +49,8 @@ class _CriticalInstructionsEditorState
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return SettingsSection(
       title: 'Critical Instructions',
       icon: LucideIcons.shield,
@@ -57,9 +59,9 @@ class _CriticalInstructionsEditorState
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: AppColors.warning.withValues(alpha: 0.1),
+            color: colorScheme.warning.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
+            border: Border.all(color: colorScheme.warning.withValues(alpha: 0.3)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,14 +71,14 @@ class _CriticalInstructionsEditorState
                   Icon(
                     LucideIcons.info,
                     size: 16,
-                    color: AppColors.warning,
+                    color: colorScheme.warning,
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'These instructions control how Gemini transcribes audio',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.warning,
+                            color: colorScheme.warning,
                             fontWeight: FontWeight.w500,
                           ),
                     ),
@@ -155,7 +157,7 @@ class _CriticalInstructionsEditorState
                 icon: const Icon(LucideIcons.save, size: 16),
                 label: const Text('Save'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: _hasChanges ? AppColors.primary : null,
+                  backgroundColor: _hasChanges ? colorScheme.primary : null,
                   foregroundColor: _hasChanges ? Colors.white : null,
                   padding: const EdgeInsets.symmetric(vertical: 8),
                 ),
@@ -272,6 +274,7 @@ class _CriticalInstructionsEditorState
   }
 
   void _showSaveConfirmation() {
+    final dialogColorScheme = Theme.of(context).colorScheme;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -291,7 +294,7 @@ class _CriticalInstructionsEditorState
               '• Too lenient: Might transcribe noise as speech\n'
               '• Invalid format: May cause API errors',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.warning,
+                    color: dialogColorScheme.warning,
                   ),
             ),
           ],
@@ -306,7 +309,7 @@ class _CriticalInstructionsEditorState
               Navigator.pop(context);
               _doSave();
             },
-            style: TextButton.styleFrom(foregroundColor: AppColors.warning),
+            style: TextButton.styleFrom(foregroundColor: dialogColorScheme.warning),
             child: const Text('Save Anyway'),
           ),
         ],
@@ -333,7 +336,7 @@ class _CriticalInstructionsEditorState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to save: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
       }

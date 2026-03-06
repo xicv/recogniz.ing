@@ -37,6 +37,7 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Card(
       elevation: 0,
       color: Theme.of(context).cardColor,
@@ -56,13 +57,13 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
                 Container(
                   padding: const EdgeInsets.all(UIConstants.spacingSmall),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
+                    color: colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius:
                         BorderRadius.circular(UIConstants.borderRadiusSmall),
                   ),
                   child: Icon(
                     LucideIcons.barChart3,
-                    color: AppColors.primary,
+                    color: colorScheme.primary,
                     size: UIConstants.iconSmall,
                   ),
                 ),
@@ -104,6 +105,7 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
   }
 
   Widget _buildDailyPattern() {
+    final colorScheme = Theme.of(context).colorScheme;
     final dailyData = widget.stats.usageByDay;
     final maxCount = dailyData.values.isNotEmpty
         ? dailyData.values.reduce((a, b) => a > b ? a : b)
@@ -137,7 +139,7 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
                                     Expanded(
                                       child: Container(
                                         decoration: BoxDecoration(
-                                          color: AppColors.primary
+                                          color: colorScheme.primary
                                               .withValues(alpha: 0.8),
                                           borderRadius:
                                               const BorderRadius.vertical(
@@ -174,6 +176,7 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
   }
 
   Widget _buildWeeklyPattern() {
+    final colorScheme = Theme.of(context).colorScheme;
     final weeklyData = widget.stats.weeklyPattern;
     final maxCount =
         weeklyData.isNotEmpty ? weeklyData.reduce((a, b) => a > b ? a : b) : 1;
@@ -225,8 +228,8 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
                           height: 80 * heightFactor,
                           decoration: BoxDecoration(
                             color: index >= 5 // Weekend
-                                ? AppColors.accent
-                                : AppColors.primary,
+                                ? colorScheme.secondary
+                                : colorScheme.primary,
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
@@ -248,6 +251,7 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
   }
 
   Widget _buildHourlyPattern() {
+    final colorScheme = Theme.of(context).colorScheme;
     final hourlyData = widget.stats.usageByHour;
     final maxCount =
         hourlyData.isNotEmpty ? hourlyData.reduce((a, b) => a > b ? a : b) : 1;
@@ -284,9 +288,9 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
                                     color: isActive
                                         ? (index >= 9 &&
                                                 index <= 17) // Business hours
-                                            ? AppColors.success
+                                            ? colorScheme.success
                                                 .withValues(alpha: 0.8)
-                                            : AppColors.primary
+                                            : colorScheme.primary
                                                 .withValues(alpha: 0.8)
                                         : Theme.of(context)
                                             .colorScheme
@@ -328,7 +332,7 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
                 width: 12,
                 height: 12,
                 decoration: BoxDecoration(
-                  color: AppColors.success.withValues(alpha: 0.8),
+                  color: colorScheme.success.withValues(alpha: 0.8),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -342,7 +346,7 @@ class _UsagePatternWidgetState extends State<UsagePatternWidget>
                 width: 12,
                 height: 12,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.8),
+                  color: colorScheme.primary.withValues(alpha: 0.8),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
