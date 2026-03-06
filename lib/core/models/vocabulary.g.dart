@@ -8,7 +8,7 @@ part of 'vocabulary.dart';
 
 class VocabularySetAdapter extends TypeAdapter<VocabularySet> {
   @override
-  final int typeId = 2;
+  final typeId = 2;
 
   @override
   VocabularySet read(BinaryReader reader) {
@@ -21,7 +21,7 @@ class VocabularySetAdapter extends TypeAdapter<VocabularySet> {
       name: fields[1] as String,
       description: fields[2] as String,
       words: (fields[3] as List).cast<String>(),
-      isDefault: fields[4] as bool,
+      isDefault: fields[4] == null ? false : fields[4] as bool,
       createdAt: fields[5] as DateTime,
     );
   }

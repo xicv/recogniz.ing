@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import '../models/transcription.dart';
 import '../models/custom_prompt.dart';
 import '../models/vocabulary.dart';

@@ -8,7 +8,7 @@ part of 'app_settings.dart';
 
 class AppSettingsAdapter extends TypeAdapter<AppSettings> {
   @override
-  final int typeId = 3;
+  final typeId = 3;
 
   @override
   AppSettings read(BinaryReader reader) {
@@ -18,20 +18,31 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
     };
     return AppSettings(
       geminiApiKey: fields[0] as String?,
-      selectedPromptId: fields[1] as String,
-      selectedVocabularyId: fields[2] as String,
-      globalHotkey: fields[3] as String,
-      darkMode: fields[4] as bool,
-      autoCopyToClipboard: fields[5] as bool,
-      showNotifications: fields[6] as bool,
-      criticalInstructions: fields[7] as String?,
-      startAtLogin: fields[10] as bool,
+      selectedPromptId: fields[1] == null
+          ? 'default-clean'
+          : fields[1] as String,
+      selectedVocabularyId: fields[2] == null
+          ? 'default-general'
+          : fields[2] as String,
+      globalHotkey: fields[3] == null ? 'Ctrl+Shift+R' : fields[3] as String,
+      darkMode: fields[4] == null ? false : fields[4] as bool,
+      autoCopyToClipboard: fields[5] == null ? true : fields[5] as bool,
+      showNotifications: fields[6] == null ? true : fields[6] as bool,
+      criticalInstructions: fields[7] == null
+          ? '''CRITICAL INSTRUCTIONS:
+- Only transcribe actual speech that you hear in the audio
+- If the audio contains only silence, background noise, or no discernible speech, respond with exactly: [NO_SPEECH]
+- Do NOT transcribe the vocabulary list or any text that is not spoken in the audio
+- The vocabulary below is for reference ONLY - do not use it to generate fake transcriptions'''
+          : fields[7] as String?,
+      startAtLogin: fields[10] == null ? false : fields[10] as bool,
       transcriptionLanguage: fields[11] == null ? 'auto' : fields[11] as String,
       audioCompressionPreference: fields[13] == null
           ? AudioCompressionPreference.auto
           : fields[13] as AudioCompressionPreference,
-      apiKeys:
-          fields[14] == null ? [] : (fields[14] as List).cast<ApiKeyInfo>(),
+      apiKeys: fields[14] == null
+          ? []
+          : (fields[14] as List).cast<ApiKeyInfo>(),
       selectedApiKeyId: fields[15] as String?,
     );
   }
@@ -82,7 +93,7 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
 class AudioCompressionPreferenceAdapter
     extends TypeAdapter<AudioCompressionPreference> {
   @override
-  final int typeId = 12;
+  final typeId = 12;
 
   @override
   AudioCompressionPreference read(BinaryReader reader) {
@@ -103,13 +114,10 @@ class AudioCompressionPreferenceAdapter
     switch (obj) {
       case AudioCompressionPreference.auto:
         writer.writeByte(0);
-        break;
       case AudioCompressionPreference.alwaysCompressed:
         writer.writeByte(1);
-        break;
       case AudioCompressionPreference.uncompressed:
         writer.writeByte(2);
-        break;
     }
   }
 

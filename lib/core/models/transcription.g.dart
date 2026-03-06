@@ -8,7 +8,7 @@ part of 'transcription.dart';
 
 class TranscriptionAdapter extends TypeAdapter<Transcription> {
   @override
-  final int typeId = 0;
+  final typeId = 0;
 
   @override
   Transcription read(BinaryReader reader) {
@@ -21,13 +21,13 @@ class TranscriptionAdapter extends TypeAdapter<Transcription> {
       rawText: fields[1] as String,
       processedText: fields[2] as String,
       createdAt: fields[3] as DateTime,
-      tokenUsage: fields[4] as int,
+      tokenUsage: (fields[4] as num).toInt(),
       promptId: fields[5] as String,
-      audioDurationSeconds: fields[6] as double,
+      audioDurationSeconds: (fields[6] as num).toDouble(),
       isFavorite: fields[7] as bool?,
       audioBackupPath: fields[8] as String?,
       errorMessage: fields[10] as String?,
-      retryCount: fields[11] == null ? 0 : fields[11] as int,
+      retryCount: fields[11] == null ? 0 : (fields[11] as num).toInt(),
       completedAt: fields[12] as DateTime?,
       detectedLanguage: fields[13] as String?,
     );
@@ -36,7 +36,7 @@ class TranscriptionAdapter extends TypeAdapter<Transcription> {
   @override
   void write(BinaryWriter writer, Transcription obj) {
     writer
-      ..writeByte(14)
+      ..writeByte(13)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -55,8 +55,6 @@ class TranscriptionAdapter extends TypeAdapter<Transcription> {
       ..write(obj.isFavorite)
       ..writeByte(8)
       ..write(obj.audioBackupPath)
-      ..writeByte(9)
-      ..write(obj.statusIndex)
       ..writeByte(10)
       ..write(obj.errorMessage)
       ..writeByte(11)

@@ -8,7 +8,7 @@ part of 'custom_prompt.dart';
 
 class CustomPromptAdapter extends TypeAdapter<CustomPrompt> {
   @override
-  final int typeId = 1;
+  final typeId = 1;
 
   @override
   CustomPrompt read(BinaryReader reader) {
@@ -21,7 +21,7 @@ class CustomPromptAdapter extends TypeAdapter<CustomPrompt> {
       name: fields[1] as String,
       description: fields[2] as String,
       promptTemplate: fields[3] as String,
-      isDefault: fields[4] as bool,
+      isDefault: fields[4] == null ? false : fields[4] as bool,
       createdAt: fields[5] as DateTime,
     );
   }

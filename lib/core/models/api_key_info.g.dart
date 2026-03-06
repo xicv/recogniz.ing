@@ -8,7 +8,7 @@ part of 'api_key_info.dart';
 
 class ApiKeyInfoAdapter extends TypeAdapter<ApiKeyInfo> {
   @override
-  final int typeId = 13;
+  final typeId = 13;
 
   @override
   ApiKeyInfo read(BinaryReader reader) {
@@ -22,7 +22,7 @@ class ApiKeyInfoAdapter extends TypeAdapter<ApiKeyInfo> {
       apiKey: fields[2] as String,
       createdAt: fields[3] as DateTime,
       rateLimitedAt: fields[4] as DateTime?,
-      isSelected: fields[5] as bool,
+      isSelected: fields[5] == null ? false : fields[5] as bool,
     );
   }
 

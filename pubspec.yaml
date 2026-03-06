@@ -6,7 +6,7 @@ publish_to: 'none'
 version: 1.15.4
 
 environment:
-  sdk: '>=3.7.0 <4.0.0'
+  sdk: '>=3.11.0 <4.0.0'
 
 dependencies:
   flutter:
@@ -15,16 +15,16 @@ dependencies:
   # State Management
   flutter_riverpod: ^3.2.0
 
-  # Local Storage
-  hive_flutter: ^1.1.0
-  hive: ^2.2.3
+  # Local Storage (Hive CE - actively maintained community fork)
+  hive_ce_flutter: ^2.3.4
+  hive_ce: ^2.19.3
 
   # Audio Recording
   record: ^6.2.0
   path_provider: ^2.1.5
 
   # AI Integration - googleai_dart replaces deprecated google_generative_ai
-  googleai_dart: ^2.1.0
+  googleai_dart: ^3.3.0
 
   # Hotkeys (Desktop)
   hotkey_manager: ^0.2.3
@@ -67,7 +67,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-  hive_generator: ^2.0.1
+  hive_ce_generator: ^1.11.1
   build_runner: ^2.4.13
   flutter_launcher_icons: ^0.14.4
   path: ^1.9.0

@@ -8,7 +8,7 @@ part of 'api_key_usage_stats.dart';
 
 class DailyUsageAdapter extends TypeAdapter<DailyUsage> {
   @override
-  final int typeId = 15;
+  final typeId = 15;
 
   @override
   DailyUsage read(BinaryReader reader) {
@@ -17,10 +17,10 @@ class DailyUsageAdapter extends TypeAdapter<DailyUsage> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return DailyUsage(
-      transcriptionCount: fields[0] as int,
-      tokens: fields[1] as int,
-      durationMinutes: fields[2] as double,
-      words: fields[3] as int,
+      transcriptionCount: (fields[0] as num).toInt(),
+      tokens: (fields[1] as num).toInt(),
+      durationMinutes: (fields[2] as num).toDouble(),
+      words: (fields[3] as num).toInt(),
       date: fields[4] as DateTime,
     );
   }
@@ -54,7 +54,7 @@ class DailyUsageAdapter extends TypeAdapter<DailyUsage> {
 
 class ApiKeyUsageStatsAdapter extends TypeAdapter<ApiKeyUsageStats> {
   @override
-  final int typeId = 16;
+  final typeId = 16;
 
   @override
   ApiKeyUsageStats read(BinaryReader reader) {
@@ -64,14 +64,14 @@ class ApiKeyUsageStatsAdapter extends TypeAdapter<ApiKeyUsageStats> {
     };
     return ApiKeyUsageStats(
       apiKeyId: fields[0] as String,
-      totalTranscriptions: fields[1] as int,
-      totalTokens: fields[2] as int,
-      totalDurationMinutes: fields[3] as double,
-      totalWords: fields[4] as int,
+      totalTranscriptions: (fields[1] as num).toInt(),
+      totalTokens: (fields[2] as num).toInt(),
+      totalDurationMinutes: (fields[3] as num).toDouble(),
+      totalWords: (fields[4] as num).toInt(),
       firstUsedAt: fields[5] as DateTime?,
       lastUsedAt: fields[6] as DateTime?,
       dailyUsage: (fields[7] as List).cast<DailyUsage>(),
-      totalEstimatedCost: fields[8] as double,
+      totalEstimatedCost: (fields[8] as num).toDouble(),
     );
   }
 
