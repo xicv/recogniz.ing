@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
+import 'core/models/transcription_status.dart';
 import 'core/providers/app_providers.dart';
 import 'core/services/hotkey_service.dart';
 import 'core/services/storage_service.dart';
@@ -34,6 +35,9 @@ void main() async {
     if (kDebugMode) {
       debugPrint('[Main] StorageService initialized');
     }
+
+    // Clean up transcriptions stuck in processing/pending from previous session
+    _cleanupStaleTranscriptions();
   } catch (e) {
     if (kDebugMode) {
       debugPrint('[Main] StorageService initialization failed: $e');
@@ -52,6 +56,44 @@ void main() async {
   );
   if (kDebugMode) {
     debugPrint('[Main] runApp completed');
+  }
+}
+
+/// Mark any processing/pending transcriptions as failed on startup.
+/// These are orphaned from a previous session where the API call
+/// never completed (e.g. app was closed mid-transcription).
+void _cleanupStaleTranscriptions() {
+  try {
+    final box = StorageService.transcriptions;
+
+    final staleIds = <String>[];
+
+    for (final t in box.values) {
+      if (t.status == TranscriptionStatus.processing ||
+          t.status == TranscriptionStatus.pending) {
+        staleIds.add(t.id);
+      }
+    }
+
+    for (final id in staleIds) {
+      final t = box.get(id);
+      if (t != null) {
+        final failed = t.asFailed('Interrupted — app was restarted');
+        box.put(id, failed);
+        if (kDebugMode) {
+          debugPrint('[Main] Cleaned up: $id (was ${t.status.value})');
+        }
+      }
+    }
+
+    if (staleIds.isNotEmpty && kDebugMode) {
+      debugPrint(
+          '[Main] Cleaned up ${staleIds.length} stale transcription(s)');
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      debugPrint('[Main] Failed to clean up stale transcriptions: $e');
+    }
   }
 }
 

@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/transcription.dart';
-import '../models/transcription_status.dart';
 import '../services/storage_service.dart';
 
 /// Sort options for transcriptions
@@ -103,30 +102,7 @@ final filteredTranscriptionsProvider = Provider<List<Transcription>>((ref) {
 /// Notifier for managing transcription state
 class TranscriptionsNotifier extends Notifier<List<Transcription>> {
   @override
-  List<Transcription> build() {
-    _cleanupStaleTranscriptions();
-    return _loadTranscriptions();
-  }
-
-  /// Mark any processing/pending transcriptions as failed on startup.
-  /// These are orphaned from a previous session where the API call
-  /// never completed (e.g. app was closed mid-transcription).
-  static void _cleanupStaleTranscriptions() {
-    try {
-      for (final t in StorageService.transcriptions.values) {
-        if (t.status == TranscriptionStatus.processing ||
-            t.status == TranscriptionStatus.pending) {
-          final failed = t.asFailed('Interrupted — app was restarted');
-          StorageService.transcriptions.put(t.id, failed);
-          debugPrint(
-              '[TranscriptionsNotifier] Cleaned up stale transcription: ${t.id}');
-        }
-      }
-    } catch (e) {
-      debugPrint(
-          '[TranscriptionsNotifier] Failed to clean up stale transcriptions: $e');
-    }
-  }
+  List<Transcription> build() => _loadTranscriptions();
 
   /// Load transcriptions from storage without sorting
   /// Sorting is handled by filteredTranscriptionsProvider based on user selection
