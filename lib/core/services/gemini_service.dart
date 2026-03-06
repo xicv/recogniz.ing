@@ -109,18 +109,19 @@ class GeminiService implements TranscriptionServiceInterface {
   }
 
   /// Build system instruction for multi-language transcription
+  ///
+  /// Consolidates all transcription rules into one place:
+  /// - Language detection and code-switching
+  /// - Grammar/filler cleanup (baked in by default)
+  /// - No-speech handling
   String _buildSystemInstruction() {
-    return '''
-You are a multilingual transcription assistant.
-
-<TRANSCRIPTION_RULES>
-- Detect the language automatically from the audio
-- Transcribe in the ORIGINAL language only - NEVER translate
-- If the audio mixes languages (code-switching), preserve each language as spoken
-- Example: "这个feature很酷" should be transcribed exactly as-is
-- Only transcribe actual speech; respond [NO_SPEECH] for only silence/noise
-</TRANSCRIPTION_RULES>
-''';
+    return 'You are a speech transcription assistant. '
+        'Detect language automatically. Transcribe in the original language only, never translate. '
+        'Preserve code-switching as spoken (e.g., "这个feature很酷"). '
+        'Fix grammar, punctuation, and sentence structure. '
+        'Remove filler words (um, uh, like, you know) and false starts. '
+        'Combine sentence fragments into complete sentences. '
+        'Preserve the speaker\'s intent, tone, and meaning.';
   }
 
   /// Generate a cache key for the audio and parameters
@@ -438,6 +439,7 @@ You are a multilingual transcription assistant.
   ///
   /// Includes automatic retry for empty responses, which can occur due to
   /// transient API issues even with valid audio input.
+  /// Global attempt cap prevents runaway retries across all retry layers.
   Future<TranscriptionResult> _combinedTranscription(
     Uint8List audioBytes,
     String vocabulary,
@@ -451,6 +453,8 @@ You are a multilingual transcription assistant.
     debugPrint('[GeminiService] Using combined transcription mode...');
 
     // Auto-retry for empty responses (known Gemini API transient issue)
+    // Capped at 2 retries to limit total API calls (combined with _executeWithRetry
+    // and _transcribeWithAutoSwitch, max total attempts is bounded to ~6)
     const maxEmptyRetries = 2;
     int emptyRetryCount = 0;
 
@@ -477,7 +481,7 @@ You are a multilingual transcription assistant.
           ),
           generationConfig: const GenerationConfig(
             temperature: 0.1,
-            maxOutputTokens: 8192,
+            maxOutputTokens: 2048,
             topP: 0.8,
             topK: 40,
           ),
@@ -510,17 +514,10 @@ You are a multilingual transcription assistant.
           }
         }
 
-        // Extract raw and processed text from the response
-        final parts = resultText.split('\n---\n');
-        String rawText = resultText;
-        String processedText = resultText;
+        // Single output format: the refined transcription is both raw and processed
+        final transcriptionText = resultText.trim();
 
-        if (parts.length >= 2) {
-          rawText = parts[0].trim();
-          processedText = parts[1].trim();
-        }
-
-        if (rawText.trim() == '[NO_SPEECH]') {
+        if (transcriptionText == '[NO_SPEECH]') {
           throw Exception('No speech detected in audio');
         }
 
@@ -530,8 +527,8 @@ You are a multilingual transcription assistant.
 
         return _createResult(
           cacheKey: cacheKey,
-          rawText: rawText,
-          processedText: processedText,
+          rawText: transcriptionText,
+          processedText: transcriptionText,
           tokenUsage: tokenUsage,
         );
       } catch (e) {
@@ -584,22 +581,30 @@ You are a multilingual transcription assistant.
   }
 
   /// Build combined prompt for single-call processing
-  /// Optimized: concise instructions, reduced token overhead
+  ///
+  /// Optimized for minimal token usage:
+  /// - Single output (no dual raw/processed format)
+  /// - No redundant [NO_SPEECH] instructions (covered in system instruction via response check)
+  /// - criticalInstructions merged into system instruction
+  /// - {{text}} placeholder stripped from templates
   String _buildCombinedPrompt(
       String promptTemplate, String vocabulary, String? criticalInstructions) {
-    final buffer =
-        StringBuffer('Transcribe the audio, then apply:\n\n$promptTemplate');
+    // Strip the {{text}} placeholder that was never substituted
+    final cleanedTemplate =
+        promptTemplate.replaceAll('\n\n{{text}}', '').replaceAll('{{text}}', '').trim();
+
+    final buffer = StringBuffer(
+        'Transcribe the audio and apply the following refinement.\n\n'
+        'Refinement: $cleanedTemplate');
 
     if (vocabulary.isNotEmpty) {
-      buffer.write('\n\nVocabulary reference (use only if heard): $vocabulary');
+      buffer.write(
+          '\n\nPrefer these terms/spellings if heard: $vocabulary');
     }
 
-    if (criticalInstructions != null) {
-      buffer.write('\n\n$criticalInstructions');
-    }
-
-    buffer.write('\n\nFormat: [raw transcription]\n---\n[processed text]');
-    buffer.write('\n\nRespond [NO_SPEECH] if only silence.');
+    buffer.write(
+        '\n\nOutput ONLY the refined transcription. '
+        'If no speech detected, respond: [NO_SPEECH]');
 
     return buffer.toString();
   }
