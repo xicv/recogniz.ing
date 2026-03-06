@@ -30,6 +30,54 @@
   },
   "versions": [
     {
+      "version": "1.16.0",
+      "date": "2026-03-06",
+      "stable": true,
+      "highlights": [
+        "Migrated to Hive CE (community edition) for continued maintenance",
+        "Theme-aware colors that adapt to light/dark mode",
+        "Rebuilt landing page with Tailwind CSS 4 and Vite 7",
+        "macOS code signing and notarization pipeline"
+      ],
+      "changes": [
+        {
+          "category": "added",
+          "title": "macOS Code Signing & Notarization",
+          "description": "Added complete signing and notarization pipeline for macOS distribution. Signed builds pass Gatekeeper without warnings. Includes local signing script and automated CI/CD pipeline via GitHub Actions."
+        },
+        {
+          "category": "changed",
+          "title": "Hive CE Migration",
+          "description": "Migrated from unmaintained hive/hive_flutter to actively-maintained hive_ce/hive_ce_flutter community edition. All adapters regenerated with null-safe defaults for backwards compatibility."
+        },
+        {
+          "category": "changed",
+          "title": "Theme-Aware Colors",
+          "description": "Replaced static AppColors class with SemanticColors extension on ColorScheme. Colors now adapt to light and dark mode automatically across all dashboard, settings, and transcription views."
+        },
+        {
+          "category": "changed",
+          "title": "Smarter Transcription Processing",
+          "description": "Grammar cleanup, filler word removal, and sentence restructuring now happen by default. Simplified prompt architecture produces cleaner transcriptions out of the box."
+        },
+        {
+          "category": "changed",
+          "title": "Landing Page Rebuild",
+          "description": "Rebuilt landing page with Tailwind CSS 4, Vite 7, and Vue Router 5. Simpler, faster, and more maintainable design with reduced bundle size."
+        },
+        {
+          "category": "changed",
+          "title": "Dependency Updates",
+          "description": "Updated googleai_dart to v3.3.0, Flutter SDK minimum to 3.11.0. Landing page: Vue 3.5.13, TypeScript 5.8."
+        },
+        {
+          "category": "removed",
+          "title": "Dead Code Cleanup",
+          "description": "Removed unused RecordingOverlay widget, legacy single-key API field, and transcription filter dialog."
+        }
+      ]
+    },
+    {
       "version": "1.15.4",
       "date": "2026-02-04",
       "stable": true,

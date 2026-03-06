@@ -326,3 +326,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.16.0] - 2026-03-06
+
+### Added
+
+- **macOS Code Signing & Notarization** - Added complete signing and notarization pipeline for macOS distribution. Signed builds pass Gatekeeper without warnings. Includes local signing script and automated CI/CD pipeline via GitHub Actions.
+
+### Changed
+
+- **Hive CE Migration** - Migrated from unmaintained hive/hive_flutter to actively-maintained hive_ce/hive_ce_flutter community edition. All adapters regenerated with null-safe defaults for backwards compatibility.
+- **Theme-Aware Colors** - Replaced static AppColors class with SemanticColors extension on ColorScheme. Colors now adapt to light and dark mode automatically across all dashboard, settings, and transcription views.
+- **Smarter Transcription Processing** - Grammar cleanup, filler word removal, and sentence restructuring now happen by default. Simplified prompt architecture produces cleaner transcriptions out of the box.
+- **Landing Page Rebuild** - Rebuilt landing page with Tailwind CSS 4, Vite 7, and Vue Router 5. Simpler, faster, and more maintainable design with reduced bundle size.
+- **Dependency Updates** - Updated googleai_dart to v3.3.0, Flutter SDK minimum to 3.11.0. Landing page: Vue 3.5.13, TypeScript 5.8.
+
+### Removed
+
+- **Dead Code Cleanup** - Removed unused RecordingOverlay widget, legacy single-key API field, and transcription filter dialog.
+
+---
+
