@@ -5,7 +5,7 @@ import AppFooter from './AppFooter.vue'
 </script>
 
 <template>
-  <div class="min-h-screen transition-colors duration-300 bg-white dark:bg-[#0a0a0a]">
+  <div class="min-h-screen bg-white dark:bg-[#030712]">
     <AppHeader />
     <main>
       <RouterView v-slot="{ Component, route }">

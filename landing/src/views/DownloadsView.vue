@@ -2,125 +2,74 @@
 import { ref, onMounted, computed } from 'vue'
 import { useScrollAnimations } from '@/composables/useScrollAnimations'
 import { getVersion, getDownloadUrl } from '@/version'
+import {
+  Download, ExternalLink, Check, ArrowRight, CircleHelp
+} from 'lucide-vue-next'
 
-// Initialize scroll animations
 useScrollAnimations()
 
 interface Platform {
   name: string
   icon: string
   version: string
-  releaseDate: string
   downloadUrl: string
-  changelog: string[]
-  requirements?: string
-  color?: string
+  requirements: string
+  color: string
   viewBox?: string
-  bg?: string
 }
 
-// Platform base data (static parts)
-const platformBaseData: Omit<Platform, 'version' | 'downloadUrl'>[] = [
+const platformBaseData = [
   {
     name: 'Android',
     icon: 'M6.382 3.968A8.962 8.962 0 0 1 12 2c2.125 0 4.078.736 5.618 1.968l1.453-1.453 1.414 1.414-1.453 1.453A8.962 8.962 0 0 1 21 11v1H3v-1c0-2.125.736-4.078 1.968-5.618L3.515 3.93l1.414-1.414 1.453 1.453zM3 14h18v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-7zm6-5a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm6 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z',
-    releaseDate: '2025-12-31',
-    changelog: [
-      'Standalone APK - no Google Play required',
-      'Works on Android 8.0+ (API 26)',
-      'Optimized for both phones and tablets'
-    ],
     requirements: 'Android 8.0+ (API 26)',
-    color: 'emerald'
+    color: 'text-emerald-500'
   },
   {
     name: 'macOS',
-    icon: 'M15.11 2.68 C16.03 1.59 16.68 0.11 16.51 0 C15.19 0.05 13.60 0.85 12.64 1.94 C11.79 2.89 11.04 4.39 11.24 5.85 C12.71 5.96 14.20 5.13 15.11 2.68 M17.54 10.82 C17.58 14.56 20.99 15.82 21.03 15.84 C21.00 15.92 20.49 17.66 19.24 19.45 C18.16 20.97 17.02 22.46 15.19 22.49 C13.40 22.52 12.84 21.50 10.83 21.50 C8.84 21.50 8.22 22.49 6.51 22.49 C4.77 22.55 3.46 20.84 2.36 19.46 C0.09 16.42 -1.66 10.88 0.63 7.08 C1.80 5.17 3.85 4 5.99 3.97 C7.70 3.94 9.31 5.06 10.35 5.06 C11.39 5.06 13.31 3.86 15.36 4.06 C16.23 4.09 18.63 4.39 20.20 6.51 C20.09 6.58 17.34 8.12 17.37 11.18 C17.40 14.25 20.81 15.30 20.85 15.32 C20.82 15.39 20.31 17.13 19.06 18.92 C17.98 20.44 16.84 21.93 15.01 21.96 C13.22 21.99 12.66 20.97 10.65 20.97 C8.66 20.97 8.04 21.96 6.33 21.96 C4.59 22.02 3.28 20.31 2.18 18.93 C-0.09 15.89 -1.84 10.35 0.45 6.55 C1.62 4.64 3.67 3.47 5.81 3.44 C7.52 3.41 9.13 4.53 10.17 4.53 C11.21 4.53 13.13 3.33 15.18 3.53 C16.05 3.56 18.45 3.86 20.02 5.98 C19.91 6.05 17.16 7.59 17.19 10.65',
-    releaseDate: '2025-12-31',
-    changelog: [
-      'User preferences with persistent desktop settings',
-      'Desktop-specific features: auto-start, minimize to tray',
-      'VAD modal UI fixes and audio processing improvements'
-    ],
+    icon: 'M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z',
     requirements: 'macOS 10.15 or later',
-    color: 'slate',
-    bg: 'bg-slate-100 dark:bg-slate-700'
+    color: 'text-slate-500'
   },
   {
     name: 'Windows',
-    icon: 'M3 12V6.7L9 5.4v6.5L3 12M20 3v8.8L10 11.9V5.2L20 3M3 13l6 .1V19.9L3 18.7V13m17 .3V22L10 20.1v-7',
-    releaseDate: '2025-12-31',
-    changelog: [
-      'Native installer with automatic updates',
-      'System tray and global hotkeys support',
-      'Same features as macOS version'
-    ],
+    icon: 'M3,12V6.75L9,5.43v6.48L3,12M20,3v8.75L10,11.97V5.21L20,3M3,13l6,.09V19.9L3,18.75V13m17,.25V22L10,20.09v-7',
     requirements: 'Windows 10 or later',
-    color: 'sky'
+    color: 'text-sky-500'
   },
   {
     name: 'Linux',
-    icon: 'M4 17h16a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2zM8 7h8v2H8V7zm0 4h8v2H8v-2z',
-    releaseDate: '2025-12-31',
-    changelog: [
-      'Portable AppImage format',
-      'Same features as macOS and Windows',
-      'Tested on Ubuntu 18.04+'
-    ],
+    icon: 'M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489a.424.424 0 0 0-.11.135c-.26.268-.45.6-.663.839-.199.199-.485.267-.797.4-.313.136-.658.269-.864.68-.09.189-.136.394-.132.602 0 .199.027.4.055.536.058.399.116.728.04.97-.249.68-.28 1.145-.106 1.484.174.334.535.47.94.601.81.2 1.91.135 2.774.6.926.466 1.866.67 2.616.47.526-.116.97-.464 1.208-.946.587-.003 1.23-.269 2.26-.334.699-.058 1.574.267 2.577.2.025.134.063.198.114.333l.003.003c.391.778 1.113 1.132 1.884 1.071.771-.06 1.592-.536 2.257-1.306.631-.765 1.683-1.084 2.378-1.503.348-.199.629-.469.649-.853.023-.4-.2-.811-.714-1.376v-.097l-.003-.003c-.17-.2-.25-.535-.338-.926-.085-.401-.182-.786-.492-1.046h-.003c-.059-.054-.123-.067-.188-.135a.357.357 0 0 0-.19-.064c.431-1.278.264-2.55-.173-3.694-.533-1.41-1.465-2.638-2.175-3.483-.796-1.005-1.576-1.957-1.56-3.368.026-2.152.236-6.133-3.544-6.139z',
     requirements: 'Ubuntu 18.04 or later',
-    color: 'amber'
+    color: 'text-amber-500'
   }
 ]
 
-// Computed platforms with dynamic version and download URLs
 const platforms = computed<Platform[]>(() => {
   const currentVersion = getVersion()
-  return platformBaseData.map((platform) => {
+  return platformBaseData.map((p) => {
     let downloadUrl = '#'
-    let ext = 'zip'
-
-    if (platform.name === 'Android') {
-      ext = 'apk'
-    } else if (platform.name === 'Windows') {
-      ext = 'exe'
+    const ext = p.name === 'Android' ? 'apk' : p.name === 'Windows' ? 'exe' : 'zip'
+    if (p.name !== 'Android') {
+      downloadUrl = getDownloadUrl(p.name.toLowerCase(), ext)
     }
-
-    // Android is "coming soon", others are available
-    if (platform.name !== 'Android') {
-      downloadUrl = getDownloadUrl(platform.name.toLowerCase(), ext)
-    }
-
-    return {
-      ...platform,
-      version: currentVersion,
-      downloadUrl
-    }
+    return { ...p, version: currentVersion, downloadUrl }
   })
 })
 
-const selectedPlatform = ref<Platform | null>(null)
-
 const downloadPlatform = (platform: Platform) => {
-  selectedPlatform.value = platform
-  // Only download if the platform is available (not "#")
   if (platform.downloadUrl !== '#') {
     window.open(platform.downloadUrl, '_blank')
   }
 }
 
-// Changelog types (matching CHANGELOG.json structure)
-interface ChangelogChange {
-  category: string
-  title: string
-  description: string
-}
-
+// Changelog
 interface ChangelogVersion {
   version: string
   date: string
   stable: boolean
   highlights: string[]
-  changes: ChangelogChange[]
+  changes: { category: string; title: string; description: string }[]
 }
 
 interface ChangelogData {
@@ -130,377 +79,191 @@ interface ChangelogData {
   versions: ChangelogVersion[]
 }
 
-// Load changelog data from CHANGELOG.json
 const changelogData = ref<ChangelogData | null>(null)
 const isLoadingChangelog = ref(true)
 
-const loadChangelog = async () => {
+onMounted(async () => {
   try {
     const response = await fetch('/CHANGELOG.json')
     if (!response.ok) throw new Error('Failed to load changelog')
-    const data = await response.json() as ChangelogData
-    changelogData.value = data
-  } catch (error) {
-    console.error('Failed to load changelog:', error)
+    changelogData.value = await response.json() as ChangelogData
+  } catch {
+    // Silently fail — the UI handles the empty state
   } finally {
     isLoadingChangelog.value = false
   }
-}
+})
 
-// Format date for display
+useScrollAnimations()
+
+const latestVersion = computed(() => {
+  return changelogData.value?.versions.find(v => v.stable) ?? null
+})
+
 const formatDate = (dateStr: string): string => {
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    year: 'numeric', month: 'long', day: 'numeric'
   })
-}
-
-// Display only the latest stable version for the Downloads page
-const displayVersions = computed(() => {
-  if (!changelogData.value) return []
-  // Show only the latest stable version (first in array)
-  const latestStable = changelogData.value.versions.find(v => v.stable)
-  return latestStable ? [latestStable] : []
-})
-
-// Load changelog on mount
-onMounted(() => {
-  loadChangelog()
-})
-
-// Color mapping for platforms
-const platformColors = {
-  emerald: {
-    bg: 'bg-emerald-100 dark:bg-emerald-900/50',
-    text: 'text-emerald-600 dark:text-emerald-400',
-    border: 'border-emerald-200 dark:border-emerald-800'
-  },
-  slate: {
-    bg: 'bg-slate-100 dark:bg-slate-800',
-    text: 'text-slate-600 dark:text-slate-400',
-    border: 'border-slate-200 dark:border-slate-700'
-  },
-  sky: {
-    bg: 'bg-sky-100 dark:bg-sky-900/50',
-    text: 'text-sky-600 dark:text-sky-400',
-    border: 'border-sky-200 dark:border-sky-800'
-  },
-  amber: {
-    bg: 'bg-amber-100 dark:bg-amber-900/50',
-    text: 'text-amber-600 dark:text-amber-400',
-    border: 'border-amber-200 dark:border-amber-800'
-  }
-}
-
-const getPlatformColor = (color?: string) => {
-  return platformColors[color || 'slate'] || platformColors.slate
 }
 </script>
 
 <template>
   <div>
-    <!-- Hero Section -->
-    <section
-      class="pt-24 sm:pt-32 pb-16 lg:pb-24 section-padding bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-[#0a0a0a] transition-colors duration-300"
-    >
-      <div class="container-custom text-center">
-        <div class="max-w-4xl mx-auto">
-          <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-6 scroll-reveal-scale bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
-            DOWNLOAD
-          </span>
-          <h1
-            class="text-4xl sm:text-5xl lg:text-6xl font-semibold mb-6 tracking-tight text-slate-950 dark:text-slate-50 transition-colors duration-300 scroll-reveal"
-            style="font-size: clamp(2.5rem, 2rem + 2.5vw, 4.5rem); line-height: 1.1;"
-          >
-            Download
-            <span class="gradient-text-accent">Recogniz.ing</span>
-          </h1>
-          <p
-            class="text-lg sm:text-xl mb-8 text-slate-600 dark:text-slate-400 transition-colors duration-300 scroll-reveal"
-          >
-            Free AI-powered voice typing. Available for all platforms.
-          </p>
-        </div>
+    <!-- Hero -->
+    <section class="pt-28 sm:pt-36 pb-16 lg:pb-20">
+      <div class="container-custom text-center max-w-3xl mx-auto">
+        <h1
+          class="text-4xl sm:text-5xl font-bold tracking-tight mb-5 text-slate-950 dark:text-slate-50 scroll-reveal"
+          style="line-height: 1.1"
+        >
+          Download <span class="text-sky-500">Recogniz.ing</span>
+        </h1>
+        <p class="text-lg sm:text-xl text-slate-600 dark:text-slate-400 scroll-reveal">
+          Free AI-powered voice typing. Available for all platforms.
+        </p>
       </div>
     </section>
 
     <!-- Platform Downloads -->
-    <section class="py-16 lg:py-24 section-padding relative overflow-hidden">
-      <!-- Decorative background -->
-      <div class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-50/50 to-transparent dark:via-slate-900/30 pointer-events-none" />
-
-      <div class="container-custom relative z-10">
-        <div class="max-w-6xl mx-auto">
-          <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div
-              v-for="platform in platforms"
-              :key="platform.name"
-              class="group rounded-3xl border bg-white dark:bg-slate-800 transition-all duration-300 overflow-hidden scroll-reveal hover:shadow-2xl hover:-translate-y-2 platform-card-enhanced"
-              :class="getPlatformColor(platform.color).border"
-            >
-              <!-- Platform Icon - Enhanced with glow -->
-              <div
-                class="p-6 sm:p-8 text-center border-b border-slate-100 dark:border-slate-700 transition-colors duration-300 relative"
-              >
-                <!-- Glow effect on hover -->
-                <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                  <div class="absolute inset-0 bg-gradient-to-br from-sky-500/5 to-violet-500/5" />
-                </div>
-
-                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg relative"
-                  :class="platform.bg || getPlatformColor(platform.color).bg"
-                >
-                  <svg
-                    :viewBox="platform.viewBox || '0 0 24 24'"
-                    fill="currentColor"
-                    class="w-8 h-8 transition-colors duration-300 relative z-10"
-                    :class="getPlatformColor(platform.color).text"
-                  >
-                    <path :d="platform.icon"/>
-                  </svg>
-                </div>
-                <h3
-                  class="text-xl sm:text-2xl font-semibold mb-1 text-slate-950 dark:text-slate-50 transition-colors duration-300 group-hover:text-sky-600 dark:group-hover:text-sky-400"
-                >
-                  {{ platform.name }}
-                </h3>
-                <p
-                  class="text-sm text-slate-500 dark:text-slate-400 transition-colors duration-300"
-                >
-                  v{{ platform.version }}
-                </p>
-                <span
-                  v-if="platform.downloadUrl === '#'"
-                  class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium mt-3 bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400"
-                >
-                  Coming Soon
-                </span>
-                <span
-                  v-else
-                  class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium mt-3 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400 shadow-sm"
-                >
-                  <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                  </svg>
-                  Available Now
-                </span>
-              </div>
-
-              <!-- Download Button - Enhanced -->
-              <div class="p-6 sm:p-8">
-                <button
-                  @click="downloadPlatform(platform)"
-                  :disabled="platform.downloadUrl === '#'"
-                  class="w-full px-6 py-4 rounded-xl font-medium transition-all duration-300 mb-4 text-white flex items-center justify-center gap-2.5 min-h-[52px] sm:min-h-[48px] group/btn relative overflow-hidden"
-                  :class="[
-                    platform.downloadUrl === '#'
-                      ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                      : 'bg-slate-900 hover:bg-slate-800 dark:bg-gradient-to-r dark:from-sky-500 dark:to-cyan-500 dark:hover:from-sky-400 dark:hover:to-cyan-400 hover:scale-105 hover:shadow-xl'
-                  ]"
-                >
-                  <svg v-if="platform.downloadUrl !== '#'" class="w-5 h-5 transition-transform group-hover/btn:translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                  </svg>
-                  {{ platform.downloadUrl === '#' ? 'Coming Soon' : 'Download' }}
-                </button>
-
-                <!-- Requirements -->
-                <div
-                  class="text-sm text-slate-600 dark:text-slate-400 text-center transition-colors duration-300"
-                >
-                  {{ platform.requirements }}
-                </div>
-              </div>
+    <section class="py-16 lg:py-24">
+      <div class="container-custom">
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-5xl mx-auto">
+          <div
+            v-for="platform in platforms"
+            :key="platform.name"
+            class="card text-center scroll-reveal group"
+          >
+            <!-- Platform Icon (brand SVG — kept as inline) -->
+            <div class="w-14 h-14 mx-auto mb-4 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+              <svg viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7" :class="platform.color">
+                <path :d="platform.icon" />
+              </svg>
             </div>
+
+            <h3 class="text-lg font-semibold mb-1 text-slate-950 dark:text-slate-50">
+              {{ platform.name }}
+            </h3>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">
+              v{{ platform.version }}
+            </p>
+
+            <!-- Status Badge -->
+            <div class="mb-4">
+              <span
+                v-if="platform.downloadUrl === '#'"
+                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
+              >
+                Coming Soon
+              </span>
+              <span
+                v-else
+                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400"
+              >
+                <Check :size="12" />
+                Available
+              </span>
+            </div>
+
+            <!-- Download Button -->
+            <button
+              @click="downloadPlatform(platform)"
+              :disabled="platform.downloadUrl === '#'"
+              class="w-full py-3 rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
+              :class="[
+                platform.downloadUrl === '#'
+                  ? 'bg-slate-100 text-slate-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-600'
+                  : 'bg-slate-900 text-white hover:bg-slate-800 dark:bg-sky-500 dark:hover:bg-sky-400'
+              ]"
+            >
+              <Download v-if="platform.downloadUrl !== '#'" :size="16" />
+              {{ platform.downloadUrl === '#' ? 'Coming Soon' : 'Download' }}
+            </button>
+
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-3">
+              {{ platform.requirements }}
+            </p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Installation Instructions - Enhanced -->
-    <section
-      class="py-16 lg:py-24 section-padding bg-slate-50 dark:bg-slate-900/30 transition-colors duration-300 relative overflow-hidden"
-    >
-      <!-- Decorative background -->
-      <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-sky-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
-
-      <div class="container-custom relative z-10">
-        <div class="max-w-4xl mx-auto">
+    <!-- Quick Start -->
+    <section class="py-16 lg:py-24 bg-slate-50 dark:bg-slate-900/40">
+      <div class="container-custom">
+        <div class="max-w-3xl mx-auto">
           <div class="text-center mb-12 scroll-reveal">
-            <span class="inline-block px-4 py-1.5 rounded-full text-xs font-semibold mb-4 bg-slate-100/80 backdrop-blur text-slate-600 border border-slate-200 dark:bg-slate-800/80 dark:border-slate-700 dark:text-slate-400">
-              INSTALLATION
-            </span>
-            <h2
-              class="text-3xl sm:text-4xl font-semibold mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
-            >
-              Installation Instructions
+            <h2 class="text-3xl sm:text-4xl font-bold mb-4 text-slate-950 dark:text-slate-50">
+              Quick Start
             </h2>
             <p class="text-lg text-slate-600 dark:text-slate-400">
-              Get up and running in just a few minutes
+              Get up and running in minutes
             </p>
           </div>
 
-          <!-- Step Cards - Enhanced -->
-          <div class="space-y-6">
-            <!-- Step 1: API Key -->
-            <div class="card shimmer scroll-reveal group">
-              <div class="flex items-start gap-6">
-                <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center text-white font-bold text-lg shadow-lg group-hover:scale-110 transition-transform">
+          <div class="space-y-4">
+            <!-- Step 1 -->
+            <div class="card scroll-reveal">
+              <div class="flex items-start gap-5">
+                <div class="shrink-0 w-10 h-10 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold text-sm">
                   1
                 </div>
-                <div class="flex-1">
-                  <h3
-                    class="text-xl font-semibold mb-2 text-slate-950 dark:text-slate-50 transition-colors duration-300 group-hover:text-sky-600 dark:group-hover:text-sky-400"
-                  >
+                <div>
+                  <h3 class="text-lg font-semibold mb-2 text-slate-950 dark:text-slate-50">
                     Get Your Free API Key
                   </h3>
-                  <p
-                    class="mb-4 text-slate-600 dark:text-slate-400 transition-colors duration-300"
-                  >
-                    Get your free Gemini API key from Google AI Studio. The app will not work without an API key.
+                  <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">
+                    Get your free Gemini API key from Google AI Studio. The app requires an API key to work.
                   </p>
                   <a
                     href="https://aistudio.google.com/app/apikey"
                     target="_blank"
                     rel="noopener"
-                    class="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all bg-slate-900 text-white hover:bg-slate-800 dark:bg-gradient-to-r dark:from-sky-500 dark:to-cyan-500 dark:hover:from-sky-400 dark:hover:to-cyan-400 hover:shadow-lg min-h-[48px] group/btn"
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-slate-900 text-white hover:bg-slate-800 dark:bg-sky-500 dark:hover:bg-sky-400 transition-colors"
                   >
-                    <svg class="w-5 h-5 transition-transform group-hover/btn:translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                    </svg>
+                    <ExternalLink :size="14" />
                     Get API Key
                   </a>
                 </div>
               </div>
             </div>
 
-            <!-- Step 2: Download & Install - Enhanced -->
-            <div class="card shimmer scroll-reveal group">
-              <div class="flex items-start gap-6">
-                <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-lg group-hover:scale-110 transition-transform">
+            <!-- Step 2 -->
+            <div class="card scroll-reveal">
+              <div class="flex items-start gap-5">
+                <div class="shrink-0 w-10 h-10 rounded-full bg-violet-500 text-white flex items-center justify-center font-bold text-sm">
                   2
                 </div>
                 <div class="flex-1">
-                  <h3
-                    class="text-xl font-semibold mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300 group-hover:text-violet-600 dark:group-hover:text-violet-400"
-                  >
+                  <h3 class="text-lg font-semibold mb-3 text-slate-950 dark:text-slate-50">
                     Download & Install
                   </h3>
-
-                  <!-- Installation details by platform - Enhanced cards -->
-                  <div class="grid sm:grid-cols-2 gap-4">
-                    <!-- Android -->
-                    <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 group-hover:border-emerald-300 dark:group-hover:border-emerald-700 transition-colors">
-                      <div class="flex items-center gap-3 mb-3">
-                        <svg viewBox="0 0 24 24" class="w-6 h-6 text-emerald-500" fill="currentColor">
-                          <path d="M6.382 3.968A8.962 8.962 0 0 1 12 2c2.125 0 4.078.736 5.618 1.968l1.453-1.453 1.414 1.414-1.453 1.453A8.962 8.962 0 0 1 21 11v1H3v-1c0-2.125.736-4.078 1.968-5.618L3.515 3.93l1.414-1.414 1.453 1.453zM3 14h18v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-7z"/>
-                        </svg>
-                        <span class="font-medium text-slate-950 dark:text-slate-50">Android</span>
-                      </div>
-                      <ol class="text-sm text-slate-600 dark:text-slate-400 space-y-1.5 list-decimal list-inside">
-                        <li>Download the APK file</li>
-                        <li>Enable "Install from unknown sources"</li>
-                        <li>Open the APK and tap "Install"</li>
-                      </ol>
-                    </div>
-
-                    <!-- macOS -->
-                    <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 group-hover:border-slate-400 dark:group-hover:border-slate-600 transition-colors">
-                      <div class="flex items-center gap-3 mb-3">
-                        <svg viewBox="0 0 24 24" class="w-6 h-6 text-slate-500" fill="currentColor">
-                          <path d="M18.7 19.5c-.8 1.2-1.7 2.5-3 2.5-1.3 0-1.8-.8-3.3-.8-1.5 0-2 .8-3.3.8-1.3 0-2.3-1.3-3.1-2.5C4.2 17 2.9 12.5 4.7 9.4c.9-1.5 2.4-2.5 4.1-2.5 1.3 0 2.5.9 3.3.9.8 0 2.3-1.1 3.8-.9.6.03 2.5.3 3.6 2-.1.06-2.2 1.3-2.1 3.8.03 3 2.6 4 2.7 4-.03.07-.4 1.4-1.4 2.8M13 3.5c.7-.8 1.9-1.5 2.9-1.5.1 1.2-.3 2.4-1 3.2-.7.8-1.8 1.5-2.9 1.4-.1-1.1.4-2.4 1.1-3.1z"/>
-                        </svg>
-                        <span class="font-medium text-slate-950 dark:text-slate-50">macOS</span>
-                      </div>
-                      <ol class="text-sm text-slate-600 dark:text-slate-400 space-y-1.5 list-decimal list-inside">
-                        <li>Download and unzip the file</li>
-                        <li>Drag to Applications folder</li>
-                        <li>Right-click → Open (if blocked)</li>
-                      </ol>
-                    </div>
-
-                    <!-- Windows -->
-                    <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 group-hover:border-sky-300 dark:group-hover:border-sky-700 transition-colors">
-                      <div class="flex items-center gap-3 mb-3">
-                        <svg viewBox="0 0 24 24" class="w-6 h-6 text-sky-500" fill="currentColor">
-                          <path d="M3 12V6.7L9 5.4v6.5L3 12M20 3v8.8L10 11.9V5.2L20 3M3 13l6 .1V19.9L3 18.7V13m17 .3V22L10 20.1v-7"/>
-                        </svg>
-                        <span class="font-medium text-slate-950 dark:text-slate-50">Windows</span>
-                      </div>
-                      <ol class="text-sm text-slate-600 dark:text-slate-400 space-y-1.5 list-decimal list-inside">
-                        <li>Download the .exe installer</li>
-                        <li>Run as Administrator</li>
-                        <li>Follow the wizard</li>
-                      </ol>
-                    </div>
-
-                    <!-- Linux -->
-                    <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 group-hover:border-amber-300 dark:group-hover:border-amber-700 transition-colors">
-                      <div class="flex items-center gap-3 mb-3">
-                        <svg viewBox="0 0 24 24" class="w-6 h-6 text-amber-500" fill="currentColor">
-                          <path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879V14.89h-2.896v-2.896h2.896V9.466c0-2.889 1.723-4.486 4.351-4.486 1.263 0 2.533.102 2.533.102v2.72h-1.425c-1.406 0-1.843.872-1.843 1.767v2.012h3.289l-.528 2.896h-2.761v6.989C18.343 21.128 22 16.991 22 12c0-5.523-4.477-10-10-10z"/>
-                        </svg>
-                        <span class="font-medium text-slate-950 dark:text-slate-50">Linux</span>
-                      </div>
-                      <ol class="text-sm text-slate-600 dark:text-slate-400 space-y-1.5 list-decimal list-inside">
-                        <li>Download the .AppImage</li>
-                        <li>Make executable: <code class="text-xs px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-900 font-mono">chmod +x</code></li>
-                        <li>Run the AppImage</li>
-                      </ol>
+                  <div class="grid sm:grid-cols-2 gap-3">
+                    <div
+                      v-for="p in ['macOS: Unzip → drag to Applications', 'Windows: Run the .exe installer', 'Linux: chmod +x the .AppImage', 'Android: Install the APK']"
+                      :key="p"
+                      class="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400"
+                    >
+                      <Check :size="14" class="text-emerald-500 mt-0.5 shrink-0" />
+                      <span>{{ p }}</span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Step 3: Setup - Enhanced -->
-            <div class="card shimmer scroll-reveal group">
-              <div class="flex items-start gap-6">
-                <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white font-bold text-lg shadow-lg group-hover:scale-110 transition-transform">
+            <!-- Step 3 -->
+            <div class="card scroll-reveal">
+              <div class="flex items-start gap-5">
+                <div class="shrink-0 w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-sm">
                   3
                 </div>
-                <div class="flex-1">
-                  <h3
-                    class="text-xl font-semibold mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400"
-                  >
-                    Setup & Start Recording
+                <div>
+                  <h3 class="text-lg font-semibold mb-2 text-slate-950 dark:text-slate-50">
+                    Start Recording
                   </h3>
-                  <div class="grid sm:grid-cols-2 gap-4">
-                    <div class="flex items-start gap-3 group">
-                      <div class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform">
-                        <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                      </div>
-                      <span class="text-slate-600 dark:text-slate-400">Launch the app</span>
-                    </div>
-                    <div class="flex items-start gap-3 group">
-                      <div class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform">
-                        <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                      </div>
-                      <span class="text-slate-600 dark:text-slate-400">Go to Settings tab</span>
-                    </div>
-                    <div class="flex items-start gap-3 group">
-                      <div class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform">
-                        <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                      </div>
-                      <span class="text-slate-600 dark:text-slate-400">Enter your Gemini API key</span>
-                    </div>
-                    <div class="flex items-start gap-3 group">
-                      <div class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform">
-                        <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                      </div>
-                      <span class="text-slate-600 dark:text-slate-400">Start recording!</span>
-                    </div>
-                  </div>
+                  <p class="text-sm text-slate-600 dark:text-slate-400">
+                    Launch the app, go to Settings, enter your API key, and start speaking!
+                  </p>
                 </div>
               </div>
             </div>
@@ -509,213 +272,100 @@ const getPlatformColor = (color?: string) => {
       </div>
     </section>
 
-    <!-- Changelog -->
-    <section class="py-16 lg:py-24 section-padding">
+    <!-- Changelog Preview -->
+    <section class="py-16 lg:py-24">
       <div class="container-custom">
-        <div class="max-w-4xl mx-auto">
-          <div class="text-center mb-12 scroll-reveal">
-            <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
-              CHANGELOG
-            </span>
-            <h2
-              class="text-3xl sm:text-4xl font-semibold mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
-            >
-              What's New in <span class="gradient-text-accent">v{{ changelogData?.versions.find(v => v.stable)?.version || getVersion() }}</span>
+        <div class="max-w-3xl mx-auto">
+          <div class="text-center mb-10 scroll-reveal">
+            <h2 class="text-3xl sm:text-4xl font-bold mb-4 text-slate-950 dark:text-slate-50">
+              What's New
             </h2>
-            <p class="text-lg text-slate-600 dark:text-slate-400">
-              The latest features and improvements
-            </p>
           </div>
 
-          <!-- Version cards -->
-          <div class="space-y-6">
-          <!-- Loading state -->
-          <div v-if="isLoadingChangelog" class="card text-center py-12">
-            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
-            <p class="mt-4 text-slate-600 dark:text-slate-400">Loading changelog...</p>
+          <!-- Loading -->
+          <div v-if="isLoadingChangelog" class="card text-center py-10 scroll-reveal">
+            <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-sky-500" />
+            <p class="mt-3 text-sm text-slate-500">Loading changelog...</p>
           </div>
 
-          <!-- Version cards from CHANGELOG.json -->
-          <template v-else-if="changelogData && displayVersions.length > 0">
-            <div
-              v-for="(versionEntry, index) in displayVersions"
-              :key="versionEntry.version"
-              class="card scroll-reveal"
-            >
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
-                <div class="flex items-center gap-4">
-                  <!-- Version icon/badge -->
-                  <div
-                    class="w-14 h-14 rounded-xl flex items-center justify-center"
-                    :class="index === 0
-                      ? 'bg-gradient-to-br from-sky-500 to-cyan-500'
-                      : 'bg-slate-100 dark:bg-slate-800'"
-                  >
-                    <svg
-                      v-if="index === 0"
-                      class="w-7 h-7 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                    </svg>
-                    <span
-                      v-else
-                      class="text-xl font-bold text-slate-500 dark:text-slate-400"
-                    >
-                      {{ versionEntry.version.split('.').slice(0, 2).join('.') }}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 class="text-2xl font-semibold text-slate-950 dark:text-slate-50 transition-colors duration-300">
-                      Version {{ versionEntry.version }}
-                    </h3>
-                    <p class="text-sm text-slate-500 dark:text-slate-400">
-                      {{ formatDate(versionEntry.date) }}
-                    </p>
-                  </div>
-                </div>
-                <!-- Latest badge (only for first version) -->
-                <span
-                  v-if="index === 0"
-                  class="px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400"
-                >
-                  Latest
-                </span>
+          <!-- Latest Version -->
+          <div v-else-if="latestVersion" class="card scroll-reveal">
+            <div class="flex items-center justify-between mb-5">
+              <div>
+                <h3 class="text-xl font-semibold text-slate-950 dark:text-slate-50">
+                  Version {{ latestVersion.version }}
+                </h3>
+                <p class="text-sm text-slate-500">{{ formatDate(latestVersion.date) }}</p>
               </div>
-
-              <!-- Highlights/Changes list -->
-              <ul v-if="versionEntry.highlights && versionEntry.highlights.length > 0" class="space-y-3">
-                <li
-                  v-for="(highlight, idx) in versionEntry.highlights"
-                  :key="idx"
-                  class="flex items-start gap-3"
-                  :class="index === 0 ? 'text-slate-600 dark:text-slate-400' : 'text-slate-600 dark:text-slate-400'"
-                >
-                  <svg
-                    class="w-5 h-5 flex-shrink-0 mt-0.5"
-                    :class="index === 0 ? 'text-emerald-500' : 'text-slate-400'"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                  </svg>
-                  {{ highlight }}
-                </li>
-              </ul>
+              <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
+                Latest
+              </span>
             </div>
-          </template>
 
-          <!-- Error state -->
-          <div v-else class="card text-center py-12">
-            <svg class="w-12 h-12 mx-auto text-slate-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <p class="text-slate-600 dark:text-slate-400">Unable to load changelog. Please try again later.</p>
-          </div>
+            <ul v-if="latestVersion.highlights.length" class="space-y-2">
+              <li
+                v-for="highlight in latestVersion.highlights"
+                :key="highlight"
+                class="flex items-start gap-2.5 text-sm text-slate-600 dark:text-slate-400"
+              >
+                <Check :size="14" class="text-emerald-500 mt-0.5 shrink-0" />
+                {{ highlight }}
+              </li>
+            </ul>
           </div>
 
-          <!-- View all changelogs link -->
-          <div class="text-center mt-12">
+          <!-- Error -->
+          <div v-else class="card text-center py-10 scroll-reveal">
+            <CircleHelp :size="32" class="mx-auto text-slate-300 dark:text-slate-600 mb-3" />
+            <p class="text-sm text-slate-500">Unable to load changelog.</p>
+          </div>
+
+          <div class="text-center mt-8">
             <RouterLink
               to="/changelog"
-              class="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all border border-slate-200 hover:border-slate-300 text-slate-700 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-600 min-h-[48px]"
+              class="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
             >
               View All Versions
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-              </svg>
+              <ArrowRight :size="16" />
             </RouterLink>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Support Section -->
-    <section
-      class="py-16 lg:py-24 section-padding bg-slate-50 dark:bg-slate-900/30 transition-colors duration-300"
-    >
-      <div class="container-custom text-center">
-        <div class="max-w-3xl mx-auto">
-          <h2
-            class="text-3xl sm:text-4xl font-semibold mb-4 text-slate-950 dark:text-slate-50 transition-colors duration-300"
+    <!-- Support -->
+    <section class="py-16 lg:py-20 bg-slate-50 dark:bg-slate-900/40">
+      <div class="container-custom text-center max-w-2xl mx-auto">
+        <h2 class="text-2xl font-bold mb-3 text-slate-950 dark:text-slate-50">
+          Need Help?
+        </h2>
+        <p class="text-slate-600 dark:text-slate-400 mb-6">
+          Check our documentation or report issues on GitHub
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <a
+            href="https://github.com/xicv/recogniz.ing"
+            target="_blank"
+            rel="noopener"
+            class="btn-primary inline-flex items-center gap-2 text-sm"
           >
-            Need Help?
-          </h2>
-          <p
-            class="text-lg mb-8 text-slate-600 dark:text-slate-400 transition-colors duration-300"
+            <!-- GitHub brand icon — kept as inline SVG -->
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+            View on GitHub
+          </a>
+          <a
+            href="https://github.com/xicv/recogniz.ing/issues"
+            target="_blank"
+            rel="noopener"
+            class="btn-secondary inline-flex items-center gap-2 text-sm"
           >
-            Check our documentation or report issues on GitHub
-          </p>
-          <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a
-              href="https://github.com/xicv/recogniz.ing"
-              target="_blank"
-              rel="noopener"
-              class="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all bg-slate-900 text-white hover:bg-slate-800 dark:bg-sky-500 dark:hover:bg-sky-400 min-h-[48px]"
-            >
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.911 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-              </svg>
-              View on GitHub
-            </a>
-            <a
-              href="https://github.com/xicv/recogniz.ing/issues"
-              target="_blank"
-              rel="noopener"
-              class="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all border border-slate-200 hover:border-slate-300 text-slate-700 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-600 min-h-[48px]"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-              Report Issue
-            </a>
-          </div>
+            <CircleHelp :size="16" />
+            Report Issue
+          </a>
         </div>
       </div>
     </section>
   </div>
 </template>
-
-<style scoped>
-.scroll-reveal {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.8s var(--ease-out-expo),
-              transform 0.8s var(--ease-out-expo);
-}
-
-.scroll-reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.scroll-reveal-scale {
-  opacity: 0;
-  transform: scale(0.9);
-  transition: opacity 0.6s var(--ease-spring),
-              transform 0.6s var(--ease-spring);
-}
-
-.scroll-reveal-scale.visible {
-  opacity: 1;
-  transform: scale(1);
-}
-
-/* Tabular numbers */
-.tabular-nums {
-  font-variant-numeric: tabular-nums;
-}
-
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .scroll-reveal,
-  .scroll-reveal-scale {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-}
-</style>
