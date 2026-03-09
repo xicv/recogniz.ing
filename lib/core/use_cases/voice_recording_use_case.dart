@@ -63,7 +63,16 @@ class VoiceRecordingUseCase {
     _onStateChanged(RecordingState.processing);
 
     try {
-      final result = await _audioService.stopRecording();
+      // Outer timeout as defense-in-depth: if AudioService.stopRecording()
+      // hangs despite its own 5s timeout on _recorder.stop(), this ensures
+      // the UI always recovers.
+      final result = await _audioService.stopRecording().timeout(
+        const Duration(seconds: 30),
+        onTimeout: () {
+          debugPrint('[VoiceRecordingUseCase] stopRecording timed out after 30s');
+          return null;
+        },
+      );
       debugPrint(
           'Recording stopped. Result: ${result != null ? "Got audio data" : "No data"}');
 

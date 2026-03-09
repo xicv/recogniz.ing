@@ -16,12 +16,17 @@ import '../models/app_settings.dart';
 import '../interfaces/audio_service_interface.dart';
 
 class AudioService implements AudioServiceInterface {
-  final AudioRecorder _recorder = AudioRecorder();
+  AudioRecorder _recorder = AudioRecorder();
   String? _currentRecordingPath;
   DateTime? _recordingStartTime;
 
   bool _isRecording = false;
   bool get isRecording => _isRecording;
+
+  // When _recorder.stop() times out, the platform channel is stuck.
+  // Any further calls (hasPermission, start, dispose) on that instance will hang.
+  // We must abandon it and create a fresh recorder.
+  bool _recorderStale = false;
 
   // Initialize audio processor on first use
   static bool _processorInitialized = false;
@@ -36,6 +41,14 @@ class AudioService implements AudioServiceInterface {
 
   @override
   Future<bool> hasPermission() async {
+    // If the recorder is stale (previous stop timed out), replace it first
+    if (_recorderStale) {
+      if (kDebugMode) {
+        debugPrint('[AudioService] hasPermission: replacing stale recorder');
+      }
+      _recorder = AudioRecorder();
+      _recorderStale = false;
+    }
     final result = await _recorder.hasPermission();
     if (kDebugMode) {
       debugPrint('[AudioService] hasPermission: $result');
@@ -52,6 +65,16 @@ class AudioService implements AudioServiceInterface {
       return;
     }
 
+    // If previous stop() timed out, the recorder's platform channel is dead.
+    // Abandon it (don't dispose — that would also hang) and create a fresh one.
+    if (_recorderStale) {
+      if (kDebugMode) {
+        debugPrint('[AudioService] Replacing stale recorder');
+      }
+      _recorder = AudioRecorder();
+      _recorderStale = false;
+    }
+
     final hasPermission = await _recorder.hasPermission();
     if (kDebugMode) {
       debugPrint('[AudioService] Permission check: $hasPermission');
@@ -65,6 +88,16 @@ class AudioService implements AudioServiceInterface {
     await _ensureProcessorInitialized();
 
     final dir = await getTemporaryDirectory();
+    // Ensure the temp directory exists — on macOS, running a local release
+    // build outside the sandbox may use a Caches path that doesn't exist yet.
+    // AVAudioRecorder silently fails if the output directory is missing.
+    final tempDir = Directory(dir.path);
+    if (!await tempDir.exists()) {
+      await tempDir.create(recursive: true);
+      if (kDebugMode) {
+        debugPrint('[AudioService] Created temp directory: ${dir.path}');
+      }
+    }
     final uuid = const Uuid().v4();
 
     // Determine file extension based on format
@@ -109,19 +142,40 @@ class AudioService implements AudioServiceInterface {
       return null;
     }
 
-    final path = await _recorder.stop();
+    // Timeout prevents hang when macOS interrupts the audio session
+    // (e.g., app goes to background, another app claims audio input).
+    // The `record` package's platform channel can block indefinitely in this case.
+    String? path;
+    try {
+      path = await _recorder.stop().timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {
+          if (kDebugMode) {
+            debugPrint('[AudioService] _recorder.stop() timed out after 5s');
+          }
+          _recorderStale = true;
+          return null;
+        },
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[AudioService] _recorder.stop() threw: $e');
+      }
+      _recorderStale = true;
+    }
     _isRecording = false;
 
     if (kDebugMode) {
       debugPrint('[AudioService] Recorder stopped, path: $path');
-    }
-    if (kDebugMode) {
       debugPrint('[AudioService] Expected path: $_currentRecordingPath');
     }
 
-    if (path == null || _currentRecordingPath == null) {
+    // If _recorder.stop() timed out or failed, fall back to the known recording path
+    final effectivePath = path ?? _currentRecordingPath;
+
+    if (effectivePath == null) {
       if (kDebugMode) {
-        debugPrint('[AudioService] No path returned');
+        debugPrint('[AudioService] No path available (both returned and expected are null)');
       }
       return null;
     }
@@ -135,7 +189,7 @@ class AudioService implements AudioServiceInterface {
       debugPrint('[AudioService] Recording duration: ${duration}s');
     }
 
-    final file = File(_currentRecordingPath!);
+    final file = File(effectivePath);
     final exists = await file.exists();
     if (kDebugMode) {
       debugPrint('[AudioService] File exists: $exists');
@@ -186,7 +240,7 @@ class AudioService implements AudioServiceInterface {
     // Full diagnostic with actual file duration (slower but more accurate)
     if (kDebugMode && diagnostic.hasTruncation) {
       final fullDiagnostic = await AudioDiagnosticService.diagnose(
-        filePath: _currentRecordingPath!,
+        filePath: effectivePath,
         timerDurationSeconds: duration,
         bitrate: effectiveBitrate,
       );
@@ -204,8 +258,8 @@ class AudioService implements AudioServiceInterface {
     // For AAC/M4A or WAV/PCM, different handling applies
     // AAC/M4A is compressed and doesn't need PCM processing
     // WAV/PCM is already uncompressed
-    final isCompressedFormat = path.endsWith('.m4a') || path.endsWith('.aac');
-    final isPcmFormat = path.endsWith('.wav') || path.endsWith('.pcm');
+    final isCompressedFormat = effectivePath.endsWith('.m4a') || effectivePath.endsWith('.aac');
+    final isPcmFormat = effectivePath.endsWith('.wav') || effectivePath.endsWith('.pcm');
     final needsProcessing = !isCompressedFormat && !isPcmFormat;
 
     // Apply audio processing and compression only for uncompressed formats
@@ -356,7 +410,7 @@ class AudioService implements AudioServiceInterface {
     }
 
     return RecordingResult(
-      path: persistentAudioPath ?? path, // Use persistent path if available
+      path: persistentAudioPath ?? effectivePath, // Use persistent path if available
       bytes: finalBytes,
       durationSeconds: duration,
       analysis: analysis,
@@ -366,7 +420,14 @@ class AudioService implements AudioServiceInterface {
   Future<void> cancelRecording() async {
     if (!_isRecording) return;
 
-    await _recorder.stop();
+    try {
+      await _recorder.stop().timeout(const Duration(seconds: 5));
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[AudioService] cancelRecording stop failed/timed out: $e');
+      }
+      _recorderStale = true;
+    }
     _isRecording = false;
 
     if (_currentRecordingPath != null) {
