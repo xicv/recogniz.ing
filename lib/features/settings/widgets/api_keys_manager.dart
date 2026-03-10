@@ -95,7 +95,15 @@ class _ApiKeysManagerState extends ConsumerState<ApiKeysManager> {
                 key: ValueKey(key.id),
                 apiKey: key,
                 isSelected: selectedKey?.id == key.id,
-                onSelect: () => ref.read(apiKeysProvider.notifier).selectApiKey(key.id),
+                onSelect: () async {
+                  await ref.read(apiKeysProvider.notifier).selectApiKey(key.id);
+                  if (context.mounted) {
+                    AppDialogs.showSuccessSnackBar(
+                      context: context,
+                      message: 'Switched to ${key.name}',
+                    );
+                  }
+                },
                 onDelete: () => _showDeleteConfirmDialog(context, ref, key),
                 onEdit: () => _showEditKeyDialog(context, ref, key),
                 onClearRateLimit: () => ref.read(apiKeysProvider.notifier).clearRateLimit(key.id),

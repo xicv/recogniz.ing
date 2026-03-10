@@ -179,6 +179,7 @@ class VoiceRecordingUseCase {
       audioDurationSeconds: audioDurationSeconds,
       audioBackupPath: audioPath,
       promptId: settings.selectedPromptId,
+      apiKeyId: settings.effectiveApiKeyId,
     );
 
     await _storageService.saveTranscription(pendingTranscription);
@@ -243,6 +244,7 @@ class VoiceRecordingUseCase {
         completedAt: DateTime.now(),
         // Clear audio backup path on success
         audioBackupPath: null,
+        apiKeyId: settings.effectiveApiKeyId,
       );
 
       await _storageService.saveTranscription(completedTranscription);

@@ -8,8 +8,10 @@ import '../services/notification_service.dart';
 import 'app_providers.dart';
 import 'config_providers.dart';
 import 'api_keys_provider.dart';
+import 'api_key_usage_provider.dart';
 import '../models/app_settings.dart';
 import '../models/api_key_info.dart';
+import '../models/transcription_status.dart';
 
 // Service providers
 final audioServiceProvider = Provider<AudioServiceInterface>((ref) {
@@ -152,6 +154,26 @@ final voiceRecordingUseCaseProvider = Provider<VoiceRecordingUseCase>((ref) {
     },
     onTranscriptionComplete: (transcription) {
       ref.read(transcriptionsProvider.notifier).addTranscription(transcription);
+
+      // Record per-key usage when a transcription completes successfully
+      if (transcription.status == TranscriptionStatus.completed &&
+          transcription.apiKeyId != null) {
+        final words = transcription.processedText.trim().isEmpty
+            ? 0
+            : transcription.processedText.trim().split(RegExp(r'\s+')).length;
+        final inputTokens = transcription.tokenUsage * 0.5;
+        final outputTokens = transcription.tokenUsage * 0.5;
+        final estimatedCost = (inputTokens / 1000000) * 0.075 +
+            (outputTokens / 1000000) * 0.40;
+
+        ref.read(apiKeyUsageProvider.notifier).recordUsage(
+          apiKeyId: transcription.apiKeyId!,
+          tokens: transcription.tokenUsage,
+          durationMinutes: transcription.audioDurationSeconds / 60,
+          words: words,
+          estimatedCost: estimatedCost,
+        );
+      }
     },
   );
 });

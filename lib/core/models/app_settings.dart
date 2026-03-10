@@ -156,16 +156,39 @@ class AppSettings extends HiveObject {
   /// Get the actual API key string to use
   ///
   /// Priority:
-  /// 1. Selected key from multi-key system
-  /// 2. Legacy geminiApiKey field (for backward compatibility)
+  /// 1. Selected key from multi-key system (if not rate-limited, or limit expired)
+  /// 2. Next available key from multi-key list
+  /// 3. Legacy geminiApiKey field (for backward compatibility)
   String? get effectiveApiKey {
-    // Try new multi-key system first
+    // Try selected key first
     final selected = selectedApiKey;
-    if (selected != null && !selected.isRateLimited) {
+    if (selected != null && (!selected.isRateLimited || selected.isRateLimitExpired)) {
       return selected.apiKey;
     }
-    // Fall back to legacy single key
+    // Try next available key from multi-key list
+    for (final key in apiKeys) {
+      if (!key.isRateLimited || key.isRateLimitExpired) {
+        return key.apiKey;
+      }
+    }
+    // Fall back to legacy single key only if no multi-keys work
     return geminiApiKey;
+  }
+
+  /// Get the ID of the API key that would be used by [effectiveApiKey]
+  ///
+  /// Returns null when falling back to the legacy single key (which has no ID)
+  String? get effectiveApiKeyId {
+    final selected = selectedApiKey;
+    if (selected != null && (!selected.isRateLimited || selected.isRateLimitExpired)) {
+      return selected.id;
+    }
+    for (final key in apiKeys) {
+      if (!key.isRateLimited || key.isRateLimitExpired) {
+        return key.id;
+      }
+    }
+    return null;
   }
 
   /// Get all available (non-rate-limited) API keys

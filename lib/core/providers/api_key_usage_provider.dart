@@ -14,29 +14,27 @@ class ApiKeyUsageNotifier extends Notifier<Map<String, ApiKeyUsageStats>> {
     return {};
   }
 
-  /// Load stats from storage
+  /// Load stats from storage, filtering transcriptions by their apiKeyId
   Future<void> _loadStats() async {
     try {
       await Future.delayed(const Duration(milliseconds: 100));
-      // Stats would be stored in a separate box
-      // For now, we'll rebuild from transcriptions
       final transcriptions = StorageService.transcriptions;
       final apiKeys = ref.read(apiKeysProvider);
 
       final statsMap = <String, ApiKeyUsageStats>{};
 
-      // Initialize empty stats for each API key
+      // Build per-key stats by filtering transcriptions on apiKeyId
       for (final key in apiKeys) {
-        statsMap[key.id] = ApiKeyUsageStats.empty(key.id);
-      }
+        final keyTranscriptions = transcriptions.values
+            .where((t) => t.apiKeyId == key.id)
+            .toList()
+          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
-      // Aggregate from transcriptions
-      // Note: This requires Transcription to have apiKeyId field
-      // For now, use the selected key
-      final settings = StorageService.settings;
-      final selectedKey = settings.selectedApiKeyId;
+        if (keyTranscriptions.isEmpty) {
+          statsMap[key.id] = ApiKeyUsageStats.empty(key.id);
+          continue;
+        }
 
-      if (selectedKey != null) {
         int totalTranscriptions = 0;
         int totalTokens = 0;
         double totalDuration = 0;
@@ -44,10 +42,7 @@ class ApiKeyUsageNotifier extends Notifier<Map<String, ApiKeyUsageStats>> {
         double totalCost = 0;
         final dailyUsageMap = <DateTime, DailyUsage>{};
 
-        final transcriptionsList = transcriptions.values.toList()
-          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-
-        for (final t in transcriptionsList) {
+        for (final t in keyTranscriptions) {
           totalTranscriptions++;
           totalTokens += t.tokenUsage;
           totalDuration += t.audioDurationSeconds / 60;
@@ -59,7 +54,7 @@ class ApiKeyUsageNotifier extends Notifier<Map<String, ApiKeyUsageStats>> {
           totalCost += (inputTokens / 1000000) * 0.075 +
                       (outputTokens / 1000000) * 0.40;
 
-          // Add to daily usage
+          // Add to daily usage using actual transcription date
           final dateKey = DateTime(
             t.createdAt.year,
             t.createdAt.month,
@@ -76,18 +71,14 @@ class ApiKeyUsageNotifier extends Notifier<Map<String, ApiKeyUsageStats>> {
           );
         }
 
-        statsMap[selectedKey] = ApiKeyUsageStats(
-          apiKeyId: selectedKey,
+        statsMap[key.id] = ApiKeyUsageStats(
+          apiKeyId: key.id,
           totalTranscriptions: totalTranscriptions,
           totalTokens: totalTokens,
           totalDurationMinutes: totalDuration,
           totalWords: totalWords,
-          firstUsedAt: transcriptionsList.isNotEmpty
-              ? transcriptionsList.last.createdAt
-              : null,
-          lastUsedAt: transcriptionsList.isNotEmpty
-              ? transcriptionsList.first.createdAt
-              : null,
+          firstUsedAt: keyTranscriptions.last.createdAt,
+          lastUsedAt: keyTranscriptions.first.createdAt,
           dailyUsage: dailyUsageMap.values.toList(),
           totalEstimatedCost: totalCost,
         );

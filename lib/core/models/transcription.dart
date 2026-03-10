@@ -48,6 +48,9 @@ class Transcription extends HiveObject {
   @HiveField(13)
   final String? detectedLanguage;
 
+  @HiveField(14)
+  final String? apiKeyId;
+
   Transcription({
     required this.id,
     required this.rawText,
@@ -63,6 +66,7 @@ class Transcription extends HiveObject {
     this.retryCount = 0,
     this.completedAt,
     this.detectedLanguage,
+    this.apiKeyId,
   })  : isFavorite = isFavorite ?? false,
         statusIndex = status.index;
 
@@ -94,6 +98,7 @@ class Transcription extends HiveObject {
     int? retryCount,
     DateTime? completedAt,
     String? detectedLanguage,
+    String? apiKeyId,
   }) {
     return Transcription(
       id: id ?? this.id,
@@ -110,6 +115,7 @@ class Transcription extends HiveObject {
       retryCount: retryCount ?? this.retryCount,
       completedAt: completedAt ?? this.completedAt,
       detectedLanguage: detectedLanguage ?? this.detectedLanguage,
+      apiKeyId: apiKeyId ?? this.apiKeyId,
     );
   }
 
@@ -119,6 +125,7 @@ class Transcription extends HiveObject {
     required double audioDurationSeconds,
     required String audioBackupPath,
     required String promptId,
+    String? apiKeyId,
   }) {
     return Transcription(
       id: id,
@@ -130,6 +137,7 @@ class Transcription extends HiveObject {
       audioDurationSeconds: audioDurationSeconds,
       audioBackupPath: audioBackupPath,
       status: TranscriptionStatus.pending,
+      apiKeyId: apiKeyId,
     );
   }
 

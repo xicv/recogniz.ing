@@ -30,13 +30,14 @@ class TranscriptionAdapter extends TypeAdapter<Transcription> {
       retryCount: fields[11] == null ? 0 : (fields[11] as num).toInt(),
       completedAt: fields[12] as DateTime?,
       detectedLanguage: fields[13] as String?,
+      apiKeyId: fields[14] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Transcription obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -62,7 +63,9 @@ class TranscriptionAdapter extends TypeAdapter<Transcription> {
       ..writeByte(12)
       ..write(obj.completedAt)
       ..writeByte(13)
-      ..write(obj.detectedLanguage);
+      ..write(obj.detectedLanguage)
+      ..writeByte(14)
+      ..write(obj.apiKeyId);
   }
 
   @override
