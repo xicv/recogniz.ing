@@ -30,6 +30,43 @@
   },
   "versions": [
     {
+      "version": "1.16.1",
+      "date": "2026-03-10",
+      "stable": true,
+      "highlights": [
+        "Per-key API usage tracking — each key now shows its own stats",
+        "Smart multi-key failover cascades through all available keys",
+        "Key switch confirmation with SnackBar feedback"
+      ],
+      "changes": [
+        {
+          "category": "added",
+          "title": "Per-Key Usage Attribution",
+          "description": "Transcriptions are now stamped with the API key ID that produced them. Dashboard stats are filtered per-key instead of dumping all usage onto the selected key."
+        },
+        {
+          "category": "added",
+          "title": "Real-Time Usage Updates",
+          "description": "recordUsage() is now wired up to fire on every successful transcription, giving the dashboard instant per-key stats without waiting for a full reload."
+        },
+        {
+          "category": "fixed",
+          "title": "Multi-Key Fallback Logic",
+          "description": "effectiveApiKey now cascades through all available multi-keys before falling back to the legacy single key. Previously it skipped straight to legacy when the selected key was rate-limited."
+        },
+        {
+          "category": "fixed",
+          "title": "Rate Limit Expiry Check",
+          "description": "Fixed missing isRateLimitExpired check on the selected key — keys whose 24h cooldown expired were being permanently skipped."
+        },
+        {
+          "category": "changed",
+          "title": "Key Switch Feedback",
+          "description": "Switching API keys now shows a confirmation SnackBar with the key name, so users get visual feedback that the switch took effect."
+        }
+      ]
+    },
+    {
       "version": "1.16.0",
       "date": "2026-03-06",
       "stable": true,

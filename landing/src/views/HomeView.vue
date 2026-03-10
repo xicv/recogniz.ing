@@ -78,7 +78,7 @@ const faqs = [
   },
   {
     question: 'Will I need to pay for the API?',
-    answer: "Probably not! Gemini 3 Flash's generous free tier typically covers daily personal voice typing. Even if you exceed it, pricing is very affordable (~$0.075 per million characters). A 5-minute recording costs only fractions of a cent."
+    answer: "Probably not! Gemini 3 Flash's generous free tier typically covers daily personal voice typing. You can even add multiple API keys and Recogniz.ing will automatically rotate between them when one hits its rate limit. Even if you exceed the free tier, pricing is very affordable (~$0.075 per million characters)."
   },
   {
     question: 'Can I customize vocabulary?',

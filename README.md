@@ -127,10 +127,11 @@ Powered by **Google Gemini 3 Flash**—Google's fastest AI model:
 
 ###  Dashboard & Analytics
 
-- **Free tier quota tracking** — Visual progress indicator
-- **Multi-API key management** — Automatic failover when hitting rate limits
-- **Usage projections** — See days until quota exhaustion
-- **Per-key statistics** — Track usage across multiple API keys
+- **Free tier quota tracking** — Visual progress indicator per API key
+- **Multi-API key management** — Smart failover cascades through all available keys
+- **Per-key usage attribution** — Each transcription is tagged to the key that produced it
+- **Usage projections** — See days until quota exhaustion per key
+- **Real-time stats** — Dashboard updates instantly after each transcription
 - **Editable transcriptions** — Fix mistakes, save changes
 - **Favorites** — Star important transcriptions for quick access
 

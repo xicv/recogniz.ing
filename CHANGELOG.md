@@ -346,3 +346,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.16.1] - 2026-03-10
+
+### Added
+
+- **Per-Key Usage Attribution** - Transcriptions are now stamped with the API key ID that produced them. Dashboard stats are filtered per-key instead of dumping all usage onto the selected key.
+- **Real-Time Usage Updates** - recordUsage() is now wired up to fire on every successful transcription, giving the dashboard instant per-key stats without waiting for a full reload.
+
+### Changed
+
+- **Key Switch Feedback** - Switching API keys now shows a confirmation SnackBar with the key name, so users get visual feedback that the switch took effect.
+
+### Fixed
+
+- **Multi-Key Fallback Logic** - effectiveApiKey now cascades through all available multi-keys before falling back to the legacy single key. Previously it skipped straight to legacy when the selected key was rate-limited.
+- **Rate Limit Expiry Check** - Fixed missing isRateLimitExpired check on the selected key — keys whose 24h cooldown expired were being permanently skipped.
+
+---
+

@@ -53,9 +53,9 @@ const vocabulary = [
 ]
 
 const settings = [
-  { title: 'Multi-API Key Management', description: 'Add multiple keys with automatic failover on rate limits', icon: Zap, badge: 'New' },
+  { title: 'Multi-API Key Management', description: 'Add multiple keys with smart failover — cascades through all available keys before falling back', icon: Zap, badge: 'New' },
   { title: 'API Configuration', description: 'Manage your Gemini API key for transcription', icon: KeyRound },
-  { title: 'Free Tier Quota Tracking', description: 'Dashboard shows usage percentage and remaining requests', icon: PieChart, badge: 'New' },
+  { title: 'Per-Key Usage Tracking', description: 'Dashboard shows per-key stats, quota percentage, and remaining requests', icon: PieChart, badge: 'New' },
   { title: 'Transcription Language', description: 'Auto-detect or choose from 20+ languages', icon: Languages },
   { title: 'Usage Projections', description: 'See days until free tier exhaustion based on usage', icon: BarChart3 },
   { title: 'Global Hotkey', description: 'Set up global hotkeys for quick recording access', icon: Code },
