@@ -58,6 +58,72 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
             const SizedBox(height: 20),
 
+            // Model Selection
+            SettingsSection(
+              title: 'AI Model',
+              icon: LucideIcons.cpu,
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Gemini Model',
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  _getModelDescription(settings.selectedModel),
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      DropdownButtonFormField<String>(
+                        initialValue: _availableModels.containsKey(settings.selectedModel)
+                            ? settings.selectedModel
+                            : 'gemini-3-flash-preview',
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
+                        ),
+                        items: _availableModels.entries.map((entry) {
+                          return DropdownMenuItem<String>(
+                            value: entry.key,
+                            child: Text(entry.value),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            ref.read(settingsProvider.notifier).updateModel(value);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ).animate().fadeIn(duration: 300.ms, delay: 120.ms),
+
+            const SizedBox(height: 20),
+
             // Hotkey Settings - Desktop only
             if (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
               SettingsSection(
@@ -382,6 +448,25 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       return language.isAuto ? 'Auto Detect' : language.nativeName;
     }
     return 'Auto Detect';
+  }
+
+  static const _availableModels = {
+    'gemini-3-flash-preview': 'Gemini 3 Flash (Default)',
+    'gemini-3.1-flash-lite-preview': 'Gemini 3.1 Flash Lite (Faster)',
+    'gemini-2.5-flash-preview-05-20': 'Gemini 2.5 Flash',
+  };
+
+  String _getModelDescription(String model) {
+    switch (model) {
+      case 'gemini-3-flash-preview':
+        return 'Balanced speed and quality';
+      case 'gemini-3.1-flash-lite-preview':
+        return '2.5x faster, 50% cheaper, great for voice';
+      case 'gemini-2.5-flash-preview-05-20':
+        return 'Previous generation, stable';
+      default:
+        return model;
+    }
   }
 
   String _getCompressionDescription(AudioCompressionPreference preference) {

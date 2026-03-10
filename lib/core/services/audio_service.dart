@@ -104,18 +104,24 @@ class AudioService implements AudioServiceInterface {
     final recordConfig = AudioCompressionService.getVoiceOptimizedConfig(
       preference: compressionPreference,
     );
-    final fileExtension =
-        recordConfig.encoder == AudioEncoder.pcm16bits ? 'wav' : 'm4a';
+    final String fileExtension;
+    if (recordConfig.encoder == AudioEncoder.pcm16bits) {
+      fileExtension = 'wav';
+    } else if (recordConfig.encoder == AudioEncoder.flac) {
+      fileExtension = 'flac';
+    } else {
+      fileExtension = 'm4a';
+    }
     _currentRecordingPath = '${dir.path}/recording_$uuid.$fileExtension';
 
     if (kDebugMode) {
       debugPrint('[AudioService] Recording to: $_currentRecordingPath');
-      debugPrint(
-          '[AudioService] Format: ${recordConfig.encoder == AudioEncoder.pcm16bits ? "PCM (uncompressed)" : "AAC (compressed)"}');
-      if (recordConfig.encoder == AudioEncoder.pcm16bits) {
-        debugPrint(
-            '[AudioService] Using reliable format - larger files but no truncation risk');
-      }
+      final formatName = switch (recordConfig.encoder) {
+        AudioEncoder.pcm16bits => 'PCM (uncompressed)',
+        AudioEncoder.flac => 'FLAC (lossless compressed)',
+        _ => 'AAC (lossy compressed)',
+      };
+      debugPrint('[AudioService] Format: $formatName');
     }
 
     await _recorder.start(recordConfig, path: _currentRecordingPath!);
@@ -258,7 +264,9 @@ class AudioService implements AudioServiceInterface {
     // For AAC/M4A or WAV/PCM, different handling applies
     // AAC/M4A is compressed and doesn't need PCM processing
     // WAV/PCM is already uncompressed
-    final isCompressedFormat = effectivePath.endsWith('.m4a') || effectivePath.endsWith('.aac');
+    final isCompressedFormat = effectivePath.endsWith('.m4a') ||
+        effectivePath.endsWith('.aac') ||
+        effectivePath.endsWith('.flac');
     final isPcmFormat = effectivePath.endsWith('.wav') || effectivePath.endsWith('.pcm');
     final needsProcessing = !isCompressedFormat && !isPcmFormat;
 
@@ -362,7 +370,14 @@ class AudioService implements AudioServiceInterface {
     } else {
       // For compressed formats (AAC/M4A) or PCM formats (WAV), create a basic analysis result
       // We assume the audio is valid if it passed duration and file size checks
-      final formatName = isCompressedFormat ? 'AAC' : 'PCM';
+      final String formatName;
+      if (effectivePath.endsWith('.flac')) {
+        formatName = 'FLAC';
+      } else if (effectivePath.endsWith('.m4a') || effectivePath.endsWith('.aac')) {
+        formatName = 'AAC';
+      } else {
+        formatName = 'PCM';
+      }
       analysis = AudioAnalysisResult(
         containsSpeech: true,
         reason: '$formatName format - validation bypassed',
@@ -395,18 +410,23 @@ class AudioService implements AudioServiceInterface {
       // Continue anyway - recording will work but retry won't be available
     }
 
-    // Delete the temporary file since we have the bytes and persistent copy
-    try {
-      if (await file.exists()) {
-        await file.delete();
-        if (kDebugMode) {
-          debugPrint('[AudioService] Temporary file deleted');
+    // Delete the temporary file in the background (non-blocking)
+    // We have the bytes in memory and a persistent copy — no need to block on cleanup
+    if (effectivePath != persistentAudioPath) {
+      () async {
+        try {
+          if (await file.exists()) {
+            await file.delete();
+            if (kDebugMode) {
+              debugPrint('[AudioService] Temporary file deleted');
+            }
+          }
+        } catch (e) {
+          if (kDebugMode) {
+            debugPrint('[AudioService] Failed to delete temp file: $e');
+          }
         }
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[AudioService] Failed to delete temp file: $e');
-      }
+      }();
     }
 
     return RecordingResult(
@@ -478,4 +498,11 @@ class RecordingResult implements RecordingResultInterface {
 
   @override
   AudioAnalysisResult? get analysis => _analysis;
+
+  @override
+  String get mimeType {
+    if (_path.endsWith('.flac')) return 'audio/flac';
+    if (_path.endsWith('.m4a') || _path.endsWith('.aac')) return 'audio/aac';
+    return 'audio/wav';
+  }
 }

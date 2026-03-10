@@ -189,6 +189,7 @@ class GeminiService implements TranscriptionServiceInterface {
     required String promptTemplate,
     String? criticalInstructions,
     String? targetLanguage,
+    String mimeType = 'audio/wav',
     bool useSingleCall = true,
   }) async {
     debugPrint('[GeminiService] transcribeAudio called');
@@ -213,6 +214,7 @@ class GeminiService implements TranscriptionServiceInterface {
       promptTemplate,
       criticalInstructions,
       cacheKey,
+      mimeType,
     );
   }
 
@@ -223,6 +225,7 @@ class GeminiService implements TranscriptionServiceInterface {
     String promptTemplate,
     String? criticalInstructions,
     String cacheKey,
+    String mimeType,
   ) async {
     const maxKeySwitches = 3;
     int attempts = 0;
@@ -235,6 +238,7 @@ class GeminiService implements TranscriptionServiceInterface {
           promptTemplate,
           criticalInstructions,
           cacheKey,
+          mimeType,
         );
       } catch (e) {
         final errorStr = e.toString().toLowerCase();
@@ -446,6 +450,7 @@ class GeminiService implements TranscriptionServiceInterface {
     String promptTemplate,
     String? criticalInstructions,
     String cacheKey,
+    String mimeType,
   ) async {
     final combinedPrompt =
         _buildCombinedPrompt(promptTemplate, vocabulary, criticalInstructions);
@@ -460,10 +465,8 @@ class GeminiService implements TranscriptionServiceInterface {
 
     while (emptyRetryCount <= maxEmptyRetries) {
       try {
-        // Use Blob.fromBytes convenience factory for cleaner code
-        final audioBlob = Blob.fromBytes('audio/wav', audioBytes);
-
-        // Use audio/wav for PCM format (recommended for Gemini API)
+        // Use Blob.fromBytes with dynamic MIME type based on recording format
+        final audioBlob = Blob.fromBytes(mimeType, audioBytes);
         final audioContent = Content(
           parts: [
             TextPart(combinedPrompt),
@@ -487,16 +490,36 @@ class GeminiService implements TranscriptionServiceInterface {
           ),
         );
 
-        final response = await _executeWithRetry(
-          () => _client!.models.generateContent(
-            model: _modelName,
-            request: request,
-          ),
+        // Stream response for faster perceived latency
+        final resultBuffer = StringBuffer();
+        int? streamTokenUsage;
+
+        await _executeWithRetry(
+          () async {
+            resultBuffer.clear();
+            streamTokenUsage = null;
+
+            final stream = _client!.models.streamGenerateContent(
+              model: _modelName,
+              request: request,
+            );
+
+            await for (final chunk in stream) {
+              final chunkText = chunk.text;
+              if (chunkText != null) {
+                resultBuffer.write(chunkText);
+              }
+              // Token usage is typically in the final chunk
+              if (chunk.usageMetadata?.totalTokenCount != null) {
+                streamTokenUsage = chunk.usageMetadata!.totalTokenCount;
+              }
+            }
+          },
           operationName: 'combined-transcription',
         );
 
-        final resultText = _extractTextFromResponse(response) ?? '';
-        debugPrint('[GeminiService] Combined transcription complete');
+        final resultText = resultBuffer.toString();
+        debugPrint('[GeminiService] Combined transcription complete (streamed)');
 
         // Handle empty response with automatic retry
         if (resultText.isEmpty) {
@@ -507,10 +530,11 @@ class GeminiService implements TranscriptionServiceInterface {
             await Future.delayed(Duration(milliseconds: 500 * emptyRetryCount));
             continue;
           } else {
-            // Final retry failed, throw detailed error
+            // Final retry failed
             debugPrint(
                 '[GeminiService] Empty response after $maxEmptyRetries retries');
-            throw _createEmptyResponseException(response);
+            throw Exception(
+                'Empty transcription received from API after $maxEmptyRetries retries');
           }
         }
 
@@ -521,15 +545,14 @@ class GeminiService implements TranscriptionServiceInterface {
           throw Exception('No speech detected in audio');
         }
 
-        // Get token usage from response metadata
-        final tokenUsage = response.usageMetadata?.totalTokenCount ??
-            (resultText.length / 4).round();
+        // Token usage from stream metadata, fallback to estimate
+        final finalTokenUsage = streamTokenUsage ?? (resultText.length / 4).round();
 
         return _createResult(
           cacheKey: cacheKey,
           rawText: transcriptionText,
           processedText: transcriptionText,
-          tokenUsage: tokenUsage,
+          tokenUsage: finalTokenUsage,
         );
       } catch (e) {
         // If it's not an empty response error, fail immediately
@@ -549,23 +572,6 @@ class GeminiService implements TranscriptionServiceInterface {
 
     // Should never reach here, but satisfy the type checker
     throw Exception('Transcription failed after retries');
-  }
-
-  /// Create a detailed exception for empty API responses
-  Exception _createEmptyResponseException(GenerateContentResponse response) {
-    final candidates = response.candidates ?? [];
-    final finishReason = candidates.isNotEmpty
-        ? candidates.first.finishReason?.name ?? 'unknown'
-        : 'no candidates';
-
-    final buffer = StringBuffer(
-        'Empty transcription received from API (finishReason: $finishReason)');
-
-    if (response.promptFeedback != null) {
-      buffer.write('. Prompt feedback: ${response.promptFeedback}');
-    }
-
-    return Exception(buffer.toString());
   }
 
   /// Extract text from GenerateContentResponse

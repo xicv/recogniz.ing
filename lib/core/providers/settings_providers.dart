@@ -115,6 +115,13 @@ class SettingsNotifier extends Notifier<AppSettings> {
     state = newState;
   }
 
+  Future<void> updateModel(String model) async {
+    _hasPendingUserUpdate = true;
+    final newState = state.copyWith(selectedModel: model);
+    await StorageService.saveSettings(newState);
+    state = newState;
+  }
+
   Future<void> toggleStartAtLogin() async {
     _hasPendingUserUpdate = true;
     final newValue = !state.startAtLogin;

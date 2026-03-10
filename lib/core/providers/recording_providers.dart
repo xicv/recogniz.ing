@@ -61,9 +61,12 @@ void _initializeService(GeminiService service, Ref ref) {
   final apiKeys = ref.read(apiKeysProvider);
   final config = ref.read(appConfigProvider);
 
-  // Get model name from config or use default
-  String modelName = 'gemini-3-flash-preview';
-  config.whenData((value) => modelName = value.api.model);
+  // User-selected model takes priority, then config, then hardcoded default
+  String modelName = settings.selectedModel;
+  if (modelName.isEmpty) {
+    config.whenData((value) => modelName = value.api.model);
+    if (modelName.isEmpty) modelName = 'gemini-3-flash-preview';
+  }
 
   // Get the effective API key (prioritizing multi-key system)
   final apiKey = settings.effectiveApiKey;

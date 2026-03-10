@@ -69,6 +69,9 @@ class AppSettings extends HiveObject {
   @HiveField(15)
   final String? selectedApiKeyId;
 
+  @HiveField(17, defaultValue: 'gemini-3-flash-preview')
+  final String selectedModel;
+
   AppSettings({
     this.geminiApiKey,
     this.selectedPromptId = 'default-clean',
@@ -87,6 +90,7 @@ class AppSettings extends HiveObject {
     this.audioCompressionPreference = AudioCompressionPreference.auto,
     this.apiKeys = const [],
     this.selectedApiKeyId,
+    this.selectedModel = 'gemini-3-flash-preview',
   });
 
   AppSettings copyWith({
@@ -103,6 +107,7 @@ class AppSettings extends HiveObject {
     AudioCompressionPreference? audioCompressionPreference,
     List<ApiKeyInfo>? apiKeys,
     String? selectedApiKeyId,
+    String? selectedModel,
   }) {
     return AppSettings(
       geminiApiKey: geminiApiKey ?? this.geminiApiKey,
@@ -120,6 +125,7 @@ class AppSettings extends HiveObject {
           audioCompressionPreference ?? this.audioCompressionPreference,
       apiKeys: apiKeys ?? this.apiKeys,
       selectedApiKeyId: selectedApiKeyId ?? this.selectedApiKeyId,
+      selectedModel: selectedModel ?? this.selectedModel,
     );
   }
 

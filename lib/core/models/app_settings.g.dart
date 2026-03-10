@@ -44,13 +44,16 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
           ? []
           : (fields[14] as List).cast<ApiKeyInfo>(),
       selectedApiKeyId: fields[15] as String?,
+      selectedModel: fields[17] == null
+          ? 'gemini-3-flash-preview'
+          : fields[17] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, AppSettings obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.geminiApiKey)
       ..writeByte(1)
@@ -76,7 +79,9 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       ..writeByte(14)
       ..write(obj.apiKeys)
       ..writeByte(15)
-      ..write(obj.selectedApiKeyId);
+      ..write(obj.selectedApiKeyId)
+      ..writeByte(17)
+      ..write(obj.selectedModel);
   }
 
   @override

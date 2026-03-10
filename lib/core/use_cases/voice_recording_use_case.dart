@@ -104,7 +104,7 @@ class VoiceRecordingUseCase {
           'Recording validated: ${(recordingResult.durationSeconds).toStringAsFixed(1)}s');
 
       await _processAudioWithRetry(recordingResult.bytes, recordingResult.path,
-          recordingResult.durationSeconds);
+          recordingResult.durationSeconds, recordingResult.mimeType);
     } catch (e) {
       debugPrint('Error processing recording: $e');
       _showErrorAndReset(_getErrorMessage(e));
@@ -140,12 +140,20 @@ class VoiceRecordingUseCase {
       await _storageService.saveTranscription(updatedTranscription);
       _onTranscriptionComplete(updatedTranscription);
 
+      // Derive MIME type from stored audio path
+      final retryMimeType = failedTranscription.audioBackupPath!.endsWith('.flac')
+          ? 'audio/flac'
+          : failedTranscription.audioBackupPath!.endsWith('.m4a')
+              ? 'audio/aac'
+              : 'audio/wav';
+
       // Process the audio
       await _callTranscriptionAPI(
         transcriptionId: failedTranscription.id,
         audioBytes: audioBytes,
         audioPath: failedTranscription.audioBackupPath!,
         audioDurationSeconds: failedTranscription.audioDurationSeconds,
+        mimeType: retryMimeType,
       );
     } catch (e) {
       debugPrint('[Retry] Error: $e');
@@ -155,7 +163,7 @@ class VoiceRecordingUseCase {
 
   /// Process audio with the new workflow: create pending, then process
   Future<void> _processAudioWithRetry(List<int> audioData, String audioPath,
-      double audioDurationSeconds) async {
+      double audioDurationSeconds, String mimeType) async {
     final settings = await _storageService.getSettings();
 
     if (!settings.hasApiKey) {
@@ -184,6 +192,7 @@ class VoiceRecordingUseCase {
       audioBytes: Uint8List.fromList(audioData),
       audioPath: audioPath,
       audioDurationSeconds: audioDurationSeconds,
+      mimeType: mimeType,
     );
   }
 
@@ -193,6 +202,7 @@ class VoiceRecordingUseCase {
     required Uint8List audioBytes,
     required String audioPath,
     required double audioDurationSeconds,
+    String mimeType = 'audio/wav',
   }) async {
     final settings = await _storageService.getSettings();
 
@@ -210,6 +220,7 @@ class VoiceRecordingUseCase {
         promptTemplate:
             prompt?.promptTemplate ?? AppConstants.defaultPromptTemplate,
         criticalInstructions: settings.effectiveCriticalInstructions,
+        mimeType: mimeType,
       );
 
       debugPrint(

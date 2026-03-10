@@ -13,6 +13,7 @@ abstract class RecordingResultInterface {
   List<int> get bytes;
   double get durationSeconds;
   AudioAnalysisResult? get analysis;
+  String get mimeType;
 }
 
 abstract class AudioServiceInterface {
@@ -28,6 +29,7 @@ abstract class TranscriptionServiceInterface {
     required String promptTemplate,
     String? criticalInstructions,
     String? targetLanguage,
+    String mimeType = 'audio/wav',
   });
 }
 

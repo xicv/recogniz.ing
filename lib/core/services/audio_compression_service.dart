@@ -27,6 +27,15 @@ enum AudioFormat {
   /// Size: ~1.92 MB/minute (at 16kHz, 16-bit, mono)
   /// Truncation Risk: NONE
   pcm16bits,
+
+  /// FLAC lossless format (~50% smaller than PCM, no truncation risk)
+  ///
+  /// ✅ RECOMMENDED: Lossless compression with no encoder buffering issues.
+  /// Supported on all platforms (macOS, Windows, Linux, iOS, Android).
+  /// Format: FLAC (.flac)
+  /// Size: ~0.8-1.0 MB/minute (at 16kHz, mono)
+  /// Truncation Risk: NONE
+  flac,
 }
 
 /// Audio compression service for optimizing audio files before API upload
@@ -171,9 +180,9 @@ class AudioCompressionService {
     }
 
     if (useReliable) {
-      // Use uncompressed PCM for maximum reliability
+      // Use FLAC for reliable recording: lossless, ~50% smaller than PCM, no truncation
       return const RecordConfig(
-        encoder: AudioEncoder.pcm16bits,
+        encoder: AudioEncoder.flac,
         sampleRate: 16000,
         numChannels: 1,
       );
@@ -240,9 +249,9 @@ class AudioCompressionService {
                 'at the end. Consider using "Uncompressed" preference for better reliability.',
           );
         } else {
-          // 5+ minutes: Use PCM automatically
+          // 5+ minutes: Use FLAC automatically (lossless, smaller than PCM)
           return (
-            getConfigForFormat(AudioFormat.pcm16bits),
+            getConfigForFormat(AudioFormat.flac),
             false,
             null,
           );
@@ -264,7 +273,7 @@ class AudioCompressionService {
   /// vs 840 KB/min for 105 second recordings).
   static RecordConfig getReliableConfig() {
     return const RecordConfig(
-      encoder: AudioEncoder.pcm16bits, // Uncompressed - no encoder buffering
+      encoder: AudioEncoder.flac, // Lossless, no encoder buffering, ~50% smaller than PCM
       sampleRate: 16000,
       numChannels: 1,
     );
@@ -276,6 +285,12 @@ class AudioCompressionService {
       case AudioFormat.pcm16bits:
         return const RecordConfig(
           encoder: AudioEncoder.pcm16bits,
+          sampleRate: 16000,
+          numChannels: 1,
+        );
+      case AudioFormat.flac:
+        return const RecordConfig(
+          encoder: AudioEncoder.flac,
           sampleRate: 16000,
           numChannels: 1,
         );
