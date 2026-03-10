@@ -92,7 +92,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                       ),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<String>(
-                        initialValue: _availableModels.containsKey(settings.selectedModel)
+                        // ignore: deprecated_member_use
+                        value: _availableModels.containsKey(settings.selectedModel)
                             ? settings.selectedModel
                             : 'gemini-3-flash-preview',
                         decoration: InputDecoration(
