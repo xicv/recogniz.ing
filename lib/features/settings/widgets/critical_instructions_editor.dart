@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../core/providers/app_providers.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../widgets/shared/app_dialogs.dart';
 import 'settings_section.dart';
 
 class CriticalInstructionsEditor extends ConsumerStatefulWidget {
@@ -242,11 +243,9 @@ class _CriticalInstructionsEditorState
     setState(() {
       _controller.text = instructions;
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Applied "$title" preset'),
-        duration: const Duration(seconds: 2),
-      ),
+    AppDialogs.showSnackBar(
+      context: context,
+      message: 'Applied "$title" preset',
     );
   }
 
@@ -261,11 +260,9 @@ class _CriticalInstructionsEditorState
       _controller.text = defaultInstructions;
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Reset to default instructions'),
-        duration: Duration(seconds: 2),
-      ),
+    AppDialogs.showSnackBar(
+      context: context,
+      message: 'Reset to default instructions',
     );
   }
 
@@ -324,20 +321,16 @@ class _CriticalInstructionsEditorState
           );
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Critical instructions saved'),
-            duration: Duration(seconds: 2),
-          ),
+        AppDialogs.showSuccessSnackBar(
+          context: context,
+          message: 'Critical instructions saved',
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to save: $e'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
+        AppDialogs.showErrorSnackBar(
+          context: context,
+          message: 'Failed to save: $e',
         );
       }
     }

@@ -6,6 +6,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/providers/app_providers.dart';
 import '../../core/services/haptic_service.dart';
+import '../../widgets/shared/app_dialogs.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/models/app_settings.dart';
 import '../../core/models/transcription.dart';
@@ -398,27 +399,14 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
           ),
           TextButton(
             onPressed: () async {
-              final messenger = ScaffoldMessenger.of(context);
               Navigator.pop(context);
               await _clearAllTranscriptions(ref);
               if (!context.mounted) return;
-              messenger.showSnackBar(
-                SnackBar(
-                  content: Text(isFiltered
-                      ? '$count transcription${count != 1 ? 's' : ''} deleted'
-                      : 'All transcriptions deleted'),
-                  behavior: SnackBarBehavior.floating,
-                  duration: const Duration(seconds: 4),
-                  action: SnackBarAction(
-                    label: 'Dismiss',
-                    textColor: Colors.white,
-                    onPressed: () {
-                      if (context.mounted) {
-                        messenger.hideCurrentSnackBar();
-                      }
-                    },
-                  ),
-                ),
+              AppDialogs.showSnackBar(
+                context: context,
+                message: isFiltered
+                    ? '$count transcription${count != 1 ? 's' : ''} deleted'
+                    : 'All transcriptions deleted',
               );
             },
             style: TextButton.styleFrom(
@@ -437,20 +425,9 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
 
   void _copyToClipboard(BuildContext context, String text) {
     Clipboard.setData(ClipboardData(text: text));
-    final messenger = ScaffoldMessenger.of(context);
-    messenger.showSnackBar(
-      SnackBar(
-        content: const Text('Copied to clipboard'),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 4),
-        action: SnackBarAction(
-          label: 'Dismiss',
-          textColor: Colors.white,
-          onPressed: () {
-            messenger.hideCurrentSnackBar();
-          },
-        ),
-      ),
+    AppDialogs.showSnackBar(
+      context: context,
+      message: 'Copied to clipboard',
     );
   }
 
@@ -458,20 +435,9 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
     // Confirmation dialog is shown in TranscriptionCard._confirmDelete()
     // This method directly performs the deletion
     ref.read(transcriptionsProvider.notifier).deleteTranscription(id);
-    final messenger = ScaffoldMessenger.of(context);
-    messenger.showSnackBar(
-      SnackBar(
-        content: const Text('Transcription deleted'),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 4),
-        action: SnackBarAction(
-          label: 'Dismiss',
-          textColor: Colors.white,
-          onPressed: () {
-            messenger.hideCurrentSnackBar();
-          },
-        ),
-      ),
+    AppDialogs.showSnackBar(
+      context: context,
+      message: 'Transcription deleted',
     );
   }
 
@@ -483,36 +449,15 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
     try {
       await useCase.retryTranscription(transcription);
       if (!context.mounted) return;
-      final messenger = ScaffoldMessenger.of(context);
-      messenger.showSnackBar(
-        const SnackBar(
-          content: Text('Retrying transcription...'),
-          behavior: SnackBarBehavior.floating,
-          duration: Duration(seconds: 4),
-          action: SnackBarAction(
-            label: 'Dismiss',
-            textColor: Colors.white,
-            onPressed: _doNothing,
-          ),
-        ),
+      AppDialogs.showSnackBar(
+        context: context,
+        message: 'Retrying transcription...',
       );
     } catch (e) {
       if (!context.mounted) return;
-      final messenger = ScaffoldMessenger.of(context);
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text('Retry failed: $e'),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Theme.of(context).colorScheme.error,
-          duration: const Duration(seconds: 4),
-          action: SnackBarAction(
-            label: 'Dismiss',
-            textColor: Colors.white,
-            onPressed: () {
-              messenger.hideCurrentSnackBar();
-            },
-          ),
-        ),
+      AppDialogs.showErrorSnackBar(
+        context: context,
+        message: 'Retry failed: $e',
       );
     }
   }
@@ -534,8 +479,6 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
     }
   }
 
-  /// No-op callback for SnackBarAction that only needs to auto-dismiss
-  static void _doNothing() {}
 }
 
 /// Favorites filter chip widget

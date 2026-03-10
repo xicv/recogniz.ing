@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../core/models/custom_prompt.dart';
 import '../../../core/providers/app_providers.dart';
+import '../../../widgets/shared/app_dialogs.dart';
 
 
 class PromptEditor extends ConsumerStatefulWidget {
@@ -134,12 +135,9 @@ class _PromptEditorState extends ConsumerState<PromptEditor> {
     final template = _templateController.text.trim();
 
     if (name.isEmpty || template.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Name and template are required'),
-          behavior: SnackBarBehavior.floating,
-          duration: Duration(seconds: 2),
-        ),
+      AppDialogs.showErrorSnackBar(
+        context: context,
+        message: 'Name and template are required',
       );
       return;
     }

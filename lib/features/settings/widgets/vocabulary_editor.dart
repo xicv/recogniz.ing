@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../core/models/vocabulary.dart';
 import '../../../core/providers/app_providers.dart';
+import '../../../widgets/shared/app_dialogs.dart';
 
 
 class VocabularyEditor extends ConsumerStatefulWidget {
@@ -137,12 +138,9 @@ class _VocabularyEditorState extends ConsumerState<VocabularyEditor> {
     final wordsText = _wordsController.text.trim();
 
     if (name.isEmpty || wordsText.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Name and words are required'),
-          behavior: SnackBarBehavior.floating,
-          duration: Duration(seconds: 2),
-        ),
+      AppDialogs.showErrorSnackBar(
+        context: context,
+        message: 'Name and words are required',
       );
       return;
     }

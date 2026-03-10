@@ -233,7 +233,7 @@ class AppDialogs {
     required BuildContext context,
     required String message,
     Color? backgroundColor,
-    Duration duration = const Duration(seconds: 4),
+    Duration duration = const Duration(seconds: 5),
     SnackBarAction? action,
   }) {
     final messenger = ScaffoldMessenger.of(context);

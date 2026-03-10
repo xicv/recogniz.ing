@@ -70,7 +70,7 @@ class NotificationService implements NotificationServiceInterface {
         content: Text(message),
         backgroundColor: isError ? Colors.red[600] : Colors.green[600],
         behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 4),
+        duration: const Duration(seconds: 5),
         action: SnackBarAction(
           label: 'Dismiss',
           textColor: Colors.white,

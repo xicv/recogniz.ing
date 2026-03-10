@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../widgets/shared/app_dialogs.dart';
 import 'error_handler.dart';
 
 /// Error categories for better error organization
@@ -391,11 +392,9 @@ class TechnicalDetailsDialog extends StatelessWidget {
           onPressed: () {
             // Copy to clipboard
             Clipboard.setData(ClipboardData(text: content));
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Copied to clipboard'),
-                duration: Duration(seconds: 2),
-              ),
+            AppDialogs.showSnackBar(
+              context: context,
+              message: 'Copied to clipboard',
             );
           },
           icon: const Icon(Icons.copy, size: 16),

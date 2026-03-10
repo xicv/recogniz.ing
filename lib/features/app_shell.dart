@@ -12,6 +12,7 @@ import '../core/error/error_provider.dart';
 import '../core/error/categorized_error_handler.dart';
 import '../core/providers/app_providers.dart';
 import '../core/services/haptic_service.dart';
+import '../widgets/shared/app_dialogs.dart';
 import '../widgets/navigation/navigation_drawer.dart' show AppNavigationDrawer;
 import 'dashboard/dashboard_page.dart';
 import 'dictionaries/dictionaries_page.dart';
@@ -67,19 +68,9 @@ class _AppShellState extends ConsumerState<AppShell> {
     } else if (lastError != null) {
       // Fallback for simple errors
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(_mainContentContext ?? context).showSnackBar(
-          SnackBar(
-            content: Text(lastError),
-            backgroundColor: Theme.of(context).colorScheme.error,
-            duration: const Duration(seconds: 5),
-            action: SnackBarAction(
-              label: 'Dismiss',
-              textColor: Colors.white,
-              onPressed: () {
-                ref.read(lastErrorProvider.notifier).state = null;
-              },
-            ),
-          ),
+        AppDialogs.showErrorSnackBar(
+          context: _mainContentContext ?? context,
+          message: lastError,
         );
         ref.read(lastErrorProvider.notifier).state = null;
       });

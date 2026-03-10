@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/providers/app_providers.dart';
+import 'app_dialogs.dart';
 import 'loading_indicators.dart';
 
 /// Global loading overlay that can be triggered from anywhere in the app
@@ -124,11 +125,9 @@ class LoadingButton extends ConsumerWidget {
       } catch (e) {
         // Error handling can be added here
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('An error occurred: $e'),
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
+          AppDialogs.showErrorSnackBar(
+            context: context,
+            message: 'An error occurred: $e',
           );
         }
         rethrow;

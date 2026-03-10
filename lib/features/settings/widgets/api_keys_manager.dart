@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../core/providers/api_keys_provider.dart';
 import '../../../core/providers/recording_providers.dart';
+import '../../../widgets/shared/app_dialogs.dart';
 
 
 /// Widget for managing multiple API keys
@@ -183,11 +184,9 @@ class _ApiKeysManagerState extends ConsumerState<ApiKeysManager> {
                         final name = nameController.text.trim();
 
                         if (key.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Please enter an API key'),
-                              behavior: SnackBarBehavior.floating,
-                            ),
+                          AppDialogs.showErrorSnackBar(
+                            context: context,
+                            message: 'Please enter an API key',
                           );
                           return;
                         }
@@ -201,12 +200,9 @@ class _ApiKeysManagerState extends ConsumerState<ApiKeysManager> {
 
                           if (!isValid) {
                             if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(error ?? 'Invalid API key'),
-                                  backgroundColor: Colors.red,
-                                  behavior: SnackBarBehavior.floating,
-                                ),
+                              AppDialogs.showErrorSnackBar(
+                                context: context,
+                                message: error ?? 'Invalid API key',
                               );
                             }
                             return;
@@ -225,12 +221,9 @@ class _ApiKeysManagerState extends ConsumerState<ApiKeysManager> {
 
                           if (context.mounted) {
                             Navigator.of(context).pop();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('API key added successfully'),
-                                backgroundColor: Colors.green,
-                                behavior: SnackBarBehavior.floating,
-                              ),
+                            AppDialogs.showSuccessSnackBar(
+                              context: context,
+                              message: 'API key added successfully',
                             );
                           }
                         } catch (e) {
@@ -251,12 +244,9 @@ class _ApiKeysManagerState extends ConsumerState<ApiKeysManager> {
                               Navigator.of(context).pop();
                             }
                           } else if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Error: ${e.toString()}'),
-                                backgroundColor: Colors.red,
-                                behavior: SnackBarBehavior.floating,
-                              ),
+                            AppDialogs.showErrorSnackBar(
+                              context: context,
+                              message: 'Error: ${e.toString()}',
                             );
                           }
                         } finally {
@@ -358,11 +348,9 @@ class _ApiKeysManagerState extends ConsumerState<ApiKeysManager> {
               await ref.read(apiKeysProvider.notifier).removeApiKey(key.id);
               if (context.mounted) {
                 Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('API key deleted'),
-                    behavior: SnackBarBehavior.floating,
-                  ),
+                AppDialogs.showSnackBar(
+                  context: context,
+                  message: 'API key deleted',
                 );
               }
             },

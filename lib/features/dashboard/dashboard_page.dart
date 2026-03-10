@@ -7,6 +7,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/providers/api_key_usage_provider.dart';
 import '../../core/providers/app_providers.dart';
 import '../../core/theme/app_theme.dart';
+import '../../widgets/shared/app_dialogs.dart';
 import '../../widgets/shared/empty_states.dart';
 import 'widgets/quick_stats_row.dart';
 import 'widgets/quota_bar.dart';
@@ -229,11 +230,9 @@ class _RecentTranscriptionCard extends StatelessWidget {
                 size: 14, color: colorScheme.onSurfaceVariant),
             onPressed: () {
               Clipboard.setData(ClipboardData(text: text));
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Copied to clipboard'),
-                  duration: Duration(seconds: 1),
-                ),
+              AppDialogs.showSnackBar(
+                context: context,
+                message: 'Copied to clipboard',
               );
             },
             tooltip: 'Copy',
