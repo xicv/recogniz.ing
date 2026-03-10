@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../interfaces/audio_service_interface.dart';
 import 'storage_service.dart';
@@ -65,20 +66,29 @@ class NotificationService implements NotificationServiceInterface {
 
     if (context == null) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
+    const duration = Duration(seconds: 5);
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.clearSnackBars();
+    messenger.showSnackBar(
       SnackBar(
         content: Text(message),
         backgroundColor: isError ? Colors.red[600] : Colors.green[600],
         behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 5),
+        duration: duration,
         action: SnackBarAction(
           label: 'Dismiss',
           textColor: Colors.white,
           onPressed: () {
-            ScaffoldMessenger.of(context!).hideCurrentSnackBar();
+            messenger.hideCurrentSnackBar();
           },
         ),
       ),
     );
+    // Safety net: force dismiss after duration
+    Timer(duration, () {
+      try {
+        messenger.hideCurrentSnackBar();
+      } catch (_) {}
+    });
   }
 }

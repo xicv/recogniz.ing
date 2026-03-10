@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'app_buttons.dart';
 
@@ -228,7 +229,10 @@ class AppDialogs {
     );
   }
 
-  /// Show a simple snackbar
+  /// Show a simple snackbar that auto-dismisses after [duration].
+  ///
+  /// Clears any existing SnackBars first, then shows the new one with a
+  /// forced timer-based dismissal as a safety net for nested Scaffold setups.
   static void showSnackBar({
     required BuildContext context,
     required String message,
@@ -237,6 +241,7 @@ class AppDialogs {
     SnackBarAction? action,
   }) {
     final messenger = ScaffoldMessenger.of(context);
+    messenger.clearSnackBars();
     messenger.showSnackBar(
       SnackBar(
         content: Text(message),
@@ -256,6 +261,15 @@ class AppDialogs {
         ),
       ),
     );
+    // Safety net: force dismiss after duration in case the built-in timer
+    // doesn't fire (e.g., nested Scaffold/IndexedStack on desktop)
+    Timer(duration, () {
+      try {
+        messenger.hideCurrentSnackBar();
+      } catch (_) {
+        // Context may be disposed - safe to ignore
+      }
+    });
   }
 
   /// Show an error snackbar
