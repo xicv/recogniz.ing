@@ -7,7 +7,8 @@ import '../../core/providers/accessibility_permission_providers.dart';
 /// A widget that informs users about Accessibility permissions on macOS
 ///
 /// Global hotkeys require Accessibility permissions on macOS. This widget
-/// provides clear instructions on how to grant these permissions manually.
+/// provides clear instructions and a button to open System Settings directly.
+/// Automatically disappears when permission is granted (polled every 3s).
 class AccessibilityPermissionPrompt extends ConsumerWidget {
   const AccessibilityPermissionPrompt({super.key});
 
@@ -15,7 +16,6 @@ class AccessibilityPermissionPrompt extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final hasPermission = ref.watch(accessibilityPermissionProvider);
 
-    // If permission is granted or not macOS, don't show anything
     if (hasPermission) return const SizedBox.shrink();
 
     final colorScheme = Theme.of(context).colorScheme;
@@ -55,23 +55,22 @@ class AccessibilityPermissionPrompt extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'Global hotkeys require Accessibility permissions. To enable the global recording hotkey:',
+            'Global hotkeys require Accessibility permissions. Grant access, then the banner will disappear automatically.',
             style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: 12),
-          _buildStep(context, '1', 'Open System Settings'),
+          _buildStep(context, '1', 'Click the button below to open System Settings'),
           const SizedBox(height: 4),
-          _buildStep(context, '2', 'Go to Privacy & Security > Accessibility'),
-          const SizedBox(height: 4),
-          _buildStep(context, '3', 'Find "Recogniz.ing" and enable the toggle'),
-          const SizedBox(height: 4),
-          _buildStep(context, '4', 'Restart this app'),
-          const SizedBox(height: 12),
-          Text(
-            'After granting permission and restarting, the global hotkey will be enabled.',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  fontStyle: FontStyle.italic,
-                ),
+          _buildStep(context, '2', 'Find "Recogniz.ing" and enable the toggle'),
+          const SizedBox(height: 16),
+          FilledButton.icon(
+            onPressed: () {
+              ref
+                  .read(accessibilityPermissionProvider.notifier)
+                  .openSettings();
+            },
+            icon: const Icon(LucideIcons.externalLink, size: 16),
+            label: const Text('Open System Settings'),
           ),
         ],
       ),

@@ -29,6 +29,26 @@ class MainFlutterWindow: NSWindow {
       }
     }
 
+    // Set up method channel for accessibility permission
+    let accessibilityChannel = FlutterMethodChannel(
+      name: "com.recognizing.app/accessibility",
+      binaryMessenger: flutterViewController.engine.binaryMessenger
+    )
+
+    accessibilityChannel.setMethodCallHandler { (call, result) in
+      switch call.method {
+      case "checkPermission":
+        result(AXIsProcessTrusted())
+      case "openSettings":
+        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+          NSWorkspace.shared.open(url)
+        }
+        result(nil)
+      default:
+        result(FlutterMethodNotImplemented)
+      }
+    }
+
     RegisterGeneratedPlugins(registry: flutterViewController)
 
     super.awakeFromNib()
