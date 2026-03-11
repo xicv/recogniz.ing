@@ -168,7 +168,7 @@ final voiceRecordingUseCaseProvider = Provider<VoiceRecordingUseCase>((ref) {
 - Collapsible left drawer with 5 pages: Transcriptions (0), Dashboard (1), Dictionaries (2), Prompts (3), Settings (4)
 - `currentPageProvider` manages active page
 - Keyboard shortcuts: Ctrl/Cmd+1-5 for navigation, Ctrl/Cmd+S to save edits
-- Global recording hotkey: Cmd+Shift+Space (macOS) / Ctrl+Shift+Space (others)
+- Global recording hotkey: Ctrl+Shift+R (configurable in Settings)
 - Implemented in `AppShell` using `CallbackShortcuts`
 
 ### Multi-API Key System

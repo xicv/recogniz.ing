@@ -30,6 +30,33 @@
   },
   "versions": [
     {
+      "version": "1.16.2",
+      "date": "2026-03-11",
+      "stable": true,
+      "highlights": [
+        "Live native accessibility permission detection on macOS",
+        "Transcription card UX improvements with anchored icons and redesigned popup menu",
+        "Corrected global hotkey reference to Ctrl+Shift+R"
+      ],
+      "changes": [
+        {
+          "category": "fixed",
+          "title": "Live Accessibility Permission Detection",
+          "description": "macOS accessibility permission is now detected natively in real time. The permission banner auto-dismisses when granted — no app restart required."
+        },
+        {
+          "category": "changed",
+          "title": "Transcription Card UX",
+          "description": "Star and copy icons are now anchored on hover instead of shifting layout. Popup menu redesigned with MenuAnchor for a cleaner, more consistent interaction."
+        },
+        {
+          "category": "fixed",
+          "title": "Global Hotkey Documentation",
+          "description": "Corrected global hotkey reference from Cmd+Shift+Space to Ctrl+Shift+R across README, landing page, and CLAUDE.md."
+        }
+      ]
+    },
+    {
       "version": "1.16.1",
       "date": "2026-03-10",
       "stable": true,

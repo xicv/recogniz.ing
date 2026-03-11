@@ -364,3 +364,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.16.2] - 2026-03-11
+
+### Changed
+
+- **Transcription Card UX** - Star and copy icons are now anchored on hover instead of shifting layout. Popup menu redesigned with MenuAnchor for a cleaner, more consistent interaction.
+
+### Fixed
+
+- **Live Accessibility Permission Detection** - macOS accessibility permission is now detected natively in real time. The permission banner auto-dismisses when granted — no app restart required.
+- **Global Hotkey Documentation** - Corrected global hotkey reference from Cmd+Shift+Space to Ctrl+Shift+R across README, landing page, and CLAUDE.md.
+
+---
+

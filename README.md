@@ -89,7 +89,7 @@ Getting started takes about 2 minutes:
 | 3 | Enter your **Gemini API Key** (add multiple keys for automatic failover!) |
 | 4 | (Optional) Customize prompts and vocabulary |
 | 5 | Go back to **Dashboard** to see your free tier quota |
-| 6 | Tap the **microphone button** or press `Cmd+Shift+Space` |
+| 6 | Tap the **microphone button** or press `Ctrl+Shift+R` (configurable in Settings) |
 | 7 | Speak, then tap again to stop and transcribe |
 
 ---
@@ -102,7 +102,7 @@ Getting started takes about 2 minutes:
 |---------|-------------|
 | **Silero VAD** | ML-based voice activity detection (~95% accuracy) |
 | **Graceful Fallback** | Amplitude-based VAD (~75%) when ML unavailable |
-| **Global Hotkey** | `Cmd+Shift+Space` / `Ctrl+Shift+Space` anywhere on your system |
+| **Global Hotkey** | `Ctrl+Shift+R` anywhere on your system (configurable in Settings) |
 | **Smart Audio Format** | Auto-selects format based on recording duration |
 | **Background Processing** | Smooth UI even during intensive audio analysis |
 
@@ -112,6 +112,7 @@ Powered by **Google Gemini 3 Flash**—Google's fastest AI model:
 
 - **Token-efficient prompts** — 67% less overhead
 - **Auto-retry** — Handles transient API errors automatically
+- **Model selection** — Choose your Gemini model via dropdown (Gemini 3 Flash default)
 - **Multi-language** — 20+ languages with auto-detection
 - **Code-switching** — Preserves mixed-language speech naturally
 - **Long-form support** — Up to ~3.5 hours per request
@@ -161,7 +162,7 @@ Powered by **Google Gemini 3 Flash**—Google's fastest AI model:
 
 ```mermaid
 flowchart LR
-    A[Press Record<br/>Cmd+Shift+Space] --> B[Silero VAD<br/>Voice Activity Detection]
+    A[Press Record<br/>Ctrl+Shift+R] --> B[Silero VAD<br/>Voice Activity Detection]
     B --> C[Audio Validation<br/>RMS Analysis in Isolate]
     C --> D{Quality OK?}
     D -->|No| E[Discard<br/>Show Feedback]
@@ -284,7 +285,7 @@ lib/
 
 | Shortcut | Action |
 |----------|--------|
-| `Cmd+Shift+Space` (macOS) / `Ctrl+Shift+Space` (Win/Lin) | Start/Stop recording |
+| `Ctrl+Shift+R` | Start/Stop recording (configurable in Settings) |
 | `Cmd/Ctrl+S` | Save edited transcription |
 | `Cmd/Ctrl+1` | Go to Transcriptions |
 | `Cmd/Ctrl+2` | Go to Dashboard |
@@ -408,7 +409,7 @@ For detailed version history, see [CHANGELOG.md](CHANGELOG.md).
 |---------|----------|
 | **"Microphone permission denied"** | • macOS: System Preferences → Security & Privacy → Privacy → Microphone<br>• iOS: Settings → Recogniz.ing → Microphone<br>• Android: Settings → Apps → Recogniz.ing → Permissions |
 | **"API key invalid"** | • Ensure you copied the full API key from Google AI Studio<br>• Check that your API key has Gemini API access enabled<br>• Verify network connectivity |
-| **"Global hotkey not working"** | • Ensure app has accessibility permissions (macOS)<br>• Check for conflicting hotkeys in system settings |
+| **"Global hotkey not working"** | • macOS: Click **"Open System Settings"** button in the accessibility banner — permission is auto-detected (no restart required)<br>• Check for conflicting hotkeys in system settings |
 | **"Transcription is empty"** | • Ensure audio was captured (check recording duration)<br>• Verify vocabulary doesn't interfere with common words<br>• Check network connection to Gemini API |
 
 ---

@@ -26,7 +26,7 @@ const features = [
   {
     icon: Zap,
     title: 'Lightning Fast',
-    description: 'Instant transcription with auto-copy to clipboard',
+    description: 'Instant transcription with model selection and auto-copy to clipboard',
     color: 'bg-amber-100 text-amber-600 dark:bg-amber-900/40 dark:text-amber-400'
   },
   {
@@ -90,7 +90,7 @@ const faqs = [
   },
   {
     question: 'Is my data private?',
-    answer: 'Yes, privacy-first design. All audio recordings, transcriptions, and settings are stored locally on your device. Audio is only sent to Google\'s API for transcription and is not stored by Google.'
+    answer: 'Yes, privacy-first design. All audio recordings, transcriptions, and settings are stored locally on your device. Audio is only sent to Google\'s API for transcription and is not stored by Google. On macOS, accessibility permission for global hotkeys is auto-detected — no app restart required.'
   }
 ]
 </script>
