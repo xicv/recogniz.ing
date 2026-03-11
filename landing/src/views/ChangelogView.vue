@@ -110,7 +110,7 @@ const groupChangesByCategory = (changes: Change[]) => {
             v-model="searchQuery"
             type="text"
             placeholder="Search changelog..."
-            class="w-full pl-10 pr-4 py-2.5 rounded-lg border bg-white dark:bg-slate-900 dark:border-slate-700 border-slate-200 text-slate-900 dark:text-slate-50 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-sky-400/50 focus:border-sky-400"
+            class="w-full pl-10 pr-4 py-2.5 rounded-lg border bg-white dark:bg-slate-900 dark:border-slate-700 border-slate-200 text-slate-900 dark:text-slate-50 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-teal-400/50 focus:border-teal-400"
           />
         </div>
 
@@ -185,7 +185,7 @@ const groupChangesByCategory = (changes: Change[]) => {
                 :key="highlight"
                 class="text-sm text-slate-600 dark:text-slate-400 flex items-start gap-2"
               >
-                <span class="text-sky-500 mt-0.5">&bull;</span>
+                <span class="text-teal-500 mt-0.5">&bull;</span>
                 {{ highlight }}
               </li>
             </ul>

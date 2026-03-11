@@ -63,7 +63,7 @@ const closeMobileMenu = () => {
             {{ link.label }}
             <span
               v-if="isActive(link.path)"
-              class="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-sky-500 rounded-full"
+              class="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-teal-500 rounded-full"
             />
           </RouterLink>
         </nav>

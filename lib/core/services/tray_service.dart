@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -49,55 +48,17 @@ class TrayService with TrayListener {
     _normalIconPath = '${tempDir.path}/recognizing_tray.png';
     _recordingIconPath = '${tempDir.path}/recognizing_tray_rec.png';
 
-    // Create normal icon - use white for macOS menu bar visibility
-    // 0xFFFFFFFF = white, which matches standard macOS menu bar icons
-    final normalIconColor = Platform.isMacOS ? 0xFFFFFFFF : 0xFF1E293B;
-    await _createRIcon(_normalIconPath!, normalIconColor, false);
-
-    // Create recording icon (red R with recording dot indicator)
-    await _createRIcon(_recordingIconPath!, 0xFFEF4444, true);
+    // Copy pre-rendered geometric R icons from bundled assets
+    // 44px variants for retina display clarity
+    await _copyAssetToFile('assets/icons/tray/tray_icon_44.png', _normalIconPath!);
+    await _copyAssetToFile('assets/icons/tray/tray_icon_recording_44.png', _recordingIconPath!);
   }
 
-  Future<void> _createRIcon(String path, int color, bool isRecording) async {
-    // Create a 44x44 image (for retina displays)
-    final recorder = ui.PictureRecorder();
-    final canvas = ui.Canvas(recorder);
-    const size = 44.0;
-
-    // Use TextPainter to render a clean "R" with no extra spacing
-    final textPainter = TextPainter(
-      text: TextSpan(
-        text: 'R',
-        style: TextStyle(
-          color: Color(color),
-          fontSize: 42, // Fill almost the entire canvas
-          fontWeight: FontWeight.w900, // Extra bold
-          letterSpacing: -2, // Tighten letter spacing
-          height: 1.0, // No line height spacing
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-      textAlign: TextAlign.left,
-    );
-
-    // Layout with max width to prevent wrapping
-    textPainter.layout(maxWidth: size);
-
-    // Center the R in the canvas with minimal offset
-    final x = (size - textPainter.width) / 2;
-    final y = (size - textPainter.height) / 2 - 1; // Slight visual adjustment
-
-    textPainter.paint(canvas, Offset(x, y));
-
-    final picture = recorder.endRecording();
-    final img = await picture.toImage(size.toInt(), size.toInt());
-    final byteData = await img.toByteData(format: ui.ImageByteFormat.png);
-
-    if (byteData != null) {
-      final file = File(path);
-      await file.writeAsBytes(byteData.buffer.asUint8List());
-      debugPrint('Created tray icon: $path');
-    }
+  Future<void> _copyAssetToFile(String assetPath, String targetPath) async {
+    final byteData = await rootBundle.load(assetPath);
+    final file = File(targetPath);
+    await file.writeAsBytes(byteData.buffer.asUint8List());
+    debugPrint('Copied tray icon: $assetPath → $targetPath');
   }
 
   Future<void> _setIcon(bool recording) async {

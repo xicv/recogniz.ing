@@ -33,7 +33,7 @@ const features = [
     icon: Mic,
     title: 'Gemini 3 Flash AI',
     description: 'Accurate, fast transcription with intelligent context understanding',
-    color: 'bg-sky-100 text-sky-600 dark:bg-sky-900/40 dark:text-sky-400'
+    color: 'bg-teal-100 text-teal-600 dark:bg-teal-900/40 dark:text-teal-400'
   },
   {
     icon: FileText,
@@ -116,7 +116,7 @@ const faqs = [
               style="line-height: 1.1"
             >
               AI Voice Typing,
-              <span class="text-sky-500">Your Way</span>
+              <span class="text-teal-500">Your Way</span>
             </h1>
 
             <p
@@ -232,9 +232,9 @@ const faqs = [
               class="text-center scroll-reveal relative"
             >
               <div class="w-20 h-20 rounded-full bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center mx-auto mb-5 relative z-10">
-                <component :is="step.icon" :size="28" class="text-sky-500" />
+                <component :is="step.icon" :size="28" class="text-teal-500" />
               </div>
-              <div class="text-xs font-bold text-sky-500 mb-1.5 uppercase tracking-wider">
+              <div class="text-xs font-bold text-teal-500 mb-1.5 uppercase tracking-wider">
                 Step {{ step.number }}
               </div>
               <h3 class="text-lg font-semibold mb-1 text-slate-950 dark:text-slate-50">

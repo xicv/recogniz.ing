@@ -35,7 +35,7 @@ const platformBaseData = [
     name: 'Windows',
     icon: 'M3,12V6.75L9,5.43v6.48L3,12M20,3v8.75L10,11.97V5.21L20,3M3,13l6,.09V19.9L3,18.75V13m17,.25V22L10,20.09v-7',
     requirements: 'Windows 10 or later',
-    color: 'text-sky-500'
+    color: 'text-teal-500'
   },
   {
     name: 'Linux',
@@ -116,7 +116,7 @@ const formatDate = (dateStr: string): string => {
           class="text-4xl sm:text-5xl font-bold tracking-tight mb-5 text-slate-950 dark:text-slate-50 scroll-reveal"
           style="line-height: 1.1"
         >
-          Download <span class="text-sky-500">Recogniz.ing</span>
+          Download <span class="text-teal-500">Recogniz.ing</span>
         </h1>
         <p class="text-lg sm:text-xl text-slate-600 dark:text-slate-400 scroll-reveal">
           Free AI-powered voice typing. Available for all platforms.
@@ -172,7 +172,7 @@ const formatDate = (dateStr: string): string => {
               :class="[
                 platform.downloadUrl === '#'
                   ? 'bg-slate-100 text-slate-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-600'
-                  : 'bg-slate-900 text-white hover:bg-slate-800 dark:bg-sky-500 dark:hover:bg-sky-400'
+                  : 'bg-slate-900 text-white hover:bg-slate-800 dark:bg-teal-500 dark:hover:bg-teal-400'
               ]"
             >
               <Download v-if="platform.downloadUrl !== '#'" :size="16" />
@@ -204,7 +204,7 @@ const formatDate = (dateStr: string): string => {
             <!-- Step 1 -->
             <div class="card scroll-reveal">
               <div class="flex items-start gap-5">
-                <div class="shrink-0 w-10 h-10 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold text-sm">
+                <div class="shrink-0 w-10 h-10 rounded-full bg-teal-500 text-white flex items-center justify-center font-bold text-sm">
                   1
                 </div>
                 <div>
@@ -218,7 +218,7 @@ const formatDate = (dateStr: string): string => {
                     href="https://aistudio.google.com/app/apikey"
                     target="_blank"
                     rel="noopener"
-                    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-slate-900 text-white hover:bg-slate-800 dark:bg-sky-500 dark:hover:bg-sky-400 transition-colors"
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-slate-900 text-white hover:bg-slate-800 dark:bg-teal-500 dark:hover:bg-teal-400 transition-colors"
                   >
                     <ExternalLink :size="14" />
                     Get API Key
@@ -284,7 +284,7 @@ const formatDate = (dateStr: string): string => {
 
           <!-- Loading -->
           <div v-if="isLoadingChangelog" class="card text-center py-10 scroll-reveal">
-            <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-sky-500" />
+            <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-teal-500" />
             <p class="mt-3 text-sm text-slate-500">Loading changelog...</p>
           </div>
 

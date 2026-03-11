@@ -30,6 +30,43 @@
   },
   "versions": [
     {
+      "version": "1.16.3",
+      "date": "2026-03-11",
+      "stable": true,
+      "highlights": [
+        "Redesigned app icon with deeper blue-teal-emerald gradient and warm coral recording dot",
+        "Custom geometric R tray icon replaces generic text rendering",
+        "Landing page color scheme updated to match new teal-centric brand identity"
+      ],
+      "changes": [
+        {
+          "category": "changed",
+          "title": "Redesigned App Icon",
+          "description": "New premium icon with deeper blue-teal-emerald gradient, radial glow overlay, refined geometric R lettermark, and warm coral-to-red recording dot with luminous halo. All platform icons regenerated (iOS, Android, macOS, Windows, Web)."
+        },
+        {
+          "category": "changed",
+          "title": "Custom Tray Icon",
+          "description": "Menu bar icon now uses pre-rendered geometric R matching the app icon design, replacing the previous runtime-generated system font text. Includes normal and recording states."
+        },
+        {
+          "category": "changed",
+          "title": "Landing Page Color Scheme",
+          "description": "Accent color shifted from sky-blue to teal across all pages, buttons, focus rings, and interactive elements to match the new icon palette. All PWA icons and favicon updated."
+        },
+        {
+          "category": "fixed",
+          "title": "iOS App Store Icon Compliance",
+          "description": "Added remove_alpha_ios flag to eliminate alpha channel from iOS icons, preventing App Store submission rejections."
+        },
+        {
+          "category": "fixed",
+          "title": "Masked Icon Format",
+          "description": "PWA masked icon converted from a PNG with incorrect .svg extension to a proper SVG file with full-bleed background for correct maskable display."
+        }
+      ]
+    },
+    {
       "version": "1.16.2",
       "date": "2026-03-11",
       "stable": true,

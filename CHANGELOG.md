@@ -377,3 +377,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.16.3] - 2026-03-11
+
+### Changed
+
+- **Redesigned App Icon** - New premium icon with deeper blue-teal-emerald gradient, radial glow overlay, refined geometric R lettermark, and warm coral-to-red recording dot with luminous halo. All platform icons regenerated (iOS, Android, macOS, Windows, Web).
+- **Custom Tray Icon** - Menu bar icon now uses pre-rendered geometric R matching the app icon design, replacing the previous runtime-generated system font text. Includes normal and recording states.
+- **Landing Page Color Scheme** - Accent color shifted from sky-blue to teal across all pages, buttons, focus rings, and interactive elements to match the new icon palette. All PWA icons and favicon updated.
+
+### Fixed
+
+- **iOS App Store Icon Compliance** - Added remove_alpha_ios flag to eliminate alpha channel from iOS icons, preventing App Store submission rejections.
+- **Masked Icon Format** - PWA masked icon converted from a PNG with incorrect .svg extension to a proper SVG file with full-bleed background for correct maskable display.
+
+---
+

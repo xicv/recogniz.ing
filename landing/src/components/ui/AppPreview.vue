@@ -16,7 +16,7 @@ import { Mic, Check } from 'lucide-vue-next'
     <div class="p-6 space-y-4">
       <!-- Recording Button -->
       <div class="flex items-center justify-center">
-        <div class="w-16 h-16 rounded-full bg-sky-500 flex items-center justify-center shadow-lg">
+        <div class="w-16 h-16 rounded-full bg-teal-500 flex items-center justify-center shadow-lg">
           <Mic :size="28" class="text-white" />
         </div>
       </div>

@@ -148,6 +148,8 @@ Powered by **Google Gemini 3 Flash**—Google's fastest AI model:
 
 ###  Modern UI/UX
 
+- Premium icon with deep blue-teal-emerald gradient and warm coral recording dot
+- Custom geometric R menu bar icon with recording state indicator
 - Material Design 3 with dynamic theming
 - Collapsible left drawer navigation
 - Light/Dark theme with system detection

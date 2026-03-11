@@ -83,7 +83,7 @@ const activeConfig = computed(() => tabConfig[activeTab.value])
           style="line-height: 1.1"
         >
           Powerful Features for
-          <span class="text-sky-500">Voice Typing</span>
+          <span class="text-teal-500">Voice Typing</span>
         </h1>
         <p class="text-lg sm:text-xl text-slate-600 dark:text-slate-400 scroll-reveal">
           Everything you need to transform your voice into perfect text, tailored to your workflow

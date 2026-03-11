@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Tray icon: monochrome R for macOS menu bar (template image) -->
+<svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
+  <!-- Geometric R — scaled to 44x44 tray size, monochrome black (macOS will template-tint) -->
+  <g transform="translate(22, 21)">
+    <path d="
+      M -10.5 -14
+      L 2 -14
+      C 5.5 -14, 8.5 -11.9, 8.5 -7.4
+      C 8.5 -3.4, 6.5 -0.8, 3.8 0.3
+      L 12 14
+      L 7.2 14
+      L -0.6 1
+      L -6 1
+      L -6 14
+      L -10.5 14
+      Z
+      M -6 -9.8
+      L 1.5 -9.8
+      C 3.9 -9.8, 5 -8.6, 5 -7.1
+      C 5 -5.7, 3.9 -3.6, 1.5 -3.6
+      L -6 -3.6
+      Z
+    " fill="#000000" fill-rule="evenodd"/>
+  </g>
+</svg>
