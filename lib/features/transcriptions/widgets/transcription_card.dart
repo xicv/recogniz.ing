@@ -423,7 +423,8 @@ class _TranscriptionCardState extends State<TranscriptionCard>
   }
 
   Widget _buildViewActions(BuildContext context, ColorScheme colorScheme) {
-    // Show fewer actions by default, reveal all on hover or when menu is open
+    // Hover-revealed icons appear LEFT of always-visible icons,
+    // so Copy and Star stay anchored in the same position.
     final showAll = _isHovered || _isMenuOpen;
     final status = widget.transcription.status;
 
@@ -459,7 +460,57 @@ class _TranscriptionCardState extends State<TranscriptionCard>
 
         // Normal actions for completed/pending transcriptions
         if (status != TranscriptionStatus.processing) ...[
-          // Star toggle (always visible, hide for failed)
+          // --- Hover-revealed actions (LEFT side, animated) ---
+
+          // More menu (hover only, completed only)
+          if (status == TranscriptionStatus.completed)
+            AnimatedOpacity(
+              opacity: showAll ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 150),
+              child: AnimatedSlide(
+                offset: showAll ? Offset.zero : const Offset(0.3, 0),
+                duration: const Duration(milliseconds: 150),
+                curve: Curves.easeOut,
+                child: IgnorePointer(
+                  ignoring: !showAll,
+                  child: _TranscriptionMenuButton(
+                    iconColor: colorScheme.onSurfaceVariant,
+                    errorColor: colorScheme.error,
+                    onEdit: _openFullScreenEdit,
+                    onDelete: () => _confirmDelete(context),
+                    onMenuOpen: () => setState(() => _isMenuOpen = true),
+                    onMenuClose: () => setState(() => _isMenuOpen = false),
+                  ),
+                ),
+              ),
+            ),
+
+          // Delete for failed/pending (hover only)
+          if (status != TranscriptionStatus.completed &&
+              status != TranscriptionStatus.processing)
+            AnimatedOpacity(
+              opacity: showAll ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 150),
+              child: IgnorePointer(
+                ignoring: !showAll,
+                child: IconButton.outlined(
+                  onPressed: () => _confirmDelete(context),
+                  icon: const Icon(LucideIcons.trash2, size: 16),
+                  tooltip: 'Delete',
+                  style: IconButton.styleFrom(
+                    padding: const EdgeInsets.all(8),
+                    minimumSize: const Size(UIConstants.touchTargetMinimum,
+                        UIConstants.touchTargetMinimum),
+                    side: BorderSide.none,
+                    foregroundColor: colorScheme.error,
+                  ),
+                ),
+              ),
+            ),
+
+          // --- Always-visible actions (RIGHT side, anchored) ---
+
+          // Star toggle (hide for failed)
           if (status != TranscriptionStatus.failed)
             IconButton.outlined(
               onPressed: _toggleStar,
@@ -479,7 +530,7 @@ class _TranscriptionCardState extends State<TranscriptionCard>
               ),
             ),
 
-          // Copy (always visible, hide for failed)
+          // Copy (hide for failed)
           if (status != TranscriptionStatus.failed)
             IconButton.outlined(
               onPressed: widget.onCopy,
@@ -490,47 +541,6 @@ class _TranscriptionCardState extends State<TranscriptionCard>
                 minimumSize: const Size(UIConstants.touchTargetMinimum,
                     UIConstants.touchTargetMinimum),
                 side: BorderSide.none,
-              ),
-            ),
-
-          // Edit and more (show on hover or when menu is open, hide for failed/pending)
-          if (showAll && status == TranscriptionStatus.completed) ...[
-            IconButton.outlined(
-              onPressed: _openFullScreenEdit,
-              icon: const Icon(LucideIcons.edit, size: 16),
-              tooltip: 'Edit',
-              style: IconButton.styleFrom(
-                padding: const EdgeInsets.all(8),
-                minimumSize: const Size(UIConstants.touchTargetMinimum,
-                    UIConstants.touchTargetMinimum),
-                side: BorderSide.none,
-              ),
-            ),
-            _TranscriptionMenuButton(
-              iconColor: colorScheme.onSurfaceVariant,
-              errorColor: colorScheme.error,
-              onEdit: _openFullScreenEdit,
-              onCopy: widget.onCopy,
-              onDelete: () => _confirmDelete(context),
-              onMenuOpen: () => setState(() => _isMenuOpen = true),
-              onMenuClose: () => setState(() => _isMenuOpen = false),
-            ),
-          ],
-
-          // Delete only for failed/pending
-          if (showAll &&
-              status != TranscriptionStatus.completed &&
-              status != TranscriptionStatus.processing)
-            IconButton.outlined(
-              onPressed: () => _confirmDelete(context),
-              icon: const Icon(LucideIcons.trash2, size: 16),
-              tooltip: 'Delete',
-              style: IconButton.styleFrom(
-                padding: const EdgeInsets.all(8),
-                minimumSize: const Size(UIConstants.touchTargetMinimum,
-                    UIConstants.touchTargetMinimum),
-                side: BorderSide.none,
-                foregroundColor: colorScheme.error,
               ),
             ),
         ],
@@ -606,7 +616,6 @@ class _TranscriptionCardState extends State<TranscriptionCard>
           iconColor: colorScheme.onSurfaceVariant,
           errorColor: colorScheme.error,
           onEdit: _openFullScreenEdit,
-          onCopy: widget.onCopy,
           onDelete: () => _confirmDelete(context),
         ),
       ],
@@ -885,7 +894,6 @@ class _TranscriptionMenuButton extends StatefulWidget {
   final Color iconColor;
   final Color errorColor;
   final VoidCallback onEdit;
-  final VoidCallback onCopy;
   final VoidCallback onDelete;
   final VoidCallback? onMenuOpen;
   final VoidCallback? onMenuClose;
@@ -894,7 +902,6 @@ class _TranscriptionMenuButton extends StatefulWidget {
     required this.iconColor,
     required this.errorColor,
     required this.onEdit,
-    required this.onCopy,
     required this.onDelete,
     this.onMenuOpen,
     this.onMenuClose,
@@ -906,45 +913,78 @@ class _TranscriptionMenuButton extends StatefulWidget {
 }
 
 class _TranscriptionMenuButtonState extends State<_TranscriptionMenuButton> {
-  OverlayEntry? _overlayEntry;
-  final LayerLink _layerLink = LayerLink();
-
-  void _showMenu() {
-    widget.onMenuOpen?.call();
-    _overlayEntry = OverlayEntry(
-      builder: (context) => _MenuOverlay(
-        targetLink: _layerLink,
-        onEdit: widget.onEdit,
-        onCopy: widget.onCopy,
-        onDelete: widget.onDelete,
-        onClose: _hideMenu,
-      ),
-    );
-    Overlay.of(context).insert(_overlayEntry!);
-  }
-
-  void _hideMenu() {
-    widget.onMenuClose?.call();
-    _overlayEntry?.remove();
-    _overlayEntry = null;
-  }
-
-  @override
-  void dispose() {
-    _overlayEntry?.remove();
-    super.dispose();
-  }
+  final MenuController _menuController = MenuController();
 
   @override
   Widget build(BuildContext context) {
-    return CompositedTransformTarget(
-      link: _layerLink,
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return MenuAnchor(
+      controller: _menuController,
+      alignmentOffset: const Offset(0, 4),
+      style: MenuStyle(
+        elevation: WidgetStatePropertyAll(4),
+        shadowColor: WidgetStatePropertyAll(Colors.black54),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: BorderSide(
+              color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+            ),
+          ),
+        ),
+        backgroundColor:
+            WidgetStatePropertyAll(colorScheme.surfaceContainerHighest),
+        padding: WidgetStatePropertyAll(
+          const EdgeInsets.symmetric(vertical: 4),
+        ),
+      ),
+      menuChildren: [
+        MenuItemButton(
+          onPressed: () {
+            widget.onEdit();
+          },
+          leadingIcon: Icon(
+            LucideIcons.pencil,
+            size: 15,
+            color: colorScheme.onSurface.withValues(alpha: 0.7),
+          ),
+          child: Text(
+            'Edit',
+            style: textTheme.bodySmall?.copyWith(
+              fontWeight: FontWeight.w500,
+              fontSize: 13,
+            ),
+          ),
+        ),
+        MenuItemButton(
+          onPressed: () {
+            widget.onDelete();
+          },
+          leadingIcon: Icon(
+            LucideIcons.trash2,
+            size: 15,
+            color: colorScheme.error.withValues(alpha: 0.8),
+          ),
+          child: Text(
+            'Delete',
+            style: textTheme.bodySmall?.copyWith(
+              color: colorScheme.error,
+              fontWeight: FontWeight.w500,
+              fontSize: 13,
+            ),
+          ),
+        ),
+      ],
+      onOpen: () => widget.onMenuOpen?.call(),
+      onClose: () => widget.onMenuClose?.call(),
       child: IconButton.outlined(
         onPressed: () {
-          if (_overlayEntry == null) {
-            _showMenu();
+          if (_menuController.isOpen) {
+            _menuController.close();
           } else {
-            _hideMenu();
+            _menuController.open();
           }
         },
         icon: const Icon(LucideIcons.moreVertical, size: 16),
@@ -953,171 +993,7 @@ class _TranscriptionMenuButtonState extends State<_TranscriptionMenuButton> {
           padding: const EdgeInsets.all(8),
           minimumSize: const Size(
               UIConstants.touchTargetMinimum, UIConstants.touchTargetMinimum),
-        ),
-      ),
-    );
-  }
-}
-
-class _MenuOverlay extends StatelessWidget {
-  final LayerLink targetLink;
-  final VoidCallback onEdit;
-  final VoidCallback onCopy;
-  final VoidCallback onDelete;
-  final VoidCallback onClose;
-
-  const _MenuOverlay({
-    required this.targetLink,
-    required this.onEdit,
-    required this.onCopy,
-    required this.onDelete,
-    required this.onClose,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return TapRegion(
-      onTapOutside: (_) => onClose(),
-      child: CompositedTransformFollower(
-        link: targetLink,
-        offset: const Offset(-140, 40),
-        targetAnchor: Alignment.topRight,
-        followerAnchor: Alignment.topLeft,
-        child: TweenAnimationBuilder<double>(
-          tween: Tween(begin: 0, end: 1),
-          duration: const Duration(milliseconds: 150),
-          curve: Curves.easeOut,
-          builder: (context, value, child) {
-            return Opacity(
-              opacity: value,
-              child: Transform.scale(
-                scaleX: value,
-                scaleY: value,
-                alignment: Alignment.topRight,
-                child: child,
-              ),
-            );
-          },
-          child: _MenuContent(
-            onEdit: onEdit,
-            onCopy: onCopy,
-            onDelete: onDelete,
-            onClose: onClose,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _MenuContent extends StatelessWidget {
-  final VoidCallback onEdit;
-  final VoidCallback onCopy;
-  final VoidCallback onDelete;
-  final VoidCallback onClose;
-
-  const _MenuContent({
-    required this.onEdit,
-    required this.onCopy,
-    required this.onDelete,
-    required this.onClose,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Material(
-      elevation: 8,
-      borderRadius: BorderRadius.circular(12),
-      color: colorScheme.surface,
-      child: Container(
-        constraints: const BoxConstraints(minWidth: 160),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.5),
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _MenuItem(
-              icon: LucideIcons.edit,
-              label: 'Edit full',
-              onTap: () {
-                onClose();
-                onEdit();
-              },
-            ),
-            _MenuItem(
-              icon: LucideIcons.copy,
-              label: 'Copy',
-              onTap: () {
-                onClose();
-                onCopy();
-              },
-            ),
-            Divider(
-              height: 1,
-              thickness: 1,
-              color: colorScheme.outlineVariant.withValues(alpha: 0.3),
-            ),
-            _MenuItem(
-              icon: LucideIcons.trash2,
-              label: 'Delete',
-              textColor: colorScheme.error,
-              onTap: () {
-                onClose();
-                onDelete();
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _MenuItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color? textColor;
-  final VoidCallback onTap;
-
-  const _MenuItem({
-    required this.icon,
-    required this.label,
-    this.textColor,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 16,
-              color: textColor ?? colorScheme.onSurface,
-            ),
-            const SizedBox(width: 12),
-            Text(
-              label,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: textColor ?? colorScheme.onSurface,
-              ),
-            ),
-          ],
+          side: BorderSide.none,
         ),
       ),
     );
