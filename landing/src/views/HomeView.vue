@@ -5,7 +5,7 @@ import { onMounted, ref } from 'vue'
 import { getVersionWithPrefix } from '@/version'
 import {
   Download, KeyRound, Check, Zap, Mic, FileText,
-  BookOpen, Monitor, Lock, ChevronDown
+  BookOpen, Monitor, Lock, ChevronDown, Hand
 } from 'lucide-vue-next'
 
 useScrollAnimations()
@@ -48,9 +48,9 @@ const features = [
     color: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400'
   },
   {
-    icon: Monitor,
-    title: 'Cross-Platform',
-    description: 'Works everywhere — macOS, Windows, Linux, and mobile',
+    icon: Hand,
+    title: 'Push-to-Talk',
+    description: 'Hold a key to record, release to transcribe — with auto-inject into any text field (macOS)',
     color: 'bg-rose-100 text-rose-600 dark:bg-rose-900/40 dark:text-rose-400'
   },
   {

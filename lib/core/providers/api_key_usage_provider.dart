@@ -51,7 +51,6 @@ class ApiKeyUsageNotifier extends Notifier<Map<String, ApiKeyUsageStats>> {
       int totalTokens = 0;
       double totalDuration = 0;
       int totalWords = 0;
-      double totalCost = 0;
       final dailyUsageMap = <DateTime, DailyUsage>{};
 
       for (final t in keyTranscriptions) {
@@ -59,12 +58,6 @@ class ApiKeyUsageNotifier extends Notifier<Map<String, ApiKeyUsageStats>> {
         totalTokens += t.tokenUsage;
         totalDuration += t.audioDurationSeconds / 60;
         totalWords += _countWords(t.processedText);
-
-        // Estimate cost (50% input, 50% output)
-        final inputTokens = t.tokenUsage * 0.5;
-        final outputTokens = t.tokenUsage * 0.5;
-        totalCost += (inputTokens / 1000000) * 0.075 +
-            (outputTokens / 1000000) * 0.40;
 
         // Add to daily usage using actual transcription date
         final dateKey = DateTime(
@@ -92,7 +85,7 @@ class ApiKeyUsageNotifier extends Notifier<Map<String, ApiKeyUsageStats>> {
         firstUsedAt: keyTranscriptions.last.createdAt,
         lastUsedAt: keyTranscriptions.first.createdAt,
         dailyUsage: dailyUsageMap.values.toList(),
-        totalEstimatedCost: totalCost,
+        totalEstimatedCost: 0,
       );
     }
 
@@ -113,7 +106,6 @@ class ApiKeyUsageNotifier extends Notifier<Map<String, ApiKeyUsageStats>> {
     required int tokens,
     required double durationMinutes,
     required int words,
-    required double estimatedCost,
   }) {
     final currentStats = state[apiKeyId];
 
@@ -122,7 +114,6 @@ class ApiKeyUsageNotifier extends Notifier<Map<String, ApiKeyUsageStats>> {
         tokens: tokens,
         durationMinutes: durationMinutes,
         words: words,
-        estimatedCost: estimatedCost,
       );
 
       state = {...state, apiKeyId: updated};
@@ -131,7 +122,6 @@ class ApiKeyUsageNotifier extends Notifier<Map<String, ApiKeyUsageStats>> {
         tokens: tokens,
         durationMinutes: durationMinutes,
         words: words,
-        estimatedCost: estimatedCost,
       );
 
       state = {...state, apiKeyId: newStats};
@@ -161,45 +151,8 @@ final selectedKeyStatsProvider = Provider<ApiKeyUsageStats?>((ref) {
   return allStats[selectedKey.id];
 });
 
-/// Provider for quota info of the selected API key
-final selectedKeyQuotaProvider = Provider<QuotaInfo?>((ref) {
+/// Provider for selected API key name (for display in usage bar)
+final selectedKeyNameProvider = Provider<String?>((ref) {
   final selectedKey = ref.watch(selectedApiKeyProvider);
-  final stats = ref.watch(selectedKeyStatsProvider);
-
-  if (selectedKey == null || stats == null) {
-    return null;
-  }
-
-  return QuotaInfo.fromStats(
-    apiKeyId: selectedKey.id,
-    apiKeyName: selectedKey.name,
-    stats: stats,
-  );
-});
-
-/// Provider for all quota info (for switching between keys)
-final allQuotaInfoProvider = Provider<List<QuotaInfo>>((ref) {
-  final keys = ref.watch(apiKeysProvider);
-  final allStats = ref.watch(apiKeyUsageProvider);
-
-  final result = <QuotaInfo>[];
-
-  for (final key in keys) {
-    final stats = allStats[key.id];
-    if (stats != null) {
-      result.add(QuotaInfo.fromStats(
-        apiKeyId: key.id,
-        apiKeyName: key.name,
-        stats: stats,
-      ));
-    } else {
-      result.add(QuotaInfo.fromStats(
-        apiKeyId: key.id,
-        apiKeyName: key.name,
-        stats: ApiKeyUsageStats.empty(key.id),
-      ));
-    }
-  }
-
-  return result;
+  return selectedKey?.name;
 });

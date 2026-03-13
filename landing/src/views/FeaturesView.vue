@@ -4,8 +4,8 @@ import { computed, ref } from 'vue'
 import {
   FileEdit, CheckCircle, List, Mail, ClipboardList, MessageSquare,
   Globe, Cpu, Building, Heart, Scale, DollarSign,
-  Zap, KeyRound, PieChart, Languages, BarChart3, Code,
-  Moon, Clipboard, Bell, Download
+  Zap, KeyRound, Activity, Languages, Hand, Code,
+  Moon, Clipboard, Bell, Download, MousePointerClick
 } from 'lucide-vue-next'
 
 useScrollAnimations()
@@ -53,11 +53,11 @@ const vocabulary = [
 ]
 
 const settings = [
-  { title: 'Multi-API Key Management', description: 'Add multiple keys with smart failover — cascades through all available keys before falling back', icon: Zap, badge: 'New' },
-  { title: 'API Configuration', description: 'Manage your Gemini API key for transcription', icon: KeyRound },
-  { title: 'Per-Key Usage Tracking', description: 'Dashboard shows per-key stats, quota percentage, and remaining requests', icon: PieChart, badge: 'New' },
+  { title: 'Push-to-Talk', description: 'Hold Right Cmd, Right Option, or Fn to record — release to transcribe instantly (macOS)', icon: Hand, badge: 'New' },
+  { title: 'Auto-Inject Text', description: 'Transcription is pasted directly into the focused text field — no manual paste needed (macOS)', icon: MousePointerClick, badge: 'New' },
+  { title: 'Multi-API Key Management', description: 'Add multiple keys with smart failover and automatic rotation on rate limit', icon: Zap },
+  { title: 'Per-Key Usage Tracking', description: "Dashboard shows today's requests, tokens, and words per API key", icon: Activity },
   { title: 'Transcription Language', description: 'Auto-detect or choose from 20+ languages', icon: Languages },
-  { title: 'Usage Projections', description: 'See days until free tier exhaustion based on usage', icon: BarChart3 },
   { title: 'Global Hotkey', description: 'Set up global hotkeys for quick recording access', icon: Code },
   { title: 'Theme Preferences', description: 'Choose between light and dark themes', icon: Moon },
   { title: 'Auto-copy to Clipboard', description: 'Automatically copy transcription results', icon: Clipboard },

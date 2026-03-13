@@ -392,3 +392,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.17.0] - 2026-03-13
+
+### Added
+
+- **Push-to-Talk Mode** - Hold Right Command, Right Option, or Fn key to record, release to stop and transcribe. Uses native CGEventTap for precise modifier key detection. Configurable in Settings with key selector dropdown. Requires macOS Accessibility permission.
+- **Auto-Inject Text** - After transcription completes, automatically pastes the result into the focused text field using macOS Accessibility API (AXUIElement). Falls back to clipboard copy if no text field is focused. Toggle in Settings.
+
+### Changed
+
+- **Menu Bar Icon Redesign** - Replaced the geometric R text icon with a clean microphone glyph. Now uses macOS template image (isTemplate) for automatic light/dark mode tinting, matching system icons like Wi-Fi and Bluetooth. Recording state shows a red dot indicator.
+- **Dashboard Usage Display** - Replaced the inaccurate API quota progress bar (which used hardcoded limits) with an honest usage display showing today's actual requests, tokens, and words per API key. The Gemini API provides no endpoint to check remaining quota, so the old display was misleading.
+- **Landing Page Updates** - Added Push-to-Talk and Auto-Inject features to the homepage feature grid and features page settings tab. Updated usage tracking descriptions to reflect actual behavior.
+
+---
+

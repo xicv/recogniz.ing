@@ -183,17 +183,12 @@ final voiceRecordingUseCaseProvider = Provider<VoiceRecordingUseCase>((ref) {
         final words = transcription.processedText.trim().isEmpty
             ? 0
             : transcription.processedText.trim().split(RegExp(r'\s+')).length;
-        final inputTokens = transcription.tokenUsage * 0.5;
-        final outputTokens = transcription.tokenUsage * 0.5;
-        final estimatedCost = (inputTokens / 1000000) * 0.075 +
-            (outputTokens / 1000000) * 0.40;
 
         ref.read(apiKeyUsageProvider.notifier).recordUsage(
           apiKeyId: transcription.apiKeyId!,
           tokens: transcription.tokenUsage,
           durationMinutes: transcription.audioDurationSeconds / 60,
           words: words,
-          estimatedCost: estimatedCost,
         );
       }
     },

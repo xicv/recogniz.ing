@@ -248,7 +248,6 @@ class ApiKeyUsageStats {
     required int tokens,
     required double durationMinutes,
     required int words,
-    required double estimatedCost,
   }) {
     final now = DateTime.now();
     final todayKey = DateTime(now.year, now.month, now.day);
@@ -290,142 +289,8 @@ class ApiKeyUsageStats {
       firstUsedAt: firstUsedAt ?? now,
       lastUsedAt: now,
       dailyUsage: updatedDailyUsage,
-      totalEstimatedCost: totalEstimatedCost + estimatedCost,
+      totalEstimatedCost: totalEstimatedCost,
     );
   }
 }
 
-/// Quota information for an API key
-class QuotaInfo {
-  /// Free tier daily request limit (conservative estimate)
-  static const int freeTierDailyRequests = 1000;
-
-  /// Free tier daily token limit (generous estimate)
-  static const int freeTierDailyTokens = 1000000; // 1M tokens
-
-  /// Cost per million input tokens for Gemini Flash (2026)
-  static const double costPerMillionInputTokens = 0.075;
-
-  /// Cost per million output tokens
-  static const double costPerMillionOutputTokens = 0.40;
-
-  /// ID of the API key
-  final String apiKeyId;
-
-  /// Name of the API key
-  final String apiKeyName;
-
-  /// Requests made today
-  final int todayRequests;
-
-  /// Tokens used today
-  final int todayTokens;
-
-  /// Daily request limit
-  final int dailyRequestLimit;
-
-  /// Daily token limit
-  final int dailyTokenLimit;
-
-  /// Percentage of daily quota used
-  final double quotaPercentage;
-
-  /// Days until free tier exhaustion (based on current trend)
-  final int? daysUntilExhaustion;
-
-  /// Projected monthly cost if usage continues
-  final double projectedMonthlyCost;
-
-  /// Daily average requests
-  final double dailyAverageRequests;
-
-  /// Whether quota is nearly exhausted (>80%)
-  final bool isNearLimit;
-
-  /// Whether quota is exhausted
-  final bool isExhausted;
-
-  const QuotaInfo({
-    required this.apiKeyId,
-    required this.apiKeyName,
-    required this.todayRequests,
-    required this.todayTokens,
-    required this.dailyRequestLimit,
-    required this.dailyTokenLimit,
-    required this.quotaPercentage,
-    this.daysUntilExhaustion,
-    required this.projectedMonthlyCost,
-    required this.dailyAverageRequests,
-    required this.isNearLimit,
-    required this.isExhausted,
-  });
-
-  /// Create quota info from usage stats
-  factory QuotaInfo.fromStats({
-    required String apiKeyId,
-    required String apiKeyName,
-    required ApiKeyUsageStats stats,
-  }) {
-    final todayRequests = stats.todayRequests;
-    final todayTokens = stats.todayTokens;
-
-    // Use the more restrictive limit (requests vs tokens)
-    final requestPercentage = todayRequests / freeTierDailyRequests;
-    final tokenPercentage = todayTokens / freeTierDailyTokens;
-    final quotaPercentage = requestPercentage > tokenPercentage
-        ? requestPercentage
-        : tokenPercentage;
-
-    // Calculate days until exhaustion
-    int? daysUntilExhaustion;
-    final dailyAvg = stats.dailyAverageTranscriptions;
-
-    if (dailyAvg > 0) {
-      // Based on request limit
-      final requestDaysLeft = (freeTierDailyRequests - todayRequests) / dailyAvg;
-      daysUntilExhaustion = requestDaysLeft.clamp(1, 365).round();
-    }
-
-    // Project monthly cost (30 days * current daily cost)
-    final dailyCost = (todayTokens / 1000000) * costPerMillionInputTokens +
-                      (todayTokens / 1000000 * 0.5) * costPerMillionOutputTokens;
-    final projectedMonthlyCost = dailyCost * 30;
-
-    return QuotaInfo(
-      apiKeyId: apiKeyId,
-      apiKeyName: apiKeyName,
-      todayRequests: todayRequests,
-      todayTokens: todayTokens,
-      dailyRequestLimit: freeTierDailyRequests,
-      dailyTokenLimit: freeTierDailyTokens,
-      quotaPercentage: quotaPercentage.clamp(0, 1),
-      daysUntilExhaustion: daysUntilExhaustion,
-      projectedMonthlyCost: projectedMonthlyCost,
-      dailyAverageRequests: stats.dailyAverageTranscriptions,
-      isNearLimit: quotaPercentage >= 0.8,
-      isExhausted: quotaPercentage >= 1.0,
-    );
-  }
-
-  /// Remaining requests today
-  int get remainingRequests =>
-      (dailyRequestLimit - todayRequests).clamp(0, dailyRequestLimit);
-
-  /// Remaining tokens today
-  int get remainingTokens =>
-      (dailyTokenLimit - todayTokens).clamp(0, dailyTokenLimit);
-
-  /// Human-readable quota status
-  String get quotaStatus {
-    if (isExhausted) return 'Exhausted';
-    if (isNearLimit) return 'Near Limit';
-    return 'Good';
-  }
-
-  /// Color code for status (hex)
-  String get statusColor {
-    if (isExhausted) return '#EF4444'; // red
-    if (isNearLimit) return '#F59E0B'; // orange
-    return '#10B981'; // green
-  }
-}

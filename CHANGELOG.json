@@ -30,6 +30,43 @@
   },
   "versions": [
     {
+      "version": "1.17.0",
+      "date": "2026-03-13",
+      "stable": true,
+      "highlights": [
+        "Push-to-Talk: hold a modifier key to record, release to transcribe (macOS)",
+        "Auto-Inject: transcription pasted directly into focused text fields (macOS)",
+        "Redesigned menu bar icon with macOS template image support for automatic light/dark mode"
+      ],
+      "changes": [
+        {
+          "category": "added",
+          "title": "Push-to-Talk Mode",
+          "description": "Hold Right Command, Right Option, or Fn key to record, release to stop and transcribe. Uses native CGEventTap for precise modifier key detection. Configurable in Settings with key selector dropdown. Requires macOS Accessibility permission."
+        },
+        {
+          "category": "added",
+          "title": "Auto-Inject Text",
+          "description": "After transcription completes, automatically pastes the result into the focused text field using macOS Accessibility API (AXUIElement). Falls back to clipboard copy if no text field is focused. Toggle in Settings."
+        },
+        {
+          "category": "changed",
+          "title": "Menu Bar Icon Redesign",
+          "description": "Replaced the geometric R text icon with a clean microphone glyph. Now uses macOS template image (isTemplate) for automatic light/dark mode tinting, matching system icons like Wi-Fi and Bluetooth. Recording state shows a red dot indicator."
+        },
+        {
+          "category": "changed",
+          "title": "Dashboard Usage Display",
+          "description": "Replaced the inaccurate API quota progress bar (which used hardcoded limits) with an honest usage display showing today's actual requests, tokens, and words per API key. The Gemini API provides no endpoint to check remaining quota, so the old display was misleading."
+        },
+        {
+          "category": "changed",
+          "title": "Landing Page Updates",
+          "description": "Added Push-to-Talk and Auto-Inject features to the homepage feature grid and features page settings tab. Updated usage tracking descriptions to reflect actual behavior."
+        }
+      ]
+    },
+    {
       "version": "1.16.3",
       "date": "2026-03-11",
       "stable": true,

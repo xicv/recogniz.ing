@@ -20,7 +20,8 @@ class DashboardPage extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final transcriptions = ref.watch(transcriptionsProvider);
     final settings = ref.watch(settingsProvider);
-    final quotaInfo = ref.watch(selectedKeyQuotaProvider);
+    final keyStats = ref.watch(selectedKeyStatsProvider);
+    final keyName = ref.watch(selectedKeyNameProvider);
 
     // Empty state: no transcriptions and no API key
     if (transcriptions.isEmpty && !settings.hasApiKey) {
@@ -100,10 +101,10 @@ class DashboardPage extends ConsumerWidget {
                       .animate()
                       .fadeIn(duration: 300.ms, delay: 100.ms),
 
-                  // Section 2: Quota Bar (only if API key configured)
-                  if (quotaInfo != null) ...[
+                  // Section 2: Usage Bar (only if API key configured)
+                  if (keyStats != null && keyName != null) ...[
                     const SizedBox(height: 12),
-                    QuotaBar(quotaInfo: quotaInfo)
+                    UsageBar(stats: keyStats, keyName: keyName)
                         .animate()
                         .fadeIn(duration: 300.ms, delay: 150.ms),
                   ],

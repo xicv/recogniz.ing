@@ -88,7 +88,7 @@ Getting started takes about 2 minutes:
 | 2 | Go to **Settings** (press Cmd/Ctrl+5) |
 | 3 | Enter your **Gemini API Key** (add multiple keys for automatic failover!) |
 | 4 | (Optional) Customize prompts and vocabulary |
-| 5 | Go back to **Dashboard** to see your free tier quota |
+| 5 | Go back to **Dashboard** to see your usage stats |
 | 6 | Tap the **microphone button** or press `Ctrl+Shift+R` (configurable in Settings) |
 | 7 | Speak, then tap again to stop and transcribe |
 
@@ -130,10 +130,9 @@ Powered by **Google Gemini 3 Flash**—Google's fastest AI model:
 
 ###  Dashboard & Analytics
 
-- **Free tier quota tracking** — Visual progress indicator per API key
-- **Multi-API key management** — Smart failover cascades through all available keys
+- **Per-key usage tracking** — Today's requests, tokens, and words per API key
+- **Multi-API key management** — Smart failover cascades through all available keys with automatic rotation on rate limit
 - **Per-key usage attribution** — Each transcription is tagged to the key that produced it
-- **Usage projections** — See days until quota exhaustion per key
 - **Real-time stats** — Dashboard updates instantly after each transcription
 - **Editable transcriptions** — Fix mistakes, save changes
 - **Favorites** — Star important transcriptions for quick access
