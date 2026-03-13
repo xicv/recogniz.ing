@@ -49,7 +49,7 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
       _searchQuery = _searchController.text;
       _isSearching = _searchQuery.isNotEmpty;
     });
-    ref.read(searchQueryProvider.notifier).state = _searchQuery;
+    ref.read(searchQueryProvider.notifier).set(_searchQuery);
   }
 
   void _clearSearch() {
@@ -59,7 +59,7 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
       _isSearching = false;
       _searchQuery = '';
     });
-    ref.read(searchQueryProvider.notifier).state = '';
+    ref.read(searchQueryProvider.notifier).set('');
   }
 
   @override
@@ -154,8 +154,8 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
                     ),
                     TextButton(
                       onPressed: () {
-                        ref.read(currentPageProvider.notifier).state =
-                            4; // Settings tab
+                        ref.read(currentPageProvider.notifier).set(
+                            4); // Settings tab
                       },
                       child: const Text('Settings'),
                     ),
@@ -187,7 +187,7 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
                     _FavoritesFilterChip(
                       currentFilter: ref.watch(filterOptionProvider),
                       onFilterChanged: (filter) {
-                        ref.read(filterOptionProvider.notifier).state = filter;
+                        ref.read(filterOptionProvider.notifier).set(filter);
                       },
                     ),
                     const Spacer(),
@@ -195,7 +195,7 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
                       icon: const Icon(LucideIcons.arrowDownUp),
                       tooltip: 'Sort',
                       onSelected: (value) {
-                        ref.read(sortOptionProvider.notifier).state = value;
+                        ref.read(sortOptionProvider.notifier).set(value);
                       },
                       itemBuilder: (context) {
                         final currentSort = ref.watch(sortOptionProvider);
@@ -338,7 +338,7 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
     if (currentFilter == FilterOption.favorites) {
       return _FavoritesEmptyState(
         onClearFilter: () {
-          ref.read(filterOptionProvider.notifier).state = FilterOption.all;
+          ref.read(filterOptionProvider.notifier).set(FilterOption.all);
         },
       );
     }
@@ -361,7 +361,7 @@ class _TranscriptionsPageState extends ConsumerState<TranscriptionsPage>
         await voiceRecordingUseCase.startRecording();
       },
       onOpenSettings: () {
-        ref.read(currentPageProvider.notifier).state = 4; // Settings tab
+        ref.read(currentPageProvider.notifier).set(4); // Settings tab
       },
     );
   }

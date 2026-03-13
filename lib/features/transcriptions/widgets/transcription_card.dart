@@ -753,6 +753,14 @@ class _TranscriptionCardState extends State<TranscriptionCard>
             ),
             color: colorScheme.outline,
           ),
+
+        // Truncation warning
+        if (widget.transcription.isTruncated)
+          _MetadataItem(
+            icon: LucideIcons.alertTriangle,
+            label: 'Truncated',
+            color: Colors.amber.shade700,
+          ),
       ],
     );
   }

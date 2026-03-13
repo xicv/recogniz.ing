@@ -7,6 +7,8 @@ import 'error_handler.dart';
 class ErrorStateNotifier extends Notifier<ErrorResult?> {
   @override
   ErrorResult? build() => null;
+
+  void set(ErrorResult? value) => state = value;
 }
 
 /// Error state provider
@@ -17,12 +19,12 @@ final errorStateProvider =
 final errorHandlerProvider = Provider<ErrorHandler>((ref) {
   return ErrorHandler(
     showError: (message) {
-      ref.read(lastErrorProvider.notifier).state = message;
+      ref.read(lastErrorProvider.notifier).set(message);
     },
     showErrorDetails: (errorResult) {
-      ref.read(errorStateProvider.notifier).state = errorResult;
+      ref.read(errorStateProvider.notifier).set(errorResult);
       // Also set the simple error message for backward compatibility
-      ref.read(lastErrorProvider.notifier).state = errorResult.message;
+      ref.read(lastErrorProvider.notifier).set(errorResult.message);
     },
   );
 });

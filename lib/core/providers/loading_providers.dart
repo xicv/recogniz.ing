@@ -4,6 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class LoadingOverlayNotifier extends Notifier<LoadingOverlayState> {
   @override
   LoadingOverlayState build() => const LoadingOverlayState();
+
+  void set(LoadingOverlayState value) => state = value;
+
+  void clear() => state = const LoadingOverlayState();
 }
 
 /// Global loading overlay provider for app-wide loading states
@@ -40,6 +44,8 @@ class LoadingOverlayState {
 class FeatureLoadingNotifier extends Notifier<Map<String, bool>> {
   @override
   Map<String, bool> build() => {};
+
+  void set(Map<String, bool> value) => state = value;
 }
 
 /// Feature-specific loading states provider
@@ -50,21 +56,21 @@ final featureLoadingProvider =
 /// Helper methods for managing loading states
 extension LoadingOverlayRef on WidgetRef {
   void showLoading([String? message]) {
-    read(loadingOverlayProvider.notifier).state = LoadingOverlayState(
+    read(loadingOverlayProvider.notifier).set(LoadingOverlayState(
       isLoading: true,
       message: message,
-    );
+    ));
   }
 
   void hideLoading() {
-    read(loadingOverlayProvider.notifier).state = const LoadingOverlayState();
+    read(loadingOverlayProvider.notifier).clear();
   }
 
   void setFeatureLoading(String feature, bool isLoading) {
     final current = read(featureLoadingProvider);
     final updated = Map<String, bool>.from(current);
     updated[feature] = isLoading;
-    read(featureLoadingProvider.notifier).state = updated;
+    read(featureLoadingProvider.notifier).set(updated);
   }
 
   bool isFeatureLoading(String feature) {

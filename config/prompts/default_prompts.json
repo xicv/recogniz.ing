@@ -1,12 +1,12 @@
 {
-  "version": "2.0.0",
+  "version": "2.1.0",
   "prompts": [
     {
       "id": "default-clean",
       "name": "Clean Transcription",
-      "description": "Clean up speech, fix grammar, remove filler words",
+      "description": "Accurate transcription with natural readability",
       "category": "general",
-      "template": "Fix grammar, remove fillers, preserve meaning and tone",
+      "template": "Clean transcription with natural readability",
       "isDefault": true
     },
     {

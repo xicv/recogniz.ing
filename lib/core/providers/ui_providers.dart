@@ -13,6 +13,8 @@ enum RecordingState {
 class RecordingStateNotifier extends Notifier<RecordingState> {
   @override
   RecordingState build() => RecordingState.idle;
+
+  void set(RecordingState value) => state = value;
 }
 
 /// Current recording state
@@ -35,6 +37,8 @@ final recordingDurationProvider =
 class CurrentPageNotifier extends Notifier<int> {
   @override
   int build() => 0;
+
+  void set(int value) => state = value;
 }
 
 /// Current page index for navigation
@@ -45,6 +49,8 @@ final currentPageProvider =
 class LastErrorNotifier extends Notifier<String?> {
   @override
   String? build() => null;
+
+  void set(String? value) => state = value;
 }
 
 /// Global error message provider
@@ -55,6 +61,8 @@ final lastErrorProvider =
 class TrayRecordingTriggerNotifier extends Notifier<int> {
   @override
   int build() => 0;
+
+  void increment() => state++;
 }
 
 /// Tray recording trigger - increment to trigger recording toggle from tray

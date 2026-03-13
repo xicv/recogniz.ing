@@ -26,8 +26,7 @@ class GlobalLoadingOverlay extends ConsumerWidget {
             Positioned.fill(
               child: GestureDetector(
                 onTap: () {
-                  ref.read(loadingOverlayProvider.notifier).state =
-                      const LoadingOverlayState();
+                  ref.read(loadingOverlayProvider.notifier).clear();
                 },
               ),
             ),
@@ -48,8 +47,7 @@ class GlobalLoadingOverlay extends ConsumerWidget {
                       const SizedBox(height: 24),
                       TextButton.icon(
                         onPressed: () {
-                          ref.read(loadingOverlayProvider.notifier).state =
-                              const LoadingOverlayState();
+                          ref.read(loadingOverlayProvider.notifier).clear();
                         },
                         icon: const Icon(Icons.close),
                         label: const Text('Cancel'),

@@ -74,10 +74,10 @@ class AppConstants {
   static const double minAmplitudeForVoice = 0.02;
   static const int minVoiceSamples = 5;
 
-  // Default prompt templates
-  // Optimized: concise, no redundant "CLEAN VERSION:" marker
+  // Default prompt template
+  // System instruction handles correction philosophy; this sets refinement style
   static const String defaultPromptTemplate =
-      'Fix grammar, remove fillers (um/uh/like), preserve meaning:\n\n{{text}}';
+      'Clean transcription with natural readability';
 
   static const String defaultPromptId = 'default-clean';
   static const String defaultVocabularyId = 'default-general';

@@ -69,7 +69,12 @@ class TrayService with TrayListener {
     }
 
     try {
-      await trayManager.setIcon(iconPath);
+      // Template images (isTemplate: true) let macOS auto-tint for light/dark mode.
+      // Recording icon uses color (red dot), so it must NOT be a template.
+      await trayManager.setIcon(
+        iconPath,
+        isTemplate: !recording && Platform.isMacOS,
+      );
     } catch (e) {
       debugPrint('Failed to set tray icon: $e');
     }

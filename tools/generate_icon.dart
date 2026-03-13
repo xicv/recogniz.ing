@@ -125,19 +125,7 @@ Future<ui.Image> createAdaptiveIcon() async {
 
   const size = 1024.0;
 
-  // Create gradient for the "R"
-  final gradient = ui.Gradient.linear(
-    const Offset(0, 0),
-    const Offset(size, size),
-    [
-      const Color(0xFF1E40AF), // Deep blue
-      const Color(0xFF0891B2), // Cyan/teal
-      const Color(0xFF10B981), // Emerald
-    ],
-    [0.0, 0.5, 1.0],
-  );
-
-  // Draw "R" letter with gradient
+  // Draw "R" letter
   drawRLetter(canvas, size, letterColor: const Color(0xFFFFFFFF));
 
   // Draw red recording dot
@@ -187,8 +175,7 @@ void drawRLetter(Canvas canvas, double size, {Color? letterColor}) {
   path.lineTo((centerX + 40) * s, (centerY + 30) * s);
   path.arcTo(
     Rect.fromCenter(
-        center: (centerX + 130) * s,
-        centerY: (centerY - 115) * s,
+        center: Offset((centerX + 130) * s, (centerY - 115) * s),
         width: 180 * s,
         height: 230 * s),
     3.14159,
@@ -211,8 +198,7 @@ void drawRLetter(Canvas canvas, double size, {Color? letterColor}) {
   innerPath.lineTo((centerX + 40) * s, (centerY - 50) * s);
   innerPath.arcTo(
     Rect.fromCenter(
-        center: (centerX + 40) * s,
-        centerY: (centerY - 80) * s,
+        center: Offset((centerX + 40) * s, (centerY - 80) * s),
         width: 120 * s,
         height: 120 * s),
     1.5708,
@@ -301,9 +287,9 @@ void drawRecordingDot(Canvas canvas, double size,
     ..style = PaintingStyle.fill
     ..isAntiAlias = true;
 
-  final dotX = 680.0;
-  final dotY = 680.0;
-  final dotRadius = 40.0;
+  const dotX = 680.0;
+  const dotY = 680.0;
+  const dotRadius = 40.0;
 
   // Draw shadow for the dot
   final shadowPaint = Paint()

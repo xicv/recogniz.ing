@@ -16,6 +16,6 @@ final geminiModelProvider = Provider<String>((ref) {
   return config.when(
     data: (config) => config.api.model,
     loading: () => 'gemini-3-flash-preview', // Fallback while loading
-    error: (_, __) => 'gemini-3-flash-preview', // Fallback on error
+    error: (_, _) => 'gemini-3-flash-preview', // Fallback on error
   );
 });

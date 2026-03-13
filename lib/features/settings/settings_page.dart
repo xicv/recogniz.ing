@@ -169,6 +169,119 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
             const SizedBox(height: 20),
 
+            // Push-to-Talk & Auto-Inject (macOS only)
+            if (Platform.isMacOS)
+              SettingsSection(
+                title: 'Push-to-Talk',
+                icon: LucideIcons.mic,
+                children: [
+                  SwitchListTile(
+                    title: const Text('Push-to-Talk'),
+                    subtitle: const Text(
+                        'Hold a key to record, release to transcribe'),
+                    value: settings.pttEnabled,
+                    onChanged: (value) {
+                      SchedulerBinding.instance.addPostFrameCallback((_) {
+                        ref.read(settingsProvider.notifier).togglePtt();
+                      });
+                    },
+                  ),
+                  if (settings.pttEnabled)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'PTT Key',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 8),
+                          DropdownButtonFormField<String>(
+                            // ignore: deprecated_member_use
+                            value: settings.pttKey,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 10,
+                              ),
+                            ),
+                            items: const [
+                              DropdownMenuItem(
+                                value: 'rightCommand',
+                                child: Text('Right Command (⌘)'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'rightOption',
+                                child: Text('Right Option (⌥)'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'fn',
+                                child: Text('Fn'),
+                              ),
+                            ],
+                            onChanged: (value) {
+                              if (value != null) {
+                                ref
+                                    .read(settingsProvider.notifier)
+                                    .updatePttKey(value);
+                              }
+                            },
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Hold the selected key to record. Release to stop and transcribe.',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(
+                                  color: colorScheme.outline,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  const Divider(height: 1),
+                  SwitchListTile(
+                    title: const Text('Auto-Inject Text'),
+                    subtitle: const Text(
+                        'Paste result directly into focused text field'),
+                    value: settings.autoInjectEnabled,
+                    onChanged: (value) {
+                      SchedulerBinding.instance.addPostFrameCallback((_) {
+                        ref.read(settingsProvider.notifier).toggleAutoInject();
+                      });
+                    },
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    child: Row(
+                      children: [
+                        Icon(LucideIcons.info, size: 14, color: colorScheme.outline),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            'Requires Accessibility permission. Works with any text field in any app.',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(color: colorScheme.outline),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ).animate().fadeIn(duration: 300.ms, delay: 160.ms),
+
+            if (Platform.isMacOS) const SizedBox(height: 20),
+
             // Quick Access to Dictionaries and Prompts
             SettingsSection(
               title: 'Quick Access',
@@ -195,8 +308,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   ),
                   trailing: const Icon(LucideIcons.chevronRight),
                   onTap: () {
-                    ref.read(currentPageProvider.notifier).state =
-                        2; // Dictionaries
+                    ref.read(currentPageProvider.notifier).set(
+                        2); // Dictionaries
                   },
                 ),
                 ListTile(
@@ -220,7 +333,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   ),
                   trailing: const Icon(LucideIcons.chevronRight),
                   onTap: () {
-                    ref.read(currentPageProvider.notifier).state = 3; // Prompts
+                    ref.read(currentPageProvider.notifier).set(3); // Prompts
                   },
                 ),
               ],

@@ -122,6 +122,27 @@ class SettingsNotifier extends Notifier<AppSettings> {
     state = newState;
   }
 
+  Future<void> togglePtt() async {
+    _hasPendingUserUpdate = true;
+    final newState = state.copyWith(pttEnabled: !state.pttEnabled);
+    await StorageService.saveSettings(newState);
+    state = newState;
+  }
+
+  Future<void> updatePttKey(String key) async {
+    _hasPendingUserUpdate = true;
+    final newState = state.copyWith(pttKey: key);
+    await StorageService.saveSettings(newState);
+    state = newState;
+  }
+
+  Future<void> toggleAutoInject() async {
+    _hasPendingUserUpdate = true;
+    final newState = state.copyWith(autoInjectEnabled: !state.autoInjectEnabled);
+    await StorageService.saveSettings(newState);
+    state = newState;
+  }
+
   Future<void> toggleStartAtLogin() async {
     _hasPendingUserUpdate = true;
     final newValue = !state.startAtLogin;

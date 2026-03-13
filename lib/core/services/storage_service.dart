@@ -47,6 +47,9 @@ class StorageService implements StorageServiceInterface {
     final vocabBox = Hive.box<VocabularySet>(StorageService.vocabularyBox);
     final settingsBox = Hive.box<AppSettings>(StorageService.settingsBox);
 
+    // Migrate outdated default prompts (v2.0 → v2.1: improved ASR prompt)
+    await _migrateDefaultCleanPrompt(promptsBox);
+
     // Add default prompts from config if empty
     if (promptsBox.isEmpty) {
       try {
@@ -96,6 +99,35 @@ class StorageService implements StorageServiceInterface {
     // Initialize settings if empty
     if (settingsBox.isEmpty) {
       await settingsBox.put('settings', AppSettings());
+    }
+  }
+
+  /// One-time migration: update the default 'Clean Transcription' prompt
+  /// if it still has the old v2.0 template. The system instruction now handles
+  /// correction logic, so the user-facing prompt can be simplified.
+  static Future<void> _migrateDefaultCleanPrompt(
+      Box<CustomPrompt> promptsBox) async {
+    final existing = promptsBox.get('default-clean');
+    if (existing == null) return;
+
+    // Match any variant of the old templates
+    const oldTemplates = [
+      'Fix grammar, remove fillers (um/uh/like), preserve meaning:\n\n{{text}}',
+      'Fix grammar, remove fillers, preserve meaning and tone',
+      'Fix grammar, remove fillers (um/uh/like), preserve meaning:',
+    ];
+
+    final currentTemplate = existing.promptTemplate.trim();
+    if (oldTemplates.any((old) => currentTemplate == old.trim())) {
+      await promptsBox.put(
+        'default-clean',
+        existing.copyWith(
+          description: 'Accurate transcription with natural readability',
+          promptTemplate: 'Clean transcription with natural readability',
+        ),
+      );
+      debugPrint(
+          '[StorageService] Migrated default-clean prompt to v2.1');
     }
   }
 

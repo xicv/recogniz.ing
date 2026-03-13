@@ -9,6 +9,7 @@ import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'core/models/transcription_status.dart';
 import 'core/providers/app_providers.dart';
 import 'core/services/hotkey_service.dart';
+import 'core/services/ptt_service.dart';
 import 'core/services/storage_service.dart';
 import 'core/services/tray_service.dart';
 import 'core/theme/app_theme.dart';
@@ -108,6 +109,7 @@ class _RecognizingAppState extends ConsumerState<RecognizingApp>
     with WidgetsBindingObserver {
   late final HotkeyService _hotkeyService;
   late final TrayService _trayService;
+  PttService? _pttService;
   bool _isDisposing = false;
 
   @override
@@ -131,6 +133,11 @@ class _RecognizingAppState extends ConsumerState<RecognizingApp>
 
     // Setup hotkey service
     _setupHotkeyService();
+
+    // Setup PTT service (macOS only)
+    if (Platform.isMacOS) {
+      _setupPttService();
+    }
   }
 
   void _setupTrayActions() {
@@ -180,10 +187,39 @@ class _RecognizingAppState extends ConsumerState<RecognizingApp>
     });
   }
 
+  void _setupPttService() {
+    _pttService = ref.read(pttServiceProvider);
+    if (_pttService == null) return;
+
+    _pttService!.onPttStart = _startRecording;
+    _pttService!.onPttEnd = _stopRecording;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final settings = ref.read(settingsProvider);
+      if (settings.pttEnabled) {
+        _pttService!.startMonitoring(settings.pttKey);
+      }
+    });
+  }
+
+  void _startRecording() {
+    final currentState = ref.read(recordingStateProvider);
+    if (currentState != RecordingState.idle) return;
+    final useCase = ref.read(voiceRecordingUseCaseProvider);
+    useCase.startRecording();
+  }
+
+  void _stopRecording() {
+    final currentState = ref.read(recordingStateProvider);
+    if (currentState != RecordingState.recording) return;
+    final useCase = ref.read(voiceRecordingUseCaseProvider);
+    useCase.stopRecording();
+  }
+
   void _toggleRecording() {
     final currentState = ref.read(recordingStateProvider);
     if (currentState == RecordingState.processing) return;
-    ref.read(trayRecordingTriggerProvider.notifier).state++;
+    ref.read(trayRecordingTriggerProvider.notifier).increment();
   }
 
   Future<void> _showApp() async {
@@ -200,8 +236,7 @@ class _RecognizingAppState extends ConsumerState<RecognizingApp>
 
   void _openSettings() {
     _showApp();
-    ref.read(currentPageProvider.notifier).state =
-        4; // Settings (now page 4 with 5 pages)
+    ref.read(currentPageProvider.notifier).set(4); // Settings (now page 4 with 5 pages)
   }
 
   void _copyLastTranscription() {
@@ -227,6 +262,7 @@ class _RecognizingAppState extends ConsumerState<RecognizingApp>
       WidgetsBinding.instance.removeObserver(this);
       // Note: async dispose is handled in didChangeAppLifecycleState
       _hotkeyService.dispose();
+      _pttService?.dispose();
       super.dispose();
     }
   }
@@ -253,6 +289,7 @@ class _RecognizingAppState extends ConsumerState<RecognizingApp>
       }
       await _trayService.dispose();
       await _hotkeyService.dispose();
+      _pttService?.dispose();
       if (kDebugMode) {
         debugPrint('[MainApp] Services cleaned up');
       }
@@ -286,6 +323,29 @@ class _RecognizingAppState extends ConsumerState<RecognizingApp>
         _hotkeyService.initialize(next);
       }
     });
+
+    // Listen for PTT settings changes
+    if (Platform.isMacOS && _pttService != null) {
+      ref.listen(settingsProvider.select((s) => s.pttEnabled), (prev, next) {
+        if (prev != next) {
+          if (next) {
+            final settings = ref.read(settingsProvider);
+            _pttService!.startMonitoring(settings.pttKey);
+          } else {
+            _pttService!.stopMonitoring();
+          }
+        }
+      });
+
+      ref.listen(settingsProvider.select((s) => s.pttKey), (prev, next) {
+        if (prev != next) {
+          final settings = ref.read(settingsProvider);
+          if (settings.pttEnabled) {
+            _pttService!.updateKey(next);
+          }
+        }
+      });
+    }
 
     // Debug print for theme changes
     ref.listen(settingsProvider.select((s) => s.darkMode), (prev, next) {

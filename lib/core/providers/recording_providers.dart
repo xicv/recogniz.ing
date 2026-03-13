@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../use_cases/voice_recording_use_case.dart';
 import '../interfaces/audio_service_interface.dart';
 import '../services/audio_service.dart';
+import '../services/auto_inject_service.dart';
 import '../services/gemini_service.dart';
+import '../services/ptt_service.dart';
 import '../services/storage_service.dart';
 import '../services/notification_service.dart';
 import 'app_providers.dart';
@@ -137,20 +141,38 @@ final appSettingsProvider = Provider<AppSettings>((ref) {
   return ref.watch(settingsProvider);
 });
 
+// Auto-inject service provider (macOS only)
+final autoInjectServiceProvider = Provider<AutoInjectService?>((ref) {
+  if (!Platform.isMacOS) return null;
+  return AutoInjectService();
+});
+
+// PTT service provider (macOS only)
+final pttServiceProvider = Provider<PttService?>((ref) {
+  if (!Platform.isMacOS) return null;
+  final service = PttService();
+  ref.onDispose(() {
+    service.dispose();
+  });
+  return service;
+});
+
 // Recording use case provider
 final voiceRecordingUseCaseProvider = Provider<VoiceRecordingUseCase>((ref) {
   final audioService = ref.watch(audioServiceProvider);
   final transcriptionService = ref.watch(transcriptionServiceProvider);
   final storageService = ref.watch(storageServiceProvider);
   final notificationService = ref.watch(notificationServiceProvider);
+  final autoInjectService = ref.watch(autoInjectServiceProvider);
 
   return VoiceRecordingUseCase(
     audioService: audioService,
     transcriptionService: transcriptionService,
     storageService: storageService,
     notificationService: notificationService,
+    autoInjectService: autoInjectService,
     onStateChanged: (RecordingState state) {
-      ref.read(recordingStateProvider.notifier).state = state;
+      ref.read(recordingStateProvider.notifier).set(state);
     },
     onTranscriptionComplete: (transcription) {
       ref.read(transcriptionsProvider.notifier).addTranscription(transcription);

@@ -49,6 +49,54 @@ class MainFlutterWindow: NSWindow {
       }
     }
 
+    // Set up PTT EventChannel for streaming key events
+    let pttService = PttEventTapService()
+    let pttChannel = FlutterEventChannel(
+      name: "com.recognizing.app/ptt",
+      binaryMessenger: flutterViewController.engine.binaryMessenger
+    )
+    pttChannel.setStreamHandler(pttService)
+
+    // PTT configuration MethodChannel
+    let pttMethodChannel = FlutterMethodChannel(
+      name: "com.recognizing.app/ptt_config",
+      binaryMessenger: flutterViewController.engine.binaryMessenger
+    )
+    pttMethodChannel.setMethodCallHandler { (call, result) in
+      switch call.method {
+      case "setKey":
+        let key = call.arguments as? String ?? "rightCommand"
+        pttService.setMonitoredKey(key)
+        result(nil)
+      case "startMonitoring":
+        pttService.startMonitoring()
+        result(nil)
+      case "stopMonitoring":
+        pttService.stopMonitoring()
+        result(nil)
+      default:
+        result(FlutterMethodNotImplemented)
+      }
+    }
+
+    // Auto-inject MethodChannel
+    let autoInjectChannel = FlutterMethodChannel(
+      name: "com.recognizing.app/autoinject",
+      binaryMessenger: flutterViewController.engine.binaryMessenger
+    )
+    autoInjectChannel.setMethodCallHandler { (call, result) in
+      switch call.method {
+      case "isTextInputFocused":
+        result(AutoInjectService.isFocusedElementTextInput())
+      case "injectText":
+        let text = call.arguments as? String ?? ""
+        AutoInjectService.injectText(text)
+        result(nil)
+      default:
+        result(FlutterMethodNotImplemented)
+      }
+    }
+
     RegisterGeneratedPlugins(registry: flutterViewController)
 
     super.awakeFromNib()

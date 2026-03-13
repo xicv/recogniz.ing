@@ -1,109 +1,120 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../models/api_key_info.dart';
 import '../models/api_key_usage_stats.dart';
-import '../services/storage_service.dart';
+import '../models/transcription.dart';
+import '../models/transcription_status.dart';
 import 'api_keys_provider.dart';
+import 'transcription_providers.dart';
 
-/// Provider for managing API key usage statistics
+/// Provider for managing API key usage statistics.
+///
+/// Reactively recomputes stats whenever API keys or transcriptions change.
+/// Stats are derived from the transcription list (source of truth), ensuring
+/// the quota display always reflects reality.
 class ApiKeyUsageNotifier extends Notifier<Map<String, ApiKeyUsageStats>> {
   @override
   Map<String, ApiKeyUsageStats> build() {
-    // Load stats asynchronously
-    _loadStats();
-    return {};
+    // Watch both providers: rebuild stats whenever keys or transcriptions change
+    final apiKeys = ref.watch(apiKeysProvider);
+    final transcriptions = ref.watch(transcriptionsProvider);
+
+    return _computeStats(apiKeys, transcriptions);
   }
 
-  /// Load stats from storage, filtering transcriptions by their apiKeyId
-  Future<void> _loadStats() async {
-    try {
-      await Future.delayed(const Duration(milliseconds: 100));
-      final transcriptions = StorageService.transcriptions;
-      final apiKeys = ref.read(apiKeysProvider);
+  /// Synchronously compute per-key stats from the transcription list.
+  Map<String, ApiKeyUsageStats> _computeStats(
+    List<ApiKeyInfo> apiKeys,
+    List<Transcription> transcriptions,
+  ) {
+    final statsMap = <String, ApiKeyUsageStats>{};
 
-      final statsMap = <String, ApiKeyUsageStats>{};
+    if (apiKeys.isEmpty) return statsMap;
 
-      // Build per-key stats by filtering transcriptions on apiKeyId
-      for (final key in apiKeys) {
-        final keyTranscriptions = transcriptions.values
-            .where((t) => t.apiKeyId == key.id)
-            .toList()
-          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    // Filter to completed transcriptions only (pending/failed don't count as usage)
+    final completed = transcriptions
+        .where((t) => t.status == TranscriptionStatus.completed)
+        .toList();
 
-        if (keyTranscriptions.isEmpty) {
-          statsMap[key.id] = ApiKeyUsageStats.empty(key.id);
-          continue;
-        }
+    for (final key in apiKeys) {
+      final keyTranscriptions =
+          completed.where((t) => t.apiKeyId == key.id).toList()
+            ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
-        int totalTranscriptions = 0;
-        int totalTokens = 0;
-        double totalDuration = 0;
-        int totalWords = 0;
-        double totalCost = 0;
-        final dailyUsageMap = <DateTime, DailyUsage>{};
+      if (keyTranscriptions.isEmpty) {
+        statsMap[key.id] = ApiKeyUsageStats.empty(key.id);
+        continue;
+      }
 
-        for (final t in keyTranscriptions) {
-          totalTranscriptions++;
-          totalTokens += t.tokenUsage;
-          totalDuration += t.audioDurationSeconds / 60;
-          totalWords += _countWords(t.processedText);
+      int totalTranscriptions = 0;
+      int totalTokens = 0;
+      double totalDuration = 0;
+      int totalWords = 0;
+      double totalCost = 0;
+      final dailyUsageMap = <DateTime, DailyUsage>{};
 
-          // Estimate cost (50% input, 50% output)
-          final inputTokens = t.tokenUsage * 0.5;
-          final outputTokens = t.tokenUsage * 0.5;
-          totalCost += (inputTokens / 1000000) * 0.075 +
-                      (outputTokens / 1000000) * 0.40;
+      for (final t in keyTranscriptions) {
+        totalTranscriptions++;
+        totalTokens += t.tokenUsage;
+        totalDuration += t.audioDurationSeconds / 60;
+        totalWords += _countWords(t.processedText);
 
-          // Add to daily usage using actual transcription date
-          final dateKey = DateTime(
-            t.createdAt.year,
-            t.createdAt.month,
-            t.createdAt.day,
-          );
-          final existing = dailyUsageMap[dateKey];
-          dailyUsageMap[dateKey] = DailyUsage(
-            transcriptionCount: (existing?.transcriptionCount ?? 0) + 1,
-            tokens: (existing?.tokens ?? 0) + t.tokenUsage,
-            durationMinutes: (existing?.durationMinutes ?? 0) +
-                (t.audioDurationSeconds / 60),
-            words: (existing?.words ?? 0) + _countWords(t.processedText),
-            date: dateKey,
-          );
-        }
+        // Estimate cost (50% input, 50% output)
+        final inputTokens = t.tokenUsage * 0.5;
+        final outputTokens = t.tokenUsage * 0.5;
+        totalCost += (inputTokens / 1000000) * 0.075 +
+            (outputTokens / 1000000) * 0.40;
 
-        statsMap[key.id] = ApiKeyUsageStats(
-          apiKeyId: key.id,
-          totalTranscriptions: totalTranscriptions,
-          totalTokens: totalTokens,
-          totalDurationMinutes: totalDuration,
-          totalWords: totalWords,
-          firstUsedAt: keyTranscriptions.last.createdAt,
-          lastUsedAt: keyTranscriptions.first.createdAt,
-          dailyUsage: dailyUsageMap.values.toList(),
-          totalEstimatedCost: totalCost,
+        // Add to daily usage using actual transcription date
+        final dateKey = DateTime(
+          t.createdAt.year,
+          t.createdAt.month,
+          t.createdAt.day,
+        );
+        final existing = dailyUsageMap[dateKey];
+        dailyUsageMap[dateKey] = DailyUsage(
+          transcriptionCount: (existing?.transcriptionCount ?? 0) + 1,
+          tokens: (existing?.tokens ?? 0) + t.tokenUsage,
+          durationMinutes:
+              (existing?.durationMinutes ?? 0) + (t.audioDurationSeconds / 60),
+          words: (existing?.words ?? 0) + _countWords(t.processedText),
+          date: dateKey,
         );
       }
 
-      state = statsMap;
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[ApiKeyUsageNotifier] Failed to load stats: $e');
-      }
+      statsMap[key.id] = ApiKeyUsageStats(
+        apiKeyId: key.id,
+        totalTranscriptions: totalTranscriptions,
+        totalTokens: totalTokens,
+        totalDurationMinutes: totalDuration,
+        totalWords: totalWords,
+        firstUsedAt: keyTranscriptions.last.createdAt,
+        lastUsedAt: keyTranscriptions.first.createdAt,
+        dailyUsage: dailyUsageMap.values.toList(),
+        totalEstimatedCost: totalCost,
+      );
     }
+
+    return statsMap;
   }
 
   int _countWords(String text) {
     return text.trim().isEmpty ? 0 : text.trim().split(RegExp(r'\s+')).length;
   }
 
-  /// Record usage from a new transcription
-  Future<void> recordUsage({
+  /// Record usage from a new transcription (optimistic update).
+  ///
+  /// This provides immediate UI feedback before the reactive rebuild
+  /// from [transcriptionsProvider] fires. The next [build()] call will
+  /// reconcile with the full transcription list.
+  void recordUsage({
     required String apiKeyId,
     required int tokens,
     required double durationMinutes,
     required int words,
     required double estimatedCost,
-  }) async {
+  }) {
     final currentStats = state[apiKeyId];
 
     if (currentStats != null) {
@@ -114,14 +125,8 @@ class ApiKeyUsageNotifier extends Notifier<Map<String, ApiKeyUsageStats>> {
         estimatedCost: estimatedCost,
       );
 
-      final updatedMap = Map<String, ApiKeyUsageStats>.from(state);
-      updatedMap[apiKeyId] = updated;
-      state = updatedMap;
-
-      // Save to storage
-      await _saveStats(apiKeyId, updated);
+      state = {...state, apiKeyId: updated};
     } else {
-      // Create new stats entry
       final newStats = ApiKeyUsageStats.empty(apiKeyId).addUsage(
         tokens: tokens,
         durationMinutes: durationMinutes,
@@ -129,23 +134,10 @@ class ApiKeyUsageNotifier extends Notifier<Map<String, ApiKeyUsageStats>> {
         estimatedCost: estimatedCost,
       );
 
-      final updatedMap = Map<String, ApiKeyUsageStats>.from(state);
-      updatedMap[apiKeyId] = newStats;
-      state = updatedMap;
-
-      await _saveStats(apiKeyId, newStats);
+      state = {...state, apiKeyId: newStats};
     }
-  }
 
-  Future<void> _saveStats(String apiKeyId, ApiKeyUsageStats stats) async {
-    // In a full implementation, this would save to a dedicated box
-    // For now, we'll trigger a reload when needed
-    debugPrint('[ApiKeyUsageNotifier] Stats saved for key: $apiKeyId');
-  }
-
-  /// Reload stats from transcriptions
-  Future<void> reload() async {
-    await _loadStats();
+    debugPrint('[ApiKeyUsageNotifier] Optimistic update for key: $apiKeyId');
   }
 
   /// Get stats for a specific API key
@@ -201,7 +193,6 @@ final allQuotaInfoProvider = Provider<List<QuotaInfo>>((ref) {
         stats: stats,
       ));
     } else {
-      // No stats yet for this key
       result.add(QuotaInfo.fromStats(
         apiKeyId: key.id,
         apiKeyName: key.name,

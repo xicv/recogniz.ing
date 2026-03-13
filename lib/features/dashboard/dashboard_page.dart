@@ -28,7 +28,7 @@ class DashboardPage extends ConsumerWidget {
         body: DashboardEmptyState(
           hasApiKey: false,
           onOpenSettings: () =>
-              ref.read(currentPageProvider.notifier).state = 4,
+              ref.read(currentPageProvider.notifier).set(4),
         ),
       );
     }
@@ -114,7 +114,7 @@ class DashboardPage extends ConsumerWidget {
                     _RecentTranscriptionsSection(
                       transcriptions: recent,
                       onViewAll: () =>
-                          ref.read(currentPageProvider.notifier).state = 0,
+                          ref.read(currentPageProvider.notifier).set(0),
                     ).animate().fadeIn(duration: 300.ms, delay: 200.ms),
                   ],
 

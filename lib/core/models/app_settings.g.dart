@@ -47,13 +47,16 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       selectedModel: fields[17] == null
           ? 'gemini-3-flash-preview'
           : fields[17] as String,
+      pttEnabled: fields[8] == null ? false : fields[8] as bool,
+      pttKey: fields[9] == null ? 'rightCommand' : fields[9] as String,
+      autoInjectEnabled: fields[18] == null ? false : fields[18] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, AppSettings obj) {
     writer
-      ..writeByte(14)
+      ..writeByte(17)
       ..writeByte(0)
       ..write(obj.geminiApiKey)
       ..writeByte(1)
@@ -70,6 +73,10 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       ..write(obj.showNotifications)
       ..writeByte(7)
       ..write(obj.criticalInstructions)
+      ..writeByte(8)
+      ..write(obj.pttEnabled)
+      ..writeByte(9)
+      ..write(obj.pttKey)
       ..writeByte(10)
       ..write(obj.startAtLogin)
       ..writeByte(11)
@@ -81,7 +88,9 @@ class AppSettingsAdapter extends TypeAdapter<AppSettings> {
       ..writeByte(15)
       ..write(obj.selectedApiKeyId)
       ..writeByte(17)
-      ..write(obj.selectedModel);
+      ..write(obj.selectedModel)
+      ..writeByte(18)
+      ..write(obj.autoInjectEnabled);
   }
 
   @override

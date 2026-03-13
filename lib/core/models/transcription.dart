@@ -51,6 +51,9 @@ class Transcription extends HiveObject {
   @HiveField(14)
   final String? apiKeyId;
 
+  @HiveField(15, defaultValue: false)
+  final bool isTruncated;
+
   Transcription({
     required this.id,
     required this.rawText,
@@ -67,6 +70,7 @@ class Transcription extends HiveObject {
     this.completedAt,
     this.detectedLanguage,
     this.apiKeyId,
+    this.isTruncated = false,
   })  : isFavorite = isFavorite ?? false,
         statusIndex = status.index;
 
@@ -99,6 +103,7 @@ class Transcription extends HiveObject {
     DateTime? completedAt,
     String? detectedLanguage,
     String? apiKeyId,
+    bool? isTruncated,
   }) {
     return Transcription(
       id: id ?? this.id,
@@ -116,6 +121,7 @@ class Transcription extends HiveObject {
       completedAt: completedAt ?? this.completedAt,
       detectedLanguage: detectedLanguage ?? this.detectedLanguage,
       apiKeyId: apiKeyId ?? this.apiKeyId,
+      isTruncated: isTruncated ?? this.isTruncated,
     );
   }
 
@@ -156,6 +162,7 @@ class Transcription extends HiveObject {
     required int tokenUsage,
     bool clearAudioBackup = true,
     String? detectedLanguage,
+    bool isTruncated = false,
   }) {
     return copyWith(
       rawText: rawText,
@@ -165,6 +172,7 @@ class Transcription extends HiveObject {
       completedAt: DateTime.now(),
       audioBackupPath: clearAudioBackup ? null : audioBackupPath,
       detectedLanguage: detectedLanguage,
+      isTruncated: isTruncated,
     );
   }
 

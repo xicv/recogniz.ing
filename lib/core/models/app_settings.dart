@@ -72,6 +72,15 @@ class AppSettings extends HiveObject {
   @HiveField(17, defaultValue: 'gemini-3-flash-preview')
   final String selectedModel;
 
+  @HiveField(8, defaultValue: false)
+  final bool pttEnabled;
+
+  @HiveField(9, defaultValue: 'rightCommand')
+  final String pttKey;
+
+  @HiveField(18, defaultValue: false)
+  final bool autoInjectEnabled;
+
   AppSettings({
     this.geminiApiKey,
     this.selectedPromptId = 'default-clean',
@@ -91,6 +100,9 @@ class AppSettings extends HiveObject {
     this.apiKeys = const [],
     this.selectedApiKeyId,
     this.selectedModel = 'gemini-3-flash-preview',
+    this.pttEnabled = false,
+    this.pttKey = 'rightCommand',
+    this.autoInjectEnabled = false,
   });
 
   AppSettings copyWith({
@@ -108,6 +120,9 @@ class AppSettings extends HiveObject {
     List<ApiKeyInfo>? apiKeys,
     String? selectedApiKeyId,
     String? selectedModel,
+    bool? pttEnabled,
+    String? pttKey,
+    bool? autoInjectEnabled,
   }) {
     return AppSettings(
       geminiApiKey: geminiApiKey ?? this.geminiApiKey,
@@ -126,6 +141,9 @@ class AppSettings extends HiveObject {
       apiKeys: apiKeys ?? this.apiKeys,
       selectedApiKeyId: selectedApiKeyId ?? this.selectedApiKeyId,
       selectedModel: selectedModel ?? this.selectedModel,
+      pttEnabled: pttEnabled ?? this.pttEnabled,
+      pttKey: pttKey ?? this.pttKey,
+      autoInjectEnabled: autoInjectEnabled ?? this.autoInjectEnabled,
     );
   }
 

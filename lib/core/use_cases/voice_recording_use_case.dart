@@ -5,6 +5,7 @@ import '../models/transcription.dart';
 import '../models/transcription_status.dart';
 import '../providers/ui_providers.dart';
 import '../services/audio_storage_service.dart';
+import '../services/auto_inject_service.dart';
 import '../interfaces/audio_service_interface.dart';
 
 class VoiceRecordingUseCase {
@@ -12,6 +13,7 @@ class VoiceRecordingUseCase {
   final TranscriptionServiceInterface _transcriptionService;
   final StorageServiceInterface _storageService;
   final NotificationServiceInterface _notificationService;
+  final AutoInjectService? _autoInjectService;
 
   final Function(RecordingState) _onStateChanged;
   final Function(Transcription) _onTranscriptionComplete;
@@ -23,10 +25,12 @@ class VoiceRecordingUseCase {
     required NotificationServiceInterface notificationService,
     required Function(RecordingState) onStateChanged,
     required Function(Transcription) onTranscriptionComplete,
+    AutoInjectService? autoInjectService,
   })  : _audioService = audioService,
         _transcriptionService = transcriptionService,
         _storageService = storageService,
         _notificationService = notificationService,
+        _autoInjectService = autoInjectService,
         _onStateChanged = onStateChanged,
         _onTranscriptionComplete = onTranscriptionComplete;
 
@@ -231,7 +235,14 @@ class VoiceRecordingUseCase {
         throw Exception('No transcription received. Please try again.');
       }
 
+      // Check if output was truncated (hit maxOutputTokens limit)
+      if (result.isTruncated) {
+        debugPrint(
+            '[Transcription] WARNING: Transcription was truncated due to maxOutputTokens limit');
+      }
+
       // Update to completed status
+      // If truncated, keep audio backup for potential retry
       final completedTranscription = Transcription(
         id: transcriptionId,
         rawText: result.rawText,
@@ -242,21 +253,41 @@ class VoiceRecordingUseCase {
         audioDurationSeconds: audioDurationSeconds,
         status: TranscriptionStatus.completed,
         completedAt: DateTime.now(),
-        // Clear audio backup path on success
-        audioBackupPath: null,
+        audioBackupPath: result.isTruncated ? audioPath : null,
         apiKeyId: settings.effectiveApiKeyId,
+        isTruncated: result.isTruncated,
       );
 
       await _storageService.saveTranscription(completedTranscription);
       _onTranscriptionComplete(completedTranscription);
       debugPrint('[Transcription] Completed successfully');
 
-      // Delete audio backup file
-      await AudioStorageService.deleteAudio(audioPath);
+      // Only delete audio backup if not truncated
+      if (!result.isTruncated) {
+        await AudioStorageService.deleteAudio(audioPath);
+      }
 
       _notificationService.clearError();
 
-      if (settings.autoCopyToClipboard) {
+      // Warn user about truncation after clearing previous errors
+      if (result.isTruncated) {
+        _notificationService.showError(
+          'Transcription may be incomplete — the recording was too long for a single transcription. Try shorter recordings.',
+        );
+      }
+
+      // Auto-inject into focused text field, or fall back to clipboard copy
+      bool injected = false;
+      if (settings.autoInjectEnabled && _autoInjectService != null) {
+        final isFocused = await _autoInjectService.isTextInputFocused();
+        if (isFocused) {
+          await _autoInjectService.injectText(result.processedText);
+          injected = true;
+          debugPrint('[Transcription] Text auto-injected into focused field');
+        }
+      }
+
+      if (!injected && settings.autoCopyToClipboard) {
         await _copyToClipboard(result.processedText);
       }
 

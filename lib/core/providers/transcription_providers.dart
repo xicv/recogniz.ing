@@ -22,6 +22,8 @@ enum FilterOption {
 class SearchQueryNotifier extends Notifier<String> {
   @override
   String build() => '';
+
+  void set(String value) => state = value;
 }
 
 /// Search query for filtering transcriptions
@@ -32,6 +34,8 @@ final searchQueryProvider =
 class SortOptionNotifier extends Notifier<SortOption> {
   @override
   SortOption build() => SortOption.newest;
+
+  void set(SortOption value) => state = value;
 }
 
 /// Sort option for transcriptions
@@ -42,6 +46,8 @@ final sortOptionProvider =
 class FilterOptionNotifier extends Notifier<FilterOption> {
   @override
   FilterOption build() => FilterOption.all;
+
+  void set(FilterOption value) => state = value;
 }
 
 /// Filter option for transcriptions

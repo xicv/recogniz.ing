@@ -62,8 +62,8 @@ class _AppShellState extends ConsumerState<AppShell> {
     if (lastError != null && errorState != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _showEnhancedErrorSnackBar(context, ref, errorState);
-        ref.read(lastErrorProvider.notifier).state = null;
-        ref.read(errorStateProvider.notifier).state = null;
+        ref.read(lastErrorProvider.notifier).set(null);
+        ref.read(errorStateProvider.notifier).set(null);
       });
     } else if (lastError != null) {
       // Fallback for simple errors
@@ -72,7 +72,7 @@ class _AppShellState extends ConsumerState<AppShell> {
           context: _mainContentContext ?? context,
           message: lastError,
         );
-        ref.read(lastErrorProvider.notifier).state = null;
+        ref.read(lastErrorProvider.notifier).set(null);
       });
     }
 
@@ -81,51 +81,51 @@ class _AppShellState extends ConsumerState<AppShell> {
       // Ctrl/Cmd + 1-5 for navigation
       if (kIsWeb)
         LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit1):
-            () => ref.read(currentPageProvider.notifier).state = 0,
+            () => ref.read(currentPageProvider.notifier).set(0),
       if (kIsWeb)
         LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit2):
-            () => ref.read(currentPageProvider.notifier).state = 1,
+            () => ref.read(currentPageProvider.notifier).set(1),
       if (kIsWeb)
         LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit3):
-            () => ref.read(currentPageProvider.notifier).state = 2,
+            () => ref.read(currentPageProvider.notifier).set(2),
       if (kIsWeb)
         LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit4):
-            () => ref.read(currentPageProvider.notifier).state = 3,
+            () => ref.read(currentPageProvider.notifier).set(3),
       if (kIsWeb)
         LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit5):
-            () => ref.read(currentPageProvider.notifier).state = 4,
+            () => ref.read(currentPageProvider.notifier).set(4),
       // Meta(Cmd) + 1-5 for macOS
       if (!kIsWeb && Platform.isMacOS)
         LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.digit1): () =>
-            ref.read(currentPageProvider.notifier).state = 0,
+            ref.read(currentPageProvider.notifier).set(0),
       if (!kIsWeb && Platform.isMacOS)
         LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.digit2): () =>
-            ref.read(currentPageProvider.notifier).state = 1,
+            ref.read(currentPageProvider.notifier).set(1),
       if (!kIsWeb && Platform.isMacOS)
         LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.digit3): () =>
-            ref.read(currentPageProvider.notifier).state = 2,
+            ref.read(currentPageProvider.notifier).set(2),
       if (!kIsWeb && Platform.isMacOS)
         LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.digit4): () =>
-            ref.read(currentPageProvider.notifier).state = 3,
+            ref.read(currentPageProvider.notifier).set(3),
       if (!kIsWeb && Platform.isMacOS)
         LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.digit5): () =>
-            ref.read(currentPageProvider.notifier).state = 4,
+            ref.read(currentPageProvider.notifier).set(4),
       // Ctrl + 1-5 for Windows/Linux
       if (!kIsWeb && (Platform.isWindows || Platform.isLinux))
         LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit1):
-            () => ref.read(currentPageProvider.notifier).state = 0,
+            () => ref.read(currentPageProvider.notifier).set(0),
       if (!kIsWeb && (Platform.isWindows || Platform.isLinux))
         LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit2):
-            () => ref.read(currentPageProvider.notifier).state = 1,
+            () => ref.read(currentPageProvider.notifier).set(1),
       if (!kIsWeb && (Platform.isWindows || Platform.isLinux))
         LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit3):
-            () => ref.read(currentPageProvider.notifier).state = 2,
+            () => ref.read(currentPageProvider.notifier).set(2),
       if (!kIsWeb && (Platform.isWindows || Platform.isLinux))
         LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit4):
-            () => ref.read(currentPageProvider.notifier).state = 3,
+            () => ref.read(currentPageProvider.notifier).set(3),
       if (!kIsWeb && (Platform.isWindows || Platform.isLinux))
         LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit5):
-            () => ref.read(currentPageProvider.notifier).state = 4,
+            () => ref.read(currentPageProvider.notifier).set(4),
     };
 
     return CallbackShortcuts(
@@ -256,7 +256,7 @@ class _AppShellState extends ConsumerState<AppShell> {
               icon: LucideIcons.settings,
               onPressed: () {
                 Navigator.of(context).pop();
-                ref.read(currentPageProvider.notifier).state = 4; // Settings
+                ref.read(currentPageProvider.notifier).set(4); // Settings
               },
             ),
         ],
@@ -406,7 +406,7 @@ class _AppShellState extends ConsumerState<AppShell> {
       onPressed: () {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         if (isSettingsAction) {
-          ref.read(currentPageProvider.notifier).state = 4; // Settings
+          ref.read(currentPageProvider.notifier).set(4); // Settings
         }
       },
     );

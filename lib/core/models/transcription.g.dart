@@ -31,13 +31,14 @@ class TranscriptionAdapter extends TypeAdapter<Transcription> {
       completedAt: fields[12] as DateTime?,
       detectedLanguage: fields[13] as String?,
       apiKeyId: fields[14] as String?,
+      isTruncated: fields[15] == null ? false : fields[15] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, Transcription obj) {
     writer
-      ..writeByte(14)
+      ..writeByte(15)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -65,7 +66,9 @@ class TranscriptionAdapter extends TypeAdapter<Transcription> {
       ..writeByte(13)
       ..write(obj.detectedLanguage)
       ..writeByte(14)
-      ..write(obj.apiKeyId);
+      ..write(obj.apiKeyId)
+      ..writeByte(15)
+      ..write(obj.isTruncated);
   }
 
   @override

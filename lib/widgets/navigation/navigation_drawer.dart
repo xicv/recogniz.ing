@@ -249,8 +249,8 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
                             BorderRadius.circular(AppTheme.radiusMedium),
                         child: InkWell(
                           onTap: () {
-                            ref.read(currentPageProvider.notifier).state =
-                                item.index;
+                            ref.read(currentPageProvider.notifier).set(
+                                item.index);
                           },
                           borderRadius:
                               BorderRadius.circular(AppTheme.radiusMedium),
@@ -317,8 +317,8 @@ class _AppNavigationDrawerState extends ConsumerState<AppNavigationDrawer>
                     borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
                     child: InkWell(
                       onTap: () {
-                        ref.read(currentPageProvider.notifier).state =
-                            item.index;
+                        ref.read(currentPageProvider.notifier).set(
+                            item.index);
                       },
                       borderRadius:
                           BorderRadius.circular(AppTheme.radiusMedium),

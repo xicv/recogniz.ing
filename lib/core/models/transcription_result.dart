@@ -4,11 +4,13 @@ class TranscriptionResult {
   final String processedText;
   final int tokenUsage;
   final String? detectedLanguage;
+  final bool isTruncated;
 
   TranscriptionResult({
     required this.rawText,
     required this.processedText,
     required this.tokenUsage,
     this.detectedLanguage,
+    this.isTruncated = false,
   });
 }

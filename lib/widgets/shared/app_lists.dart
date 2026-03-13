@@ -202,7 +202,7 @@ class AppLists {
               ],
             ),
           ),
-          if (action != null) action,
+          ?action,
         ],
       ),
     );

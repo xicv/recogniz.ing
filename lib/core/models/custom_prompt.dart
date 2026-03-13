@@ -54,9 +54,9 @@ class CustomPrompt extends HiveObject {
         CustomPrompt(
           id: 'default-clean',
           name: 'Clean Transcription',
-          description: 'Clean up speech, fix grammar, remove filler words',
+          description: 'Accurate transcription with natural readability',
           promptTemplate:
-              'Fix grammar, remove fillers (um/uh/like), preserve meaning:\n\n{{text}}',
+              'Clean transcription with natural readability',
           isDefault: true,
           createdAt: DateTime.now(),
         ),

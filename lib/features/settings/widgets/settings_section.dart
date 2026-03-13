@@ -41,7 +41,7 @@ class SettingsSection extends StatelessWidget {
                     ),
               ),
               const Spacer(),
-              if (action != null) action!,
+              ?action,
             ],
           ),
         ),

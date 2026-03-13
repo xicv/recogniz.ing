@@ -103,6 +103,8 @@ Getting started takes about 2 minutes:
 | **Silero VAD** | ML-based voice activity detection (~95% accuracy) |
 | **Graceful Fallback** | Amplitude-based VAD (~75%) when ML unavailable |
 | **Global Hotkey** | `Ctrl+Shift+R` anywhere on your system (configurable in Settings) |
+| **Push-to-Talk** | Hold a modifier key (Right Cmd, Right Option, or Fn) to record, release to transcribe (macOS) |
+| **Auto-Inject** | Automatically pastes transcription into the focused text field (macOS) |
 | **Smart Audio Format** | Auto-selects format based on recording duration |
 | **Background Processing** | Smooth UI even during intensive audio analysis |
 
@@ -149,7 +151,7 @@ Powered by **Google Gemini 3 Flash**—Google's fastest AI model:
 ###  Modern UI/UX
 
 - Premium icon with deep blue-teal-emerald gradient and warm coral recording dot
-- Custom geometric R menu bar icon with recording state indicator
+- Microphone menu bar icon with template image support (auto light/dark mode) and recording state indicator
 - Material Design 3 with dynamic theming
 - Collapsible left drawer navigation
 - Light/Dark theme with system detection
@@ -164,7 +166,7 @@ Powered by **Google Gemini 3 Flash**—Google's fastest AI model:
 
 ```mermaid
 flowchart LR
-    A[Press Record<br/>Ctrl+Shift+R] --> B[Silero VAD<br/>Voice Activity Detection]
+    A[Press Record<br/>Ctrl+Shift+R / PTT Key] --> B[Silero VAD<br/>Voice Activity Detection]
     B --> C[Audio Validation<br/>RMS Analysis in Isolate]
     C --> D{Quality OK?}
     D -->|No| E[Discard<br/>Show Feedback]
@@ -172,7 +174,7 @@ flowchart LR
     F --> G[Send to Gemini 3 Flash<br/>with Language Detection]
     G --> H[Receive Transcription]
     H --> I[Save to Local Storage<br/>Hive Database]
-    I --> J[Copy to Clipboard<br/>Show in Dashboard]
+    I --> J[Auto-Inject or<br/>Copy to Clipboard]
 
     style A fill:#10B981,stroke:#059669,color:#fff
     style B fill:#3B82F6,stroke:#2563EB,color:#fff
@@ -288,6 +290,7 @@ lib/
 | Shortcut | Action |
 |----------|--------|
 | `Ctrl+Shift+R` | Start/Stop recording (configurable in Settings) |
+| Hold `Right Cmd` | Push-to-talk: hold to record, release to transcribe (macOS, configurable) |
 | `Cmd/Ctrl+S` | Save edited transcription |
 | `Cmd/Ctrl+1` | Go to Transcriptions |
 | `Cmd/Ctrl+2` | Go to Dashboard |
@@ -412,6 +415,7 @@ For detailed version history, see [CHANGELOG.md](CHANGELOG.md).
 | **"Microphone permission denied"** | • macOS: System Preferences → Security & Privacy → Privacy → Microphone<br>• iOS: Settings → Recogniz.ing → Microphone<br>• Android: Settings → Apps → Recogniz.ing → Permissions |
 | **"API key invalid"** | • Ensure you copied the full API key from Google AI Studio<br>• Check that your API key has Gemini API access enabled<br>• Verify network connectivity |
 | **"Global hotkey not working"** | • macOS: Click **"Open System Settings"** button in the accessibility banner — permission is auto-detected (no restart required)<br>• Check for conflicting hotkeys in system settings |
+| **"Push-to-talk / auto-inject not working"** | • macOS: Requires Accessibility permission (same as global hotkey)<br>• Enable PTT in Settings → Push-to-Talk section<br>• Auto-inject requires a focused text field in another app |
 | **"Transcription is empty"** | • Ensure audio was captured (check recording duration)<br>• Verify vocabulary doesn't interfere with common words<br>• Check network connection to Gemini API |
 
 ---

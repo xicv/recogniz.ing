@@ -440,12 +440,12 @@ export function getVersion(): string {
 
 // Get version with 'v' prefix for GitHub tags
 export function getVersionWithPrefix(): string {
-  return \`v\${VERSION}\`
+  return `v\${VERSION}`
 }
 
 // Get download URL for a platform
 export function getDownloadUrl(platform: string, ext: string = 'zip'): string {
-  return \`https://github.com/xicv/recogniz.ing/releases/download/\${getVersionWithPrefix()}/recognizing-\${VERSION}-\${platform}.\${ext}\`
+  return `https://github.com/xicv/recogniz.ing/releases/download/\${getVersionWithPrefix()}/recognizing-\${VERSION}-\${platform}.\${ext}`
 }
 ''';
 

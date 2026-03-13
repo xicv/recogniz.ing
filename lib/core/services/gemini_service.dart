@@ -108,20 +108,47 @@ class GeminiService implements TranscriptionServiceInterface {
     );
   }
 
-  /// Build system instruction for multi-language transcription
+  /// Build system instruction for speech transcription
   ///
   /// Consolidates all transcription rules into one place:
+  /// - Conservative correction philosophy (phonetic plausibility)
+  /// - Accent awareness for non-native speakers
   /// - Language detection and code-switching
-  /// - Grammar/filler cleanup (baked in by default)
-  /// - No-speech handling
+  /// - Filler/artifact removal
+  /// - Anti-hallucination guard
   String _buildSystemInstruction() {
-    return 'You are a speech transcription assistant. '
-        'Detect language automatically. Transcribe in the original language only, never translate. '
-        'Preserve code-switching as spoken (e.g., "这个feature很酷"). '
-        'Fix grammar, punctuation, and sentence structure. '
-        'Remove filler words (um, uh, like, you know) and false starts. '
-        'Combine sentence fragments into complete sentences. '
-        'Preserve the speaker\'s intent, tone, and meaning.';
+    return 'You are a multilingual speech transcription assistant receiving raw audio. '
+        'Detect and transcribe in the original language. Never translate. '
+        'Preserve code-switching as spoken (e.g., "这个feature很酷").'
+        '\n\n'
+        'CORRECTION PHILOSOPHY: '
+        'Most audio is transcribed correctly. Fix only what is genuinely wrong. '
+        'Every correction must pass two tests: '
+        '(1) the replacement sounds similar to the original — phonetically plausible as what was spoken, and '
+        '(2) the corrected sentence reads as coherent and meaningful. '
+        'If either test fails, keep the original. '
+        'Under-correcting is always safer than over-correcting.'
+        '\n\n'
+        'ACCENT AWARENESS: '
+        'The speaker may have a non-native accent. '
+        'When a word doesn\'t fit context, consider similar-sounding alternatives the speaker likely intended, '
+        'but only substitute if clearly correct.'
+        '\n\n'
+        'FIX: Misrecognized words that are phonetically close but semantically wrong. '
+        'Broken word boundaries (split compounds, merged words). '
+        'Grammar and punctuation errors from misrecognition, not speaker style.'
+        '\n\n'
+        'REMOVE: Filler sounds (um, uh, like, you know, 嗯, 那个, 就是, えーと, あの). '
+        'Repeated phrases from audio overlap. '
+        'False starts and abandoned thoughts (keep only the final version). '
+        'Background noise transcribed as words.'
+        '\n\n'
+        'PRESERVE: Speaker\'s natural tone, register, and formality level. '
+        'All words carrying substantive meaning. '
+        'Words that already make sense in context.'
+        '\n\n'
+        'IMPORTANT: Only transcribe actual speech heard in the audio. '
+        'Vocabulary and prompt text provided below are reference only — never transcribe them as if spoken.';
   }
 
   /// Generate a cache key for the audio and parameters
@@ -171,12 +198,14 @@ class GeminiService implements TranscriptionServiceInterface {
     required String processedText,
     int? tokenUsage,
     String? detectedLanguage,
+    bool isTruncated = false,
   }) {
     final result = TranscriptionResult(
       rawText: rawText,
       processedText: processedText,
       tokenUsage: tokenUsage ?? 0,
       detectedLanguage: detectedLanguage,
+      isTruncated: isTruncated,
     );
     _storeInCache(cacheKey, result);
     return result;
@@ -484,7 +513,7 @@ class GeminiService implements TranscriptionServiceInterface {
           ),
           generationConfig: const GenerationConfig(
             temperature: 0.1,
-            maxOutputTokens: 2048,
+            maxOutputTokens: 8192,
             topP: 0.8,
             topK: 40,
           ),
@@ -493,11 +522,13 @@ class GeminiService implements TranscriptionServiceInterface {
         // Stream response for faster perceived latency
         final resultBuffer = StringBuffer();
         int? streamTokenUsage;
+        bool isTruncated = false;
 
         await _executeWithRetry(
           () async {
             resultBuffer.clear();
             streamTokenUsage = null;
+            isTruncated = false;
 
             final stream = _client!.models.streamGenerateContent(
               model: _modelName,
@@ -512,6 +543,13 @@ class GeminiService implements TranscriptionServiceInterface {
               // Token usage is typically in the final chunk
               if (chunk.usageMetadata?.totalTokenCount != null) {
                 streamTokenUsage = chunk.usageMetadata!.totalTokenCount;
+              }
+              // Check if output was truncated due to maxOutputTokens limit
+              final finishReason = chunk.firstCandidate?.finishReason;
+              if (finishReason == FinishReason.maxTokens) {
+                isTruncated = true;
+                debugPrint(
+                    '[GeminiService] WARNING: Output truncated (hit maxOutputTokens limit)');
               }
             }
           },
@@ -553,6 +591,7 @@ class GeminiService implements TranscriptionServiceInterface {
           rawText: transcriptionText,
           processedText: transcriptionText,
           tokenUsage: finalTokenUsage,
+          isTruncated: isTruncated,
         );
       } catch (e) {
         // If it's not an empty response error, fail immediately
@@ -588,28 +627,36 @@ class GeminiService implements TranscriptionServiceInterface {
 
   /// Build combined prompt for single-call processing
   ///
-  /// Optimized for minimal token usage:
-  /// - Single output (no dual raw/processed format)
-  /// - No redundant [NO_SPEECH] instructions (covered in system instruction via response check)
-  /// - criticalInstructions merged into system instruction
-  /// - {{text}} placeholder stripped from templates
+  /// Assembles user prompt, vocabulary, and critical instructions into
+  /// a single user-role message alongside the audio.
+  /// The system instruction handles correction philosophy and rules;
+  /// this prompt specifies refinement style and context.
   String _buildCombinedPrompt(
       String promptTemplate, String vocabulary, String? criticalInstructions) {
-    // Strip the {{text}} placeholder that was never substituted
-    final cleanedTemplate =
-        promptTemplate.replaceAll('\n\n{{text}}', '').replaceAll('{{text}}', '').trim();
+    // Strip the {{text}} placeholder (legacy — audio is the input, not text)
+    final cleanedTemplate = promptTemplate
+        .replaceAll('\n\n{{text}}', '')
+        .replaceAll('{{text}}', '')
+        .trim();
 
-    final buffer = StringBuffer(
-        'Transcribe the audio and apply the following refinement.\n\n'
-        'Refinement: $cleanedTemplate');
+    final buffer = StringBuffer('Transcribe the audio.');
+
+    if (cleanedTemplate.isNotEmpty) {
+      buffer.write('\n\nRefinement: $cleanedTemplate');
+    }
 
     if (vocabulary.isNotEmpty) {
       buffer.write(
           '\n\nPrefer these terms/spellings if heard: $vocabulary');
     }
 
+    if (criticalInstructions != null &&
+        criticalInstructions.trim().isNotEmpty) {
+      buffer.write('\n\n$criticalInstructions');
+    }
+
     buffer.write(
-        '\n\nOutput ONLY the refined transcription. '
+        '\n\nOutput ONLY the transcription. '
         'If no speech detected, respond: [NO_SPEECH]');
 
     return buffer.toString();
