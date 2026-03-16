@@ -30,13 +30,19 @@
   },
   "versions": [
     {
-      "version": "1.17.1",
+      "version": "1.17.2",
       "date": "2026-03-16",
       "stable": true,
       "highlights": [
-        "Fix accessibility permission banner stuck on macOS despite permission being granted"
+        "Fix menu bar icon not showing menu on click (macOS 16)",
+        "Fix accessibility permission banner stuck on macOS"
       ],
       "changes": [
+        {
+          "category": "fixed",
+          "title": "Menu Bar Icon Click",
+          "description": "Fixed system tray icon not showing context menu when clicked on macOS 16. The tray_manager plugin's performClick approach fails when the original mouse event is consumed during the Flutter MethodChannel round-trip. Patched locally to use NSMenu.popUp() for reliable menu display."
+        },
         {
           "category": "fixed",
           "title": "Accessibility Permission Detection",

@@ -407,7 +407,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.17.1] - 2026-03-16
+## [1.17.2] - 2026-03-16
 
 ### Changed
 
@@ -415,6 +415,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Menu Bar Icon Click** - Fixed system tray icon not showing context menu when clicked on macOS 16. The tray_manager plugin's performClick approach fails when the original mouse event is consumed during the Flutter MethodChannel round-trip. Patched locally to use NSMenu.popUp() for reliable menu display.
 - **Accessibility Permission Detection** - Fixed the accessibility permission banner persisting on macOS even after granting permission. The issue was caused by AXIsProcessTrusted() returning stale results with ad-hoc signed builds. Switched to AXIsProcessTrustedWithOptions for improved detection and added a dismiss button for cases where macOS fails to report the correct state.
 
 ---

@@ -3,7 +3,7 @@ description: AI-powered voice typing application
 
 publish_to: 'none'
 
-version: 1.17.1
+version: 1.17.2
 
 environment:
   sdk: '>=3.11.0 <4.0.0'
@@ -29,8 +29,9 @@ dependencies:
   # Hotkeys (Desktop)
   hotkey_manager: ^0.2.3
 
-  # System Tray / Menu Bar (Desktop)
-  tray_manager: ^0.5.2
+  # System Tray / Menu Bar (Desktop) — local patch for macOS 16 popUpContextMenu fix
+  tray_manager:
+    path: packages/tray_manager
 
   # Start at Login (Desktop)
   launch_at_startup: ^0.5.1
