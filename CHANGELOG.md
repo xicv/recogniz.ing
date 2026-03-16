@@ -407,3 +407,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.17.1] - 2026-03-16
+
+### Changed
+
+- **Accessibility Permission Prompt UX** - Improved the permission prompt with a dismiss button, a 'Check Again' action, clearer step-by-step instructions including the restart hint, and a note explaining the banner can appear incorrectly on some macOS configurations.
+
+### Fixed
+
+- **Accessibility Permission Detection** - Fixed the accessibility permission banner persisting on macOS even after granting permission. The issue was caused by AXIsProcessTrusted() returning stale results with ad-hoc signed builds. Switched to AXIsProcessTrustedWithOptions for improved detection and added a dismiss button for cases where macOS fails to report the correct state.
+
+---
+

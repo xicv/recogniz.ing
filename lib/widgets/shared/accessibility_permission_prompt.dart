@@ -9,6 +9,9 @@ import '../../core/providers/accessibility_permission_providers.dart';
 /// Global hotkeys require Accessibility permissions on macOS. This widget
 /// provides clear instructions and a button to open System Settings directly.
 /// Automatically disappears when permission is granted (polled every 3s).
+///
+/// Includes a dismiss option for cases where AXIsProcessTrusted() returns
+/// false despite permission being granted (common with ad-hoc signed builds).
 class AccessibilityPermissionPrompt extends ConsumerWidget {
   const AccessibilityPermissionPrompt({super.key});
 
@@ -51,26 +54,69 @@ class AccessibilityPermissionPrompt extends ConsumerWidget {
                       ),
                 ),
               ),
+              // Dismiss button
+              IconButton(
+                onPressed: () {
+                  ref
+                      .read(accessibilityPermissionProvider.notifier)
+                      .dismiss();
+                },
+                icon: Icon(
+                  LucideIcons.x,
+                  size: 16,
+                  color: colorScheme.outline,
+                ),
+                tooltip: 'Dismiss (I already granted permission)',
+                visualDensity: VisualDensity.compact,
+              ),
             ],
           ),
           const SizedBox(height: 12),
           Text(
-            'Global hotkeys require Accessibility permissions. Grant access, then the banner will disappear automatically.',
+            'Global hotkeys and push-to-talk require Accessibility permissions.',
             style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: 12),
-          _buildStep(context, '1', 'Click the button below to open System Settings'),
+          _buildStep(context, '1',
+              'Click the button below to open System Settings'),
           const SizedBox(height: 4),
-          _buildStep(context, '2', 'Find "Recogniz.ing" and enable the toggle'),
+          _buildStep(
+              context, '2', 'Find "recognizing" and enable the toggle'),
+          const SizedBox(height: 4),
+          _buildStep(context, '3',
+              'Quit and relaunch the app (macOS caches permissions)'),
+          const SizedBox(height: 8),
+          Text(
+            'Still seeing this after granting permission? You can dismiss this banner — it can appear incorrectly on some macOS configurations.',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: colorScheme.outline,
+                  fontStyle: FontStyle.italic,
+                ),
+          ),
           const SizedBox(height: 16),
-          FilledButton.icon(
-            onPressed: () {
-              ref
-                  .read(accessibilityPermissionProvider.notifier)
-                  .openSettings();
-            },
-            icon: const Icon(LucideIcons.externalLink, size: 16),
-            label: const Text('Open System Settings'),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              FilledButton.icon(
+                onPressed: () {
+                  ref
+                      .read(accessibilityPermissionProvider.notifier)
+                      .openSettings();
+                },
+                icon: const Icon(LucideIcons.externalLink, size: 16),
+                label: const Text('Open System Settings'),
+              ),
+              OutlinedButton.icon(
+                onPressed: () {
+                  ref
+                      .read(accessibilityPermissionProvider.notifier)
+                      .refresh();
+                },
+                icon: const Icon(LucideIcons.refreshCw, size: 16),
+                label: const Text('Check Again'),
+              ),
+            ],
           ),
         ],
       ),

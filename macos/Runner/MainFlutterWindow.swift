@@ -38,9 +38,15 @@ class MainFlutterWindow: NSWindow {
     accessibilityChannel.setMethodCallHandler { (call, result) in
       switch call.method {
       case "checkPermission":
-        result(AXIsProcessTrusted())
+        // Use AXIsProcessTrustedWithOptions for a fresh check (bypasses some caching)
+        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue(): false] as CFDictionary
+        let trusted = AXIsProcessTrustedWithOptions(options)
+        result(trusted)
       case "openSettings":
-        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+        // Try modern System Settings URL first (macOS 13+), fall back to legacy
+        let modernURL = URL(string: "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_Accessibility")
+        let legacyURL = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")
+        if let url = modernURL ?? legacyURL {
           NSWorkspace.shared.open(url)
         }
         result(nil)
